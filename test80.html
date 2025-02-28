@@ -1,88 +1,307 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>تطبيق المشاهدة المجاني</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snaptube - تنزيل التطبيق</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
+        /* تصميم عام */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            text-align: center;
-        }
-        h2, h3 {
-            color: #333;
-        }
-        .content-section {
-            padding: 20px;
-        }
-        .features p {
-            font-size: 14px;
-            margin: 5px 0;
-        }
-        .img-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin: 10px 0;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        .btn-download {
-            background-color: #ff6600;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn-download:hover {
-            background-color: #e65c00;
+            background: #ffcc00;
+            scroll-behavior: smooth;
         }
 
-        /* تحسين المظهر في الهواتف */
+        .ltr {
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* Navbar */
+        .custom-navbar {
+            background: white;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-logo img {
+            width: 30px;
+            height: 30px;
+            margin-right: 8px;
+        }
+
+        .menu-btn, .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .language-icon {
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* القائمة الجانبية */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: #f8f8f8;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            padding-top: 50px;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+            text-align: right;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            display: block;
+            border-bottom: 1px dashed #555;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(180deg, #ffcc00, #ff9900);
+            color: #000;
+        }
+
+        .hero-section h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .download-btn, .beta-btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin: 10px 5px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .download-btn {
+            background: #ff4500;
+            color: white;
+        }
+
+        .beta-btn {
+            background: white;
+            color: black;
+        }
+
+        .download-btn:hover {
+            background: #d63c00;
+        }
+
+        .beta-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .security-verified {
+            font-size: 14px;
+            color: #003366;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .security-verified i {
+            margin-left: 5px;
+            color: #003366;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px 15px;
+        }
+
+        .features {
+            text-align: right;
+            padding-top: 20px;
+        }
+
+        .features h3 {
+            color: #ff9900;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .features p {
+            font-size: 16px;
+            color: black;
+            margin-bottom: 10px;
+        }
+
+        .features i {
+            margin-right: 8px;
+            color: black;
+        }
+
+        .phone-image {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Media Queries */
         @media (max-width: 768px) {
-            .content-section {
-                padding: 10px;
+            .sidebar {
+                width: 220px;
             }
-            h2 {
-                font-size: 22px;
+
+            .sidebar ul li a {
+                font-size: 16px;
             }
-            h3 {
-                font-size: 18px;
+
+            .hero-section h1 {
+                font-size: 20px;
             }
-            .features p {
-                font-size: 12px;
+
+            .download-btn, .beta-btn {
+                font-size: 14px;
+                padding: 10px 25px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="custom-navbar">
+        <button class="menu-btn"><i class="fas fa-bars"></i></button>
+        <div class="navbar-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Snaptube_logo.png" alt="Snaptube Logo">
+            <span>Snaptube</span>
+        </div>
+        <i class="fas fa-globe language-icon"></i>
+    </nav>
 
-    <div class="container">
-        <div class="content-section">
-            <h2>✨ New upgrade 🎉</h2>
-            <h3>تطبيق قوي لمشاهدة المحتوى المميز مجانًا</h3>
-            
-            <div class="features text-start">
-                <p>➡️ <strong>Netflix:</strong> شاهد جميع أفلام ومسلسلات نتفليكس بجودة 4K مجانًا بدون إعلانات.</p>
-                <p>➡️ <strong>Spotify:</strong> استمتع بتحميل جميع أغاني Spotify مجانًا بدون اشتراك.</p>
-                <p>➡️ <strong>Shahid VIP:</strong> شاهد المسلسلات والأفلام التركية مترجمة بجودة عالية قبل عرضها على التلفزيون.</p>
-                <p>➡️ <strong>Bein Sports:</strong> استمتع بالبث المباشر لأهم البطولات مثل دوري الأبطال وكأس العالم بتعليق عربي.</p>
+    <!-- القائمة الجانبية -->
+    <div class="sidebar">
+        <button class="close-btn"><i class="fas fa-times"></i></button>
+        <ul>
+            <li><a href="#">Download Snaptube</a></li>
+            <li><a href="#">Snaptube APK</a></li>
+            <li><a href="#">Install Snaptube</a></li>
+            <li><a href="#">Snaptube App</a></li>
+        </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1>Download Snaptube APK Free for Android MP3 downloader</h1>
+        <a href="#features" class="download-btn">Download Snaptube</a>
+        <div>
+            <a href="#music-video" class="beta-btn">Beta Version</a>
+            <div class="security-verified">
+                <i class="fas fa-shield-alt"></i> Security Verified
             </div>
+        </div>
+    </section>
 
-            <div class="img-container">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjziAIAelTdugao-ifa8QhylC7ix_qq9706EGhSocbVpCSGLFSiUkBKbvN8e3hS450bVcDTUixCAYLQ3hYxIs5A0upPS_o82056Bn_zDJjTskxsxG32x4rd5gQtVzCAwR1Lq_0FfR_9uoOADsrK2NpNYLq_gSSX5FJwSACDVVSicT4F4vPBB3UQLX4p-vw/s16000/20250219_162729.png" alt="صورة التطبيق">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGkDHipHz84DtYcZ5b9HrqVTcwiIM4HEslSwvANdNuCb6a1-X6534sseAPS1HHt4348nXTwIR9et3Nj75w7cReBw9f77TnqyoQUs9xaO-fYeCeVE3dJvDMOtP-Q6CL1hSaZIqLWm7k8sNmDmyYnQbzV8qSUgPWABTXb0cnaatywTeCZtNhFyXwROKCDeY/s16000/video_1740617860934online-video-cutter.com-ezgif.com-video-to-gif-converter.gif" alt="معاينة الفيديو">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjnXmcBb9hs-MgT7kG2p0eBZin9hXYivLBJDyI8Y-vESkWLoJbF_pPXG1RVFpMPcNvjWBgicvb2Rlwp1ccRfAMbM0_nSMjw0Cq7iULhSYuUD91DtO56XyrMuATiWwhVDJQ9A4w7gB2kbi5lQrengEjgjUCDTQ2gno9ZP5vdFt6Ao2Ce0cX8BUmCduk-Pe0/s16000/Untitleddesign11-ezgif.com-video-to-gif-converter.gif" alt="GIF توضيحي">
+    <!-- Main Content -->
+    <section id="features" class="main-content container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <img src="https://i.imgur.com/1OeZZg4.png" alt="Snaptube App" class="phone-image">
             </div>
+            <div class="col-md-6">
+                <div class="features">
+                    <h3>مميزات Snaptube</h3>
+                    <p><i class="fas fa-check"></i> تنزيل الفيديوهات بجودة عالية.</p>
+                    <p><i class="fas fa-check"></i> دعم العديد من المنصات مثل YouTube و Facebook.</p>
+                    <p><i class="fas fa-check"></i> واجهة مستخدم بسيطة وسهلة الاستخدام.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <br>
-            <a href="https://your-download-link.com" class="btn btn-download">📥 تحميل التطبيق الآن</a>
+    <!-- Additional Content -->
+    <div class="container mt-4">
+        <h2 style="text-align: left;"><span style="font-family: arial;">New upgrade 🎉</span> <span style="font-family: arial;">fast, simple and light</span></h2>
+        <h3 style="text-align: left;"><span style="font-family: arial;">Powerful App to Watch Premium Content Free Fast at One Touch</span></h3>
+        <p style="text-align: left;"><span style="font-family: arial; font-size: x-small;">➡️ Netflix : Watch all your favorite Netflix movies and series in high quality 4K without ads or subscriptions for free</span></p>
+        <p><span style="font-family: arial; font-size: x-small;">➡️ Spotify : Enjoy and download all your favorite Spotify songs for free without ads or subscriptions.</span></p>
+        <p><span style="font-family: arial; font-size: x-small;">➡️ Shahid VIP : Watch all Turkish series and movies dubbed and translated Shahid VIP Exclusive in high quality and without ads, with content available before it is shown on TV. Free without a subscription</span></p>
+        <p><span style="font-family: arial; font-size: x-small;">➡️ Bein Sports : Watch live and exclusive broadcasts of the most important international tournaments such as the Champions League and the World Cup, in high quality and professional commentary in Arabic.</span></p>
+    </div>
+
+    <!-- Images Section -->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjziAIAelTdugao-ifa8QhylC7ix_qq9706EGhSocbVpCSGLFSiUkBKbvN8e3hS450bVcDTUixCAYLQ3hYxIs5A0upPS_o82056Bn_zDJjTskxsxG32x4rd5gQtVzCAwR1Lq_0FfR_9uoOADsrK2NpNYLq_gSSX5FJwSACDVVSicT4F4vPBB3UQLX4p-vw/s626/20250219_162729.png" class="img-fluid" alt="Snaptube Screenshot">
+            </div>
+            <div class="col-md-6">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGkDHipHz84DtYcZ5b9HrqVTcwiIM4HEslSwvANdNuCb6a1-X6534sseAPS1HHt4348nXTwIR9et3Nj75w7cReBw9f77TnqyoQUs9xaO-fYeCeVE3dJvDMOtP-Q6CL1hSaZIqLWm7k8sNmDmyYnQbzV8qSUgPWABTXb0cnaatywTeCZtNhFyXwROKCDeY/s752/video_1740617860934online-video-cutter.com-ezgif.com-video-to-gif-converter.gif" class="img-fluid" alt="Snaptube Demo">
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script>
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Sidebar Toggle
+        document.querySelector('.menu-btn').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.add('active');
+        });
+
+        document.querySelector('.close-btn').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.remove('active');
+        });
+
+        document.addEventListener('click', function (event) {
+            let sidebar = document.querySelector('.sidebar');
+            let menuBtn = document.querySelector('.menu-btn');
+
+            if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
