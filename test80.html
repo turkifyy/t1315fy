@@ -1,24 +1,19 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snaptube - تنزيل التطبيق</title>
+    <title>Snaptube - Download App</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <!-- Font Awesome للأيقونات -->
+    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* تصميم عام */
+        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             background: #ffcc00;
             scroll-behavior: smooth;
-        }
-
-        .ltr {
-            direction: ltr;
-            text-align: left;
         }
 
         /* Navbar */
@@ -26,11 +21,17 @@
             background: white;
             padding: 10px 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .navbar-logo {
             display: flex;
             align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .navbar-logo img {
@@ -51,7 +52,7 @@
             cursor: pointer;
         }
 
-        /* القائمة الجانبية */
+        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -75,7 +76,7 @@
 
         .sidebar ul li {
             padding: 15px;
-            text-align: right;
+            text-align: left;
         }
 
         .sidebar ul li a {
@@ -108,7 +109,7 @@
             border: none;
             cursor: pointer;
             display: inline-block;
-            margin: 10px 5px;
+            margin: 10px auto;
             transition: 0.3s;
             text-decoration: none;
         }
@@ -136,10 +137,12 @@
             color: #003366;
             margin-top: 10px;
             display: inline-block;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
         }
 
         .security-verified i {
-            margin-left: 5px;
+            margin-right: 5px;
             color: #003366;
         }
 
@@ -149,7 +152,7 @@
         }
 
         .features {
-            text-align: right;
+            text-align: center;
             padding-top: 20px;
         }
 
@@ -207,7 +210,7 @@
         <i class="fas fa-globe language-icon"></i>
     </nav>
 
-    <!-- القائمة الجانبية -->
+    <!-- Sidebar -->
     <div class="sidebar">
         <button class="close-btn"><i class="fas fa-times"></i></button>
         <ul>
@@ -220,11 +223,10 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h1>Download Snaptube APK Free for Android MP3 downloader</h1>
+        <h1>Download Snaptube APK Free for Android MP3 Downloader</h1>
         <a href="#features" class="download-btn">Download Snaptube</a>
         <div>
             <a href="#music-video" class="beta-btn">Beta Version</a>
-            <br>
             <div class="security-verified">
                 <i class="fas fa-shield-alt"></i> Security Verified
             </div>
@@ -239,10 +241,10 @@
             </div>
             <div class="col-md-6">
                 <div class="features">
-                    <h3>مميزات Snaptube</h3>
-                    <p><i class="fas fa-check"></i> تنزيل الفيديوهات بجودة عالية.</p>
-                    <p><i class="fas fa-check"></i> دعم العديد من المنصات مثل YouTube و Facebook.</p>
-                    <p><i class="fas fa-check"></i> واجهة مستخدم بسيطة وسهلة الاستخدام.</p>
+                    <h3>Snaptube Features</h3>
+                    <p><i class="fas fa-check"></i> Download videos in high quality.</p>
+                    <p><i class="fas fa-check"></i> Supports multiple platforms like YouTube and Facebook.</p>
+                    <p><i class="fas fa-check"></i> Simple and user-friendly interface.</p>
                 </div>
             </div>
         </div>
@@ -250,12 +252,12 @@
 
     <!-- Additional Content -->
     <div class="container mt-4">
-        <h2 style="text-align: left;"><span style="font-family: arial;">New upgrade 🎉</span> <span style="font-family: arial;">fast, simple and light</span></h2>
-        <h3 style="text-align: left;"><span style="font-family: arial;">Powerful App to Watch Premium Content Free Fast at One Touch</span></h3>
-        <p style="text-align: left;"><span style="font-family: arial; font-size: x-small;">➡️ Netflix : Watch all your favorite Netflix movies and series in high quality 4K without ads or subscriptions for free</span></p>
-        <p><span style="font-family: arial; font-size: x-small;">➡️ Spotify : Enjoy and download all your favorite Spotify songs for free without ads or subscriptions.</span></p>
-        <p><span style="font-family: arial; font-size: x-small;">➡️ Shahid VIP : Watch all Turkish series and movies dubbed and translated Shahid VIP Exclusive in high quality and without ads, with content available before it is shown on TV. Free without a subscription</span></p>
-        <p><span style="font-family: arial; font-size: x-small;">➡️ Bein Sports : Watch live and exclusive broadcasts of the most important international tournaments such as the Champions League and the World Cup, in high quality and professional commentary in Arabic.</span></p>
+        <h2 style="text-align: center;">New Upgrade 🎉 Fast, Simple, and Light</h2>
+        <h3 style="text-align: center;">Powerful App to Watch Premium Content Free at One Touch</h3>
+        <p style="text-align: center;">➡️ Netflix: Watch all your favorite Netflix movies and series in high quality 4K without ads or subscriptions for free.</p>
+        <p style="text-align: center;">➡️ Spotify: Enjoy and download all your favorite Spotify songs for free without ads or subscriptions.</p>
+        <p style="text-align: center;">➡️ Shahid VIP: Watch all Turkish series and movies dubbed and translated in high quality and without ads.</p>
+        <p style="text-align: center;">➡️ Bein Sports: Watch live and exclusive broadcasts of the most important international tournaments.</p>
     </div>
 
     <!-- Images Section -->
