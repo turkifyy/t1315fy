@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Flaticon for Platform Icons -->
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-straight/css/uicons-solid-straight.css">
     <style>
         /* General Styles */
         body {
@@ -103,13 +105,11 @@
 
         .download-btn, .beta-btn {
             border-radius: 25px;
-            padding: 12px 30px;
-            font-size: 16px;
             font-weight: bold;
             border: none;
             cursor: pointer;
-            display: inline-block;
-            margin: 10px auto;
+            display: block;
+            margin: 10px auto; /* Centered buttons */
             transition: 0.3s;
             text-decoration: none;
         }
@@ -117,11 +117,15 @@
         .download-btn {
             background: #ff4500;
             color: white;
+            padding: 15px 40px; /* Larger button */
+            font-size: 18px;
         }
 
         .beta-btn {
             background: white;
             color: black;
+            padding: 10px 30px; /* Smaller button */
+            font-size: 16px;
         }
 
         .download-btn:hover {
@@ -136,9 +140,10 @@
             font-size: 14px;
             color: #003366;
             margin-top: 10px;
-            display: inline-block;
+            display: block;
             font-family: Arial, sans-serif;
             font-weight: bold;
+            text-align: center;
         }
 
         .security-verified i {
@@ -178,6 +183,53 @@
             height: auto;
         }
 
+        /* Platform Features Section */
+        .platform-features {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .platform-features h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff4500;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .platform-features .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .platform-features .feature-item i {
+            font-size: 24px;
+            color: #ff4500;
+            margin-right: 10px;
+        }
+
+        .platform-features .feature-item .platform-name {
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .platform-features .feature-item .platform-description {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Images Section */
+        .images-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
         /* Media Queries */
         @media (max-width: 768px) {
             .sidebar {
@@ -192,9 +244,22 @@
                 font-size: 20px;
             }
 
-            .download-btn, .beta-btn {
+            .download-btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            .beta-btn {
+                padding: 8px 25px;
                 font-size: 14px;
-                padding: 10px 25px;
+            }
+
+            .platform-features h2 {
+                font-size: 20px;
+            }
+
+            .platform-features .feature-item i {
+                font-size: 20px;
             }
         }
     </style>
@@ -225,11 +290,9 @@
     <section class="hero-section">
         <h1>Download Snaptube APK Free for Android MP3 Downloader</h1>
         <a href="#features" class="download-btn">Download Snaptube</a>
-        <div>
-            <a href="#music-video" class="beta-btn">Beta Version</a>
-            <div class="security-verified">
-                <i class="fas fa-shield-alt"></i> Security Verified
-            </div>
+        <a href="#music-video" class="beta-btn">Beta Version</a>
+        <div class="security-verified">
+            <i class="fas fa-shield-alt"></i> Security Verified
         </div>
     </section>
 
@@ -250,18 +313,41 @@
         </div>
     </section>
 
-    <!-- Additional Content -->
-    <div class="container mt-4">
-        <h2 style="text-align: center;">New Upgrade 🎉 Fast, Simple, and Light</h2>
-        <h3 style="text-align: center;">Powerful App to Watch Premium Content Free at One Touch</h3>
-        <p style="text-align: center;">➡️ Netflix: Watch all your favorite Netflix movies and series in high quality 4K without ads or subscriptions for free.</p>
-        <p style="text-align: center;">➡️ Spotify: Enjoy and download all your favorite Spotify songs for free without ads or subscriptions.</p>
-        <p style="text-align: center;">➡️ Shahid VIP: Watch all Turkish series and movies dubbed and translated in high quality and without ads.</p>
-        <p style="text-align: center;">➡️ Bein Sports: Watch live and exclusive broadcasts of the most important international tournaments.</p>
+    <!-- Platform Features Section -->
+    <div class="platform-features">
+        <h2>New Upgrade 🎉 Fast, Simple, and Light</h2>
+        <div class="feature-item">
+            <i class="fi fi-ss-film"></i> <!-- Netflix Icon -->
+            <div>
+                <span class="platform-name">Netflix</span>
+                <p class="platform-description">Watch all your favorite Netflix movies and series in high quality 4K without ads or subscriptions for free.</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <i class="fi fi-ss-music"></i> <!-- Spotify Icon -->
+            <div>
+                <span class="platform-name">Spotify</span>
+                <p class="platform-description">Enjoy and download all your favorite Spotify songs for free without ads or subscriptions.</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <i class="fi fi-ss-tv"></i> <!-- Shahid VIP Icon -->
+            <div>
+                <span class="platform-name">Shahid VIP</span>
+                <p class="platform-description">Watch all Turkish series and movies dubbed and translated in high quality and without ads.</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <i class="fi fi-ss-play"></i> <!-- Bein Sports Icon -->
+            <div>
+                <span class="platform-name">Bein Sports</span>
+                <p class="platform-description">Watch live and exclusive broadcasts of the most important international tournaments.</p>
+            </div>
+        </div>
     </div>
 
     <!-- Images Section -->
-    <div class="container mt-4">
+    <div class="container images-section">
         <div class="row">
             <div class="col-md-6">
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjziAIAelTdugao-ifa8QhylC7ix_qq9706EGhSocbVpCSGLFSiUkBKbvN8e3hS450bVcDTUixCAYLQ3hYxIs5A0upPS_o82056Bn_zDJjTskxsxG32x4rd5gQtVzCAwR1Lq_0FfR_9uoOADsrK2NpNYLq_gSSX5FJwSACDVVSicT4F4vPBB3UQLX4p-vw/s626/20250219_162729.png" class="img-fluid" alt="Snaptube Screenshot">
@@ -307,4 +393,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
