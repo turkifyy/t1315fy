@@ -36,7 +36,7 @@
             transition: all 0.3s ease;
         }
         .sub-text:hover {
-            color: #FF0000; /* لون أحمر مفتوح */
+            color: #FFD700;
             transform: scale(1.1);
         }
         .icons {
@@ -62,7 +62,7 @@
             height: auto;
             border-radius: 15px;
             display: block;
-            margin: 20px auto; /* زيادة المسافة بين الصور */
+            margin: 15px auto;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             pointer-events: none; /* منع النقر */
             user-select: none; /* منع تحديد الصورة */
@@ -72,11 +72,6 @@
             line-height: 1.5;
             max-width: 80%;
             margin: auto;
-            color: white; /* لون النص أبيض */
-            font-weight: bold; /* نص bold */
-        }
-        .instructions strong {
-            color: #FF0000; /* لون أحمر مفتوح */
         }
 
         /* Responsive Design */
@@ -92,22 +87,6 @@
             }
             .instructions {
                 font-size: 13px;
-            }
-            .image-box {
-                max-width: 250px; /* تصغير الصور على الأجهزة الصغيرة */
-            }
-        }
-
-        @media (max-width: 576px) {
-            .icons {
-                flex-direction: column; /* ترتيب الأيقونات عموديًا على الشاشات الصغيرة */
-                gap: 5px;
-            }
-            .icons img {
-                width: 30px;
-            }
-            .image-box {
-                max-width: 200px; /* تصغير الصور أكثر على الشاشات الصغيرة */
             }
         }
     </style>
@@ -130,7 +109,7 @@
         <img src="image2.png" alt="Image 2" class="image-box">
 
         <p class="instructions">
-            <strong>Go to Settings > select Security > turn on unknown source</strong><br>
+            Go to Settings > select Security > turn on unknown source<br>
             If you have never downloaded apps from sources other than Google Play, then it might block the installation. Follow the steps above to get Snaptube！
         </p>
     </div>
