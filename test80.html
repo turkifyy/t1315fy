@@ -390,6 +390,199 @@
             }
         }
     </style>
+
+     <style>
+        :root {
+            --primary-color: #FFD600;
+            --secondary-color: #007bff;
+            --text-dark: #333;
+            --text-light: #666;
+            --background-light: #FFF9C4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--background-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .testimonial-widget {
+            background-color: var(--primary-color);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 100%;
+            padding: 50px 30px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .widget-headline {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 40px;
+            line-height: 1.3;
+        }
+
+        .widget-headline span {
+            color: var(--secondary-color);
+        }
+
+        .testimonial-slider {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .slider-container {
+            overflow: hidden;
+            border-radius: 15px;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .testimonial-card {
+            flex: 0 0 100%;
+            background-color: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            border: 3px solid var(--primary-color);
+        }
+
+        .user-info {
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .navigation-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s;
+        }
+
+        .navigation-arrow:hover {
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .navigation-arrow.prev {
+            left: 20px;
+        }
+
+        .navigation-arrow.next {
+            right: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .widget-headline {
+                font-size: 1.8rem;
+            }
+
+            .testimonial-card {
+                padding: 25px;
+            }
+
+            .user-avatar {
+                width: 60px;
+                height: 60px;
+                margin-right: 15px;
+            }
+
+            .user-name {
+                font-size: 1rem;
+            }
+
+            .testimonial-text {
+                font-size: 0.9rem;
+            }
+
+            .navigation-arrow {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user-profile {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .user-info {
+                text-align: center;
+            }
+        }
+    </style>
+    
 </head>
 <body>
     <!-- Navbar -->
@@ -404,7 +597,7 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <button class="close-btn"><i class="fas fa-times"></i></button>
+        
         <ul>
             <li><a href="#">Download Snaptube</a></li>
             <li><a href="#">Snaptube APK</a></li>
@@ -493,6 +686,108 @@
             </di>
         </div>
     </div>
+
+        <div class="testimonial-widget">
+        <h1 class="widget-headline">" More than <span>10 million users</span> They enjoy paid platforms for free and without ads with Turkify</h1>
+        
+        <div class="testimonial-slider">
+            <div class="slider-container">
+                <div class="slider" id="testimonialSlider">
+                    <!-- Testimonial Cards -->
+                    <div class="testimonial-card">
+                        <div class="user-profile">
+                            <img alt="Javier" class="user-avatar" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj798XyHCl7bSTebrrBsDZjz7epR4ltJmXry41nGGlff-_bEt7MuSV_uwGMh5o_qeeUkKCn8UCsrqcJagTE_eqqWLVKxflTLVQBoy9CdwFtzZJyIULriBCJ6jh6a-uNsmkp0BdF2eQ9JtNiAlj56XVZHSa8ieKMXzGYrP6Es-rf6hyLKbEOJmX4wLNxRFM/s72/4e08ac-user_3.png" />
+                            <div class="user-info">
+                                <h3 class="user-name">Javier, Student</h3>
+                                <p class="user-role">new user of Turkify</p>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            Recently, a friend recommended the Turkify to me, and it completely transformed how I watch movies and shows on Netflix. With Turkify, I can stream all my favorite series and the latest films Netflix for free, without the need for a subscription or annoying ads. It’s the perfect solution for enjoying Netflix content seamlessly during my downtime!
+
+                        </p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="user-profile">
+                            <img alt="Maria" class="user-avatar" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjFu9x4fBjHMAis8iO5aDViJGUoWI3KaZ0-2-oIWaHSNlA9dQy1Nbqjvud78qfcZp1jeUcR81L86AIUYlQONJYqUrFi3F7Z3gHTN1fuf9j9M3bL7kWC0TmFwFQQkOv2AqmNBxErXvnI7fB0MRmxBguHdO1EWKPNDD7jorMsrkaDKOmaZZAwALWpUFRMNLw/s72/cb696b-user_1.png" />
+                            <div class="user-info">
+                                <h3 class="user-name">Maria,Youtuber</h3>
+                                <p class="user-role">using Turkify for 5 years</p>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                         I use Turkify and I couldn’t be more grateful. With Turkify, I now have access to Spotify Premium without paying for a subscription. I can enjoy all my favorite music, ad-free, and in high quality, anytime I want. It’s the best way to experience music without any interruptions or hidden fees!
+                        </p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="user-profile">
+                            <img alt="James" class="user-avatar" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHesX3H7U1hxA4YSafjn-E6-p0aQZSTtvo1gUPouC80ngDm5CcnTroor42sxTckjNnfDV8NMhZu_j_PWtOqlT3uCr1sVlt0r0t7WmHF32rveph-1QtpZlCb1Ln_JV43JxQQ9MGzeWgwKK7q-B9G1caTbE4qjXTdwMcUsJ-36POmOAQ1niSmc07K7tgPdQ/s72/f91a27-user_2.png" />
+                            <div class="user-info">
+                                <h3 class="user-name">James,Student</h3>
+                                <p class="user-role">using Turkify for 2 years</p>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                           My family recently recommend Turkify to me  and it has completely changed how I enjoy football matches and offline games. With Turkify, I can stream all the live football matches for free, without any interruptions or subscription fees. Plus, it lets me download and play offline games without any hassle. It’s the perfect way to enjoy sports and gaming on the go!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="navigation-arrow prev" id="prevSlide">←</button>
+            <button class="navigation-arrow next" id="nextSlide">→</button>
+        </div>
+    </div>
+
+    <script>
+        const slider = document.getElementById('testimonialSlider');
+        const prevBtn = document.getElementById('prevSlide');
+        const nextBtn = document.getElementById('nextSlide');
+
+        const testimonials = document.querySelectorAll('.testimonial-card');
+        let currentIndex = 0;
+        let autoSlideInterval;
+
+        function updateSlider() {
+            slider.style.transform = `translateX(${-currentIndex * 100}%)`;
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % testimonials.length;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
+            updateSlider();
+        }
+
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(nextSlide, 120000);
+        }
+
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            resetAutoSlide();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            resetAutoSlide();
+        });
+
+        // Pause on hover
+        slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+        slider.addEventListener('mouseleave', resetAutoSlide);
+
+        // Initial auto-slide
+        resetAutoSlide();
+    </script>
+                
+                
         <div class="footer2">
         <h2>How to install</h2>
         <p class="sub-text">Click OK</p>
