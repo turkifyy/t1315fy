@@ -14,13 +14,11 @@
     <style>
         /* General Styles */
         body {
-            
             scroll-behavior: smooth;
-            background-color: #F9F9F9; /* لون أزرق غامق */
+            background-color: #F9F9F9;
             color: white;
             font-family: 'Poppins', sans-serif;
             text-align: center;
-            
         }
 
         /* Navbar */
@@ -114,7 +112,7 @@
             border: none;
             cursor: pointer;
             display: block;
-            margin: 10px auto; /* Centered buttons */
+            margin: 10px auto;
             transition: 0.3s;
             text-decoration: none;
         }
@@ -122,14 +120,14 @@
         .download-btn {
             background: #ff4500;
             color: white;
-            padding: 15px 40px; /* Larger button */
+            padding: 15px 40px;
             font-size: 25px;
         }
 
         .beta-btn {
             background: white;
             color: #A9A9A9;
-            padding: 15px 20px; /* Smaller button */
+            padding: 15px 20px;
             font-size: 16px;
         }
 
@@ -235,23 +233,22 @@
             border-radius: 10px;
             margin-bottom: 20px;
         }
-          /* Footer */
-        footer {
-            background: #333; /* Light black background */
-            color: white;
-            padding: 20px 0; 
-            text-align: center;
-            margin-top: 40px; 
-            box-sizing: border-box;
-            
 
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+            box-sizing: border-box;
         }
 
         footer .footer-links {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 20px; /* Space between links */
+            gap: 20px;
         }
 
         footer .footer-links a {
@@ -268,130 +265,182 @@
             margin-top: 10px;
             font-size: 14px;
         }
-        /* Media Queries */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 220px;
-            }
 
-            .sidebar ul li a {
-                font-size: 16px;
-            }
+        /* Testimonial Widget Styles */
+        :root {
+            --primary-color: #FFD600;
+            --secondary-color: #007bff;
+            --text-dark: #333;
+            --text-light: #666;
+            --background-light: #FFF9C4;
+        }
 
-            .hero-section h1 {
-                font-size: 20px;
-            }
-
-            .download-btn {
-                padding: 12px 30px;
-                font-size: 23px;
-            }
-
-            .beta-btn {
-                padding: 8px 20px;
-                font-size: 14px;
-            }
-
-            .platform-features h2 {
-                font-size: 20px;
-            }
-
-            .platform-features .feature-item i {
-                font-size: 20px;
-            }
-            footer .footer-links {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-    </style>
-    <style>
-         
-            
-            
-        
-        
-        .footer2 {
-            padding: 30px 15px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 1s ease-out forwards;
-            background: #4162A7;
-            
-        }
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            animation: fadeIn 1s ease-in-out;
-        }
-        .sub-text {
-            font-size: 18px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .sub-text:hover {
-            color: #FFD700;
-            transform: scale(1.1);
-        }
-        .icons {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px; /* مسافة بين الأيقونات */
-        }
-        .icons img {
-            width: 40px;
-            pointer-events: none; /* منع التفاعل */
-            user-select: none; /* منع التحديد */
-        }
-        .security-text {
-            font-size: 14px;
-            font-weight: bold;
-            color: #86DAAF; /* لون أزرق فاتح */
-            margin-top: 5px;
-        }
-        .image-box {
+        .testimonial-widget {
+            background-color: var(--primary-color);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            max-width: 1000px;
             width: 100%;
-            max-width: 300px;
-            height: auto;
-            border-radius: 15px;
-            display: block;
-            margin: 15px auto;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            pointer-events: none; /* منع النقر */
-            user-select: none; /* منع تحديد الصورة */
-        }
-        .instructions {
-            font-size: 14px;
-            line-height: 1.5;
-            max-width: 80%;
-            margin: auto;
+            padding: 50px 30px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            margin: 40px auto;
         }
 
-        /* Responsive Design */
+        .widget-headline {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 40px;
+            line-height: 1.3;
+        }
+
+        .widget-headline span {
+            color: var(--secondary-color);
+        }
+
+        .testimonial-slider {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .slider-container {
+            overflow: hidden;
+            border-radius: 15px;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .testimonial-card {
+            flex: 0 0 100%;
+            background-color: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            border: 3px solid var(--primary-color);
+        }
+
+        .user-info {
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .navigation-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s;
+        }
+
+        .navigation-arrow:hover {
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .navigation-arrow.prev {
+            left: 20px;
+        }
+
+        .navigation-arrow.next {
+            right: 20px;
+        }
+
         @media (max-width: 768px) {
-            h2 {
-                font-size: 20px;
+            .widget-headline {
+                font-size: 1.8rem;
             }
-            .sub-text {
-                font-size: 16px;
+
+            .testimonial-card {
+                padding: 25px;
             }
-            .icons img {
-                width: 35px;
+
+            .user-avatar {
+                width: 60px;
+                height: 60px;
+                margin-right: 15px;
             }
-            .instructions {
-                font-size: 13px;
+
+            .user-name {
+                font-size: 1rem;
+            }
+
+            .testimonial-text {
+                font-size: 0.9rem;
+            }
+
+            .navigation-arrow {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user-profile {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .user-info {
+                text-align: center;
             }
         }
     </style>
-
-     
 </head>
 <body>
     <!-- Navbar -->
@@ -406,7 +455,6 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        
         <ul>
             <li><a href="#">Download Snaptube</a></li>
             <li><a href="#">Snaptube APK</a></li>
@@ -446,33 +494,33 @@
     <div class="platform-features">
         <h2>New Upgrade 🎉 Fast, Simple, and Light</h2>
         <div class="feature-item">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi4wuX845cKbxFW-WdFLke_AwZJVxXsvi6i3-pNIH016SF6bQs9OFwr3HKZuIso-BicdfBzRzpzV9gVSGwMi1WW3ItZUdOF3-kRCAbhLXLyW7CDSmlBFlhTadRmaO6FIhvc6QHZmb6WeM4b1lYfJnaNnTdfuHm5hg24rk-TCR5PtXTfKAVlzAruN2qPxn4/s157/IMG_20241017_214800_950.webp" alt="Netflix Icon" width="24" height="24"/> <!-- Netflix Icon -->
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi4wuX845cKbxFW-WdFLke_AwZJVxXsvi6i3-pNIH016SF6bQs9OFwr3HKZuIso-BicdfBzRzpzV9gVSGwMi1WW3ItZUdOF3-kRCAbhLXLyW7CDSmlBFlhTadRmaO6FIhvc6QHZmb6WeM4b1lYfJnaNnTdfuHm5hg24rk-TCR5PtXTfKAVlzAruN2qPxn4/s157/IMG_20241017_214800_950.webp" alt="Netflix Icon" width="24" height="24"/>
             <div>
                 <span class="platform-name">Netflix</span>
                 <p class="platform-description">Watch all your favorite Netflix movies and series in high quality 4K without ads or subscriptions for free.</p>
             </div>
         </div>
         <div class="feature-item">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjvGHFe1LFffm1fhc1jxlSrXkfUfBEzK41huD-oia6iGeRupo9eSeoIiLOqNYvbPFsJWtebZ6mT3v7sITDVTNsbdJE4x02DCqkcQ48wbpuBEntyTZDIQRjmrMbKUl4OMvCgmTA2gFubAb8pUbbrkWdLdGcwFohycsebZpD5KoAw4SAC9KvZTTmkImtrhsU/s157/IMG_20241017_214329_597.webp" alt="Spotify Icon" width="24" height="24"/> <!-- Spotify Icon -->
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjvGHFe1LFffm1fhc1jxlSrXkfUfBEzK41huD-oia6iGeRupo9eSeoIiLOqNYvbPFsJWtebZ6mT3v7sITDVTNsbdJE4x02DCqkcQ48wbpuBEntyTZDIQRjmrMbKUl4OMvCgmTA2gFubAb8pUbbrkWdLdGcwFohycsebZpD5KoAw4SAC9KvZTTmkImtrhsU/s157/IMG_20241017_214329_597.webp" alt="Spotify Icon" width="24" height="24"/>
             <div>
                 <span class="platform-name">Spotify</span>
                 <p class="platform-description">Enjoy and download all your favorite Spotify songs for free without ads or subscriptions.</p>
             </div>
         </div>
         <div class="feature-item">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPA7DtflzKvoLgrH4UvAcbYlnRBOlq7oqB8LZSn49_MMcBeh7VRfkHoVGclX7Mg0Fwia9pE2slS4vo1l9BBptVgLm4mzCo3bbdzAExj1Wn4MkpZiqkRWde3IJz-AseL9OBzoa1bWntgwyFgNB2aTu_K4tZV6Gx-wbWXIH1hYlo_d5oyIdSeUMdIeI3FK4/s157/IMG_20241017_214745_735.webp" alt="ShahidVIP Icon" width="24" height="24"/> <!-- Shahid VIP Icon -->
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPA7DtflzKvoLgrH4UvAcbYlnRBOlq7oqB8LZSn49_MMcBeh7VRfkHoVGclX7Mg0Fwia9pE2slS4vo1l9BBptVgLm4mzCo3bbdzAExj1Wn4MkpZiqkRWde3IJz-AseL9OBzoa1bWntgwyFgNB2aTu_K4tZV6Gx-wbWXIH1hYlo_d5oyIdSeUMdIeI3FK4/s157/IMG_20241017_214745_735.webp" alt="ShahidVIP Icon" width="24" height="24"/>
             <div>
                 <span class="platform-name">Shahid VIP</span>
                 <p class="platform-description">Watch all Turkish series and movies dubbed and translated in high quality and without ads.</p>
             </div>
         </div>
         <div class="feature-item">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg-f-UUB6DUrgD9Wyfz1h3C7VsFyzQJh4YgvGTOQ1NW1gFa4nuRqQf9qz0-E9Ry3o18YbbKlrSD9gWCct34zdXImlOuAjUTJgswE__srtzovgAgbS35f3SS352DQ0aXP1D6QgkQ-ibR2yRZoalVhiHM2ALs5OgOnDFzp17yB4KhofFJVlCoem7SoFNVx7g/s24/turkify-beinsports-matches.png" alt="Bein Sports Icon" width="24" height="24"/> <!-- Bein Sports Icon -->
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg-f-UUB6DUrgD9Wyfz1h3C7VsFyzQJh4YgvGTOQ1NW1gFa4nuRqQf9qz0-E9Ry3o18YbbKlrSD9gWCct34zdXImlOuAjUTJgswE__srtzovgAgbS35f3SS352DQ0aXP1D6QgkQ-ibR2yRZoalVhiHM2ALs5OgOnDFzp17yB4KhofFJVlCoem7SoFNVx7g/s24/turkify-beinsports-matches.png" alt="Bein Sports Icon" width="24" height="24"/>
             <div>
                 <span class="platform-name">Bein Sports</span>
                 <p class="platform-description">Watch live and exclusive broadcasts of the most important international tournaments.</p>
             </div>
-         </div>
+        </div>
     </div>
 
     <!-- Images Section -->
@@ -486,42 +534,73 @@
             </div>
             <div class="col-md-6">
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiScwbe3GfuIg1jcdeq2yiisXxaI07lGqXv-ObaAg30oVhzih0gCFXkPAx8NLtCYJX91L0ny6est5_NAlYc8Lb2zMJ6qLK0LbpNQ9Ts0v7qcOCr3XcXJhEQQe9m3cOZ08YwWVO1E8UYplFfPeru9UmHEnfgYcq0uqh93pgEUtG43T18nDrlHVzOZPpZj-A/s952/Turkify-mode.gif" class="img-fluid" alt="Snaptube Demo">
-            </di>
-             <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhGOGzDHjFs8juPsPWnldruPboEx527TgMnHQuLV1p4lRZ5HHEGHRrtdnDFG8mIHkdddrN4w7xHrIR9wc_ymPW13L9R84a6AQBGdlY5M32l3RXHEYEpYwF9RV7qVhwaxPUOYooQRyeyNYEPVBY33hkNm1wKo-RFfe4TF3i0svXdLLdHwMFNKs7u5bglCN0/s800/turkify-tinder-dating%20.gif" class="img-fluid" alt="Snaptube Demo">
-            </di>   
-             <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAUO8vj_u73MhjaAMiRgkVEgx1sBTwE6JYx8fNVz5n_izhiwS8vJJhlgvpHVnP0KZ0Gk9v8wEOrMF-o7t4ubbEU1b2fd0twhMi3_Nse9QkLo1-5zHhjx9pBrJh79oL84ydHVMAW6BDH_UFb7geBckVI-tXucIrV3grg8xt6TL88bE2-5CYcjeozHHFq_U/s360/turkify-is-Growing1.gif" class="img-fluid" alt="Snaptube Demo">
-            </di>
+            </div>
         </div>
     </div>
 
+    <!-- Testimonial Widget Section -->
+    <div class="testimonial-widget">
+        <h1 class="widget-headline">" More than <span>10 million users</span> They enjoy paid platforms for free and without ads with Turkify</h1>
         
-        <div class="footer2">
-        <h2>How to install</h2>
-        <p class="sub-text">Click OK</p>
-        <p class="sub-text">Snaptube 100% SAFE your phone</p>
+        <div class="testimonial-slider">
+            <div class="slider-container">
+                <div class="slider" id="testimonialSlider">
+                    <!-- Testimonial Cards -->
+                    <div class="testimonial-card">
+                        <div class="user-profile">
+                            <img alt="Javier" class="user-avatar" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj798XyHCl7bSTebrrBsDZjz7epR4ltJmXry41nGGlff-_bEt7MuSV_uwGMh5o_qeeUkKCn8UCsrqcJagTE_eqqWLVKxflTLVQBoy9CdwFtzZJyIULriBCJ6jh6a-uNsmkp0BdF2eQ9JtNiAlj56XVZHSa8ieKMXzGYrP6Es-rf6hyLKbEOJmX4wLNxRFM/s72/4e08ac-user_3.png" />
+                            <div class="user-info">
+                                <h3 class="user-name">Javier, Student</h3>
+                                <p class="user-role">new user of Turkify</p>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            Recently, a friend recommended the Turkify to me, and it completely transformed how I watch movies and shows on Netflix. With Turkify, I can stream all my favorite series and the latest films Netflix for free, without the need for a subscription or annoying ads. It’s the perfect solution for enjoying Netflix content seamlessly during my downtime!
+                        </p>
+                    </div>
 
-        <div class="icons">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6E0VXGH_U7Q3aabuuxomn9Hyp0CPMYqJMgpLJhLe9I4NubCmy69isJ1ZWticb07SAeNHoYF3Mqyky7tJMNMhn_IPpPBXxHwMzE7h5XZ5VdZzIEscLprdetYcho-hUu-Za1ZBxXkqJphCwdSXnIjvy1X0AnliDXBwKmMYgzWG5qhHxKuupc-2ie0I5K0U/s225/1740967332033.png" alt="Avast Antivirus">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJrpRmg2QPGl3gSVRrMXtXRQxzYOp9Zz3malWf8neITfjc6_U4NzUsQcriesUX4uONu1I_PrLrK-u6u6VitglEld9HKBJmJBgbE5RynoO1OUKkKblVlvuNe-xAMIMHkC0clZ6M4X-LOLTgBSfT4X9kXOr_qN-vKJIvRWrjsijb5KvNYoGY7AFTXV41CFw/s231/1740967378069.png" alt="McAfee">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVExpYHb042YkmQ0B96n-hdBMhvCXNrzqA4bfiW_Losis18pci4dZiiGqN6lqwh2b48-e-VDg-PMtWA5jkA2w34an4UDYnP4bsudkIeGgP5DCo9ppuEoG7bCpg11tY27ugdr4_cvLbDvU9m2vRWyRksQkSHmPOIg4VybZ88cmKxnwafoqxB9Njo6mHplc/s225/1740967399779.png" alt="AVG Antivirus">
-            <span class="security-text">Security Verified</span>
+                    <div class="testimonial-card">
+                        <div class="user-profile">
+                            <img alt="Maria" class="user-avatar" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjFu9x4fBjHMAis8iO5aDViJGUoWI3KaZ0-2-oIWaHSNlA9dQy1Nbqjvud78qfcZp1jeUcR81L86AIUYlQONJYqUrFi3F7Z3gHTN1fuf9j9M3bL7kWC0TmFwFQQkOv2AqmNBxErXvnI7fB0MRmxBguHdO1EWKPNDD7jorMsrkaDKOmaZZAwALWpUFRMNLw/s72/cb696b-user_1.png" />
+                            <div class="user-info">
+                                <h3 class="user-name">Maria,Youtuber</h3>
+                                <p class="user-role">using Turkify for 5 years</p>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                         I use Turkify and I couldn’t be more grateful. With Turkify, I now have access to Spotify Premium without paying for a subscription. I can enjoy all my favorite music, ad-free, and in high quality, anytime I want. It’s the best way to experience music without any interruptions or hidden fees!
+                        </p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="user-profile">
+                            <img alt="James" class="user-avatar" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHesX3H7U1hxA4YSafjn-E6-p0aQZSTtvo1gUPouC80ngDm5CcnTroor42sxTckjNnfDV8NMhZu_j_PWtOqlT3uCr1sVlt0r0t7WmHF32rveph-1QtpZlCb1Ln_JV43JxQQ9MGzeWgwKK7q-B9G1caTbE4qjXTdwMcUsJ-36POmOAQ1niSmc07K7tgPdQ/s72/f91a27-user_2.png" />
+                            <div class="user-info">
+                                <h3 class="user-name">James,Student</h3>
+                                <p class="user-role">using Turkify for 2 years</p>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                           My family recently recommend Turkify to me  and it has completely changed how I enjoy football matches and offline games. With Turkify, I can stream all the live football matches for free, without any interruptions or subscription fees. Plus, it lets me download and play offline games without any hassle. It’s the perfect way to enjoy sports and gaming on the go!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="navigation-arrow prev" id="prevSlide">←</button>
+            <button class="navigation-arrow next" id="nextSlide">→</button>
         </div>
-
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjF2P-zI6nRp9haXhzQJ-Z5lkuV9OsQPnlRRJOcr1si59T0se81NpwsjN4erC7KmLpN98eufPlXRnyy1C2jbhnRGEAoVWVP7IBNwbahOd_t1sckQPqz3pMNB6Ez9L0LaStjvwQgQ1PwKqDW6Qh8C9Lix1ejsNNfbhdl-PO43MQa5TY7ao2cPrdYJKtdULw/s475/1740965126158.png" alt="Image 1" class="image-box">
-        
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgQZCREFSFKyuuO74BO4flEN3keX7axvjwJGRPoi5y05B_s0m5fLC7tAYoMS9llmP_vm2d9V78irlfVA3Athq5TvxLvzgJAN1RWBbtvVBJAT4CvSM6q_k3SYPvkE2SQiLmfFzlZRGwnBIt1ovY2fSSXmpMdx0fN0yMNHo08q1AX5jzrk-TrEYDCvp2m_L8/s800/turkify%20how%20to%20install%20.gif" alt="Image 2" class="image-box">
-        <h6>Go to Settings > select Security > turn on unknown source</h6>
-        <p class="instructions">
-            <br>
-            If you have never downloaded apps from sources other than Google Play, then it might block the installation. Follow the steps above to get Snaptube！
-        </p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-      <!-- Footer -->
+
+    <!-- Footer -->
     <footer>
-       <div class="copyright">
+        <div class="copyright">
             Copyright © 2025 Snaptube
         </div>
         <div class="footer-links">
@@ -530,9 +609,10 @@
             <a href="#">Terms of Use</a>
             <a href="#">How to Install</a>
         </div>
-        
     </footer>
+
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -565,6 +645,51 @@
                 sidebar.classList.remove('active');
             }
         });
+
+        // Testimonial Slider Script
+        const slider = document.getElementById('testimonialSlider');
+        const prevBtn = document.getElementById('prevSlide');
+        const nextBtn = document.getElementById('nextSlide');
+
+        const testimonials = document.querySelectorAll('.testimonial-card');
+        let currentIndex = 0;
+        let autoSlideInterval;
+
+        function updateSlider() {
+            slider.style.transform = `translateX(${-currentIndex * 100}%)`;
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % testimonials.length;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
+            updateSlider();
+        }
+
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(nextSlide, 120000);
+        }
+
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            resetAutoSlide();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            resetAutoSlide();
+        });
+
+        // Pause on hover
+        slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+        slider.addEventListener('mouseleave', resetAutoSlide);
+
+        // Initial auto-slide
+        resetAutoSlide();
     </script>
 </body>
-    </html>
+</html>
