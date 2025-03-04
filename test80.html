@@ -440,6 +440,96 @@
                 text-align: center;
             }
         }
+
+        /* Footer 2 Styles */
+        .footer2 {
+            padding: 30px 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out forwards;
+            background: #4162A7;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer2 h2 {
+            font-size: 24px;
+            font-weight: bold;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .footer2 .sub-text {
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .footer2 .sub-text:hover {
+            color: #FFD700;
+            transform: scale(1.1);
+        }
+
+        .footer2 .icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer2 .icons img {
+            width: 40px;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .footer2 .security-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #86DAAF;
+            margin-top: 5px;
+        }
+
+        .footer2 .image-box {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 15px;
+            display: block;
+            margin: 15px auto;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .footer2 .instructions {
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 80%;
+            margin: auto;
+        }
+
+        @media (max-width: 768px) {
+            .footer2 h2 {
+                font-size: 20px;
+            }
+
+            .footer2 .sub-text {
+                font-size: 16px;
+            }
+
+            .footer2 .icons img {
+                width: 35px;
+            }
+
+            .footer2 .instructions {
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -455,6 +545,7 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
+        <button class="close-btn"><i class="fas fa-times"></i></button>
         <ul>
             <li><a href="#">Download Snaptube</a></li>
             <li><a href="#">Snaptube APK</a></li>
@@ -550,7 +641,7 @@
         
         <div class="testimonial-slider">
             <div class="slider-container">
-                <div class="slider" id="testimonialSlider">
+      <div class="slider" id="testimonialSlider">
                     <!-- Testimonial Cards -->
                     <div class="testimonial-card">
                         <div class="user-profile">
@@ -598,6 +689,29 @@
         </div>
     </div>
 
+    <!-- Footer 2 -->
+    <div class="footer2">
+        <h2>How to install</h2>
+        <p class="sub-text">Click OK</p>
+        <p class="sub-text">Snaptube 100% SAFE your phone</p>
+
+        <div class="icons">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6E0VXGH_U7Q3aabuuxomn9Hyp0CPMYqJMgpLJhLe9I4NubCmy69isJ1ZWticb07SAeNHoYF3Mqyky7tJMNMhn_IPpPBXxHwMzE7h5XZ5VdZzIEscLprdetYcho-hUu-Za1ZBxXkqJphCwdSXnIjvy1X0AnliDXBwKmMYgzWG5qhHxKuupc-2ie0I5K0U/s225/1740967332033.png" alt="Avast Antivirus">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJrpRmg2QPGl3gSVRrMXtXRQxzYOp9Zz3malWf8neITfjc6_U4NzUsQcriesUX4uONu1I_PrLrK-u6u6VitglEld9HKBJmJBgbE5RynoO1OUKkKblVlvuNe-xAMIMHkC0clZ6M4X-LOLTgBSfT4X9kXOr_qN-vKJIvRWrjsijb5KvNYoGY7AFTXV41CFw/s231/1740967378069.png" alt="McAfee">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVExpYHb042YkmQ0B96n-hdBMhvCXNrzqA4bfiW_Losis18pci4dZiiGqN6lqwh2b48-e-VDg-PMtWA5jkA2w34an4UDYnP4bsudkIeGgP5DCo9ppuEoG7bCpg11tY27ugdr4_cvLbDvU9m2vRWyRksQkSHmPOIg4VybZ88cmKxnwafoqxB9Njo6mHplc/s225/1740967399779.png" alt="AVG Antivirus">
+            <span class="security-text">Security Verified</span>
+        </div>
+
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjF2P-zI6nRp9haXhzQJ-Z5lkuV9OsQPnlRRJOcr1si59T0se81NpwsjN4erC7KmLpN98eufPlXRnyy1C2jbhnRGEAoVWVP7IBNwbahOd_t1sckQPqz3pMNB6Ez9L0LaStjvwQgQ1PwKqDW6Qh8C9Lix1ejsNNfbhdl-PO43MQa5TY7ao2cPrdYJKtdULw/s475/1740965126158.png" alt="Image 1" class="image-box">
+        
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgQZCREFSFKyuuO74BO4flEN3keX7axvjwJGRPoi5y05B_s0m5fLC7tAYoMS9llmP_vm2d9V78irlfVA3Athq5TvxLvzgJAN1RWBbtvVBJAT4CvSM6q_k3SYPvkE2SQiLmfFzlZRGwnBIt1ovY2fSSXmpMdx0fN0yMNHo08q1AX5jzrk-TrEYDCvp2m_L8/s800/turkify%20how%20to%20install%20.gif" alt="Image 2" class="image-box">
+        <h6>Go to Settings > select Security > turn on unknown source</h6>
+        <p class="instructions">
+            <br>
+            If you have never downloaded apps from sources other than Google Play, then it might block the installation. Follow the steps above to get Snaptube！
+        </p>
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="copyright">
@@ -629,67 +743,72 @@
         });
 
         // Sidebar Toggle
-        document.querySelector('.menu-btn').addEventListener('click', function () {
-            document.querySelector('.sidebar').classList.add('active');
-        });
+        const menuBtn = document.querySelector('.menu-btn');
+        const closeBtn = document.querySelector('.close-btn');
+        const sidebar = document.querySelector('.sidebar');
 
-        document.querySelector('.close-btn').addEventListener('click', function () {
-            document.querySelector('.sidebar').classList.remove('active');
-        });
+        if (menuBtn && closeBtn && sidebar) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+            });
 
-        document.addEventListener('click', function (event) {
-            let sidebar = document.querySelector('.sidebar');
-            let menuBtn = document.querySelector('.menu-btn');
-
-            if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+            closeBtn.addEventListener('click', () => {
                 sidebar.classList.remove('active');
-            }
-        });
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        }
 
         // Testimonial Slider Script
         const slider = document.getElementById('testimonialSlider');
         const prevBtn = document.getElementById('prevSlide');
         const nextBtn = document.getElementById('nextSlide');
 
-        const testimonials = document.querySelectorAll('.testimonial-card');
-        let currentIndex = 0;
-        let autoSlideInterval;
+        if (slider && prevBtn && nextBtn) {
+            const testimonials = document.querySelectorAll('.testimonial-card');
+            let currentIndex = 0;
+            let autoSlideInterval;
 
-        function updateSlider() {
-            slider.style.transform = `translateX(${-currentIndex * 100}%)`;
-        }
+            function updateSlider() {
+                slider.style.transform = `translateX(${-currentIndex * 100}%)`;
+            }
 
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % testimonials.length;
-            updateSlider();
-        }
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % testimonials.length;
+                updateSlider();
+            }
 
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
-            updateSlider();
-        }
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + testimonials.length) % testimonials.length;
+                updateSlider();
+            }
 
-        function resetAutoSlide() {
-            clearInterval(autoSlideInterval);
-            autoSlideInterval = setInterval(nextSlide, 120000);
-        }
+            function resetAutoSlide() {
+                clearInterval(autoSlideInterval);
+                autoSlideInterval = setInterval(nextSlide, 120000);
+            }
 
-        nextBtn.addEventListener('click', () => {
-            nextSlide();
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                resetAutoSlide();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                resetAutoSlide();
+            });
+
+            // Pause on hover
+            slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+            slider.addEventListener('mouseleave', resetAutoSlide);
+
+            // Initial auto-slide
             resetAutoSlide();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            prevSlide();
-            resetAutoSlide();
-        });
-
-        // Pause on hover
-        slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-        slider.addEventListener('mouseleave', resetAutoSlide);
-
-        // Initial auto-slide
-        resetAutoSlide();
+        }
     </script>
 </body>
 </html>
