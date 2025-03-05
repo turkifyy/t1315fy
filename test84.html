@@ -2,19 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Snaptube Install</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Snaptube Installation Guide</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* جعل الصفحة تمتد على كامل الشاشة */
+        :root {
+            --primary-bg-color: #fff9c4;
+            --text-color: #333;
+            --accent-color: #1e88e5;
+        }
+
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            background: #f8f9fa; /* لون خلفية فاتح */
-            color: black; /* تغيير لون الخط إلى الأسود */
+            background-color: var(--primary-bg-color);
+            color: var(--text-color);
             font-family: Arial, sans-serif;
-            text-align: center;
+            line-height: 1.6;
         }
 
         .full-page {
@@ -22,112 +28,146 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            padding: 20px;
-        }
-
-        h2 {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .content {
-            max-width: 600px;
+            min-height: 100vh;
+            padding: 2rem;
             text-align: left;
         }
 
-        .step {
-            font-size: 16px;
+        .content {
+            max-width: 700px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        h2 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
             font-weight: bold;
-            margin-top: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .step {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        .step-title {
+            color: var(--text-color);
+        }
+
+        .icons-and-security {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .security-verified {
+            display: flex;
+            align-items: center;
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .security-verified i {
+            margin-right: 5px;
+            color: var(--accent-color);
         }
 
         .icons {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 15px;
-            margin: 15px 0;
+            gap: 1rem;
         }
 
         .icons img {
             width: 50px;
-            pointer-events: none;
-            user-select: none;
+            height: 50px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .icons img:hover {
+            transform: scale(1.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li::before {
+            content: "✓ ";
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-right: 10px;
         }
 
         .image-box {
+            max-width: 500px;
             width: 100%;
-            max-width: 400px;
             border-radius: 15px;
-            margin: 15px auto;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            pointer-events: none;
-            user-select: none;
-        }
-
-        /* تحسين الاستجابة للشاشات الصغيرة */
-        @media (max-width: 768px) {
-            h2 {
-                font-size: 22px;
-            }
-            .step {
-                font-size: 14px;
-            }
-            .icons img {
-                width: 40px;
-            }
-        }
-
-        /* تحسين العرض على الهواتف الصغيرة جداً */
-        @media (max-width: 480px) {
-            .full-page {
-                padding: 10px;
-            }
-            h2 {
-                font-size: 20px;
-            }
-            .step {
-                font-size: 13px;
-            }
-            .icons img {
-                width: 35px;
-            }
-            .image-box {
-                width: 90%;
-            }
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin: 1rem auto;
+            transition: transform 0.3s ease;
         }
     </style>
 </head>
 <body>
-
-    <div class="full-page">
-        <h2>Snaptube Install</h2>
+    <div class="full-page container">
         <div class="content">
-            <p><strong>Thanks for downloading Snaptube!</strong></p>
-            <p>Once you have downloaded the APK file, launch it, and complete the installation of Snaptube app by following the steps below:</p>
-
-            <p class="step"><strong>Step 1. Find the Downloaded APK</strong></p>
+            <h2>Snaptube Installation Guide</h2>
+            <p class="subtitle">Thanks for downloading Snaptube!</p>
+             <br>
+          <p class="subtitle">Once you have downloaded the APK file, launch it, and complete the installation of Snaptube app by following the steps below:</p>
+              <br>
+            <div class="step">
+                <span class="step-title">Step 1: Locate the Downloaded APK</span>
+            </div>
             <ul>
-                <li>Click on the popup which appears in your browser when the download finishes</li>
-                <li>Find it in the "Downloads" of your browser</li>
-                <li>Find it in the notification bar of your phone</li>
+                <li>1. Click on the popup that appears in your browser when the download finishes</li>
+                <li>2. Find it in the "Downloads" of your browser</li>
+                <li>3. Find it in the notification bar of your phone</li>
             </ul>
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgo00FkXtJyoJcx_8C7eUBgjnYwXvdxtnOcNAkMd3mw0YuSWktuDadCpTCC7F4i07Jy69qxtshckA5LZlt9QElKOZHYRiZ-8jDpVvqD33WinRMWwSYCQjzKb9Je_bNZYE8OVAgweQOUJPeEaSIOD3n6Pd8b2iXH0xsE9t-GsJiGLpJC6bcvmUqteFS1K9Q/s544/1741193675149.png" alt="Installation Guide" class="image-box" loading="lazy"/>
 
-            <p class="step"><strong>Step 2.</strong> If the popup below appears in your browser, click "OK". Snaptube is safe for your mobile.</p>
+            <div class="step">
+                <span class="step-title">Step 2: Confirm Safety If a popup appears in your browser, click "OK". Snaptube is safe for your mobile.</span>
+            </div>
+           <br>
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhJWMZxvS97FjwUdl8kcmV5Ag_-SJZ7faTgHc0qypvb548EtOoQpCEI_ZFIhRy8DG0PYYNsttBrasWK33CkwSicS-z9DRhz7Lu372Nh79nmRSixXoetS6Aa6t4jyJApW4tR0sj_5EY7PBvc9zVV5vq-U8XVSFJvyX4mUFqbvb6Y1xFSCkJJ4Wq8woe9bpQ/s715/20250305_170751.png" alt="Installation Guide" class="image-box" loading="lazy"/>
+            <br>
+            <div class="icons-and-security">
+                <div class="icons">
+            <p class="subtitle">Snaptube is safe for your mobile</p>
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgDEQTe2f1T22Em5LwTJB6gHRIcWT_rrkGByMU1-bcOR4tI6Hi-tzHD10r0knZsMriZZbtlamycPHfR_1ZHNwkIzgyOCG11D5aSzEgOE_xFjZ4BeiR8ohM1qCKc-7F4-ypuALHHqH8KHRlo1VhH1ccGjth4Se0rBO_A8yDjalsYdCNeDHf4i2SA-t9fw94/s60/beda53-ic_security_a.png" alt="beda sécurité" loading="lazy"/>
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgREiN0Pcgqq1DCC2f8lV7PfRkGw7RCVBS2GyI7x4PsSmUYbtSARwvjUFfaXYC9YQkyoM-jtX26jkvwimbaQN1SYHylKD764YV3Tvz4Mu6a9pKYFI_suncUvTPYBIjypGUkEMXUteuWUeMHaRZtQwoneDDwn0xcf6p4QgiXIUks2-Cjefa3u8-98p3csiQ/s60/32a67a-ic_security_b.png" alt="mcafee" loading="lazy"/>
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiZ4pcrXp58gahWFcpcy9ic2cO6Mk9OukKr-sIbHpWhAH1RLSOdFuaBYY2J9y9Uzb3aC8RqIIr3wIDHP4dQMSxxttVAw8GXVdthDesIgVIXxGBvbVmUdzcSk7fO6bVSGygBHclNtL8Ij2fvzGJQYgwpKSYH6bXWUHwMntiDPel_Wk7UGuJ9gwnnh38K4qI/s60/6271f4-ic_security_c.png" alt="Avast Antivirus" loading="lazy"/>
+                </div>
+                <div class="security-verified">                   
+                    Security Verified
+                </div>
+            </div>
 
-            <p class="step"><strong>Step 3.</strong> During the Snaptube app install process, you may need to go to your device's "Settings" and turn on “Unknown Sources".</p>
-            <p>It's required because Snaptube is not on Google Play. Turning on this option won't harm your mobile.</p>
+            <div class="step">
+                <span class="step-title">Step 3: Enable Unknown Sources During the Snaptube app installation process, you may need to go to your device's "Settings" and turn on "Unknown Sources".</span>
+            </div>
+           <br>
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgQZCREFSFKyuuO74BO4flEN3keX7axvjwJGRPoi5y05B_s0m5fLC7tAYoMS9llmP_vm2d9V78irlfVA3Athq5TvxLvzgJAN1RWBbtvVBJAT4CvSM6q_k3SYPvkE2SQiLmfFzlZRGwnBIt1ovY2fSSXmpMdx0fN0yMNHo08q1AX5jzrk-TrEYDCvp2m_L8/s800/turkify%20how%20to%20install%20.gif" alt="Installation Guide" class="image-box" loading="lazy"/>
+            <br>
+            <p>This is required because Snaptube is not on Google Play. Turning on this option won't harm your mobile.</p>
         </div>
-
-        <div class="icons">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6E0VXGH_U7Q3aabuuxomn9Hyp0CPMYqJMgpLJhLe9I4NubCmy69isJ1ZWticb07SAeNHoYF3Mqyky7tJMNMhn_IPpPBXxHwMzE7h5XZ5VdZzIEscLprdetYcho-hUu-Za1ZBxXkqJphCwdSXnIjvy1X0AnliDXBwKmMYgzWG5qhHxKuupc-2ie0I5K0U/s225/1740967332033.png" alt="Avast Antivirus">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJrpRmg2QPGl3gSVRrMXtXRQxzYOp9Zz3malWf8neITfjc6_U4NzUsQcriesUX4uONu1I_PrLrK-u6u6VitglEld9HKBJmJBgbE5RynoO1OUKkKblVlvuNe-xAMIMHkC0clZ6M4X-LOLTgBSfT4X9kXOr_qN-vKJIvRWrjsijb5KvNYoGY7AFTXV41CFw/s231/1740967378069.png" alt="McAfee">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVExpYHb042YkmQ0B96n-hdBMhvCXNrzqA4bfiW_Losis18pci4dZiiGqN6lqwh2b48-e-VDg-PMtWA5jkA2w34an4UDYnP4bsudkIeGgP5DCo9ppuEoG7bCpg11tY27ugdr4_cvLbDvU9m2vRWyRksQkSHmPOIg4VybZ88cmKxnwafoqxB9Njo6mHplc/s225/1740967399779.png" alt="AVG Antivirus">
-        </div>
-
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjF2P-zI6nRp9haXhzQJ-Z5lkuV9OsQPnlRRJOcr1si59T0se81NpwsjN4erC7KmLpN98eufPlXRnyy1C2jbhnRGEAoVWVP7IBNwbahOd_t1sckQPqz3pMNB6Ez9L0LaStjvwQgQ1PwKqDW6Qh8C9Lix1ejsNNfbhdl-PO43MQa5TY7ao2cPrdYJKtdULw/s475/1740965126158.png" alt="Installation Guide" class="image-box">
+        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
