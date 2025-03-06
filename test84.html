@@ -31,12 +31,17 @@
             min-height: 100vh;
             padding: 2rem;
             text-align: left;
+            background-image: url('https://via.placeholder.com/1920x1080'); /* استبدل هذا الرابط بالصورة التي تريدها */
+            background-size: cover;
+            background-position: center;
         }
 
         .content {
             max-width: 100%;
             width: 100%;
             padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.9); /* خلفية شبه شفافة للمحتوى */
+            border-radius: 10px;
         }
 
         h2 {
@@ -57,6 +62,7 @@
         .step {
             margin-top: 1rem;
             font-weight: bold;
+            text-align: left; /* جعل النص على جهة اليسار */
         }
 
         .step-title {
@@ -118,13 +124,59 @@
             height: auto;
             border-radius: 10px;
             margin-bottom: 20px;
-            
-            
-            
-             
-            
             transition: transform 0.3s ease;
-            
+        }
+
+        /* Media Queries للتجاوب مع جميع الشاشات */
+        @media (max-width: 768px) {
+            .full-page {
+                padding: 1rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.8rem;
+            }
+
+            .icons img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .image-box {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .full-page {
+                padding: 0.5rem;
+            }
+
+            .content {
+                padding: 0.5rem;
+            }
+
+            h2 {
+                font-size: 1rem;
+            }
+
+            .subtitle {
+                font-size: 0.7rem;
+            }
+
+            .icons img {
+                width: 30px;
+                height: 30px;
+            }
         }
     </style>
 </head>
@@ -133,9 +185,9 @@
         <div class="content">
             <h2>Snaptube Installation Guide</h2>
             <p class="subtitle">Thanks for downloading Snaptube!</p>
-             <br>
-          <p class="subtitle">Once you have downloaded the APK file, launch it, and complete the installation of Snaptube app by following the steps below:</p>
-              <br>
+            <br>
+            <p class="subtitle">Once you have downloaded the APK file, launch it, and complete the installation of Snaptube app by following the steps below:</p>
+            <br>
             <div class="step">
                 <span class="step-title">Step 1: Locate the Downloaded APK</span>
             </div>
@@ -144,17 +196,17 @@
                 <li>2. Find it in the "Downloads" of your browser</li>
                 <li>3. Find it in the notification bar of your phone</li>
             </ul>
-  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgo00FkXtJyoJcx_8C7eUBgjnYwXvdxtnOcNAkMd3mw0YuSWktuDadCpTCC7F4i07Jy69qxtshckA5LZlt9QElKOZHYRiZ-8jDpVvqD33WinRMWwSYCQjzKb9Je_bNZYE8OVAgweQOUJPeEaSIOD3n6Pd8b2iXH0xsE9t-GsJiGLpJC6bcvmUqteFS1K9Q/s544/1741193675149.png" alt="Installation Guide" class="image-box" loading="lazy"/>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgo00FkXtJyoJcx_8C7eUBgjnYwXvdxtnOcNAkMd3mw0YuSWktuDadCpTCC7F4i07Jy69qxtshckA5LZlt9QElKOZHYRiZ-8jDpVvqD33WinRMWwSYCQjzKb9Je_bNZYE8OVAgweQOUJPeEaSIOD3n6Pd8b2iXH0xsE9t-GsJiGLpJC6bcvmUqteFS1K9Q/s544/1741193675149.png" alt="Installation Guide" class="image-box" loading="lazy"/>
 
             <div class="step">
                 <span class="step-title">Step 2: Confirm Safety If a popup appears in your browser, click "OK". Snaptube is safe for your mobile.</span>
             </div>
-           <br>
-    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhJWMZxvS97FjwUdl8kcmV5Ag_-SJZ7faTgHc0qypvb548EtOoQpCEI_ZFIhRy8DG0PYYNsttBrasWK33CkwSicS-z9DRhz7Lu372Nh79nmRSixXoetS6Aa6t4jyJApW4tR0sj_5EY7PBvc9zVV5vq-U8XVSFJvyX4mUFqbvb6Y1xFSCkJJ4Wq8woe9bpQ/s715/20250305_170751.png" alt="Installation Guide" class="image-box" loading="lazy"/>
+            <br>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhJWMZxvS97FjwUdl8kcmV5Ag_-SJZ7faTgHc0qypvb548EtOoQpCEI_ZFIhRy8DG0PYYNsttBrasWK33CkwSicS-z9DRhz7Lu372Nh79nmRSixXoetS6Aa6t4jyJApW4tR0sj_5EY7PBvc9zVV5vq-U8XVSFJvyX4mUFqbvb6Y1xFSCkJJ4Wq8woe9bpQ/s715/20250305_170751.png" alt="Installation Guide" class="image-box" loading="lazy"/>
             <br>
             <div class="icons-and-security">
                 <div class="icons">
-            <p class="subtitle">Snaptube is safe for your mobile</p>
+                    <p class="subtitle">Snaptube is safe for your mobile</p>
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgDEQTe2f1T22Em5LwTJB6gHRIcWT_rrkGByMU1-bcOR4tI6Hi-tzHD10r0knZsMriZZbtlamycPHfR_1ZHNwkIzgyOCG11D5aSzEgOE_xFjZ4BeiR8ohM1qCKc-7F4-ypuALHHqH8KHRlo1VhH1ccGjth4Se0rBO_A8yDjalsYdCNeDHf4i2SA-t9fw94/s60/beda53-ic_security_a.png" alt="beda sécurité" loading="lazy"/>
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgREiN0Pcgqq1DCC2f8lV7PfRkGw7RCVBS2GyI7x4PsSmUYbtSARwvjUFfaXYC9YQkyoM-jtX26jkvwimbaQN1SYHylKD764YV3Tvz4Mu6a9pKYFI_suncUvTPYBIjypGUkEMXUteuWUeMHaRZtQwoneDDwn0xcf6p4QgiXIUks2-Cjefa3u8-98p3csiQ/s60/32a67a-ic_security_b.png" alt="mcafee" loading="lazy"/>
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiZ4pcrXp58gahWFcpcy9ic2cO6Mk9OukKr-sIbHpWhAH1RLSOdFuaBYY2J9y9Uzb3aC8RqIIr3wIDHP4dQMSxxttVAw8GXVdthDesIgVIXxGBvbVmUdzcSk7fO6bVSGygBHclNtL8Ij2fvzGJQYgwpKSYH6bXWUHwMntiDPel_Wk7UGuJ9gwnnh38K4qI/s60/6271f4-ic_security_c.png" alt="Avast Antivirus" loading="lazy"/>
@@ -167,14 +219,13 @@
             <div class="step">
                 <span class="step-title">Step 3: Enable Unknown Sources During the Snaptube app installation process, you may need to go to your device's "Settings" and turn on "Unknown Sources".</span>
             </div>
-           <br>
-    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgQZCREFSFKyuuO74BO4flEN3keX7axvjwJGRPoi5y05B_s0m5fLC7tAYoMS9llmP_vm2d9V78irlfVA3Athq5TvxLvzgJAN1RWBbtvVBJAT4CvSM6q_k3SYPvkE2SQiLmfFzlZRGwnBIt1ovY2fSSXmpMdx0fN0yMNHo08q1AX5jzrk-TrEYDCvp2m_L8/s800/turkify%20how%20to%20install%20.gif" alt="Installation Guide" class="image-box" loading="lazy"/>
+            <br>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgQZCREFSFKyuuO74BO4flEN3keX7axvjwJGRPoi5y05B_s0m5fLC7tAYoMS9llmP_vm2d9V78irlfVA3Athq5TvxLvzgJAN1RWBbtvVBJAT4CvSM6q_k3SYPvkE2SQiLmfFzlZRGwnBIt1ovY2fSSXmpMdx0fN0yMNHo08q1AX5jzrk-TrEYDCvp2m_L8/s800/turkify%20how%20to%20install%20.gif" alt="Installation Guide" class="image-box" loading="lazy"/>
             <br>
             <p>This is required because Snaptube is not on Google Play. Turning on this option won't harm your mobile.</p>
         </div>
-        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+    </html>
