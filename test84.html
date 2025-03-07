@@ -29,10 +29,27 @@
             min-height: 100vh;
             padding: 2rem;
             text-align: left;
-            background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg2doQrFmZWm0N5UfNO5dYGsbsjM6FgjYnH_pcCu_Ft1wKGVdJqy9bsPaz4ei3UHA4VIOhyphenhyphencDZpvxC3u7xVx-D2n2nysvg-QB3kG5UsA27sUsgS0fFhcbYe144jeDkjfwLtAuPUweA73Dbqfrz7klECNgIwdVrg1yJ530rj3O7SIAKMg0oA-A6Nrtr6NxU/s794/turkify-is-growing.webp'); /* الصورة الخلفية */
+            background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhZLulsuSlRAj0kYv5ddPhUuzB36yZnwNyUimqOe4MSxtt_EKL6E5M1lELlnFZ7YlthSMYNdv110DmET89-rxPmEG8j-hIwz_K7Qf-JZTMI7W5zjUc-ibPk94LEaknHL4GZQth8CYHPMwwsUe5fx0x7U8QJK7oUW-fHsGbd_HqfyhazLXquHaMMCEwWeyM/s794/turkify-is-growing1.webp'); /* الصورة الخلفية */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* إضافة أيقونات ترفيه بشكل زخرفي */
+        .full-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg2doQrFmZWm0N5UfNO5dYGsbsjM6FgjYnH_pcCu_Ft1wKGVdJqy9bsPaz4ei3UHA4VIOhyphenhyphencDZpvxC3u7xVx-D2n2nysvg-QB3kG5UsA27sUsgS0fFhcbYe144jeDkjfwLtAuPUweA73Dbqfrz7klECNgIwdVrg1yJ530rj3O7SIAKMg0oA-A6Nrtr6NxU/s794/turkify-is-growing.webp'); /* أيقونات ترفيه */
+            background-size: 150px; /* حجم الأيقونات */
+            opacity: 0.1; /* شفافية الأيقونات */
+            z-index: 0;
+            pointer-events: none; /* لمنع التفاعل مع الأيقونات */
         }
 
         .content {
@@ -41,6 +58,8 @@
             padding: 2rem;
             background-color: rgba(255, 255, 255, 0.8); /* خلفية شبه شفافة للمحتوى */
             border-radius: 10px;
+            position: relative;
+            z-index: 1; /* لجعل المحتوى فوق الخلفية */
         }
 
         h2 {
