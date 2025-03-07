@@ -202,12 +202,13 @@
             padding-left: 0;
         }
 
-        ul li::before {
-            content: "✓ ";
-            color: var(--accent-color);
-            font-weight: bold;
-            margin-right: 10px;
-        }
+        ul {
+    list-style-type: none; /* إزالة العلامات من القائمة */
+    padding-left: 0;
+}
+ul li {
+    margin-bottom: 0.5rem; /* تباعد بين العناصر */
+}
 
         .image-box {
             max-width: 100%;
@@ -233,7 +234,7 @@
 
             .subtitle {
                 font-size: 0.8rem;
-            }
+           }
 
             .icons img {
                 width: 40px;
