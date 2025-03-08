@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Snaptube Installation Guide</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --text-color: #333;
+            --accent-color: #1e88e5;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+       /* Navbar */
+        .custom-navbar {
+            background: white;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 30;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .navbar-logo img {
+            width: 30px;
+            height: 30px;
+            margin-right: 8px;
+        }
+
+        .menu-btn, .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .language-icon {
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: #f8f8f8;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            padding-top: 50px;
+            transition: left 0.3s ease-in-out;
+            z-index: 35;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            display: block;
+            border-bottom: 1px dashed #555;
+        }
+
+        .full-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: left;
+            background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHatRRmoCor_K1-6dD3d4CjstqQacp-Izny9PGlbhQby7O43_AwAt6CrlWxZY_bGUei44WBfNhiAZF_Muzwpd_E2sPSNn8KshzHUYPyA9PgC1e66BQz2Wk8E2a0pf1yyKlHKS1bAM4A0PsERxlQtpT8jB9o1dy8hkyoyZFRpA5t5rZc0S8vU8KjvPWodc/s1279/turkify-is-growing_719x1279.webp'); /* الصورة الخلفية */
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* إضافة أيقونات ترفيه بشكل زخرفي */
+        .full-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHatRRmoCor_K1-6dD3d4CjstqQacp-Izny9PGlbhQby7O43_AwAt6CrlWxZY_bGUei44WBfNhiAZF_Muzwpd_E2sPSNn8KshzHUYPyA9PgC1e66BQz2Wk8E2a0pf1yyKlHKS1bAM4A0PsERxlQtpT8jB9o1dy8hkyoyZFRpA5t5rZc0S8vU8KjvPWodc/s1279/turkify-is-growing_719x1279.webp'); /* أيقونات ترفيه */
+            background-size: 350px; /* حجم الأيقونات */
+            background-repeat: repeat;
+            z-index: 1;
+            pointer-events: none; /* لمنع التفاعل مع الأيقونات */
+        }
+
+        .content {
+            max-width: 100%;
+            width: 100%;
+            height: 100%;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.8); /* خلفية شبه شفافة للمحتوى */
+            border-radius: 10px;
+            position: relative;
+            z-index: 2; /* لجعل المحتوى فوق الخلفية */
+        }
+     
+        .download-btn {
+            border-radius: 25px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto;
+            transition: 0.3s;
+            text-decoration: none;
+            background: #ff4500;
+            color: white;
+            padding: 15px 40px;
+            font-size: 21px;
+        }
+
+       .download-btn:hover {
+            background: #d63c00;
+        }
+
+        h1 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .step {
+            margin-top: 1rem;
+            font-weight: bold;
+            text-align: left; /* جعل النص على جهة اليسار */
+        }
+
+        .step-title {
+            color: var(--text-color);
+        }          
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul {
+    list-style-type: none; /* إزالة العلامات من القائمة */
+    padding-left: 0;
+}
+ul li {
+    margin-bottom: 0.5rem; /* تباعد بين العناصر */
+}
+
+        .image-box {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Media Queries للتجاوب مع جميع الشاشات */
+        @media (max-width: 768px) {
+            .full-page {
+                padding: 1rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.8rem;
+           }           
+
+            .image-box {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .full-page {
+                padding: 0.5rem;
+            }
+
+            .content {
+                padding: 0.5rem;
+            }
+
+            h2 {
+                font-size: 1rem;
+            }
+
+            .subtitle {
+                font-size: 0.7rem;
+            }
+   
+            /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+            box-sizing: border-box;
+        }
+
+        footer .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        footer .footer-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer .footer-links a:hover {
+            color: #ff4500;
+        }
+
+        footer .copyright {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+            .icons img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+     <!-- Navbar -->
+    <nav class="custom-navbar">
+        <button class="menu-btn"><i class="fas fa-bars"></i></button>
+        <div class="navbar-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Snaptube_logo.png" alt="Snaptube Logo">
+            <span>Snaptube</span>
+        </div>
+        <i class="fas fa-globe language-icon"></i>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <button class="close-btn"></button>
+        <ul>
+            <li><a href="#">Download Snaptube</a></li>
+            <li><a href="#">Snaptube APK</a></li>
+            <li><a href="#">Install Snaptube</a></li>
+            <li><a href="#">Snaptube App</a></li>
+        </ul>
+    </div>
+    <div class="full-page container">
+        <div class="content">
+            <h1>Download the Latest Version of Snaptube</h1>
+                            
+            <p class="subtitle">After downloading to the latest version, you will experience faster download speeds, more useful features, more stable performance, and a safer environment, with a cleaner and more intuitive interface.</p>   
+
+      <a href="#features" class="download-btn">Download Snaptube</a>
+       
+             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjyK678MjpD76YKefmmi6pzfpVKNjBG0hn3ZyIvKK3OmQIHwa8EpCCF63oLunASnWbdNEKaaqNTNj0dgNfRg4S__4XpZ5KO-zhGSsfBdYwbmh_PFEWK83a4uvi3rNCI8r39RIUoWzDzpCC54GLpZIIY6ZlwCkleiH1e7q_ct5SN3MfiMRUv1m8aqWXm9-A/s1600/turkify-screenshot.webp" alt="Turkify-screenshot" class="image-box" loading="lazy"/>
+
+         <h1>Snaptube APK Download Latest Version: 4 Steps</h1>
+
+            <div class="step">
+                <span class="step-title">Step 1: Snaptube APK Latest Version Download</span>
+     <p>Click the download button to get the latest Snaptube APK.</p>
+            </div>                    
+            <div class="step">
+             <span class="step-title">Step 2: Install</span>
+      <p>Once the download is complete, click the APK file to start the installation process.</p>
+            </div>
+            <br>
+                
+            <div class="step">
+                <span class="step-title">Step 3: If You Encounter a Popup</span>
+        <p>If you see a "install unknown app" popup, click "Allow." This popup does not mean the app is harmful; it simply indicates that the browser does not have permission to install apps.</p>
+            </div>
+            <div class="step">
+   <span class="step-title">Step 4: Successful Installation</span>
+            <p>Once installed, the app will appear on your phone's home screen, ready for you to download your favorite content.
+Note: Both our website and the Snaptube app are certified by CM Security and McAfee, 100% safe, virus-free, and can be downloaded and used with confidence. Download Snaptube APK latest version without any worries.</p>
+             </div>
+         <h1>Snaptube Latest Version and Other Popular Versions</h1>
+
+<h6>Turkify 1.0</h6>
+
+<p>Enjoy the best streaming experience with StreamElite! Combine Netflix, Spotify, Shahid VIP, and beIN Sports in one app. Supports high-quality streaming with improvements in playback speed and performance.</p>
+
+<h6>Turkify 2.2</h6>
+
+<p>Improved viewing and listening experience with 4K and 320kbps audio support. Smart recommendations feature added to help you find your favorite content quickly.</p>
+
+<h6>Turkify 3.5 APK Download</h6>
+
+<p>Download content to watch or listen offline with improved quality. Ad-free experience with faster playback and easier control over multiple accounts.</p>
+
+<h6>Turkify 4.0</h6>
+
+<p>Complete redesign of the user interface for a smoother experience. Supports quick navigation between different streaming services with one click. Improved download speed of videos and songs.</p>
+
+<h6>Turkify 5.07 APK Download</h6>
+
+<p>Add your favorite content to custom playlists and share them with your friends. Now you can control quality settings and save data consumption easily.</p>
+
+<h6>Turkify 5.28 APK Download</h6>
+
+<p>General performance improvements for smoother viewing. Support for live streaming of beIN Sports channels in high quality and without interruption.</p>
+
+<h6>Turkify 6.0</h6>
+<p>The ability to change the playback speed for videos and music. Support multiple translations and improve the night viewing experience with the new dark mode.</p>
+
+<h6>Turkify 6.06 APK Download<h6>
+
+<p>Fix some bugs to improve the user experience. Improve the smart search feature to quickly access your favorite content.</p>
+
+<h6>Turkify 6.15 APK Download</h6>
+
+<p>Add a queue feature to organize and play videos or songs in sequence. Support quick navigation between accounts for a personalized experience for each user.</p>
+
+<h6>Turkify 7.04</h6>
+
+<p>Faster download speeds for streaming and pre-loaded content. Improved page design for a clearer and more elegant experience.</p>
+
+<h6>Turkify 7.12</h6>
+
+<p>Support for downloading and playing short videos quickly and easily. Automatically clean duplicate files to free up storage space. Improved download speed for all types of content.</p>
+
+<h6>Turkify 7.22</h6>
+
+<p>Support for downloading videos from Netflix, Shahid, beIN Sports in different qualities.  Improved multi-search across all platforms. Faster and better experience in downloading and playing your favorite content.</p>
+
+<!-- Footer -->
+    <footer>
+        <div class="copyright">
+            Copyright © 2025 Snaptube
+        </div>
+        <div class="footer-links">
+            <a href="#">About Us</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Use</a>
+            <a href="#">How to Install</a>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Sidebar Toggle
+        const menuBtn = document.querySelector('.menu-btn');
+        const closeBtn = document.querySelector('.close-btn');
+        const sidebar = document.querySelector('.sidebar');
+
+        if (menuBtn && closeBtn && sidebar) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        }
+</script>
+</body>
+  </html>
