@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-straight/css/uicons-solid-straight.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-          root {
+        :root {
             --text-color: #333;
             --accent-color: #1e88e5;
             --primary-color: #ff4500;
@@ -21,26 +21,31 @@
             --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.2);
             --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
             --transition-normal: all 0.3s ease;
-          }
-        
+        }
+
         /* General Styles */
         body {
             scroll-behavior: smooth;
             background-color: #F9F9F9;
-            color: white;
+            color: var(--text-color);
             font-family: 'Poppins', sans-serif;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
 
         /* Navbar */
         .custom-navbar {
             background: white;
             padding: 10px 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-sm);
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
+            position: fixed;
+            width: 100%;
+            top: 0;
         }
 
         .navbar-logo {
@@ -57,8 +62,7 @@
             margin-right: 8px;
         }
 
-
-h1 {
+        h1 {
             color: var(--text-color);
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
@@ -66,20 +70,20 @@ h1 {
             text-align: center;
         }
 
-         h2 {
-    color: var(--text-color);
-    font-size: 1.8rem;
-    margin: 1.5rem 0 1rem;
-    font-weight: bold;
-    text-align: center;
-    position: relative;
-    padding-bottom: 10px;
-  }
+        h2 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin: 1.5rem 0 1rem;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
 
-h2::after {
-    display: none;
-}
-        
+        h2::after {
+            display: none;
+        }
+
         .menu-btn, .close-btn {
             background: none;
             border: none;
@@ -99,10 +103,11 @@ h2::after {
             left: -250px;
             width: 250px;
             height: 100%;
-            background: #f8f8f8;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            background: var(--bg-light);
+            box-shadow: var(--shadow-md);
             padding-top: 50px;
-            transition: left 0.3s ease-in-out;
+            transition: var(--transition-normal);
+            z-index: 1001;
         }
 
         .sidebar.active {
@@ -130,7 +135,7 @@ h2::after {
         /* Hero Section */
         .hero-section {
             text-align: center;
-             padding: 60px 20px;
+            padding: 100px 20px 60px;
             background: linear-gradient(180deg, #ffcc00, #ff9900);
             color: #000;
         }
@@ -146,14 +151,14 @@ h2::after {
             font-weight: bold;
             border: none;
             cursor: pointer;
-            display: block;
+            display: inline-block;
             margin: 10px auto;
-            transition: 0.3s;
+            transition: var(--transition-normal);
             text-decoration: none;
         }
 
         .download-btn {
-            background: #ff4500;
+            background: var(--primary-color);
             color: white;
             padding: 15px 40px;
             font-size: 21px;
@@ -167,26 +172,12 @@ h2::after {
         }
 
         .download-btn:hover {
-            background: #d63c00;
+            background: var(--primary-hover);
         }
 
         .beta-btn:hover {
             background: #f0f0f0;
         }
-
-        h2 {
-    color: Black;
-    font-size: 1.8rem;
-    margin: 1.5rem 0 1rem;
-    font-weight: bold;
-    text-align: center;
-    position: relative;
-    padding-bottom: 10px;
-  }
-
-h2::after {
-    display: none;
-}
 
         .security-verified {
             font-size: 14px;
@@ -239,7 +230,7 @@ h2::after {
         /* Platform Features Section */
         .platform-features {
             padding: 20px;
-            background: #F9F9F9;
+            background: var(--bg-light);
             border-radius: 10px;
             margin: 20px auto;
             max-width: 800px;
@@ -248,7 +239,7 @@ h2::after {
         .platform-features h2 {
             font-size: 24px;
             font-weight: bold;
-            color: #ff4500;
+            color: var(--primary-color);
             text-align: center;
             margin-bottom: 20px;
         }
@@ -261,7 +252,7 @@ h2::after {
 
         .platform-features .feature-item i {
             font-size: 24px;
-            color: #ff4500;
+            color: var(--primary-color);
             margin-right: 10px;
         }
 
@@ -307,7 +298,7 @@ h2::after {
         }
 
         footer .footer-links a:hover {
-            color: #ff4500;
+            color: var(--primary-color);
         }
 
         footer .copyright {
@@ -316,16 +307,8 @@ h2::after {
         }
 
         /* Testimonial Widget Styles */
-        :root {
-            --primary-color: #FFD600;
-            --secondary-color: #007bff;
-            --text-dark: #333;
-            --text-light: #666;
-            --background-light: #FFF9C4;
-        }
-
         .testimonial-widget {
-            background-color: var(--primary-color);
+            background: linear-gradient(180deg, #ffcc00, #ff9900); /* Gradient background */
             border-radius: 20px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.1);
             max-width: 1000px;
@@ -340,13 +323,13 @@ h2::after {
         .widget-headline {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--text-color);
             margin-bottom: 40px;
             line-height: 1.3;
         }
 
         .widget-headline span {
-            color: var(--secondary-color);
+            color: var(--accent-color);
         }
 
         .testimonial-slider {
@@ -399,17 +382,17 @@ h2::after {
         .user-name {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--text-dark);
+            color: var(--text-color);
         }
 
         .user-role {
             font-size: 0.9rem;
-            color: var(--text-light);
+            color: var(--text-color);
         }
 
         .testimonial-text {
             font-size: 1.1rem;
-            color: var(--text-light);
+            color: var(--text-color);
             line-height: 1.8;
             max-width: 700px;
             margin: 0 auto;
@@ -497,6 +480,7 @@ h2::after {
             transform: translateY(20px);
             animation: fadeIn 1s ease-out forwards;
             background: #4162A7;
+            color: white; /* تغيير لون النص إلى الأبيض */
         }
 
         @keyframes fadeIn {
@@ -510,12 +494,14 @@ h2::after {
             font-size: 24px;
             font-weight: bold;
             animation: fadeIn 1s ease-in-out;
+            color: white; /* تغيير لون النص إلى الأبيض */
         }
 
         .footer2 .sub-text {
             font-size: 18px;
             font-weight: bold;
             transition: all 0.3s ease;
+            color: white; /* تغيير لون النص إلى الأبيض */
         }
 
         .footer2 .sub-text:hover {
@@ -560,6 +546,7 @@ h2::after {
             line-height: 1.5;
             max-width: 80%;
             margin: auto;
+            color: white; /* تغيير لون النص إلى الأبيض */
         }
 
         @media (max-width: 768px) {
@@ -594,7 +581,7 @@ h2::after {
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <button class="close-btn"></button>
+        <button class="close-btn"><i class="fas fa-times"></i></button>
         <ul>
             <li><a href="#">Download Snaptube</a></li>
             <li><a href="#">Snaptube APK</a></li>
@@ -690,7 +677,7 @@ h2::after {
         
         <div class="testimonial-slider">
             <div class="slider-container">
-      <div class="slider" id="testimonialSlider">
+                <div class="slider" id="testimonialSlider">
                     <!-- Testimonial Cards -->
                     <div class="testimonial-card">
                         <div class="user-profile">
@@ -843,12 +830,12 @@ h2::after {
 
             nextBtn.addEventListener('click', () => {
                 nextSlide();
-                resetAutoSlide();
+                clearInterval(autoSlideInterval); // إيقاف التمرير التلقائي عند التفاعل اليدوي
             });
 
             prevBtn.addEventListener('click', () => {
                 prevSlide();
-                resetAutoSlide();
+                clearInterval(autoSlideInterval); // إيقاف التمرير التلقائي عند التفاعل اليدوي
             });
 
             // Pause on hover
