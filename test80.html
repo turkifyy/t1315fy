@@ -12,6 +12,17 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-straight/css/uicons-solid-straight.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
+          root {
+            --text-color: #333;
+            --accent-color: #1e88e5;
+            --primary-color: #ff4500;
+            --primary-hover: #d63c00;
+            --bg-light: #f8f8f8;
+            --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --transition-normal: all 0.3s ease;
+          }
+        
         /* General Styles */
         body {
             scroll-behavior: smooth;
@@ -29,6 +40,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 1000;
         }
 
         .navbar-logo {
@@ -45,6 +57,29 @@
             margin-right: 8px;
         }
 
+
+h1 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+         h2 {
+    color: var(--text-color);
+    font-size: 1.8rem;
+    margin: 1.5rem 0 1rem;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    padding-bottom: 10px;
+  }
+
+h2::after {
+    display: none;
+}
+        
         .menu-btn, .close-btn {
             background: none;
             border: none;
@@ -95,7 +130,7 @@
         /* Hero Section */
         .hero-section {
             text-align: center;
-            padding: 60px 20px;
+             padding: 60px 20px;
             background: linear-gradient(180deg, #ffcc00, #ff9900);
             color: #000;
         }
