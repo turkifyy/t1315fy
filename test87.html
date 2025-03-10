@@ -51,23 +51,17 @@
             transform: scale(1.05);
         }
 
-        /* زر ثابت في وسط الشاشة */
-        .fixed-btn {
+        /* زر ثابت في أسفل الشاشة مع خلفية بيضاء */
+        .fixed-btn-container {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            background-color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
-        }
-
-        /* تحسين تصميم الصفحة */
-        .container {
-            margin-top: 50px;
+            text-align: center;
         }
 
         /* تحسين الزر للأجهزة الصغيرة */
@@ -87,23 +81,10 @@
     </style>
 </head>
 <body>
-  <p>These ULED TVs are built for fast action, supporting a 330Hz system-level refresh rate, one of the highest available on a consumer television. Whether it’s competitive gaming or high-speed sports, motion clarity is taken to the next level, aided by AI motion compensation that minimizes blur. The E8Q series also packs Hisense’s U+Mini LED Halo Control System, optimizing brightness and local dimming for enhanced HDR visuals.
 
-Under the hood, the E8Q runs on the Xinxin AI Picture Quality Chip H6, while the E8Q Pro gets an upgrade to the H7 processor. These chips drive AI-powered enhancements like AI Light and Color Control, ensuring precise adjustments to brightness and color accuracy in real time. The E8Q Pro, in particular, boasts 6120 local dimming zones and XDR Pro technology, enabling an astounding 8500-nit peak brightness for HDR content that pops off the screen. Gaming is a clear priority, with both models featuring four full-bandwidth HDMI 2.1 ports capable of delivering 4K at 170Hz. They are FreeSync Premium Pro-certified, eliminating screen tearing and ensuring a fluid gaming experience, even at high frame rates.
-
-Audio performance isn’t an afterthought here. Hisense has partnered with Devialet to equip the E8Q with a 4.1-channel speaker system, while the E8Q Pro takes it further with a 4.1.2-channel Devialet Cinema Sound setup. The result? Room-filling audio with deep bass and crisp highs, enhanced by Dolby Atmos and IMAX Enhanced certification. Hisense’s AI spatial sound optimization further fine-tunes the output based on room acoustics.
-
-Both models run on Android 14, providing a streamlined interface packed with AI-powered features like DeepSeek AI, which dynamically optimizes visuals based on content. The E8Q comes with 4GB of RAM and 64GB of storage, while the Pro variant bumps storage up to 128GB, ensuring smooth performance and ample space for apps.
-
-Aesthetically, Hisense sticks to a sleek, Bauhaus-inspired design. The E8Q sports a razor-thin 44mm chassis, while the E8Q Pro is just 46mm thick, with an 8mm wall-mount gap that allows them to blend seamlessly into any space. With Pantone Color Certification and Dolby Vision IQ support, these displays promise pro-grade color accuracy straight out of the box.
-
-Pricing and Availability
-The Hisense E8Q series starts at 7,499 yuan (~$1,040) for the 65-inch model, while the 75-inch variant is priced at 9,999 yuan (~$1,385). The 85-inch version comes in at 12,999 yuan (~$1,800), and the largest 100-inch model costs 22,999 yuan (~$3,180).
-
-Meanwhile, the Hisense E8Q Pro lineup offers a 75-inch model for 13,599 yuan (~$1,885), an 85-inch variant at 17,999 yuan (~$2,490), and a 100-inch version priced at 27,999 yuan (~$3,870).</p>
-    <!-- زر ثابت يظهر عند التمرير لأسفل -->
-    <div class="fixed-btn" id="fixedDownloadBtn">
-        <a href="#" class="download-btn">Download App</a>
+    <!-- زر ثابت في أسفل الشاشة مع خلفية بيضاء -->
+    <div class="fixed-btn-container">
+        <a href="#" class="download-btn" id="fixedDownloadBtn">Download App</a>
     </div>
 
     <!-- كود JavaScript لمعالجة التحميل وتحسين التجربة -->
@@ -122,18 +103,6 @@ Meanwhile, the Hisense E8Q Pro lineup offers a 75-inch model for 13,599 yuan (~$
                 return "Unknown";
             }
         }
-
-        /**
-         * إظهار الزر الثابت عند التمرير
-         */
-        window.addEventListener("scroll", function () {
-            let fixedBtn = document.getElementById("fixedDownloadBtn");
-            if (window.scrollY > 100) { 
-                fixedBtn.style.display = "block";
-            } else {
-                fixedBtn.style.display = "none";
-            }
-        });
 
         /**
          * تنفيذ تحميل التطبيق عند الضغط على أي زر تحميل
