@@ -1,114 +1,107 @@
-<!DOCTYPE html>
-<html lang="en">
+ <!DOCTYPE html>
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download the App</title>
-    
+    <title>تحميل التطبيق</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Google Analytics for Download Tracking -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-XXXXXXXXXX'); // Replace with your Google Analytics ID
+        gtag('config', 'G-XXXXXXXXXX'); // ضع Google Analytics ID هنا
     </script>
 
     <style>
-        /* General Styling */
+        /* تصميم الصفحة بالكامل */
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(to bottom, #ffffff, #f8f9fa);
             text-align: center;
-            direction: ltr; /* Set direction to left-to-right */
+            direction: ltr; /* لضمان الاتجاه من اليسار إلى اليمين */
+            margin: 0;
+            padding: 0;
         }
 
-        /* Download Button */
+        /* تصميم زر التحميل */
         .download-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #ff6600;
+            display: inline-block;
+            background: linear-gradient(to right, #ff9800, #ff6600); /* لون متدرج مثل Snaptube */
             color: white;
-            padding: 15px 25px;
-            border: none;
-            border-radius: 30px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            transition: opacity 0.3s ease-in-out, transform 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 102, 0, 0.3);
+            transition: all 0.3s ease-in-out;
+            text-decoration: none;
         }
 
+        /* تأثير عند تمرير الفأرة */
         .download-btn:hover {
-            background-color: #ff5500;
+            background: linear-gradient(to right, #ff8800, #ff5500);
+            box-shadow: 0 8px 20px rgba(255, 102, 0, 0.5);
             transform: scale(1.05);
         }
 
-        /* Page Container */
+        /* زر ثابت في أسفل الشاشة */
+        .fixed-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+        }
+
+        /* تحسين تصميم الصفحة */
         .container {
             margin-top: 50px;
         }
 
-        /* Responsive Design - Media Queries */
+        /* تحسين الزر للأجهزة الصغيرة */
         @media (max-width: 768px) {
             .download-btn {
-                bottom: 15px;
-                right: 15px;
-                padding: 12px 20px;
-                font-size: 16px;
+                font-size: 18px;
+                padding: 12px 35px;
             }
         }
 
         @media (max-width: 480px) {
             .download-btn {
-                bottom: 10px;
-                right: 10px;
-                padding: 10px 18px;
-                font-size: 14px;
+                font-size: 16px;
+                padding: 10px 30px;
             }
         }
     </style>
 </head>
 <body>
 
+    <!-- المحتوى الرئيسي -->
     <div class="container">
-        <h1 class="my-4">Welcome to the App Download Page</h1>
-        <p class="lead">Download our app now and enjoy the best features! Users on Google Workspace Business and Enterprise tiers, as well as customers with a Gemini Education, Gemini Education Premium, or Google One AI Premium plan, are eligible for the new feature. (Users who previously purchased the now-deprecated Gemini Business or Gemini Enterprise add-ons are also eligible.) Admins can enable “Add to calendar” by switching on smart features and personalization from the Workspace Admin console.
+        <h1 class="my-4">قم بتحميل التطبيق الآن</h1>
+        <p class="lead">احصل على أفضل الميزات عبر تحميل تطبيقنا الآن! ggggggggggggggggggggggggggggggggggggggggggggghggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggghg</p>
 
-“Add to calendar” is only the latest Gemini-powered tool to reach Gmail inboxes. In June 2024, Google added new capabilities to Gmail on the web to help users write emails and summarize email threads, plus ask questions and find specific information from emails within an inbox. Some of those capabilities came to the Gmail apps for iOS and Android toward the end of last year. Both models equip XDR display technology, with the Q10L achieving an impressive 4,500 nits peak brightness, while the Q10L Pro reaches a staggering 6,500 nits. This extreme brightness level ensures vivid highlights and enhanced HDR performance, making content appear more lifelike. The 7,000:1 ultra-high native contrast ratio delivers deep blacks and crisp whites.
-
-For improved clarity and color accuracy, the series comes with Butterfly Wing Brilliance Screen technology and 98% DCI-P3 quantum dot wide color gamut, ensuring true-to-life colors and professional-grade accuracy with ΔE<0.99. Additionally, it integrates a 0.5% LR low-reflection film, significantly reducing glare and maintaining clarity in bright environments.
-
-The TCL Q10L series equips a 2.2.2 Hi-Fi audio system, developed in collaboration with Onkyo, delivering rich bass, clear dialogue, and immersive surround sound. The Q10L Pro enhances this with independent Atmos channels, offering a more expansive and detailed soundscape.
-
-Both models feature TCL’s Fuxi AI giant model, an intelligent system that automatically adjusts contrast, brightness, and sharpness based on the displayed content. The TVs further optimize the user experience with Ling Control System 3.0, ensuring a smooth, ad-free startup and personalized content recommendations. The DeepSeek large AI model is also integrated, offering an adaptive and intuitive smart TV interface.
-
-The Q10L series sports an ultra-thin ZeroBorder design, creating a virtually bezel-free display for a more immersive viewing experience. They come with a custom-designed magnetic wall mount, giving the illusion of a floating screen when installed.
-
-The lineup equips HDMI 2.1 ports, supporting high refresh rates of up to 144Hz in 4K resolution and up to 240Hz in lower resolutions, making it ideal for next-generation gaming consoles. They support Variable Refresh Rate (VRR) and Auto Low Latency Mode (ALLM), ensuring ultra-smooth motion, reduced input lag, and a highly responsive gaming experience.
-
-Pricing and Availability
-The TCL Q10L series is competitively priced, with the standard model starting at 5,999 yuan (~$826) and the Q10L Pro from 7,199 yuan (~$992) after subsidies.
-
-Earlier this year, TCL introduced the Thunderbird Q8 Special Edition, a 34-inch Mini LED ultrawide monitor with a 180Hz refresh rate, along with the new Thunderbird 300Hz gaming monitor, which comes at a surprisingly affordable price.</p>
-        
+        <!-- زر التحميل الرئيسي -->
+        <a href="#" class="download-btn" id="mainDownloadBtn">📥 تحميل التطبيق</a>
     </div>
 
-    <button class="download-btn" id="downloadBtn">📥 Download App</button>
+    <!-- زر ثابت يظهر عند التمرير لأسفل -->
+    <a href="#" class="download-btn fixed-btn" id="fixedDownloadBtn">📥 تحميل التطبيق</a>
 
+    <!-- كود JavaScript لمعالجة التحميل وتحسين التجربة -->
     <script>
         /**
-         * Function to detect the user's device type
+         * كود لاكتشاف نوع الجهاز
          */
         function detectDevice() {
             let userAgent = navigator.userAgent || navigator.vendor || window.opera;
             let platform = navigator.platform.toLowerCase();
-
             if (/android/i.test(userAgent)) {
                 return "Android";
             } else if (/iPhone|iPad|iPod/i.test(userAgent) || /iOS/i.test(platform)) {
@@ -119,46 +112,52 @@ Earlier this year, TCL introduced the Thunderbird Q8 Special Edition, a 34-inch 
         }
 
         /**
-         * Show the download button when scrolling down
+         * إظهار الزر الثابت عند التمرير
          */
         window.addEventListener("scroll", function () {
-            let downloadBtn = document.getElementById("downloadBtn");
+            let fixedBtn = document.getElementById("fixedDownloadBtn");
             if (window.scrollY > 100) { 
-                downloadBtn.style.display = "block";
+                fixedBtn.style.display = "block";
+            } else {
+                fixedBtn.style.display = "none";
             }
         });
 
         /**
-         * Handle app download when the button is clicked
+         * تنفيذ تحميل التطبيق عند الضغط على أي زر تحميل
          */
-        document.getElementById("downloadBtn").addEventListener("click", function () {
+        function handleDownload() {
             let deviceType = detectDevice();
             let downloadLink = "";
 
             if (deviceType === "Android") {
-                downloadLink = "https://drive.google.com/your-android-app.apk"; 
+                downloadLink = "https://drive.google.com/your-android-app.apk"; // رابط تحميل الأندرويد
             } else if (deviceType === "iOS") {
-                downloadLink = "https://drive.google.com/your-ios-app.ipa"; 
+                downloadLink = "https://drive.google.com/your-ios-app.ipa"; // رابط تحميل iOS
             } else {
-                alert("Sorry, your device is not supported!");
+                alert("عذراً، جهازك غير مدعوم!");
                 return;
             }
 
-            // Track download event in Google Analytics
+            // إرسال حدث التحميل إلى Google Analytics
             gtag('event', 'download', {
                 'event_category': 'App Download',
                 'event_label': deviceType,
                 'value': 1
             });
 
-            // Start app download
+            // بدء تحميل التطبيق
             window.location.href = downloadLink;
 
-            // Redirect to "How to Install" page after 3 seconds
+            // إعادة توجيه المستخدم إلى صفحة "كيفية التثبيت" بعد 3 ثوانٍ
             setTimeout(function () {
-                window.location.href = "https://yourwebsite.com/how-to-install"; 
+                window.location.href = "https://yourwebsite.com/how-to-install";
             }, 3000);
-        });
+        }
+
+        // ربط الأزرار بوظيفة التحميل
+        document.getElementById("mainDownloadBtn").addEventListener("click", handleDownload);
+        document.getElementById("fixedDownloadBtn").addEventListener("click", handleDownload);
     </script>
 
     <!-- Bootstrap JavaScript -->
