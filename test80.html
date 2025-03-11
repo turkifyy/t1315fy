@@ -46,13 +46,13 @@
         /* Navbar */
         .custom-navbar {
             background: white;
-            padding: 10px 15px;
+            padding: 8px 15px; /* تصغير حجم النافبار */
             box-shadow: var(--shadow-sm);
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            position: relative; /* تغيير position إلى relative */
+            position: relative;
             width: 100%;
             top: 0;
         }
@@ -66,8 +66,8 @@
         }
 
         .navbar-logo img {
-            width: 25px; /* تصغير حجم الشعار */
-            height: 25px; /* تصغير حجم الشعار */
+            width: 25px;
+            height: 25px;
             margin-right: 8px;
         }
 
@@ -176,8 +176,8 @@
         .beta-btn {
             background: white;
             color: #A9A9A9;
-            padding: 20px 30px; /* زيادة padding */
-            font-size: 16px;
+            padding: 15px 40px; /* نفس حجم زر Download-btn */
+            font-size: 21px; /* نفس حجم زر Download-btn */
         }
 
         .download-btn:hover {
@@ -202,13 +202,14 @@
             margin-right: 5px;
             color: #3988B3;
         }
-         .download-btn123 {
+
+        .download-btn123 {
             display: inline-block;
-            background: #FF5500; /* اللون الجديد للزر */
+            background: #FF5500;
             color: white;
-            font-size: 1.5em; /* حجم الخط النسبي */
+            font-size: 1.5em;
             font-weight: bold;
-            padding: 1.2em 2.5em; /* زيادة حجم الزر */
+            padding: 1.2em 2.5em;
             border: none;
             border-radius: 50px;
             cursor: pointer;
@@ -216,53 +217,48 @@
             text-decoration: none;
             position: relative;
             overflow: hidden;
-            white-space: nowrap; /* منع انكسار النص */
-            box-shadow: 0 5px 15px rgba(255, 85, 0, 0.3); /* ظل للزر */
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(255, 85, 0, 0.3);
         }
 
-        /* تأثير عند تمرير الفأرة */
         .download-btn123:hover {
-            background: #FF4500; /* لون أغمق قليلاً عند التمرير */
+            background: #FF4500;
             transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(255, 85, 0, 0.5); /* ظل أكبر عند التمرير */
+            box-shadow: 0 8px 20px rgba(255, 85, 0, 0.5);
         }
 
-        /* تأثير النقر على الزر */
         .download-btn123:active {
             transform: scale(0.95);
         }
 
-        /* زر ثابت في أسفل الشاشة */
         .fixed-btn-container {
             position: fixed;
-            bottom: -100px; /* مخفي في البداية */
-            left: 50%; /* توسيط الزر */
-            transform: translateX(-50%); /* توسيط الزر */
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1000;
             text-align: center;
             transition: bottom 0.5s ease-in-out;
-            
         }
 
-        /* إظهار الزر عند التمرير لأسفل */
         .fixed-btn-container.visible {
-            bottom: 20px; /* ظهور الزر أعلى قليلاً */
+            bottom: 20px;
         }
 
-        /* تحسين الزر للأجهزة الصغيرة */
         @media (max-width: 768px) {
             .download-btn123 {
-                font-size: 1.2em; /* حجم أصغر للشاشات الصغيرة */
-                padding: 1em 2em; /* padding أصغر */
+                font-size: 1.2em;
+                padding: 1em 2em;
             }
         }
 
         @media (max-width: 480px) {
             .download-btn123 {
-                font-size: 1em; /* حجم أصغر للشاشات الصغيرة جدًا */
-                padding: 0.8em 1.5em; /* padding أصغر */
+                font-size: 1em;
+                padding: 0.8em 1.5em;
             }
         }
+
         /* Main Content */
         .main-content {
             padding: 30px 15px;
@@ -297,7 +293,11 @@
             width: auto;
             border-radius: 10px;
             margin-bottom: 20px;
-            
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .phone-image:hover {
+            transform: scale(1.05); /* تكبير الصورة عند التمرير */
         }
 
         /* Platform Features Section */
@@ -345,6 +345,7 @@
             height: auto;
             border-radius: 10px;
             margin-bottom: 20px;
+            object-fit: cover; /* منع انكسار الصور */
         }
 
         /* Footer */
@@ -353,7 +354,7 @@
             color: white;
             padding: 20px 0;
             text-align: center;
-            margin-top: 0; /* إزالة الهامش الأبيض بين footer2 و footer */
+            margin-top: 0;
             box-sizing: border-box;
         }
 
@@ -381,23 +382,23 @@
 
         /* Testimonial Widget Styles */
         .testimonial-widget {
-            background: linear-gradient(180deg, #ffcc00, #ff9900); /* Gradient background */
+            background: linear-gradient(180deg, #ffcc00, #ff9900);
             border-radius: 20px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.1);
             max-width: 1000px;
             width: 100%;
-            padding: 50px 30px;
+            padding: 30px 20px; /* تصغير حجم Testimonial Card */
             position: relative;
             overflow: hidden;
             text-align: center;
-            margin: 40px auto 0; /* إزالة الهوامش الزائدة */
+            margin: 40px auto 0;
         }
 
         .widget-headline {
-            font-size: 2.5rem;
+            font-size: 2rem; /* تصغير حجم العنوان */
             font-weight: 700;
             color: var(--text-color);
-            margin-bottom: 40px;
+            margin-bottom: 30px; /* تقليل الهامش */
             line-height: 1.3;
         }
 
@@ -425,28 +426,28 @@
             flex: 0 0 100%;
             background-color: white;
             border-radius: 15px;
-            padding: 35px;
+            padding: 25px; /* تصغير حجم Testimonial Card */
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            margin: 0; /* إزالة الهوامش الزائدة */
+            margin: 0;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px; /* تقليل الهامش */
         }
 
         .user-avatar {
-            width: 80px;
-            height: 80px;
+            width: 60px; /* تصغير حجم الصورة */
+            height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            margin-right: 20px;
-            border: 3px solid #ffcc00; /* تغيير لون الحدود إلى الأصفر */
+            margin-right: 15px;
+            border: 3px solid #ffcc00;
         }
 
         .user-info {
@@ -454,20 +455,20 @@
         }
 
         .user-name {
-            font-size: 1.2rem;
+            font-size: 1rem; /* تصغير حجم الخط */
             font-weight: 600;
             color: var(--text-color);
         }
 
         .user-role {
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* تصغير حجم الخط */
             color: var(--text-color);
         }
 
         .testimonial-text {
-            font-size: 1.1rem;
+            font-size: 0.9rem; /* تصغير حجم الخط */
             color: var(--text-color);
-            line-height: 1.8;
+            line-height: 1.6; /* تقليل ارتفاع السطر */
             max-width: 700px;
             margin: 0 auto;
         }
@@ -479,8 +480,8 @@
             background-color: rgba(0,0,0,0.5);
             color: white;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 40px; /* تصغير حجم الأسهم */
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -495,39 +496,39 @@
         }
 
         .navigation-arrow.prev {
-            left: 20px;
+            left: 10px; /* تقليل المسافة */
         }
 
         .navigation-arrow.next {
-            right: 20px;
+            right: 10px; /* تقليل المسافة */
         }
 
         @media (max-width: 768px) {
             .widget-headline {
-                font-size: 1.8rem;
+                font-size: 1.5rem; /* تصغير حجم العنوان للشاشات الصغيرة */
             }
 
             .testimonial-card {
-                padding: 25px;
+                padding: 20px; /* تصغير حجم Testimonial Card للشاشات الصغيرة */
             }
 
             .user-avatar {
-                width: 60px;
-                height: 60px;
-                margin-right: 15px;
+                width: 50px; /* تصغير حجم الصورة للشاشات الصغيرة */
+                height: 50px;
+                margin-right: 10px;
             }
 
             .user-name {
-                font-size: 1rem;
+                font-size: 0.9rem; /* تصغير حجم الخط للشاشات الصغيرة */
             }
 
             .testimonial-text {
-                font-size: 0.9rem;
+                font-size: 0.8rem; /* تصغير حجم الخط للشاشات الصغيرة */
             }
 
             .navigation-arrow {
-                width: 40px;
-                height: 40px;
+                width: 35px; /* تصغير حجم الأسهم للشاشات الصغيرة */
+                height: 35px;
             }
         }
 
@@ -539,7 +540,7 @@
 
             .user-avatar {
                 margin-right: 0;
-                margin-bottom: 15px;
+                margin-bottom: 10px;
             }
 
             .user-info {
@@ -554,8 +555,8 @@
             transform: translateY(20px);
             animation: fadeIn 1s ease-out forwards;
             background: #4162A7;
-            color: white; /* تغيير لون النص إلى الأبيض */
-            margin-bottom: 0; /* إزالة الهامش الأبيض بين footer2 و footer */
+            color: white;
+            margin-bottom: 0;
         }
 
         @keyframes fadeIn {
@@ -569,14 +570,14 @@
             font-size: 24px;
             font-weight: bold;
             animation: fadeIn 1s ease-in-out;
-            color: white; /* تغيير لون النص إلى الأبيض */
+            color: white;
         }
 
         .footer2 .sub-text {
             font-size: 18px;
             font-weight: bold;
             transition: all 0.3s ease;
-            color: white; /* تغيير لون النص إلى الأبيض */
+            color: white;
         }
 
         .footer2 .sub-text:hover {
@@ -621,7 +622,7 @@
             line-height: 1.5;
             max-width: 80%;
             margin: auto;
-            color: white; /* تغيير لون النص إلى الأبيض */
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -670,21 +671,21 @@
     <section class="hero-section">
         <h1>Download Snaptube APK Free for Android MP3 Downloader</h1>
         <a href="#features" class="download-btn" id="fixedDownloadBtn">Download Snaptube</a>
-        <a href="#" class="beta-btn" id="fixedDownloadBtn">Beta Version</a>
+        <a href="#" class="beta-btn" id="betaDownloadBtn">Beta Version</a>
         <div class="security-verified">
             <i class="fas fa-shield-alt"></i> Security Verified
         </div>
         
     </section>
       <div class="fixed-btn-container" id="fixedBtnContainer">
-        <a href="#" class="download-btn123" id="fixedDownloadBtn">Download App</a>
+        <a href="#" class="download-btn123" id="fixedDownloadBtn123">Download App</a>
       </div>
     
     <!-- Main Content -->
     <section id="features" class="main-content container">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6s0wvEPX2-TNKW168KZndwvvYMLy_Od6CSnFBv-KZTdcrYge3HkvBapQ4XHEYAcOqBtUJslNja9Plc94eqC0DEHUdIRyhT5kyByt_4w0CHM7k2a1k_AHds5xndvltuX77builKhMZi6-CQbkQ7PAXinswlv6qfDVEQ9nv3_PtLm-V-_6II74YZ69kAuY/s720/banner.webp"Snaptube App" class="phone-image"/>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6s0wvEPX2-TNKW168KZndwvvYMLy_Od6CSnFBv-KZTdcrYge3HkvBapQ4XHEYAcOqBtUJslNja9Plc94eqC0DEHUdIRyhT5kyByt_4w0CHM7k2a1k_AHds5xndvltuX77builKhMZi6-CQbkQ7PAXinswlv6qfDVEQ9nv3_PtLm-V-_6II74YZ69kAuY/s720/banner.webp" alt="Snaptube App" class="phone-image"/>
             </div>
             
         </div>
@@ -918,8 +919,7 @@
             // Initial auto-slide
             resetAutoSlide();
         }
-    </script>
-    <script>
+
         /**
          * كود لاكتشاف نوع الجهاز
          */
@@ -971,6 +971,8 @@
 
         // ربط الأزرار بوظيفة التحميل
         document.getElementById("fixedDownloadBtn").addEventListener("click", handleDownload);
+        document.getElementById("betaDownloadBtn").addEventListener("click", handleDownload);
+        document.getElementById("fixedDownloadBtn123").addEventListener("click", handleDownload);
 
         /**
          * إظهار الزر الثابت عند التمرير لأسفل
