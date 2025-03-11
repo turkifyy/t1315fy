@@ -61,10 +61,14 @@
         .fixed-btn-container {
             position: fixed;
             bottom: -100px; /* مخفي في البداية */
-            left: 0;
-            width: 100%;
+            left: 50%; /* توسيط الخلفية */
+            transform: translateX(-50%); /* توسيط الخلفية */
+            width: auto; /* عرض تلقائي يتناسب مع الزر */
+            max-width: 90%; /* أقصى عرض للخلفية */
             background: white; /* خلفية بيضاء */
-            padding: 1.5em 0; /* زيادة حجم الحاوية */
+            padding: 1em 2em; /* زيادة حجم الحاوية */
+            border-radius: 50px; /* حواف دائرية */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* ظل أبيض */
             z-index: 1000;
             text-align: center;
             transition: bottom 0.5s ease-in-out;
@@ -72,7 +76,7 @@
 
         /* إظهار الزر عند التمرير لأسفل */
         .fixed-btn-container.visible {
-            bottom: 0;
+            bottom: 20px; /* ظهور الخلفية أعلى قليلاً */
         }
 
         /* تحسين الزر للأجهزة الصغيرة */
@@ -92,11 +96,7 @@
     </style>
 </head>
 <body>
- <p>Repairing your iPhone without shelling out lots of money to Apple has long felt impossible. But, with recent Right to Repair laws in the likes of Colorado and Oregon, the new iPhones are a bit easier to repair without ever setting foot in an Apple store. This shift includes Apple's latest product, the iPhone 16e, which debuted last month. It received a provisional 7/10 rating from iFixit thanks to features like a new repair guide for the USB-C port and its easy-release battery adhesive.
-
-The charging port repair guide is a big deal and something even the other iPhone 16s don't offer. However, that's not to say it's a simple process. First, you have to remove the back glass, selfie camera, top earpiece speaker, battery, Taptic Engine and the list goes on. Then you have to lift up the logic board to access the port replacement bit. So, it's still a bit of a mess, but at least you now know you're taking the right steps as you go along it.
-
-The iPhone also offers the same electrically released battery adhesive as its fellow iPhone 16 models. It replaces the stretch-release adhesive which never worked as well as you'd hope. This is also the first time an iPhone has Apple's C1 modem after a decade of rumored development. iFixit got down and dirty with the logic board to explore the C1 modem. The team went so far as to run the C1 through a CT scanner, which revealed that there's not a trace of Qualcomm tech in the package.</p>
+  <p>Repairing your iPhone without shelling out lots of money to Apple has long felt impossible. But, with recent Right to Repair laws in the likes of Colorado and Oregon, the new iPhones are a bit easier to repair without ever setting foot in an Apple store. This shift includes Apple's latest product, the iPhone 16e, which debuted last month. It received a provisional 7/10 rating from iFixit thanks to features like a new repair guide for the USB-C port and its easy-release battery adhesive. The charging port repair guide is a big deal and something even the other iPhone 16s don't offer. However, that's not to say it's a simple process. First, you have to remove the back glass, selfie camera, top earpiece speaker, battery, Taptic Engine and the list goes on. Then you have to lift up the logic board to access the port replacement bit. So, it's still a bit of a mess, but at least you now know you're taking the right steps as you go along it. The iPhone also offers the same electrically released battery adhesive as its fellow iPhone 16 models. It replaces the stretch-release adhesive which never worked as well as you'd hope. This is also the first time an iPhone has Apple's C1 modem after a decade of rumored development. iFixit got down and dirty with the logic board to</p>
     <!-- زر ثابت في أسفل الشاشة مع خلفية بيضاء -->
     <div class="fixed-btn-container" id="fixedBtnContainer">
         <a href="#" class="download-btn" id="fixedDownloadBtn">Download App</a>
