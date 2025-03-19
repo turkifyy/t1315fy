@@ -1,0 +1,1303 @@
+<html dir="rtl" lang="en">
+<head>
+    <meta charset="UTF-8"></meta>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+    <meta content="
+        default-src 'self' https://www.egybest.co.in;
+                    
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.egybest.co.in;
+                                                        
+        style-src 'self' 'unsafe-inline' https://www.egybest.co.in;
+                                    
+        img-src 'self' data: https://www.egybest.co.in;
+                             
+        frame-src 'self' https://www.egybest.co.in;
+                        
+        connect-src 'self' https://www.egybest.co.in;
+                            
+    " http-equiv="Content-Security-Policy"></meta>
+    <meta content="Explore EgyBest: The best platform to stream and download movies and series for free in HD quality, including Arabic subtitles. Watch trending content like Avatar, John Wick, and more." name="description"></meta>
+    <meta content="EgyBest,إيجي بيست,Free movie streaming, Download series, Arabic subtitles, افلام مترجمة, مسلسلات مترجمة , فيلم مترجم , مسلسل مترجم , Squid game season 2 ,Latest movies, Avatar: The Way of Water, John Wick 4, Squid Game, Breaking Bad" name="keywords"></meta>
+    <meta content="turkify" name="author"></meta>
+    <title>EgyBest: Stream and Download Free Movies & Series</title>
+    <meta content="EgyBest: Free Movies &amp; Series Streaming" property="og:title"></meta>
+    <meta content="Discover EgyBest, the ultimate platform for free movie and series streaming in HD with Arabic subtitles. Explore trending content today!" property="og:description"></meta>
+    <meta content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgXV-ZxMo3WqbJXAmhUxOt_mTe1S2zI7ipgzbEuGtFCoBBi4fN0f0vPzCTqfVmUTP0IwJZkAH36PCp5nw99nFIMAIjWjSU98W6xlA7Ar6i24CHGeXB-J6rSndTVmeSMVOPVJxvDoRGc2HXT0D2-W_ldQDPNuBSFwCRTKRH_bGU0bE11XphxgxJbetQS6VY/s1200/20250126_192057.png" property="og:image"></meta>
+    <meta content="https://example.com/egybest" property="og:url"></meta>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "EgyBest - Free Movies and Series",
+        "description": "EgyBest is the leading platform offering free streaming and downloading of movies and series with Arabic subtitles in HD quality.",
+        "url": "https://example.com/egybest",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://example.com/egybest"
+        },
+        "image": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgXV-ZxMo3WqbJXAmhUxOt_mTe1S2zI7ipgzbEuGtFCoBBi4fN0f0vPzCTqfVmUTP0IwJZkAH36PCp5nw99nFIMAIjWjSU98W6xlA7Ar6i24CHGeXB-J6rSndTVmeSMVOPVJxvDoRGc2HXT0D2-W_ldQDPNuBSFwCRTKRH_bGU0bE11XphxgxJbetQS6VY/s1200/20250126_192057.png",
+        "author": {
+            "@type": "Person",
+            "name": "Turkify"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "EgyBest",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiqayxhA1t69hf3GXZ5DhtnCzhgzi6tKz0xkXy8i3SKzPQpmts4uBb6Y3PFygqbk5nfJH85qJJ6n_xlRyKjFhuXmEcFfQw1-TErfPISEXYu85XYAELXSMDRhDr8cwB0slw4rSjCW2WHlWOJm8DQfiGr9GHpiU6GzyG8WtuQTlEAIz4kyaUcXYTeDlE5O_Y/s500/20241224_200907.png"
+            }
+        }
+    }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.rtl.min.css" rel="stylesheet"></link>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"></link>
+    
+    <style>
+    /* Variables */
+    :root {
+        --primary-color: #0070ff;
+        --secondary-color: #00adef;
+        --dark-bg: #121212;
+        --text-color: #ffffff;
+         --success-color: #28a745;
+        --whatsapp-color: #25D366;
+        --modal-bg: rgba(0, 0, 0, 0.6);
+        --white: #ffffff;
+        --black: #000000;
+        --modal-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        --transition-speed: 0.3s;
+        --offline-bg: #EEF7FF;
+        
+    }
+
+    /* Global Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--dark-bg);
+        font-family: Arial, sans-serif;
+    }
+
+    /* Logo Container */
+    .logo-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 41000;
+        display: flex;
+        align-items: center;
+    }
+
+    .logo-container img {
+        width: 150px;
+        height: auto;
+        transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        .logo-container img {
+            width: 185px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .logo-container img {
+            width: 175px;
+        }
+    }
+
+    .logo-container:hover img {
+        transform: scale(1.1);
+    }
+
+    /* Orientation Message */
+    .orientation-message {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 40000;
+        text-align: center;
+    }
+
+    /* Timer Circle */
+    .timer-circle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: #808080;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        z-index: 40000;
+    }
+
+    /* Ad Container */
+    .ad-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 40000;
+        backdrop-filter: blur(5px);
+    }
+
+    .ad-frame {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 900px;
+        height: 85vh;
+        border: none;
+        border-radius: 24px;
+        background: white;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+    }
+
+    
+  
+ @font-face {
+        font-family: 'Poppins';
+        src: url('https://cdnjs.cloudflare.com/ajax/libs/poppins-font/1.0.1/Poppins-Bold.ttf') format('truetype');
+        font-weight: 700;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('https://cdnjs.cloudflare.com/ajax/libs/poppins-font/1.0.1/Poppins-Medium.ttf') format('truetype');
+        font-weight: 500;
+    }
+</style>
+<style>
+    .share-system {
+        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        font-weight: 500;
+    }
+
+    .modal-base {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: var(--modal-bg);
+        z-index: 70000;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity var(--transition-speed) ease;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: var(--white);
+        padding: 2.5rem;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 90%;
+        width: 450px;
+        position: relative;
+        transform: scale(0.9);
+        transition: transform var(--transition-speed) ease;
+        box-shadow: var(--modal-shadow);
+    }
+
+    .modal-base.show {
+        opacity: 1;
+    }
+
+    .modal-base.show .modal-content {
+        transform: scale(1);
+    }
+
+    .modal-title {
+        margin-bottom: 2rem;
+        color: var(--black);
+        font-weight: 700;
+        font-size: 1.4rem;
+        line-height: 1.4;
+        letter-spacing: -0.02em;
+    }
+
+    .share-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.8rem;
+    }
+
+    .share-button {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: none;
+        background-color: var(--whatsapp-color);
+        color: var(--white);
+        font-size: 2rem;
+        cursor: pointer;
+        transition: all var(--transition-speed) ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+
+    .share-button:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    }
+
+    .share-button:active {
+        transform: translateY(-2px);
+    }
+
+    .share-text {
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+        color: var(--black);
+        font-weight: 500;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 6px;
+        background: #eee;
+        border-radius: 3px;
+        overflow: hidden;
+        display: none;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--whatsapp-color);
+        width: 0%;
+        transition: width var(--transition-speed) ease;
+    }
+
+    .spinner {
+        display: none;
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--white);
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+    }
+
+    .success-message {
+        color: var(--success-color);
+        display: none;
+        align-items: center;
+        gap: 0.8rem;
+        margin-top: 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .success-modal .modal-content {
+        padding: 3rem;
+        border-radius: 25px;
+    }
+
+    .success-icon {
+        font-size: 4rem;
+        color: var(--success-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .success-text {
+        font-size: 1.3rem;
+        color: var(--primary-color);
+        line-height: 1.7;
+        margin-top: 1.5rem;
+        font-weight: 500;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .modal-content {
+            padding: 2rem;
+            width: 92%;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+        }
+
+        .share-button {
+            width: 65px;
+            height: 65px;
+            font-size: 1.8rem;
+        }
+
+        .success-text {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .modal-content {
+            padding: 1.8rem;
+            width: 95%;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-button {
+            width: 60px;
+            height: 60px;
+            font-size: 1.6rem;
+        }
+
+        .share-text {
+            font-size: 1rem;
+        }
+
+        .success-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+    }
+
+    [dir="ltr"] .modal-base {
+        text-align: left;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
+<style>
+    /* Content Wrapper */
+    .content-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 70px;
+        z-index: 20000;
+    }
+
+    /* Video Iframes */
+    .video-iframe, .video-iframe1, .video-iframe2, .video-iframe3, .video-iframe4, .video-iframe5, .video-iframe6, .video-iframe7, .video-iframe9, .video-iframe10 {
+        width: 100%;
+        height: 100%;
+        border: none;
+        z-index: 40000;
+    }
+
+    /* Iframe Container */
+    .iframe-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+        bottom: 70px;
+        z-index: 40000;
+    }
+
+    .iframe-container.active {
+        display: block;
+    }
+
+    /* Bottom Navigation */
+   
+    .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    z-index: 50000;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    font-size: clamp(12px, 1.2vw, 16px);
+    padding: 10px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 90px;
+}
+
+.nav-item.active {
+    color: #00C6FF;
+}
+
+.nav-item i {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 480px) {
+    .nav-item {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+    .badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+        display: inline-block;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    /* Custom Backgrounds */
+    #dating-content {
+        background: linear-gradient(135deg, #FF9A9E, #FAD0C4);
+    }
+
+    #football-content {
+        background: linear-gradient(135deg, #4CAF50, #81C784);
+    }
+
+    #movies-content {
+        background: #333;
+    }
+
+    #home-content {
+        background: var(--offline-bg);
+    }
+
+    #games-content {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+    }
+
+    #recipes-content, #tv-content, #earnmoney-content, #music-content {
+        background: linear-gradient(135deg, #FFA07A, #FF6347);
+    }
+    
+    #apps-content {
+
+    background: linear-gradient(135deg, #007AFF, #1E3A8A); /* لون أزرق شبيه بألوان التطبيقات */
+
+    }
+    /* Offline Page */
+    .offline-page {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--offline-bg);
+        z-index: 50000;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .offline-page i {
+        font-size: 100px;
+        color: #888;
+    }
+
+    .offline-page h1 {
+        font-size: 24px;
+        color: #333;
+        margin-top: 20px;
+    }
+
+    /* Toast */
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 60000;
+        display: none;
+    }
+
+    /* Responsive Adjustments for Bottom Navigation */
+    @media (max-width: 768px) {
+        .nav-item {
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .nav-item {
+            font-size: 10px;
+            padding: 5px;
+        }
+
+        .nav-item i {
+            font-size: 16px;
+        }
+    }
+
+    /* Responsive Iframe Adjustments */
+    .iframe-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    #games-content iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* General Styles */
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #000, #222);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* Swipe Up Prompt */
+    .swipe-up-prompt {
+        text-align: center;
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 45000;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .swipe-up-prompt.hide {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* Content Container */
+    .content-container {
+        text-align: center;
+    }
+
+    /* Main Image */
+    .main-image {
+        width: 100%;
+        max-width: 250px;
+        max-height: 250px;
+        height: auto;
+        margin: 0 auto;
+        transform: translateX(20px);
+    }
+
+    /* Swipe Text */
+    .swipe-text {
+        margin-top: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Main Content */
+    #mainContent {
+        display: none;
+        padding: 20px;
+        color: white;
+        text-align: center;
+    }
+
+    /* Media Queries for Responsiveness */
+    @media (max-width: 768px) {
+        .main-image {
+            max-width: 200px;
+            max-height: 200px;
+        }
+        .swipe-text {
+            font-size: 22px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .main-image {
+            max-width: 150px;
+            max-height: 150px;
+        }
+        .swipe-text {
+            font-size: 20px;
+        }
+    }
+
+    /* Hide Ads */
+    iframe[src*="doubleclick.net"],
+    iframe[src*="googleads"],
+    iframe[src*="adsense"],
+    iframe[src*="adservice.google.com"],
+    div[id*="google_ads"],
+    div[class*="GoogleActiveView"],
+    div[class*="adsbygoogle"],
+    ins.adsbygoogle {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+    }
+
+    /* Next Episode Button */
+    .next-episode-btn {
+        display: none;
+        position: fixed;
+        bottom: 70px;
+        left: 15px;
+        background: linear-gradient(45deg, #e50914, #b20710);
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 12px 24px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 80000;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        transform: scale(1);
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+    }
+
+    .next-episode-btn:hover {
+        background: linear-gradient(45deg, #ff0a16, #e50914);
+        transform: scale(1.05);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        opacity: 1;
+    }
+
+    .next-episode-btn:active {
+        transform: scale(0.95);
+        background: linear-gradient(45deg, #b20710, #e50914);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Responsive Next Episode Button */
+    @media (max-width: 768px) {
+        .next-episode-btn {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .next-episode-btn {
+            font-size: 12px;
+            padding: 8px 16px;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <!-- Swipe Up Prompt -->
+    <div class="swipe-up-prompt" id="swipeUpPrompt">
+        <div class="content-container">
+            <!-- Main Image -->
+            <img alt="Swipe Up Prompt" class="main-image" src="https://turkify.netlify.app/Swipe_up.webp" /> 
+            <!-- Swipe Up Text -->
+            <div class="swipe-text">Swipe up for more</div>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden until prompt is dismissed) -->
+    <div id="mainContent">
+    </div>
+    <div class="logo-container">
+        <img alt="Logo" src="https://turkify.netlify.app/logo.webp" /> 
+    </div>
+
+    <!-- Offline Page -->
+    <div class="offline-page" id="offlinePage">
+        
+    <img src="https://turkify.netlify.app/Wifi-offline-18060429.webp" alt="Offline" width="70" height="70"/>
+        <h1>لا يوجد اتصال بالإنترنت</h1>
+    </div>
+
+    <div class="iframe-container active" id="home-content">
+        <iframe allowfullscreen="" class="video-iframe1" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t131.html"></iframe> 
+    </div>
+
+    <div class="iframe-container" id="dating-content">
+        <iframe allowfullscreen="" class="video-iframe3" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t132.html"></iframe> 
+    </div>
+ 
+    <div class="iframe-container" id="football-content">
+        <iframe allowfullscreen="" class="video-iframe2" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t133.html"></iframe> 
+    </div>
+
+    <div class="iframe-container" id="movies-content">
+        <iframe allowfullscreen="" class="video-iframe" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t134.html"></iframe>
+    </div>
+
+    <div class="iframe-container" id="games-content">
+        <iframe allowfullscreen="" class="video-iframe4" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t135.html"></iframe>
+    </div>
+
+    <div class="iframe-container" id="tv-content">
+        <iframe allowfullscreen="" class="video-iframe7" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t136.html"></iframe>
+    </div> 
+
+    <div class="iframe-container" id="recipes-content">
+        <iframe allowfullscreen="" class="video-iframe5" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t137.html"></iframe>
+    </div> 
+
+    <div class="iframe-container" id="earnmoney-content">
+        <iframe allowfullscreen="" class="video-iframe6" sandbox="allow-scripts allow-same-origin allow-forms" src="https://turkify.netlify.app/t138.html"></iframe>
+    </div> 
+
+    <!-- زر "Next Episode" -->
+    <button class="next-episode-btn" id="nextEpisodeBtn" onclick="goBack()">
+       ⏭️ Next Episode
+    </button>
+  
+    <div class="iframe-container" id="apps-content">
+
+    <iframe allowfullscreen="" class="video-iframe10" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads" src="https://turkify.netlify.app/t140.html"></iframe>
+</div>
+ 
+    <nav class="bottom-nav">
+        <div class="nav-container">
+          <a class="nav-item" data-target="apps-content" href="#">
+
+    <img src="https://turkify.netlify.app/Google-play-20250226_212933.webp" alt="Home Icon" width="24" height="24"/>
+
+    <span>Apps</span>
+
+    <span class="badge">4</span>
+
+</a>
+            
+            <a class="nav-item" data-target="earnmoney-content" href="#">
+                <img alt="Shahid VIP Icon" height="24" src="https://turkify.netlify.app/Shahid-1740605030935.webp" width="24" /> 
+                <span>Series</span>
+                <span class="badge">3</span>
+            </a>
+            <a class="nav-item" data-target="tv-content" href="#">
+                <img alt="IPTV Icon" height="24" src="https://turkify.netlify.app/iptv-20250226_212553.webp" width="24" />
+                <span>TV</span>
+                <span class="badge">5</span>
+            </a>  
+            <a class="nav-item" data-target="recipes-content" href="#">
+                <img src="https://turkify.netlify.app/cockpad-20250226_212749.webp" alt="Cookpad Icon" width="24" height="24"/>
+                <span>Recipes</span>
+                <span class="badge">7</span>
+            </a>        
+            <a class="nav-item" data-target="dating-content" href="#">
+                <img alt="Tinder Icon" height="24" src="https://turkify.netlify.app/tinder-20250226_213116.webp" width="24" />
+                <span>Dating</span>
+                <span class="badge">3</span>
+            </a>
+            <a class="nav-item" data-target="football-content" href="#">
+                <img alt="Bein Sports Icon" height="24" src="https://turkify.netlify.app/bein-sports-20250226_212618.webp" width="24" />
+                <span>Football</span>
+                <span class="badge">1</span>
+            </a>
+            <a class="nav-item" data-target="movies-content" href="#">
+                <img alt="Netflix Icon" height="24" src="https://turkify.netlify.app/Netflix-20250226_212509.webp" width="24" />
+                <span>Movies</span>
+                <span class="badge">5</span>
+            </a>
+            <a class="nav-item" data-target="games-content" href="#">
+                <img src="https://turkify.netlify.app/psp-20250226_212702.webp" alt="PlayStation Icon" width="24" height="24"/>
+                <span>Games</span>
+                <span class="badge">2</span>
+            </a>
+            <a class="nav-item active" data-target="home-content" href="#">
+                <img src="https://turkify.netlify.app/home-1740610537233.webp" alt="Home Icon" width="24" height="24"/>
+                <span>Home</span>
+                <span class="badge">4</span> <!-- Added badge for home -->
+            </a>
+        </div>
+    </nav>
+
+    <div class="orientation-message" id="orientationMessage">
+        <p>يرجى تدوير الشاشة إلى الوضع الأفقي (Landscape) لمشاهدة الفيديو بشكل كامل.</p>
+    </div>
+
+    <div class="timer-circle" id="timer" style="display: none;"></div>
+    <div class="ad-container" id="adContainer">
+        <div class="loading-overlay" id="loadingOverlay">جاري التحميل...</div>
+        <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen" class="ad-frame" id="adFrame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation allow-top-navigation-by-user-activation"></iframe>
+    </div>
+ 
+    
+ <div class="share-system" id="shareModalSystem">
+        <div aria-labelledby="shareTitle" class="modal-base" id="shareModal" role="dialog">
+            <div class="modal-content">
+                <h4 class="modal-title" id="shareTitle">ادعوك لمشاهدة هذه الحلقة من مسلسل ماتنسانيش الحلقة واحد</h4>
+                <div class="share-container">
+                    <button aria-label="مشاركة على واتساب" class="share-button" id="whatsappShareBtn" onclick="ShareSystem.shareToWhatsApp()">
+                        <img alt="WhatsApp Icon" height="55" src="https://turkify.netlify.app/WhatsApp-1742259599883.webp" width="55" />
+                        <div class="spinner"></div>
+                    </button>
+                    <div class="share-text">شارك عبر واتساب</div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <span>تمت المشاركة بنجاح</span>
+                </div>
+            </div>
+        </div>
+
+        <div aria-labelledby="successTitle" class="modal-base success-modal" id="successModal" role="dialog">
+            <div class="modal-content">
+                <div class="success-icon">🎉</div>
+                <h4 class="modal-title" id="successTitle">تهانينا!</h4>
+                <p class="success-text">
+                    شكرا جزيلا لك. الآن يمكنك مشاهدة جميع الأفلام والمسلسلات المفضلة لديك بدون إعلانات أو اشتراكات مزعجة وبجودة عالية وبدون انقطاع. شكرا لك مرة أخرى.
+                </p>
+            </div>
+        </div>
+    </div>
+            
+
+    <!-- Toast -->
+    <div class="toast" id="toast">تم استعادة الاتصال بالإنترنت</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/turkifyy/t1315fy@main/adsystem3159.js"></script> 
+    <script src="https://cdn.jsdelivr.net/gh/turkifyy/t1315fy@main/Sharedsystem.js"></script> 
+     <script>
+        const offlinePage = document.getElementById('offlinePage');
+        const toast = document.getElementById('toast');
+
+        function handleOffline() {
+            offlinePage.style.display = 'flex';
+            iframeContainers.forEach(container => container.style.display = 'none');
+        }
+
+        function handleOnline() {
+            offlinePage.style.display = 'none';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+                iframeContainers.forEach(container => {
+                    if (container.classList.contains('active')) {
+                        container.style.display = 'block';
+                    }
+                });
+            }, 3000);
+        }
+       window.addEventListener('offline', handleOffline);
+        window.addEventListener('online', handleOnline);
+
+        if (!navigator.onLine) {
+            handleOffline();
+        }
+    </script>
+    <script>
+        const navItems = document.querySelectorAll('.nav-item');
+        const iframeContainers = document.querySelectorAll('.iframe-container');
+
+        navItems.forEach(item => {  
+            item.addEventListener('click', (e) => {  
+                e.preventDefault();  
+
+                navItems.forEach(nav => nav.classList.remove('active'));  
+                item.classList.add('active');
+
+                const targetId = item.getAttribute('data-target');
+                iframeContainers.forEach(container => {
+                    container.classList.remove('active');
+                    container.style.display = 'none';  
+
+                    if (container.id === targetId) {
+                        container.classList.add('active');
+                        container.style.display = 'block';
+                        container.classList.add("loading");
+
+                        setTimeout(() => {  
+                            container.classList.remove("loading");
+                            console.log(`✅ تم تحميل ${targetId} وإزالة الخلفية بعد 3 ثوانٍ.`);  
+                        }, 3000);  
+                    }  
+                });  
+            });  
+        });
+
+        const iframes = document.querySelectorAll('.video-iframe, .video-iframe1, .video-iframe2, .video-iframe3, .video-iframe4, .video-iframe5, .video-iframe6, .video-iframe7, .video-iframe9, .video-iframe10');
+        iframes.forEach(iframe => {
+            iframe.addEventListener('load', () => {
+                iframe.parentElement.querySelector('.loading').style.display = 'none';
+            });
+        });
+      </script>
+      <script>
+        const badges = document.querySelectorAll('.badge');
+        badges.forEach(badge => {
+            badge.textContent = Math.floor(Math.random() * 10) + 1;
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const navItems = document.querySelectorAll(".nav-item");
+
+            navItems.forEach(item => {
+                item.addEventListener("click", function () {
+                    const badge = this.querySelector(".badge");
+
+                    if (badge) {
+                        badge.style.display = "none";
+
+                        setTimeout(() => {
+                            badge.style.display = "inline-block";
+                            badge.textContent = Math.floor(Math.random() * 10) + 1;
+                        }, getRandomTime(30000, 60000));
+                    }
+                });
+            });
+
+            function updateBadgesRandomly() {
+                document.querySelectorAll(".badge").forEach(badge => {
+                    if (badge.style.display !== "none") {
+                        setTimeout(() => {
+                            badge.textContent = Math.floor(Math.random() * 10) + 1;
+                        }, getRandomTime(10000, 60000));
+                    }
+                });
+            }
+
+            setInterval(updateBadgesRandomly, 60000);
+
+            function getRandomTime(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        });
+   </script>
+   <script>
+        let googleAdPatterns = JSON.parse(localStorage.getItem('googleAdPatterns')) || [
+            'doubleclick.net',
+            'googleads',
+            'adsense',
+            'adservice.google.com',
+            'google_ads',
+            'GoogleActiveView',
+            'adsbygoogle'
+        ];
+
+        function isGoogleAd(element) {
+            if (element.tagName === 'IFRAME') {
+                const src = element.getAttribute('src') || '';
+                return googleAdPatterns.some(pattern => src.includes(pattern));
+            }
+            if (element.tagName === 'DIV' || element.tagName === 'INS') {
+                const id = element.getAttribute('id') || '';
+                const className = element.getAttribute('class') || '';
+                return googleAdPatterns.some(pattern => id.includes(pattern) || className.includes(pattern));
+            }
+            return false;
+        }
+
+        function removeGoogleAdsInIframe(iframe) {
+            try {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const elementsToCheck = iframeDocument.querySelectorAll('iframe, div, ins');
+                elementsToCheck.forEach(element => {
+                    if (isGoogleAd(element)) {
+                        element.remove();
+                    }
+                });
+                iframeDocument.querySelectorAll('iframe').forEach(nestedIframe => {
+                    removeGoogleAdsInIframe(nestedIframe);
+                });
+            } catch (e) {
+                console.warn('Cannot access iframe content due to CORS policy.');
+            }
+        }
+
+        function observeIframeDOMChanges(iframe) {
+            try {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const observer = new MutationObserver((mutationsList) => {
+                    for (const mutation of mutationsList) {
+                        if (mutation.type === 'childList') {
+                            mutation.addedNodes.forEach(node => {
+                                if (node.nodeType === Node.ELEMENT_NODE) {
+                                    if (isGoogleAd(node)) {
+                                        node.remove();
+                                    }
+                                    node.querySelectorAll('iframe, div, ins').forEach(element => {
+                                        if (isGoogleAd(element)) {
+                                            element.remove();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+                observer.observe(iframeDocument.body, { childList: true, subtree: true });
+            } catch (e) {
+                console.warn('Cannot access iframe content due to CORS policy.');
+            }
+        }
+
+        function startIframeAdBlockerBot(iframe) {
+            setInterval(() => {
+                removeGoogleAdsInIframe(iframe);
+            }, 2000);
+        }
+
+        function autoDetectGoogleAdPatternsInIframe(iframe) {
+            try {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const elementsToCheck = iframeDocument.querySelectorAll('iframe, div, ins');
+                elementsToCheck.forEach(element => {
+                    if (element.tagName === 'IFRAME') {
+                        const src = element.getAttribute('src') || '';
+                        if (src.includes('google') && !googleAdPatterns.some(pattern => src.includes(pattern))) {
+                            googleAdPatterns.push(src);
+                            localStorage.setItem('googleAdPatterns', JSON.stringify(googleAdPatterns));
+                        }
+                    }
+                    if (element.tagName === 'DIV' || element.tagName === 'INS') {
+                        const id = element.getAttribute('id') || '';
+                        const className = element.getAttribute('class') || '';
+                        if ((id.includes('google') || className.includes('google')) && !googleAdPatterns.some(pattern => id.includes(pattern) || className.includes(pattern))) {
+                            googleAdPatterns.push(id, className);
+                            localStorage.setItem('googleAdPatterns', JSON.stringify(googleAdPatterns));
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn('Cannot access iframe content due to CORS policy.');
+            }
+        }
+
+        window.onload = () => {
+            const iframe = document.querySelector('.video-iframe4');
+            if (iframe) {
+                removeGoogleAdsInIframe(iframe);
+                observeIframeDOMChanges(iframe);
+                startIframeAdBlockerBot(iframe);
+                autoDetectGoogleAdPatternsInIframe(iframe);
+            }
+        };
+      document.addEventListener('DOMContentLoaded', () => {
+            const iframe = document.querySelector('.video-iframe4');
+            if (iframe) {
+                removeGoogleAdsInIframe(iframe);
+                observeIframeDOMChanges(iframe);
+                startIframeAdBlockerBot(iframe);
+                autoDetectGoogleAdPatternsInIframe(iframe);
+            }
+        });
+  </script>
+  <script>     document.addEventListener("DOMContentLoaded", function () {
+            const nextEpisodeBtn = document.getElementById("nextEpisodeBtn");
+            const earnIframe = document.querySelector("#earnmoney-content iframe");
+            const earnSection = document.getElementById("earnmoney-content");
+
+            let elapsedTime = sessionStorage.getItem("earnElapsedTime") ? parseInt(sessionStorage.getItem("earnElapsedTime"), 10) : 0;
+            let previousURLs = JSON.parse(sessionStorage.getItem("earnHistory")) || [];
+            
+            const firstAppearance = 15 * 1000;
+            const repeatInterval = 3 * 60 * 1000;
+            const displayDuration = 25 * 1000;
+            const maxDuration = 195 * 60 * 1000;
+            let timer;
+            
+            function showNextEpisodeButton() {
+                if (earnSection.style.display === "block") {
+                    nextEpisodeBtn.style.display = "block";
+                    console.log(`✅ [${elapsedTime / 60000} دقائق] زر 'Next Episode' ظهر للمستخدم`);
+                    
+                    setTimeout(() => {
+                        nextEpisodeBtn.style.display = "none";
+                        console.log(`❌ [${elapsedTime / 60000} دقائق] زر 'Next Episode' اختفى`);
+                    }, displayDuration);
+                }
+            }
+
+            function startNextEpisodeTimer() {
+                console.log("⏳ بدأ عداد وقت قسم Earn...");
+                timer = setInterval(() => {
+                    elapsedTime += 1000;
+                    sessionStorage.setItem("earnElapsedTime", elapsedTime);
+
+                    if (elapsedTime >= firstAppearance) {
+                        if ((elapsedTime - firstAppearance) % repeatInterval === 0) {
+                            showNextEpisodeButton();
+                        }
+                    }
+
+                    if (elapsedTime >= maxDuration) {
+                        console.log("🔄 إعادة تشغيل دورة زر 'Next Episode'");
+                        elapsedTime = 0;
+                        sessionStorage.setItem("earnElapsedTime", elapsedTime);
+                        sessionStorage.setItem("earnHistory", JSON.stringify([]));
+                    }
+                }, 1000);
+            }
+
+            function goBack() {
+                if (previousURLs.length > 0) {
+                    const lastURL = previousURLs.pop();
+                    sessionStorage.setItem("earnHistory", JSON.stringify(previousURLs));
+                    earnIframe.src = lastURL;
+                    console.log(`↩️ المستخدم ضغط على زر 'Next Episode' وتم الرجوع إلى: ${lastURL}`);
+                } else {
+                    console.warn("⚠️ لا يوجد سجل للرجوع إليه!");
+                }
+            }
+          nextEpisodeBtn.addEventListener("click", goBack);
+
+            setInterval(() => {
+                if (earnIframe.src !== previousURLs[previousURLs.length - 1]) {
+                    previousURLs.push(earnIframe.src);
+                    sessionStorage.setItem("earnHistory", JSON.stringify(previousURLs));
+                    console.log(`📌 تمت إضافة رابط جديد إلى سجل التنقل: ${earnIframe.src}`);
+                }
+            }, 5000);
+
+            document.querySelector("[data-target='earnmoney-content']").addEventListener("click", function () {
+                if (!timer) {
+                    startNextEpisodeTimer();
+                }
+            });
+         document.querySelectorAll(".nav-item").forEach(item => {
+                item.addEventListener("click", function () {
+                    if (item.getAttribute("data-target") !== "earnmoney-content") {
+                        nextEpisodeBtn.style.display = "none";
+                        console.log("❌ تم إخفاء زر 'Next Episode' لأن المستخدم غادر قسم Earn Money");
+                    }
+                });
+            });
+        });
+
+</script>
+<script>
+ document.addEventListener('DOMContentLoaded', () => {
+            const swipeUpPrompt = document.getElementById('swipeUpPrompt');
+            const mainContent = document.getElementById('mainContent');
+
+            if (!swipeUpPrompt || !mainContent) {
+                console.error("العناصر المطلوبة غير موجودة في الصفحة.");
+                return;
+            }
+
+            if (localStorage.getItem('swipeUpPromptShown') === "true") {
+                swipeUpPrompt.classList.add('hide');
+                mainContent.style.display = 'block';
+            }
+
+            let startY = 0;
+         swipeUpPrompt.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            });
+      swipeUpPrompt.addEventListener('touchmove', (e) => {
+                const moveY = e.touches[0].clientY;
+                if (startY - moveY > 50) {
+                    swipeUpPrompt.classList.add('hide');
+                    mainContent.style.display = 'block';
+                    localStorage.setItem('swipeUpPromptShown', 'true');
+                    window.scrollBy({
+                        top: window.innerHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+</script>
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
