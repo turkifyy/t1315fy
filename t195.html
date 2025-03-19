@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+ <html>
+ <head>
+	 <title>Sharing Système</title>
+	 <meta charset="UTF-8"/>
+	 <style>
+.share-system {
+        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        font-weight: 500;
+    }
+
+    .modal-base {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: var(--modal-bg);
+        z-index: 70000;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity var(--transition-speed) ease;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: var(--white);
+        padding: 2.5rem;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 90%;
+        width: 450px;
+        position: relative;
+        transform: scale(0.9);
+        transition: transform var(--transition-speed) ease;
+        box-shadow: var(--modal-shadow);
+    }
+
+    .modal-base.show {
+        opacity: 1;
+    }
+
+    .modal-base.show .modal-content {
+        transform: scale(1);
+    }
+
+    .modal-title {
+        margin-bottom: 2rem;
+        color: var(--black);
+        font-weight: 700;
+        font-size: 1.4rem;
+        line-height: 1.4;
+        letter-spacing: -0.02em;
+    }
+
+    .share-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.8rem;
+    }
+
+    .share-button {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: none;
+        background-color: var(--whatsapp-color);
+        color: var(--white);
+        font-size: 2rem;
+        cursor: pointer;
+        transition: all var(--transition-speed) ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+
+    .share-button:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    }
+
+    .share-button:active {
+        transform: translateY(-2px);
+    }
+
+    .share-text {
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+        color: var(--black);
+        font-weight: 500;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 6px;
+        background: #eee;
+        border-radius: 3px;
+        overflow: hidden;
+        display: none;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--whatsapp-color);
+        width: 0%;
+        transition: width var(--transition-speed) ease;
+    }
+
+    .spinner {
+        display: none;
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--white);
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+    }
+
+    .success-message {
+        color: var(--success-color);
+        display: none;
+        align-items: center;
+        gap: 0.8rem;
+        margin-top: 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .success-modal .modal-content {
+        padding: 3rem;
+        border-radius: 25px;
+    }
+
+    .success-icon {
+        font-size: 4rem;
+        color: var(--success-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .success-text {
+        font-size: 1.3rem;
+        color: var(--primary-color);
+        line-height: 1.7;
+        margin-top: 1.5rem;
+        font-weight: 500;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .modal-content {
+            padding: 2rem;
+            width: 92%;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+        }
+
+        .share-button {
+            width: 65px;
+            height: 65px;
+            font-size: 1.8rem;
+        }
+
+        .success-text {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .modal-content {
+            padding: 1.8rem;
+            width: 95%;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-button {
+            width: 60px;
+            height: 60px;
+            font-size: 1.6rem;
+        }
+
+        .share-text {
+            font-size: 1rem;
+        }
+
+        .success-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+    }
+
+    [dir="ltr"] .modal-base {
+        text-align: left;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
+ </head>
+	 <body>
+	<div class="share-system" id="shareModalSystem">
+        <div aria-labelledby="shareTitle" class="modal-base" id="shareModal" role="dialog">
+            <div class="modal-content">
+                <h4 class="modal-title" id="shareTitle">ادعوك لمشاهدة هذه الحلقة من مسلسل ماتنسانيش الحلقة واحد</h4>
+                <div class="share-container">
+                    <button aria-label="مشاركة على واتساب" class="share-button" id="whatsappShareBtn" onclick="ShareSystem.shareToWhatsApp()">
+                        <i class="fab fa-whatsapp"></i>
+                        <div class="spinner"></div>
+                    </button>
+                    <div class="share-text">شارك عبر واتساب</div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <span>تمت المشاركة بنجاح</span>
+                </div>
+            </div>
+        </div>
+
+        <div aria-labelledby="successTitle" class="modal-base success-modal" id="successModal" role="dialog">
+            <div class="modal-content">
+                <div class="success-icon">🎉</div>
+                <h4 class="modal-title" id="successTitle">تهانينا!</h4>
+                <p class="success-text">
+                    شكرا جزيلا لك. الآن يمكنك مشاهدة جميع الأفلام والمسلسلات المفضلة لديك بدون إعلانات أو اشتراكات مزعجة وبجودة عالية وبدون انقطاع. شكرا لك مرة أخرى.
+                </p>
+            </div>
+        </div>
+    </div>
+    <script>
+
+      const ShareSystem = {
+        config: {
+            shareText: 'ادعوك لمشاهدة هذه الحلقة من مسلسل ماتنسانيش الحلقة واحد',
+            shareUrl: 'https://demo.playtubescript.com/',
+            minShareTime: 1500,
+            modalDelay: 30000,
+            successModalDelay: 10000,
+            successModalDuration: 12000
+        },
+
+        state: {
+            shareStartTime: 0,
+            shareCompleted: false,
+            progressInterval: null
+        },
+
+        init() {
+            this.checkLocalStorage();
+            this.bindEvents();
+            this.setupModalDelay();
+        },
+
+        checkLocalStorage() {
+            this.state.shareCompleted = localStorage.getItem('shareCompleted') === 'true';
+        },
+
+        bindEvents() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') this.closeShareModal();
+            });
+
+            window.addEventListener('offline', () => {
+                document.getElementById('whatsappShareBtn').disabled = true;
+            });
+
+            window.addEventListener('online', () => {
+                document.getElementById('whatsappShareBtn').disabled = false;
+            });
+        },
+
+        setupModalDelay() {
+            if (!this.state.shareCompleted) {
+                setTimeout(() => this.showShareModal(), this.config.modalDelay);
+            }
+        },
+
+        showShareModal() {
+            const modal = document.getElementById('shareModal');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => modal.classList.add('show'));
+        },
+
+        closeShareModal() {
+            const modal = document.getElementById('shareModal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+            clearInterval(this.state.progressInterval);
+        },
+
+        async shareToWhatsApp() {
+            const button = document.getElementById('whatsappShareBtn');
+            this.toggleLoadingState(button, true);
+            this.state.shareStartTime = Date.now();
+
+            try {
+                const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+                    this.config.shareText + ' ' + this.config.shareUrl
+                )}`;
+                window.open(shareUrl, '_blank');
+
+                this.startProgressBar();
+                this.handleShareCompletion(button);
+            } catch (error) {
+                this.toggleLoadingState(button, false);
+                alert('حدث خطأ أثناء المشاركة على واتساب. يرجى المحاولة مرة أخرى.');
+            }
+        },
+
+        toggleLoadingState(button, isLoading) {
+            const icon = button.querySelector('.fa-whatsapp');
+            const spinner = button.querySelector('.spinner');
+            icon.style.display = isLoading ? 'none' : 'block';
+            spinner.style.display = isLoading ? 'block' : 'none';
+        },
+
+        startProgressBar() {
+            const container = document.querySelector('.progress-container');
+            const bar = document.querySelector('.progress-bar');
+            container.style.display = 'block';
+            
+            this.state.progressInterval = setInterval(() => {
+                const progress = Math.min(
+                    ((Date.now() - this.state.shareStartTime) / this.config.minShareTime) * 100,
+                    100
+                );
+                bar.style.width = `${progress}%`;
+            }, 100);
+        },
+
+        handleShareCompletion(button) {
+            const checkVisibility = () => {
+                if (document.visibilityState === 'visible') {
+                    setTimeout(() => {
+                        this.toggleLoadingState(button, false);
+                        clearInterval(this.state.progressInterval);
+                        this.completeShare();
+                    }, 2000);
+                    document.removeEventListener('visibilitychange', checkVisibility);
+                }
+            };
+            
+            document.addEventListener('visibilitychange', checkVisibility);
+        },
+
+        completeShare() {
+            this.state.shareCompleted = true;
+            localStorage.setItem('shareCompleted', 'true');
+            
+            const successMessage = document.querySelector('.success-message');
+            successMessage.style.display = 'flex';
+            
+            setTimeout(() => {
+                this.closeShareModal();
+                setTimeout(() => this.showSuccessModal(), this.config.successModalDelay);
+            }, 1500);
+        },
+
+        showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => modal.classList.add('show'));
+
+            setTimeout(() => {
+                modal.classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }, this.config.successModalDuration);
+        }
+    };
+ document.addEventListener('DOMContentLoaded', () => ShareSystem.init());
+ </script>
+	 </body>
+ </html>
