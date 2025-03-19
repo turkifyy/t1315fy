@@ -711,12 +711,6 @@
     </div>
  
     
- <b:widget id='ShareSystemWidget' locked='false' title='مشاركة على واتساب' type='HTML'>
-    <b:includable id='main' var='widget'>
-        <script type="text/javascript">
-            document.addEventListener("DOMContentLoaded", function () {
-                let shareWidgetContainer = document.createElement("div");
-                shareWidgetContainer.innerHTML = `
      <style>
 .share-system {
         font-family: 'Poppins', system-ui, -apple-system, sans-serif;
@@ -1098,8 +1092,7 @@
  document.addEventListener('DOMContentLoaded', () => ShareSystem.init());
                   
      </script>                          
-    </b:includable>
-</b:widget>
+    
                 
     <!-- Toast -->
     <div class="toast" id="toast">تم استعادة الاتصال بالإنترنت</div>
