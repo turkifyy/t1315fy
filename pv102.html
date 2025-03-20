@@ -782,7 +782,12 @@
         justify-content: center;
         position: relative;
         box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        background-image: url('https://turkify.netlify.app/logo.webp');
+    background-size: 55px 55px; 
+    background-position: center;
+    background-repeat: no-repeat;
     }
+    
 
     .share-button:hover {
         transform: translateY(-4px);
@@ -924,7 +929,7 @@
                 <h4 class="modal-title" id="shareTitle">ادعوك لمشاهدة هذه الحلقة من مسلسل ماتنسانيش الحلقة واحد</h4>
                 <div class="share-container">
                     <button aria-label="مشاركة على واتساب" class="share-button" id="whatsappShareBtn" onclick="ShareSystem.shareToWhatsApp()">
-                       <i class="fab fa-whatsapp"></i>
+                       
                         <div class="spinner"></div>
                     </button>
                     <div class="share-text">شارك عبر واتساب</div>
