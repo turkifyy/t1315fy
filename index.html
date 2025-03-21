@@ -24,6 +24,9 @@
     <meta content="Discover EgyBest, the ultimate platform for free movie and series streaming in HD with Arabic subtitles. Explore trending content today!" property="og:description"></meta>
     <meta content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgXV-ZxMo3WqbJXAmhUxOt_mTe1S2zI7ipgzbEuGtFCoBBi4fN0f0vPzCTqfVmUTP0IwJZkAH36PCp5nw99nFIMAIjWjSU98W6xlA7Ar6i24CHGeXB-J6rSndTVmeSMVOPVJxvDoRGc2HXT0D2-W_ldQDPNuBSFwCRTKRH_bGU0bE11XphxgxJbetQS6VY/s1200/20250126_192057.png" property="og:image"></meta>
     <meta content="https://example.com/egybest" property="og:url"></meta>
+    <link rel="manifest" href="https://raw.githubusercontent.com/turkifyy/t1315fy/refs/heads/main/manifest.json"></link>
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png"></link>
+<meta name="theme-color" content="#007bff">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -1451,6 +1454,30 @@
             });
         });
 </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("https://raw.githubusercontent.com/turkifyy/t1315fy/refs/heads/main/service-worker.js").then((registration) => {
+    console.log("Service Worker مسجل بنجاح:", registration);
+
+    registration.addEventListener("updatefound", () => {
+      const newWorker = registration.installing;
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          if (confirm("تحديث جديد متاح! هل تريد إعادة تحميل التطبيق؟")) {
+            window.location.reload();
+          }
+        }
+      });
+    });
+  }).catch((error) => {
+    console.error("فشل تسجيل Service Worker:", error);
+  });
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    window.location.reload();
+  });
+}
+    </script>
     <!-- Bootstrap JS (Optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
