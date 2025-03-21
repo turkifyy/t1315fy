@@ -1,0 +1,52 @@
+{
+  "name": "Turkify",
+  "short_name": "Turkify",
+  "description": "تطبيق Turkify الرسمي - أسرع وأسهل طريقة للوصول إلى خدماتنا!",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "serviceworker": {
+    "src": "/service-worker.js",
+    "scope": "/",
+    "type": "module",
+    "update_via_cache": "all"
+  },
+  "display_override": ["standalone", "fullscreen"],
+  "categories": ["utilities", "productivity"],
+  "related_applications": [
+    {
+      "platform": "web"
+    }
+  ],
+  "prefer_related_applications": false
+}
