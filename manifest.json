@@ -2,7 +2,7 @@
   "name": "Turkify",
   "short_name": "Turkify",
   "description": "تطبيق Turkify الرسمي - أسرع وأسهل طريقة للوصول إلى خدماتنا!",
-  "start_url": "/index.html",
+  "start_url": "https://turkify.netlify.app",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -30,13 +30,13 @@
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "https://turkify.netlify.app/logo-512x512-20252026.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
   "serviceworker": {
-    "src": "/service-worker.js",
+    "src": "https://raw.githubusercontent.com/turkifyy/t1315fy/refs/heads/main/service-worker.js",
     "scope": "/",
     "type": "module",
     "update_via_cache": "all"
