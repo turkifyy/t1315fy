@@ -10,22 +10,22 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
+      "src": "https://turkify.netlify.app/logo-72%C3%9772-20252026.png",
       "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-96x96.png",
+      "src": "https://turkify.netlify.app/logo%C3%9796%C3%9796-20252026.png",
       "sizes": "96x96",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-144x144.png",
+      "src": "https://turkify.netlify.app/logo-144%C3%97144-20252026.png",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "https://turkify.netlify.app/logo-192%C3%97192-20252026.png",
       "sizes": "192x192",
       "type": "image/png"
     },
