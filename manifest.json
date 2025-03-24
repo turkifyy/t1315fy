@@ -1,7 +1,7 @@
 {
   "name": "Turkify",
   "short_name": "Turkify",
-  "description": "تطبيق Turkify الرسمي - أسرع وأسهل طريقة للوصول إلى خدماتنا!",
+  "description": "The official Turkify app - the fastest and easiest way to access all paid entertainment platforms for free, without subscriptions or annoying ads.",
   "start_url": "https://turkify.netlify.app",
   "scope": "/",
   "display": "standalone",
