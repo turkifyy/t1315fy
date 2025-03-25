@@ -1,18 +1,17 @@
+<script>
 // تحديد اسم الكاش وإصداره
 const CACHE_NAME = "turkify-cache-v3"; // قم بتحديث رقم الإصدار عند تحديث الموقع
 
 // الملفات التي سيتم تخزينها في الكاش
 const urlsToCache = [
   "/",
-  "/index.html",
-  "/styles.css",
-  "/script.js",
-  "/icons/icon-72x72.png",
-  "/icons/icon-96x96.png",
-  "/icons/icon-144x144.png",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
-  "/manifest.json"
+  "https://turkify.netlify.app",
+  "https://turkify.netlify.app/logo-72%C3%9772-20252026.png",
+  "https://turkify.netlify.app/logo%C3%9796%C3%9796-20252026.png",
+  "https://turkify.netlify.app/logo-144%C3%97144-20252026.png",
+  "https://turkify.netlify.app/logo-192%C3%97192-20252026.png",
+  "https://turkify.netlify.app/logo-512x512-20252026.png",
+  "https://raw.githubusercontent.com/turkifyy/t1315fy/refs/heads/main/manifest.json"
 ];
 
 // تثبيت الـ Service Worker وتخزين الملفات في الكاش
@@ -50,7 +49,7 @@ self.addEventListener("fetch", (event) => {
           return fetchResponse;
         });
       });
-    }).catch(() => caches.match("/offline.html")) // عرض صفحة Offline إذا لم يكن هناك اتصال
+    }).catch(() => caches.match("https://turkify.netlify.app")) // عرض صفحة Offline إذا لم يكن هناك اتصال
   );
 });
 
@@ -60,3 +59,4 @@ self.addEventListener("message", (event) => {
     self.skipWaiting();
   }
 });
+</script>
