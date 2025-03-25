@@ -36,7 +36,7 @@
     }
   ],
   "serviceworker": {
-    "src": "https://raw.githubusercontent.com/turkifyy/t1315fy/refs/heads/main/service-worker.js",
+    "src": "https://turkify.netlify.app/service-worker.js",
     "scope": "/",
     "type": "module",
     "update_via_cache": "all"
