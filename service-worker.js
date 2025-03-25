@@ -1,4 +1,4 @@
-<script>
+
 // تحديد اسم الكاش وإصداره
 const CACHE_NAME = "turkify-cache-v3"; // قم بتحديث رقم الإصدار عند تحديث الموقع
 
@@ -11,7 +11,7 @@ const urlsToCache = [
   "https://turkify.netlify.app/logo-144%C3%97144-20252026.png",
   "https://turkify.netlify.app/logo-192%C3%97192-20252026.png",
   "https://turkify.netlify.app/logo-512x512-20252026.png",
-  "https://raw.githubusercontent.com/turkifyy/t1315fy/refs/heads/main/manifest.json"
+  "https://turkify.netlify.app/manifest.json"
 ];
 
 // تثبيت الـ Service Worker وتخزين الملفات في الكاش
@@ -59,4 +59,4 @@ self.addEventListener("message", (event) => {
     self.skipWaiting();
   }
 });
-</script>
+
