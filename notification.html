@@ -1,9 +1,98 @@
- <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<!DOCTYPE html>
+ <html>
+ <head>
+	 <title>Untitled</title>
+	 <meta charset="UTF-8"/>
+	 <link rel="stylesheet" href="" type="text/css"/>
+ </head>
+	 <body>
+	<div id="onesignal-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+  <!-- سيتم إضافة زر الاشتراك هنا تلقائياً -->
+</div>
+
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+  // دالة لتحميل OneSignal بطريقة غير متزامنة
+  function loadOneSignal() {
+    // إنشاء عنصر script لـ OneSignal SDK
+    const oneSignalScript = document.createElement('script');
+    oneSignalScript.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+    oneSignalScript.defer = true;
+    oneSignalScript.async = true;
+    
+    // إضافة العنصر إلى body
+    document.body.appendChild(oneSignalScript);
+    
+    // تهيئة OneSignal بعد تحميل SDK
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      try {
+        await OneSignal.init({
+          appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+          allowLocalhostAsSecureOrigin: true,
+          promptOptions: {
+            /* خيارات النافذة المنبثقة */
+            slidedown: {
+              enabled: true,
+              autoPrompt: true,
+              timeDelay: 3,
+              pageViews: 1,
+              force: true,
+              isInUpdateModeForCurrentUser: false,
+              position: 'bottom-right'
+            }
+          }
+        });
+        
+        // تحسينات للواجهة لتكون متجاوبة
+        customizeOneSignalUI();
+      } catch (error) {
+        console.error('Error initializing OneSignal:', error);
+      }
     });
-  });
+  }
+  
+  // دالة لتخصيص واجهة OneSignal لجعلها متجاوبة
+  function customizeOneSignalUI() {
+    const style = document.createElement('style');
+    style.textContent = `
+      .onesignal-slidedown-container {
+        max-width: 100% !important;
+        width: auto !important;
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        top: auto !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+      }
+      
+      @media (min-width: 768px) {
+        .onesignal-slidedown-container {
+          width: 400px !important;
+          left: auto !important;
+          right: 20px !important;
+          bottom: 20px !important;
+        }
+      }
+      
+      .onesignal-slidedown-dialog {
+        padding: 15px !important;
+      }
+      
+      .onesignal-slidedown-button {
+        border-radius: 4px !important;
+        padding: 8px 16px !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // تحميل OneSignal عندما تكون الصفحة جاهزة
+  if (document.readyState === 'complete') {
+    loadOneSignal();
+  } else {
+    window.addEventListener('load', loadOneSignal);
+  }
 </script>
+	 </body>
+ </html>
