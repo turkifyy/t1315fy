@@ -1,4 +1,12 @@
-<div id="onesignal-widget-container" style="position: fixed; z-index: 99999;">
+<!DOCTYPE html>
+ <html>
+ <head>
+	 <title>Untitled</title>
+	 <meta charset="UTF-8"/>
+	 <link rel="stylesheet" href="" type="text/css"/>
+ </head>
+	 <body>
+	<div id="onesignal-widget-container" style="position: fixed; z-index: 99999;">
   <!-- سيتم إضافة زر الاشتراك هنا تلقائياً -->
 </div>
 
@@ -74,7 +82,7 @@
     style.textContent = `
       /* التنسيقات الأساسية المحسنة */
       .onesignal-slidedown-container {
-        z-index: 0 !important;
+        z-index: 99999 !important;
         max-width: 100% !important;
         border-radius: 16px !important;
         box-shadow: 0 8px 32px rgba(0,0,0,0.28) !important;
@@ -280,3 +288,5 @@
     window.addEventListener('load', loadOneSignal);
   }
 </script>
+	 </body>
+ </html>
