@@ -586,6 +586,11 @@
             padding: 8px 16px;
         }
     }
+    .onesignal-bell-launcher, 
+iframe[src*="onesignal.com"] {
+    z-index: 99999 !important;
+    position: fixed !important;
+}
 </style>
    <style>
         .custom-turkify-banner {
@@ -771,7 +776,7 @@
             <div class="swipe-text">Swipe up for more</div>
         </div>
     </div>
-
+<div class="onesignal-bell-launcher"></div>
     <!-- Main Content (Hidden until prompt is dismissed) -->
     <div id="mainContent">
     </div>
@@ -1600,8 +1605,16 @@
                 autoDetectGoogleAdPatternsInIframe(iframe);
             }
         });
+       setTimeout(function() {
+    let osElements = document.querySelectorAll('.onesignal-bell-launcher, iframe[src*="onesignal.com"]');
+    osElements.forEach(el => {
+        el.style.zIndex = "99999";
+        el.style.position = "fixed";
+    });
+}, 3000);
   </script>
-  <script>     document.addEventListener("DOMContentLoaded", function () {
+  <script>    
+      document.addEventListener("DOMContentLoaded", function () {
             const nextEpisodeBtn = document.getElementById("nextEpisodeBtn");
             const earnIframe = document.querySelector("#earnmoney-content iframe");
             const earnSection = document.getElementById("earnmoney-content");
