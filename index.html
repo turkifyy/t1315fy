@@ -1278,6 +1278,153 @@
  document.addEventListener('DOMContentLoaded', () => ShareSystem.init());
                   
      </script>                          
+
+
+    <div id="onesignal-widget-container" style="position: fixed; z-index: 99999;">
+  <!-- سيتم إضافة زر الاشتراك هنا تلقائياً -->
+</div>
+
+<script>
+  // دالة لتحميل OneSignal بطريقة غير متزامنة
+  function loadOneSignal() {
+    // إنشاء عنصر script لـ OneSignal SDK
+    const oneSignalScript = document.createElement('script');
+    oneSignalScript.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+    oneSignalScript.defer = true;
+    oneSignalScript.async = true;
+    
+    // إضافة العنصر إلى body
+    document.body.appendChild(oneSignalScript);
+    
+    // تهيئة OneSignal بعد تحميل SDK
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      try {
+        await OneSignal.init({
+          appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+          allowLocalhostAsSecureOrigin: true,
+          promptOptions: {
+            slidedown: {
+              enabled: true,
+              autoPrompt: true,
+              timeDelay: 3,
+              pageViews: 1,
+              force: true,
+              isInUpdateModeForCurrentUser: false,
+              position: 'center' // سيتم تعديله عبر CSS حسب حجم الشاشة
+            }
+          }
+        });
+        
+        // تحسينات للواجهة لتكون متجاوبة
+        customizeOneSignalUI();
+      } catch (error) {
+        console.error('Error initializing OneSignal:', error);
+      }
+    });
+  }
+  
+  // دالة لتخصيص واجهة OneSignal لجعلها متجاوبة
+  function customizeOneSignalUI() {
+    const style = document.createElement('style');
+    style.textContent = `
+      /* التنسيقات العامة */
+      .onesignal-slidedown-container {
+        z-index: 99999 !important;
+        max-width: 100% !important;
+        border-radius: 12px !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important;
+        animation: fadeIn 0.5s ease-out !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+      }
+      
+      .onesignal-slidedown-dialog {
+        padding: 20px !important;
+      }
+      
+      .onesignal-slidedown-button {
+        border-radius: 6px !important;
+        padding: 10px 20px !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+      }
+      
+      .onesignal-slidedown-button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+      }
+      
+      /* للهواتف - شاشات حتى 767px */
+      @media (max-width: 767px) {
+        .onesignal-slidedown-container {
+          width: 90% !important;
+          left: 5% !important;
+          right: 5% !important;
+          bottom: auto !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          margin: 0 auto !important;
+        }
+        
+        .onesignal-slidedown-dialog {
+          padding: 15px !important;
+        }
+        
+        .onesignal-slidedown-button {
+          width: 100% !important;
+          margin-bottom: 10px !important;
+        }
+      }
+      
+      /* للأجهزة اللوحية - شاشات من 768px إلى 1023px */
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .onesignal-slidedown-container {
+          width: 70% !important;
+          left: 15% !important;
+          right: 15% !important;
+          bottom: 30px !important;
+          top: auto !important;
+        }
+      }
+      
+      /* لأجهزة الكمبيوتر - شاشات 1024px فأكبر */
+      @media (min-width: 1024px) {
+        .onesignal-slidedown-container {
+          width: 400px !important;
+          left: auto !important;
+          right: 30px !important;
+          bottom: 30px !important;
+          top: auto !important;
+        }
+      }
+      
+      /* تأثير الظهور */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* إصلاحات للتشوهات على متصفحات مختلفة */
+      .onesignal-slidedown-container * {
+        box-sizing: border-box !important;
+      }
+      
+      .onesignal-slidedown-close-button {
+        top: 10px !important;
+        right: 10px !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // تحميل OneSignal عندما تكون الصفحة جاهزة
+  if (document.readyState === 'complete') {
+    loadOneSignal();
+  } else {
+    window.addEventListener('load', loadOneSignal);
+  }
+</script>
+
     
                 
     <!-- Toast -->
