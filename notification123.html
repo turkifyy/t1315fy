@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إشعارات الموقع</title>
+    
+    <!-- OneSignal SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // 🔹 App ID مضاف هنا
+            });
+        });
+    </script>
+
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -95,76 +107,55 @@
     </div>
 </div>
 
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-    const notification = document.getElementById('custom-notification');
+    const notificationBox = document.getElementById('custom-notification');
     const acceptBtn = document.getElementById('acceptBtn');
     const loader = acceptBtn.querySelector('.loader');
     const btnText = acceptBtn.querySelector('.btn-text');
 
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    
-    OneSignalDeferred.push(function(OneSignal) {
-        OneSignal.init({
-            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
-            promptOptions: {
-                slidedown: { enabled: false }
-            },
-            autoRegister: false,
-            notifyButton: { enable: false }
-        });
-    });
-
-    const checkPermission = async () => {
-        return new Promise(resolve => {
+    // التحقق من حالة الإذن للإشعارات
+    async function checkPermission() {
+        return new Promise((resolve) => {
             OneSignalDeferred.push(async function(OneSignal) {
-                try {
-                    const permission = await OneSignal.Notifications.permission;
-                    resolve(permission);
-                } catch {
-                    resolve('default');
-                }
+                const status = await OneSignal.Notification.getPermission();
+                resolve(status);
             });
         });
-    };
+    }
 
-    const showIfNeeded = async () => {
+    // عرض النافذة إذا لم يتم منح الإذن
+    async function showIfNeeded() {
         const permission = await checkPermission();
-        if (permission === 'granted') {
-            notification.remove();
+        if (permission !== 'granted') {
+            setTimeout(() => notificationBox.classList.add('show'), 3000);
         } else {
-            setTimeout(() => notification.classList.add('show'), 3000);
+            notificationBox.remove();
         }
-    };
+    }
 
+    // عند النقر على زر التفعيل
     acceptBtn.addEventListener('click', async () => {
         loader.style.display = 'inline-block';
         btnText.textContent = 'جاري التفعيل...';
         acceptBtn.disabled = true;
 
         try {
-            OneSignalDeferred.push(async function(OneSignal) {
-                try {
-                    const permission = await OneSignal.Notifications.requestPermission();
-                    if (permission === 'granted') {
-                        await OneSignal.User.pushSubscription.optIn();
-                        notification.classList.remove('show');
-                        setTimeout(() => notification.remove(), 300);
-                    } else {
-                        throw new Error('تم رفض الإذن');
-                    }
-                } catch (error) {
-                    console.error('خطأ:', error);
-                    alert('تعذر تفعيل الإشعارات. حاول مرة أخرى لاحقًا.');
-                } finally {
-                    loader.style.display = 'none';
-                    btnText.textContent = 'موافق';
-                    acceptBtn.disabled = false;
+            await OneSignalDeferred.push(async function(OneSignal) {
+                await OneSignal.Notification.requestPermission();
+                await OneSignal.User.pushSubscription.optIn();
+                const status = await OneSignal.Notification.getPermission();
+                if (status === 'granted') {
+                    notificationBox.classList.remove('show');
+                    setTimeout(() => notificationBox.remove(), 300);
+                } else {
+                    throw new Error('تم رفض الإذن');
                 }
             });
         } catch (error) {
-            console.error('خطأ في OneSignal:', error);
+            console.error('خطأ:', error);
+            alert('تعذر تفعيل الإشعارات. حاول مرة أخرى لاحقًا.');
+        } finally {
             loader.style.display = 'none';
             btnText.textContent = 'موافق';
             acceptBtn.disabled = false;
