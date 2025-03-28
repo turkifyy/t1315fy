@@ -4,233 +4,191 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ويدجيت الإشعارات</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome للأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #1877f2; /* أزرق فيسبوك */
-            --hover-color: #166fe5; /* أزرق فيسبوك عند التفاعل */
-            --text-color: #1e293b;
-            --border-radius: 10px;
-            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --primary-blue: #1877f2; /* أزرق فيسبوك */
+            --hover-blue: #166fe5;
+            --border-radius: 8px;
         }
-        
-        #custom-notification-widget {
+
+        #custom-notification {
             position: fixed;
             bottom: 20px;
             left: 50%;
-            transform: translateX(-50%) translateY(150%);
+            transform: translateX(-50%) translateY(120%);
             width: 95%;
             max-width: 400px;
-            background-color: white;
+            background: #fff;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            overflow: hidden;
-            z-index: 999999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             opacity: 0;
-            transition: var(--transition);
-            border: 1px solid #dddfe2;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10000;
         }
-        
-        #custom-notification-widget.show {
+
+        #custom-notification.show {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-        
-        #custom-notification-widget.hide {
-            opacity: 0;
-            transform: translateX(-50%) translateY(150%);
-        }
-        
+
         .notification-header {
+            padding: 16px;
+            border-bottom: 1px solid #ddd;
             display: flex;
             align-items: center;
-            padding: 15px;
-            background-color: white;
-            border-bottom: 1px solid #dddfe2;
+            gap: 12px;
         }
-        
+
         .app-logo {
             width: 40px;
             height: 40px;
-            margin-left: 12px;
-            border-radius: 50%;
-            object-fit: cover;
+            border-radius: 8px;
         }
-        
-        .app-info {
-            flex: 1;
+
+        .notification-body {
+            padding: 16px;
         }
-        
-        .app-info h3 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-color);
+
+        .notification-body p {
+            margin-bottom: 20px;
+            color: #606770;
         }
-        
-        .app-info p {
-            margin: 2px 0 0;
-            font-size: 12px;
-            color: #65676b;
-        }
-        
-        .notification-content {
-            padding: 15px;
-        }
-        
-        .notification-content p {
-            margin: 0 0 15px 0;
-            color: var(--text-color);
-            line-height: 1.5;
-        }
-        
-        .notification-btn {
+
+        #acceptBtn {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
+            background: var(--primary-blue);
+            color: white;
             border: none;
             border-radius: var(--border-radius);
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 15px;
+            transition: background 0.2s;
         }
-        
-        .notification-btn:hover {
-            background-color: var(--hover-color);
+
+        #acceptBtn:hover {
+            background: var(--hover-blue);
         }
-        
-        .loading-spinner {
+
+        .loader {
             display: none;
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            border-top-color: white;
+            border-top-color: #fff;
             animation: spin 1s linear infinite;
-            margin-right: 8px;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
-        .btn-loading .loading-spinner {
-            display: inline-block;
-        }
-        
-        @media (max-width: 576px) {
-            #custom-notification-widget {
+
+        @media (max-width: 480px) {
+            #custom-notification {
                 bottom: 10px;
+                width: calc(100% - 20px);
             }
         }
     </style>
 </head>
 <body>
-    <!-- ويدجيت الإشعارات المحدث -->
-    <div id="custom-notification-widget">
-        <div class="notification-header">
-            <img src="https://via.placeholder.com/40" alt="شعار الموقع" class="app-logo">
-            <div class="app-info">
-                <h3>إشعارات الموقع</h3>
-                <p>طلب إذن الإشعارات</p>
-            </div>
-        </div>
-        <div class="notification-content">
-            <p>نود إعلامك بالإشعارات المهمة لتجربة أفضل. يرجى الموافقة على تلقي الإشعارات.</p>
-            <button class="notification-btn" id="acceptBtn">
-                <span class="loading-spinner"></span>
-                <span class="btn-text">موافق</span>
-            </button>
+
+<div id="custom-notification">
+    <div class="notification-header">
+        <img src="شعار-موقعك.png" class="app-logo" alt="الشعار">
+        <div>
+            <h4 style="margin:0">إشعارات الموقع</h4>
+            <small style="color:#65676b">الرجاء الموافقة على تلقي الإشعارات</small>
         </div>
     </div>
+    <div class="notification-body">
+        <p>ابقَ على اطلاع دائم مع أهم التحديثات من خلال تفعيل الإشعارات.</p>
+        <button id="acceptBtn">
+            <span class="loader"></span>
+            <span class="btn-text">موافق</span>
+        </button>
+    </div>
+</div>
 
-    <!-- كود OneSignal المحدث -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-                appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
-                promptOptions: {
-                    slidedown: {
-                        enabled: false // تعطيل الطلب التلقائي
-                    }
-                },
-                notifyButton: {
-                    enable: false // تعطيل زر الإشعار الافتراضي
+<!-- OneSignal Integration -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+        OneSignal.init({
+            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+            allowLocalhostAsSecureOrigin: true,
+            promptOptions: {
+                slidedown: {
+                    prompts: [
+                        {
+                            type: "push",
+                            autoPrompt: false
+                        }
+                    ]
                 }
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const notificationWidget = document.getElementById('custom-notification-widget');
-            const acceptBtn = document.getElementById('acceptBtn');
-            const btnText = acceptBtn.querySelector('.btn-text');
-            const loadingSpinner = acceptBtn.querySelector('.loading-spinner');
-            
-            // التحقق من الإذن السابق
-            const notificationPermission = localStorage.getItem('notificationPermission');
-            
-            if (!notificationPermission) {
-                setTimeout(() => {
-                    notificationWidget.classList.add('show');
-                }, 3000);
-            }
-            
-            // حدث قبول الإشعارات
-            acceptBtn.addEventListener('click', async function() {
-                acceptBtn.classList.add('btn-loading');
-                btnText.textContent = 'جاري التحميل...';
-                
-                try {
-                    // انتظار تهيئة OneSignal
-                    await OneSignalDeferred;
-                    
-                    // طلب الإذن من المتصفح
-                    const permission = await OneSignal.Notifications.requestPermission();
-                    
-                    if (permission) {
-                        // إذا تم منح الإذن
-                        localStorage.setItem('notificationPermission', 'granted');
-                        btnText.textContent = 'تم القبول!';
-                        
-                        // تسجيل المستخدم في OneSignal
-                        await OneSignal.User.pushSubscription.optIn();
-                        
-                        setTimeout(() => {
-                            notificationWidget.classList.add('hide');
-                            setTimeout(() => {
-                                notificationWidget.remove();
-                            }, 300);
-                        }, 1000);
-                    } else {
-                        // إذا تم رفض الإذن
-                        throw new Error('تم رفض الإذن من قبل المستخدم');
-                    }
-                } catch (error) {
-                    console.error('خطأ في تفعيل الإشعارات:', error);
-                    acceptBtn.classList.remove('btn-loading');
-                    btnText.textContent = 'موافق';
-                    alert('لم يتم تفعيل الإشعارات. يرجى التأكد من السماح بالإشعارات في إعدادات المتصفح.');
-                }
-            });
-            
-            // إخفاء الويدجيت
-            function hideWidget() {
-                notificationWidget.classList.add('hide');
-                setTimeout(() => {
-                    notificationWidget.remove();
-                }, 300);
             }
         });
-    </script>
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const notification = document.getElementById('custom-notification');
+    const acceptBtn = document.getElementById('acceptBtn');
+    const loader = acceptBtn.querySelector('.loader');
+    const btnText = acceptBtn.querySelector('.btn-text');
+
+    // التحقق من الحالة السابقة
+    const hasResponded = localStorage.getItem('notificationResponded');
+    const permission = Notification.permission;
+
+    if (hasResponded || permission === 'granted') {
+        notification.remove();
+        return;
+    }
+
+    // عرض الإشعار بعد 3 ثواني
+    setTimeout(() => notification.classList.add('show'), 3000);
+
+    // معالجة الضغط على الزر
+    acceptBtn.addEventListener('click', async () => {
+        try {
+            // عرض حالة التحميل
+            loader.style.display = 'inline-block';
+            btnText.textContent = 'جاري التفعيل...';
+            acceptBtn.disabled = true;
+
+            // التحقق من دعم المتصفح
+            if (!('Notification' in window)) {
+                throw new Error('المتصفح لا يدعم الإشعارات');
+            }
+
+            // طلب الإذن الفعلي
+            const permission = await OneSignal.Notifications.requestPermission();
+            
+            if (permission === 'granted') {
+                // تسجيل المستخدم في OneSignal
+                await OneSignal.User.pushSubscription.optIn();
+                localStorage.setItem('notificationResponded', 'true');
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            } else {
+                throw new Error('تم رفض الإذن');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('يرجى تفعيل الإشعارات يدويًا من إعدادات المتصفح.');
+        } finally {
+            loader.style.display = 'none';
+            btnText.textContent = 'موافق';
+            acceptBtn.disabled = false;
+        }
+    });
+});
+</script>
+
 </body>
 </html>
