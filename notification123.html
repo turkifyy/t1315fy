@@ -1,192 +1,213 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Notifications</title>
-    <style>
-        /* Custom Notification Window */
-        #custom-notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(120%);
-            width: 95%;
-            max-width: 400px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transition: all 0.4s ease;
-            z-index: 999999;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-
-        #custom-notification.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .notification-header {
-            padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .notification-body {
-            padding: 16px;
-        }
-
-        #acceptBtn {
-            width: 100%;
-            padding: 12px;
-            background: #1877f2;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .loader {
-            display: none;
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Anti-Adblock Fix */
-        .adblock-test {
-            width: 1px;
-            height: 1px;
-            position: absolute;
-            left: -9999px;
-            visibility: hidden;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Notifications</title>
+  <style>
+    /* Custom Notification Window */
+    #custom-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      width: 95%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: 999999;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    #custom-notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .notification-header {
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .notification-body {
+      padding: 16px;
+    }
+    #acceptBtn {
+      width: 100%;
+      padding: 12px;
+      background: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .loader {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Element for AdBlock detection */
+    .adblock-test {
+      width: 1px;
+      height: 1px;
+      position: absolute;
+      left: -9999px;
+      visibility: hidden;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Hidden div for detecting AdBlock -->
+<!-- Hidden element for detecting AdBlock -->
 <div class="adblock-test">Advertisement</div>
 
 <!-- Custom Notification Popup -->
 <div id="custom-notification">
-    <div class="notification-header">
-        <img src="your-logo.png" width="40" height="40" style="border-radius:8px;" alt="Logo">
-        <div>
-            <h4 style="margin:0;color:#1d2129;">Enable Notifications</h4>
-            <small style="color:#65676b;">Stay updated with the latest news</small>
-        </div>
+  <div class="notification-header">
+    <img src="your-logo.png" width="40" height="40" style="border-radius:8px;" alt="Logo">
+    <div>
+      <h4 style="margin:0;color:#1d2129;">Enable Notifications</h4>
+      <small style="color:#65676b;">Stay updated with the latest news</small>
     </div>
-    <div class="notification-body">
-        <p style="color:#606770;margin-bottom:16px;">We will send you notifications about the latest updates and content.</p>
-        <button id="acceptBtn">
-            <span class="loader"></span>
-            <span class="btn-text">Allow</span>
-        </button>
-    </div>
+  </div>
+  <div class="notification-body">
+    <p style="color:#606770;margin-bottom:16px;">We will send you notifications about the latest updates and content.</p>
+    <button id="acceptBtn">
+      <span class="loader"></span>
+      <span class="btn-text">Allow</span>
+    </button>
+  </div>
 </div>
 
 <!-- Load OneSignal SDK -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const notification = document.getElementById('custom-notification');
-    const acceptBtn = document.getElementById('acceptBtn');
-    const loader = acceptBtn.querySelector('.loader');
-    const btnText = acceptBtn.querySelector('.btn-text');
-
-    // Initialize OneSignal without auto prompt
+(function(){
+  // دالة تهيئة نافذة الإشعارات مع ضمان توافقها عبر المتصفحات
+  function initNotification() {
+    var notification = document.getElementById('custom-notification');
+    var acceptBtn = document.getElementById('acceptBtn');
+    var loader = acceptBtn.querySelector('.loader');
+    var btnText = acceptBtn.querySelector('.btn-text');
+    
+    // تهيئة OneSignal إذا كان متاحاً
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
-            promptOptions: { slidedown: { enabled: false } },
-            autoRegister: false,
-            notifyButton: { enable: false }
-        });
+    OneSignalDeferred.push(function(OneSignal) {
+      OneSignal.init({
+        appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+        promptOptions: { slidedown: { enabled: false } },
+        autoRegister: false,
+        notifyButton: { enable: false }
+      });
     });
-
-    // Check Notification Permission
-    const checkPermission = async () => {
-        return new Promise(resolve => {
-            OneSignalDeferred.push(async function(OneSignal) {
-                const permission = await OneSignal.Notifications.permission;
-                resolve(permission);
-            });
-        });
-    };
-
-    // Show Notification if Not Allowed and Not Saved in LocalStorage
-    const showIfNeeded = async () => {
-        const permission = await checkPermission();
-        if (permission === 'granted' || localStorage.getItem('notificationsAccepted') === 'true') {
-            notification.remove();
-        } else {
-            setTimeout(() => notification.classList.add('show'), 3000);
-        }
-    };
-
-    // Detect AdBlock (If the test div is hidden, AdBlock is enabled)
-    const detectAdBlock = () => {
-        const adBlockTest = document.querySelector('.adblock-test');
-        return adBlockTest && getComputedStyle(adBlockTest).display === 'none';
-    };
-
-    // On Click "Allow" Button
-    acceptBtn.addEventListener('click', async () => {
-        loader.style.display = 'inline-block';
-        btnText.textContent = 'Activating...';
-        acceptBtn.disabled = true;
-
-        try {
-            OneSignalDeferred.push(async function(OneSignal) {
-                try {
-                    const permission = await OneSignal.Notifications.requestPermission();
-                    
-                    if (permission === 'granted') {
-                        await OneSignal.User.pushSubscription.optIn();
-                        localStorage.setItem('notificationsAccepted', 'true');
-                        notification.classList.remove('show');
-                        setTimeout(() => notification.remove(), 300);
-                    } else {
-                        throw new Error('Permission Denied');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Notification activation failed. Please try again.');
-                } finally {
-                    loader.style.display = 'none';
-                    btnText.textContent = 'Allow';
-                    acceptBtn.disabled = false;
-                }
-            });
-        } catch (error) {
-            console.error('Init error:', error);
-            loader.style.display = 'none';
-            btnText.textContent = 'Allow';
-            acceptBtn.disabled = false;
-        }
-    });
-
-    // Force Notification to Show Even If AdBlock is Enabled
-    if (detectAdBlock()) {
-        notification.classList.add('show');
-    } else {
-        showIfNeeded();
+    
+    // التحقق مما إذا كان المستخدم قد وافق مسبقاً عبر Local Storage
+    function alreadyAccepted() {
+      return localStorage.getItem('notificationsAccepted') === 'true';
     }
-});
+    
+    // دالة لعرض نافذة الإشعارات
+    function showNotification() {
+      notification.classList.add('show');
+    }
+    
+    // فحص حالة إذن الإشعارات باستخدام OneSignal مع فحص بديل إن لم يكن متاحاً
+    function checkPermission(callback) {
+      if (window.OneSignal && OneSignal.Notifications && typeof OneSignal.Notifications.permission !== 'undefined') {
+        OneSignalDeferred.push(function(OneSignal) {
+          OneSignal.Notifications.permission.then(function(permission) {
+            callback(permission);
+          }).catch(function(){
+            callback('default');
+          });
+        });
+      } else {
+        callback('default');
+      }
+    }
+    
+    // إذا لم يتم قبول الإشعارات مسبقاً، اعرض النافذة بعد تأخير
+    if (!alreadyAccepted()) {
+      setTimeout(function(){
+        checkPermission(function(permission){
+          // إذا لم يكن الإذن 'granted' اعرض النافذة
+          if (permission !== 'granted') {
+            showNotification();
+          }
+        });
+      }, 3000);
+    }
+    
+    // حدث النقر على زر "Allow"
+    acceptBtn.addEventListener('click', function(){
+      loader.style.display = 'inline-block';
+      btnText.textContent = 'Activating...';
+      acceptBtn.disabled = true;
+      
+      function completeActivation(success) {
+        if (success) {
+          localStorage.setItem('notificationsAccepted', 'true');
+          notification.classList.remove('show');
+          setTimeout(function(){ 
+            if (notification && notification.parentNode) {
+              notification.parentNode.removeChild(notification); 
+            }
+          }, 300);
+        } else {
+          alert('Notification activation failed. Please try again.');
+        }
+        loader.style.display = 'none';
+        btnText.textContent = 'Allow';
+        acceptBtn.disabled = false;
+      }
+      
+      // محاولة طلب إذن الإشعارات من خلال OneSignal إن كان متاحاً
+      if (window.OneSignal && OneSignal.Notifications) {
+        OneSignalDeferred.push(function(OneSignal) {
+          OneSignal.Notifications.requestPermission().then(function(permission) {
+            if (permission === 'granted') {
+              if (OneSignal.User && OneSignal.User.pushSubscription) {
+                OneSignal.User.pushSubscription.optIn().then(function(){
+                  completeActivation(true);
+                }).catch(function(){
+                  completeActivation(false);
+                });
+              } else {
+                completeActivation(true);
+              }
+            } else {
+              completeActivation(false);
+            }
+          }).catch(function(){
+            completeActivation(false);
+          });
+        });
+      } else {
+        // في حال عدم توفر OneSignal، نقوم بتخزين القبول وإخفاء النافذة
+        completeActivation(true);
+      }
+    });
+  }
+  
+  // استخدام window.onload لضمان التوافق مع جميع المتصفحات
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(initNotification, 0);
+  } else {
+    window.addEventListener('load', initNotification);
+  }
+})();
 </script>
 
 </body>
