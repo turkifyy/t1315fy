@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,50 +7,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         /* تصميم نافذة الإشعارات */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
         #custom-notification {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             display: none;
-            width: 320px;
+            width: 350px;
             text-align: center;
             z-index: 9999;
             animation: fadeIn 0.5s ease-in-out;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-50%) translateY(120%); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateX(-50%) translateY(50%); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(0); 
+            }
+        }
+        
+        #custom-notification h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #custom-notification p {
+            color: #666;
+            margin-bottom: 15px;
         }
         
         #custom-notification button {
-            background: #007bff;
+            background: #2196F3;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 12px;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 6px;
             margin-top: 10px;
             width: 100%;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
         }
         
         #custom-notification button:hover {
-            background: #0056b3;
+            background: #1976D2;
+        }
+
+        #custom-notification button:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
-
     <!-- نافذة الإشعارات المخصصة -->
     <div id="custom-notification">
-        <h4>تفعيل الإشعارات</h4>
-        <p>هل ترغب في تلقي آخر التحديثات لدينا؟</p>
-        <button id="acceptBtn">موافق</button>
+        <h4>🔔 تفعيل الإشعارات</h4>
+        <p>هل ترغب في تلقي آخر التحديثات والأخبار الهامة؟</p>
+        <button id="acceptBtn">سماح بالإشعارات</button>
     </div>
 
     <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
@@ -60,30 +88,50 @@
             const notification = document.getElementById("custom-notification");
             const acceptBtn = document.getElementById("acceptBtn");
 
-            if (!localStorage.getItem("notifications_accepted")) {
-                setTimeout(() => {
-                    notification.style.display = "block";
-                }, 2000);
+            // التحقق من حالة الإشعارات
+            function checkNotificationStatus() {
+                const isAccepted = localStorage.getItem("notifications_accepted");
+                const permission = Notification.permission;
+
+                if (!isAccepted || permission !== "granted") {
+                    setTimeout(() => {
+                        notification.style.display = "block";
+                    }, 2000);
+                }
             }
 
             acceptBtn.addEventListener("click", function() {
                 notification.style.display = "none";
                 localStorage.setItem("notifications_accepted", "true");
 
+                // طلب إذن الإشعارات
                 if ("Notification" in window) {
                     Notification.requestPermission().then(permission => {
                         if (permission === "granted") {
-                            new Notification("تم تفعيل الإشعارات بنجاح!");
+                            new Notification("تم تفعيل الإشعارات بنجاح!", {
+                                body: "سنبقيك على اطلاع بآخر المستجدات",
+                                icon: "https://example.com/notification-icon.png" // أضف رابط أيقونة
+                            });
                         }
                     });
                 }
 
+                // تهيئة OneSignal
                 if (window.OneSignal) {
                     OneSignal.push(function() {
                         OneSignal.init({
-                            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // ضع معرف التطبيق الخاص بك هنا
+                            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", 
                             autoRegister: false,
-                            notifyButton: { enable: true },
+                            notifyButton: { 
+                                enable: true,
+                                size: 'medium',
+                                position: 'bottom-right'
+                            },
+                            promptOptions: {
+                                actionMessage: "سنرسل لك إشعارات مهمة",
+                                acceptButton: "موافق",
+                                cancelButton: "إلغاء"
+                            }
                         });
 
                         setTimeout(() => {
@@ -92,8 +140,10 @@
                     });
                 }
             });
+
+            // التحقق من حالة الإشعارات عند تحميل الصفحة
+            checkNotificationStatus();
         });
     </script>
-
 </body>
 </html>
