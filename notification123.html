@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إشعارات الموقع</title>
+    <title>Site Notifications</title>
     <style>
-        /* تصميم النافذة المخصصة */
+        /* Custom Notification Window */
         #custom-notification {
             position: fixed;
             bottom: 20px;
@@ -18,8 +18,8 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             opacity: 0;
             transition: all 0.4s ease;
-            z-index: 10000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            z-index: 999999;
+            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
         #custom-notification.show {
@@ -63,55 +63,62 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Anti-Adblock Fix */
+        .adblock-test {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            left: -9999px;
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
 
-<!-- نافذة الإشعارات المخصصة -->
+<!-- Hidden div for detecting AdBlock -->
+<div class="adblock-test">Advertisement</div>
+
+<!-- Custom Notification Popup -->
 <div id="custom-notification">
     <div class="notification-header">
-        <img src="شعار-موقعك.png" width="40" height="40" style="border-radius:8px;" alt="الشعار">
+        <img src="your-logo.png" width="40" height="40" style="border-radius:8px;" alt="Logo">
         <div>
-            <h4 style="margin:0;color:#1d2129;">تفعيل الإشعارات</h4>
-            <small style="color:#65676b;">ابق على اطلاع بآخر التحديثات</small>
+            <h4 style="margin:0;color:#1d2129;">Enable Notifications</h4>
+            <small style="color:#65676b;">Stay updated with the latest news</small>
         </div>
     </div>
     <div class="notification-body">
-        <p style="color:#606770;margin-bottom:16px;">سنرسل لك إشعارات حول آخر التحديثات والمحتوى الجديد.</p>
+        <p style="color:#606770;margin-bottom:16px;">We will send you notifications about the latest updates and content.</p>
         <button id="acceptBtn">
             <span class="loader"></span>
-            <span class="btn-text">موافق</span>
+            <span class="btn-text">Allow</span>
         </button>
     </div>
 </div>
 
-<!-- تحميل OneSignal SDK بدون تشغيل النافذة الافتراضية -->
+<!-- Load OneSignal SDK -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const notification = document.getElementById('custom-notification');
     const acceptBtn = document.getElementById('acceptBtn');
     const loader = acceptBtn.querySelector('.loader');
     const btnText = acceptBtn.querySelector('.btn-text');
-    
-    // تهيئة OneSignal بدون تشغيل النافذة الافتراضية
+
+    // Initialize OneSignal without auto prompt
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
-            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // ضع الـ App ID هنا
-            promptOptions: {
-                slidedown: {
-                    enabled: false // تعطيل النافذة الافتراضية بالكامل
-                }
-            },
-            autoRegister: false, // عدم التسجيل التلقائي، سيتم عبر النافذة المخصصة فقط
-            notifyButton: {
-                enable: false // إخفاء زر الإشعارات الافتراضي
-            }
+            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+            promptOptions: { slidedown: { enabled: false } },
+            autoRegister: false,
+            notifyButton: { enable: false }
         });
     });
 
-    // التحقق مما إذا كان المستخدم قد وافق على الإشعارات مسبقًا
+    // Check Notification Permission
     const checkPermission = async () => {
         return new Promise(resolve => {
             OneSignalDeferred.push(async function(OneSignal) {
@@ -121,57 +128,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // عرض النافذة المخصصة إذا لم يوافق المستخدم مسبقًا
+    // Show Notification if Not Allowed and Not Saved in LocalStorage
     const showIfNeeded = async () => {
         const permission = await checkPermission();
-        if (permission === 'granted') {
+        if (permission === 'granted' || localStorage.getItem('notificationsAccepted') === 'true') {
             notification.remove();
         } else {
             setTimeout(() => notification.classList.add('show'), 3000);
         }
     };
 
-    // عند الضغط على زر الموافقة
+    // Detect AdBlock (If the test div is hidden, AdBlock is enabled)
+    const detectAdBlock = () => {
+        const adBlockTest = document.querySelector('.adblock-test');
+        return adBlockTest && getComputedStyle(adBlockTest).display === 'none';
+    };
+
+    // On Click "Allow" Button
     acceptBtn.addEventListener('click', async () => {
         loader.style.display = 'inline-block';
-        btnText.textContent = 'جاري التفعيل...';
+        btnText.textContent = 'Activating...';
         acceptBtn.disabled = true;
 
         try {
             OneSignalDeferred.push(async function(OneSignal) {
                 try {
-                    // طلب إذن الإشعارات
                     const permission = await OneSignal.Notifications.requestPermission();
                     
                     if (permission === 'granted') {
-                        // تسجيل المستخدم في OneSignal
                         await OneSignal.User.pushSubscription.optIn();
-                        
-                        // إخفاء النافذة بعد النجاح
+                        localStorage.setItem('notificationsAccepted', 'true');
                         notification.classList.remove('show');
                         setTimeout(() => notification.remove(), 300);
                     } else {
-                        throw new Error('تم رفض الإذن');
+                        throw new Error('Permission Denied');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('لم يتم تفعيل الإشعارات، يرجى المحاولة مرة أخرى.');
+                    alert('Notification activation failed. Please try again.');
                 } finally {
                     loader.style.display = 'none';
-                    btnText.textContent = 'موافق';
+                    btnText.textContent = 'Allow';
                     acceptBtn.disabled = false;
                 }
             });
         } catch (error) {
             console.error('Init error:', error);
             loader.style.display = 'none';
-            btnText.textContent = 'موافق';
+            btnText.textContent = 'Allow';
             acceptBtn.disabled = false;
         }
     });
 
-    // بدء العملية
-    showIfNeeded();
+    // Force Notification to Show Even If AdBlock is Enabled
+    if (detectAdBlock()) {
+        notification.classList.add('show');
+    } else {
+        showIfNeeded();
+    }
 });
 </script>
 
