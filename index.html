@@ -873,6 +873,22 @@
         .allow-btn:hover {
             background-color: #166FE5;
         }
+        .not-now-btn {
+    background-color: #65676B;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 48%;
+}
+
+.not-now-btn:hover {
+    background-color: #4a4e53;
+}
 
         @media (max-width: 480px) {
             #facebook-notification {
@@ -915,6 +931,7 @@
             </div>
             <div class="notification-actions">
                 <button class="allow-btn" id="allowBtn">Allow Notifications</button>
+                <button class="not-now-btn" id="notNowBtn">Not Now</button>
             </div>
         </div>
     </div>
@@ -1936,6 +1953,7 @@
                 }, 300);
             }
 
+           
             // Auto show notification after 2 seconds
             setTimeout(showNotification, 2000);
 
@@ -1962,6 +1980,10 @@
                 }
             });
 
+          document.getElementById('notNowBtn').addEventListener('click', function() {
+    hideNotification();
+});
+    
             // Android-specific meta tags
             const androidMeta = document.createElement('meta');
             androidMeta.name = 'theme-color';
