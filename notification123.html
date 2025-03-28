@@ -9,59 +9,38 @@
     <!-- Font Awesome للأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* التصميم العام - دعم متصفحات قديمة */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #f8fafc;
+            --primary-color: #1877f2; /* أزرق فيسبوك */
+            --hover-color: #166fe5; /* أزرق فيسبوك عند التفاعل */
             --text-color: #1e293b;
-            --border-radius: 12px;
-            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius: 10px;
+            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: #f9fafb;
-            padding: 20px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        /* تصميم إشعار iOS عصري */
-        #custom-turkify-notification {
+        #custom-notification-widget {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(150%);
             width: 95%;
-            max-width: 420px;
+            max-width: 400px;
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             overflow: hidden;
             z-index: 999999;
             opacity: 0;
-            transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            transition: var(--transition);
+            border: 1px solid #dddfe2;
         }
         
-        #custom-turkify-notification.show {
+        #custom-notification-widget.show {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
         
-        #custom-turkify-notification.hide {
+        #custom-notification-widget.hide {
             opacity: 0;
             transform: translateX(-50%) translateY(150%);
         }
@@ -69,86 +48,61 @@
         .notification-header {
             display: flex;
             align-items: center;
-            padding: 16px;
-            background-color: var(--primary-color);
-            color: white;
-            position: relative;
+            padding: 15px;
+            background-color: white;
+            border-bottom: 1px solid #dddfe2;
         }
         
-        .notification-header .app-logo {
-            width: 32px;
-            height: 32px;
+        .app-logo {
+            width: 40px;
+            height: 40px;
             margin-left: 12px;
-            border-radius: 8px;
+            border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.2);
         }
         
-        .notification-header .app-info {
+        .app-info {
             flex: 1;
         }
         
-        .notification-header h3 {
+        .app-info h3 {
             margin: 0;
             font-size: 16px;
             font-weight: 600;
+            color: var(--text-color);
         }
         
-        .notification-header .app-time {
+        .app-info p {
+            margin: 2px 0 0;
             font-size: 12px;
-            opacity: 0.8;
+            color: #65676b;
         }
         
         .notification-content {
-            padding: 16px;
-            background-color: white;
+            padding: 15px;
         }
         
         .notification-content p {
-            margin: 0 0 16px 0;
+            margin: 0 0 15px 0;
             color: var(--text-color);
             line-height: 1.5;
-            font-size: 14px;
-        }
-        
-        .notification-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
         }
         
         .notification-btn {
-            flex: 1;
-            padding: 10px 16px;
+            width: 100%;
+            padding: 10px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-accept {
             background-color: var(--primary-color);
             color: white;
+            font-size: 15px;
         }
         
-        .btn-accept:hover {
-            background-color: #1d4ed8;
-            transform: translateY(-1px);
-        }
-        
-        .btn-decline {
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-        }
-        
-        .btn-decline:hover {
-            background-color: #e2e8f0;
-            transform: translateY(-1px);
+        .notification-btn:hover {
+            background-color: var(--hover-color);
         }
         
         .loading-spinner {
@@ -158,8 +112,8 @@
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-left: 8px;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
         }
         
         @keyframes spin {
@@ -170,284 +124,113 @@
             display: inline-block;
         }
         
-        /* Media Queries لجميع الأجهزة */
         @media (max-width: 576px) {
-            #custom-turkify-notification {
-                width: calc(100% - 20px);
+            #custom-notification-widget {
                 bottom: 10px;
-            }
-            
-            .notification-buttons {
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
-        
-        @media (min-width: 577px) and (max-width: 768px) {
-            #custom-turkify-notification {
-                max-width: 380px;
-            }
-        }
-        
-        /* دعم لمتصفحات قديمة */
-        @supports not (backdrop-filter: blur(10px)) {
-            #custom-turkify-notification {
-                background-color: rgba(255, 255, 255, 0.95);
-            }
-        }
-        
-        /* تحسينات لأجهزة iOS */
-        @media (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 3) {
-            #custom-turkify-notification {
-                bottom: max(20px, env(safe-area-inset-bottom));
-            }
-        }
-        
-        /* دعم لمتصفح Safari */
-        @media not all and (min-resolution: 0.001dpcm) {
-            @supports (-webkit-appearance: none) {
-                #custom-turkify-notification {
-                    backdrop-filter: none;
-                    -webkit-backdrop-filter: blur(10px);
-                }
             }
         }
     </style>
 </head>
 <body>
-    <!-- محتوى الصفحة التجريبي -->
-    <div class="container py-5">
-        <h1 class="text-center mb-4">موقع تجريبي</h1>
-        <p class="text-center">هذا محتوى تجريبي لاختبار ظهور ويدجيت الإشعارات</p>
-    </div>
-
-    <!-- ويدجيت الإشعارات المخصص -->
-    <div id="custom-turkify-notification">
+    <!-- ويدجيت الإشعارات المحدث -->
+    <div id="custom-notification-widget">
         <div class="notification-header">
-            <!-- شعار الموقع - استبدل المصدر بشعارك -->
-            <img src="https://via.placeholder.com/32" alt="شعار الموقع" class="app-logo">
+            <img src="https://via.placeholder.com/40" alt="شعار الموقع" class="app-logo">
             <div class="app-info">
                 <h3>إشعارات الموقع</h3>
-                <div class="app-time">الآن</div>
+                <p>طلب إذن الإشعارات</p>
             </div>
-            <i class="fas fa-bell"></i>
         </div>
         <div class="notification-content">
-            <p>نود إعلامك بالإشعارات المهمة لتجربة أفضل. هل توافق على تلقي الإشعارات منا؟</p>
-            <div class="notification-buttons">
-                <button class="notification-btn btn-accept" id="customAcceptBtn">
-                    <span class="btn-text">موافق</span>
-                    <span class="loading-spinner"></span>
-                </button>
-                <button class="notification-btn btn-decline" id="customDeclineBtn">ليس الآن</button>
-            </div>
+            <p>نود إعلامك بالإشعارات المهمة لتجربة أفضل. يرجى الموافقة على تلقي الإشعارات.</p>
+            <button class="notification-btn" id="acceptBtn">
+                <span class="loading-spinner"></span>
+                <span class="btn-text">موافق</span>
+            </button>
         </div>
     </div>
 
-    <!-- OneSignal SDK -->
+    <!-- كود OneSignal المحدث -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-        // كائن للتتبع والأخطاء
-        const notificationLogger = {
-            log: function(message) {
-                console.log(`[CustomNotification] ${new Date().toISOString()} - ${message}`);
-            },
-            error: function(error, context = '') {
-                console.error(`[CustomNotification] ${new Date().toISOString()} - ERROR: ${error.message}`, context);
-                // يمكنك هنا إضافة إرسال الأخطاء إلى سيرفر إذا لزم الأمر
-            }
-        };
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+                promptOptions: {
+                    slidedown: {
+                        enabled: false // تعطيل الطلب التلقائي
+                    }
+                },
+                notifyButton: {
+                    enable: false // تعطيل زر الإشعار الافتراضي
+                }
+            });
+        });
+    </script>
 
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            notificationLogger.log('بدء تحميل ويدجيت الإشعارات');
-            
-            const notificationWidget = document.getElementById('custom-turkify-notification');
-            const acceptBtn = document.getElementById('customAcceptBtn');
-            const declineBtn = document.getElementById('customDeclineBtn');
+            const notificationWidget = document.getElementById('custom-notification-widget');
+            const acceptBtn = document.getElementById('acceptBtn');
             const btnText = acceptBtn.querySelector('.btn-text');
             const loadingSpinner = acceptBtn.querySelector('.loading-spinner');
             
-            // التحقق مما إذا كان المستخدم قد اختار سابقًا
-            const notificationChoice = localStorage.getItem('turkifyNotificationPermission');
+            // التحقق من الإذن السابق
+            const notificationPermission = localStorage.getItem('notificationPermission');
             
-            // تهيئة OneSignal
-            function initializeOneSignal() {
-                try {
-                    window.OneSignal = window.OneSignal || [];
-                    
-                    OneSignal.push(function() {
-                        OneSignal.init({
-                            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
-                            safari_web_id: "web.onesignal.auto.8e9a7a5a-8e9a-7a5a-8e9a-7a5a8e9a7a5a",
-                            notifyButton: {
-                                enable: false // تعطيل زر الإشعار الافتراضي
-                            },
-                            promptOptions: {
-                                slidedown: {
-                                    enabled: false
-                                },
-                                push: {
-                                    enabled: false
-                                }
-                            },
-                            welcomeNotification: {
-                                disable: true
-                            }
-                        });
-                        
-                        notificationLogger.log('OneSignal initialized successfully');
-                        
-                        // التحقق من حالة الاشتراك الحالية
-                        OneSignal.getUserId().then(function(userId) {
-                            if (userId) {
-                                localStorage.setItem('turkifyNotificationPermission', 'granted');
-                                notificationLogger.log('User is already subscribed, user ID: ' + userId);
-                            } else {
-                                notificationLogger.log('No existing subscription found');
-                            }
-                        }).catch(error => {
-                            notificationLogger.error(error, 'While checking existing subscription');
-                        });
-                    });
-                } catch (error) {
-                    notificationLogger.error(error, 'While initializing OneSignal');
-                }
-            }
-            
-            // استدعاء تهيئة OneSignal
-            initializeOneSignal();
-            
-            // إذا لم يكن هناك اختيار سابق، عرض الويدجيت بعد تأخير
-            if (!notificationChoice) {
+            if (!notificationPermission) {
                 setTimeout(() => {
-                    try {
-                        notificationWidget.classList.add('show');
-                        notificationLogger.log('Notification widget shown to user');
-                    } catch (error) {
-                        notificationLogger.error(error, 'While showing notification widget');
-                    }
+                    notificationWidget.classList.add('show');
                 }, 3000);
-            } else {
-                notificationLogger.log('User already made a choice: ' + notificationChoice);
             }
             
             // حدث قبول الإشعارات
             acceptBtn.addEventListener('click', async function() {
+                acceptBtn.classList.add('btn-loading');
+                btnText.textContent = 'جاري التحميل...';
+                
                 try {
-                    // عرض تحميل
-                    acceptBtn.classList.add('btn-loading');
-                    btnText.textContent = 'جاري التفعيل...';
+                    // انتظار تهيئة OneSignal
+                    await OneSignalDeferred;
                     
-                    notificationLogger.log('User clicked accept button, starting subscription process');
+                    // طلب الإذن من المتصفح
+                    const permission = await OneSignal.Notifications.requestPermission();
                     
-                    // تسجيل المستخدم في OneSignal
-                    await OneSignal.push(async () => {
-                        try {
-                            await OneSignal.registerForPushNotifications();
-                            await OneSignal.setSubscription(true);
-                            
-                            // حفظ الاختيار في localStorage
-                            localStorage.setItem('turkifyNotificationPermission', 'granted');
-                            
-                            btnText.textContent = 'تم التفعيل!';
-                            notificationLogger.log('Notification subscription successful');
-                            
+                    if (permission) {
+                        // إذا تم منح الإذن
+                        localStorage.setItem('notificationPermission', 'granted');
+                        btnText.textContent = 'تم القبول!';
+                        
+                        // تسجيل المستخدم في OneSignal
+                        await OneSignal.User.pushSubscription.optIn();
+                        
+                        setTimeout(() => {
+                            notificationWidget.classList.add('hide');
                             setTimeout(() => {
-                                hideWidget();
-                            }, 1000);
-                            
-                        } catch (error) {
-                            acceptBtn.classList.remove('btn-loading');
-                            btnText.textContent = 'موافق';
-                            notificationLogger.error(error, 'While subscribing to notifications');
-                            alert('حدث خطأ أثناء تفعيل الإشعارات. يرجى التأكد من السماح بالإشعارات في إعدادات المتصفح.');
-                        }
-                    });
-                    
+                                notificationWidget.remove();
+                            }, 300);
+                        }, 1000);
+                    } else {
+                        // إذا تم رفض الإذن
+                        throw new Error('تم رفض الإذن من قبل المستخدم');
+                    }
                 } catch (error) {
+                    console.error('خطأ في تفعيل الإشعارات:', error);
                     acceptBtn.classList.remove('btn-loading');
                     btnText.textContent = 'موافق';
-                    notificationLogger.error(error, 'In accept button click handler');
-                    alert('حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.');
+                    alert('لم يتم تفعيل الإشعارات. يرجى التأكد من السماح بالإشعارات في إعدادات المتصفح.');
                 }
             });
             
-            // حدث رفض الإشعارات
-            declineBtn.addEventListener('click', function() {
-                try {
-                    localStorage.setItem('turkifyNotificationPermission', 'denied');
-                    notificationLogger.log('User declined notifications');
-                    
-                    // تعطيل الإشعارات في OneSignal
-                    OneSignal.push(() => {
-                        OneSignal.setSubscription(false);
-                    });
-                    
-                    hideWidget();
-                } catch (error) {
-                    notificationLogger.error(error, 'In decline button click handler');
-                }
-            });
-            
-            // وظيفة إخفاء الويدجيت مع أنيميشن
+            // إخفاء الويدجيت
             function hideWidget() {
-                try {
-                    notificationWidget.classList.add('hide');
-                    notificationLogger.log('Hiding notification widget');
-                    
-                    setTimeout(() => {
-                        notificationWidget.remove();
-                        notificationLogger.log('Notification widget removed from DOM');
-                    }, 300);
-                } catch (error) {
-                    notificationLogger.error(error, 'While hiding notification widget');
-                }
-            }
-            
-            // دعم لمتصفحات قديمة بدون classList
-            if (!('classList' in document.documentElement)) {
-                notificationLogger.log('Old browser detected, adding classList polyfill');
-                Object.defineProperty(HTMLElement.prototype, 'classList', {
-                    get: function() {
-                        var self = this;
-                        function update(fn) {
-                            return function(value) {
-                                var classes = self.className.split(/\s+/),
-                                    index = classes.indexOf(value);
-                                
-                                fn(classes, index, value);
-                                self.className = classes.join(' ');
-                            };
-                        }
-                        
-                        return {
-                            add: update(function(classes, index, value) {
-                                if (index === -1) classes.push(value);
-                            }),
-                            
-                            remove: update(function(classes, index) {
-                                if (index !== -1) classes.splice(index, 1);
-                            }),
-                            
-                            contains: function(value) {
-                                return this.toString().split(/\s+/).indexOf(value) !== -1;
-                            },
-                            
-                            toggle: function(value) {
-                                this[this.contains(value) ? 'remove' : 'add'](value);
-                            },
-                            
-                            toString: function() {
-                                return self.className;
-                            }
-                        };
-                    }
-                });
+                notificationWidget.classList.add('hide');
+                setTimeout(() => {
+                    notificationWidget.remove();
+                }, 300);
             }
         });
     </script>
 </body>
-  </html>
+</html>
