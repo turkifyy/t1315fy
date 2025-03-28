@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Netflix-Style Notifications</title>
+    <title>Facebook-Style Notifications</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --netflix-background: #141414;
-            --netflix-red: #E50914;
-            --text-color: #ffffff;
+            --fb-blue: #1877F2;
+            --fb-background: #F0F2F5;
+            --text-primary: #1C1E21;
+            --text-secondary: #65676B;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: var(--netflix-background);
+            background-color: var(--fb-background);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,7 +36,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(255, 255, 255, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
@@ -43,109 +44,131 @@
             backdrop-filter: blur(5px);
         }
 
-        #netflix-notification {
+        #facebook-notification {
             width: 90%;
-            max-width: 500px;
-            background: linear-gradient(to bottom, #1f1f1f, #141414);
-            border-radius: 10px;
+            max-width: 450px;
+            background: white;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transform: scale(0.7);
             opacity: 0;
             transition: all 0.3s ease;
-            border: 2px solid var(--netflix-red);
+            border: 1px solid #E5E5E5;
         }
 
         .notification-header {
-            background: var(--netflix-red);
-            color: var(--text-color);
+            background: var(--fb-blue);
+            color: white;
             padding: 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+        }
+
+        .notification-header-content {
+            display: flex;
+            align-items: center;
         }
 
         .notification-header img {
-            width: 80px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            border: 3px solid white;
-            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid white;
+        }
+
+        .notification-header-text h3 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .notification-header-text p {
+            font-size: 12px;
+            opacity: 0.8;
         }
 
         .notification-content {
-            padding: 25px;
+            padding: 20px;
             text-align: center;
         }
 
         .notification-content h2 {
-            color: var(--text-color);
+            color: var(--text-primary);
             margin-bottom: 15px;
-            font-size: 22px;
-            font-weight: bold;
+            font-size: 20px;
         }
 
         .notification-content p {
-            color: #b3b3b3;
-            line-height: 1.6;
-            font-size: 16px;
-            margin-bottom: 20px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 15px;
         }
 
         .notification-actions {
             display: flex;
             justify-content: center;
             padding: 15px;
-            background: #1f1f1f;
+            background: var(--fb-background);
+            border-top: 1px solid #E5E5E5;
         }
 
         .allow-btn {
-            background-color: var(--netflix-red);
-            color: var(--text-color);
+            background-color: var(--fb-blue);
+            color: white;
             border: none;
             padding: 12px 30px;
-            border-radius: 5px;
+            border-radius: 6px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
         }
 
         .allow-btn:hover {
-            background-color: #f6121d;
-            transform: scale(1.05);
+            background-color: #166FE5;
         }
 
         @media (max-width: 480px) {
-            #netflix-notification {
+            #facebook-notification {
                 width: 95%;
                 max-width: 95%;
             }
 
-            .notification-content h2 {
-                font-size: 18px;
+            .notification-header img {
+                width: 40px;
+                height: 40px;
             }
 
-            .notification-content p {
+            .notification-header-text h3 {
                 font-size: 14px;
             }
-        }
 
-        @keyframes popIn {
-            0% { transform: scale(0.7); opacity: 0; }
-            70% { transform: scale(1.1); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+            .notification-header-text p {
+                font-size: 11px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="notification-overlay">
-        <div id="netflix-notification">
+        <div id="facebook-notification">
             <div class="notification-header">
-                <img src="https://via.placeholder.com/150?text=APP+LOGO" alt="App Logo">
+                <div class="notification-header-content">
+                    <img src="https://via.placeholder.com/150?text=APP+LOGO" alt="App Logo">
+                    <div class="notification-header-text">
+                        <h3>App Notifications</h3>
+                        <p>Stay Connected</p>
+                    </div>
+                </div>
+                <i class="fab fa-facebook" style="color: white; font-size: 24px;"></i>
             </div>
             <div class="notification-content">
                 <h2>Enable Notifications</h2>
-                <p>Get the latest updates, recommendations, and exclusive content right to your device.</p>
+                <p>Get instant updates, messages, and important alerts directly on your device.</p>
             </div>
             <div class="notification-actions">
                 <button class="allow-btn" id="allowBtn">Allow Notifications</button>
@@ -156,22 +179,22 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const notificationOverlay = document.getElementById('notification-overlay');
-            const netflixNotification = document.getElementById('netflix-notification');
+            const facebookNotification = document.getElementById('facebook-notification');
             const allowBtn = document.getElementById('allowBtn');
 
             function showNotification() {
                 if (!localStorage.getItem('notifications_accepted')) {
                     notificationOverlay.style.display = 'flex';
                     setTimeout(() => {
-                        netflixNotification.style.transform = 'scale(1)';
-                        netflixNotification.style.opacity = '1';
+                        facebookNotification.style.transform = 'scale(1)';
+                        facebookNotification.style.opacity = '1';
                     }, 100);
                 }
             }
 
             function hideNotification() {
-                netflixNotification.style.transform = 'scale(0.7)';
-                netflixNotification.style.opacity = '0';
+                facebookNotification.style.transform = 'scale(0.7)';
+                facebookNotification.style.opacity = '0';
                 setTimeout(() => {
                     notificationOverlay.style.display = 'none';
                 }, 300);
@@ -188,7 +211,7 @@
                             localStorage.setItem('notifications_accepted', 'true');
                             hideNotification();
                             new Notification('Notifications Enabled', {
-                                body: 'You will now receive updates and recommendations.',
+                                body: 'You will now receive updates and alerts.',
                                 icon: 'https://via.placeholder.com/150?text=APP+LOGO'
                             });
                         }
@@ -206,7 +229,7 @@
             // Android-specific meta tags
             const androidMeta = document.createElement('meta');
             androidMeta.name = 'theme-color';
-            androidMeta.content = '#141414';
+            androidMeta.content = '#1877F2';
             document.head.appendChild(androidMeta);
 
             const androidCompatMeta = document.createElement('meta');
