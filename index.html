@@ -749,7 +749,7 @@
     <style>
               :root {
             --fb-blue: #1877F2;
-            --fb-background: rgba(255, 255, 255, 0.02);
+            --fb-background: transparent;
             --text-primary: #1C1E21;
             --text-secondary: #65676B;
         }
@@ -761,13 +761,14 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
           body {
-              background-color: var(--fb-background);
+            background-color: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
+            backdrop-filter: blur(0);
             
         }
 
