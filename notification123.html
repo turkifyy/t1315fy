@@ -4,23 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إشعارات الموقع</title>
-    
-    <!-- OneSignal SDK -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-                appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // 🔹 App ID مضاف هنا
-            });
-        });
-    </script>
-
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
+        /* تصميم النافذة المخصصة */
         #custom-notification {
             position: fixed;
             bottom: 20px;
@@ -34,6 +19,7 @@
             opacity: 0;
             transition: all 0.4s ease;
             z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         #custom-notification.show {
@@ -62,15 +48,6 @@
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        #acceptBtn:disabled {
-            background: #a1c5f7;
-            cursor: not-allowed;
         }
 
         .loader {
@@ -90,6 +67,7 @@
 </head>
 <body>
 
+<!-- نافذة الإشعارات المخصصة -->
 <div id="custom-notification">
     <div class="notification-header">
         <img src="شعار-موقعك.png" width="40" height="40" style="border-radius:8px;" alt="الشعار">
@@ -107,61 +85,92 @@
     </div>
 </div>
 
+<!-- تحميل OneSignal SDK بدون تشغيل النافذة الافتراضية -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-    const notificationBox = document.getElementById('custom-notification');
+document.addEventListener('DOMContentLoaded', () => {
+    const notification = document.getElementById('custom-notification');
     const acceptBtn = document.getElementById('acceptBtn');
     const loader = acceptBtn.querySelector('.loader');
     const btnText = acceptBtn.querySelector('.btn-text');
+    
+    // تهيئة OneSignal بدون تشغيل النافذة الافتراضية
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+            appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // ضع الـ App ID هنا
+            promptOptions: {
+                slidedown: {
+                    enabled: false // تعطيل النافذة الافتراضية بالكامل
+                }
+            },
+            autoRegister: false, // عدم التسجيل التلقائي، سيتم عبر النافذة المخصصة فقط
+            notifyButton: {
+                enable: false // إخفاء زر الإشعارات الافتراضي
+            }
+        });
+    });
 
-    // التحقق من حالة الإذن للإشعارات
-    async function checkPermission() {
-        return new Promise((resolve) => {
+    // التحقق مما إذا كان المستخدم قد وافق على الإشعارات مسبقًا
+    const checkPermission = async () => {
+        return new Promise(resolve => {
             OneSignalDeferred.push(async function(OneSignal) {
-                const status = await OneSignal.Notification.getPermission();
-                resolve(status);
+                const permission = await OneSignal.Notifications.permission;
+                resolve(permission);
             });
         });
-    }
+    };
 
-    // عرض النافذة إذا لم يتم منح الإذن
-    async function showIfNeeded() {
+    // عرض النافذة المخصصة إذا لم يوافق المستخدم مسبقًا
+    const showIfNeeded = async () => {
         const permission = await checkPermission();
-        if (permission !== 'granted') {
-            setTimeout(() => notificationBox.classList.add('show'), 3000);
+        if (permission === 'granted') {
+            notification.remove();
         } else {
-            notificationBox.remove();
+            setTimeout(() => notification.classList.add('show'), 3000);
         }
-    }
+    };
 
-    // عند النقر على زر التفعيل
+    // عند الضغط على زر الموافقة
     acceptBtn.addEventListener('click', async () => {
         loader.style.display = 'inline-block';
         btnText.textContent = 'جاري التفعيل...';
         acceptBtn.disabled = true;
 
         try {
-            await OneSignalDeferred.push(async function(OneSignal) {
-                await OneSignal.Notification.requestPermission();
-                await OneSignal.User.pushSubscription.optIn();
-                const status = await OneSignal.Notification.getPermission();
-                if (status === 'granted') {
-                    notificationBox.classList.remove('show');
-                    setTimeout(() => notificationBox.remove(), 300);
-                } else {
-                    throw new Error('تم رفض الإذن');
+            OneSignalDeferred.push(async function(OneSignal) {
+                try {
+                    // طلب إذن الإشعارات
+                    const permission = await OneSignal.Notifications.requestPermission();
+                    
+                    if (permission === 'granted') {
+                        // تسجيل المستخدم في OneSignal
+                        await OneSignal.User.pushSubscription.optIn();
+                        
+                        // إخفاء النافذة بعد النجاح
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 300);
+                    } else {
+                        throw new Error('تم رفض الإذن');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('لم يتم تفعيل الإشعارات، يرجى المحاولة مرة أخرى.');
+                } finally {
+                    loader.style.display = 'none';
+                    btnText.textContent = 'موافق';
+                    acceptBtn.disabled = false;
                 }
             });
         } catch (error) {
-            console.error('خطأ:', error);
-            alert('تعذر تفعيل الإشعارات. حاول مرة أخرى لاحقًا.');
-        } finally {
+            console.error('Init error:', error);
             loader.style.display = 'none';
             btnText.textContent = 'موافق';
             acceptBtn.disabled = false;
         }
     });
 
+    // بدء العملية
     showIfNeeded();
 });
 </script>
