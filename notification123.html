@@ -1,84 +1,160 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إشعارات مخصصة</title>
+    <title>Notification System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* تصميم نافذة الإشعارات */
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary-color: #007bff;
+            --background-color: #f0f2f5;
+            --text-color: #1c1e21;
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--background-color);
+            direction: ltr;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+            padding: 0 15px;
+            z-index: 1000;
         }
 
         #custom-notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             display: none;
-            width: 350px;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f0f2f5;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .notification-header-text {
+            flex-grow: 1;
+        }
+
+        .notification-header-text h4 {
+            font-size: 16px;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .notification-header-text p {
+            font-size: 14px;
+            color: #65676b;
+        }
+
+        .notification-body {
+            padding: 15px;
             text-align: center;
-            z-index: 9999;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateX(-50%) translateY(50%); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateX(-50%) translateY(0); 
-            }
-        }
-        
-        #custom-notification h4 {
-            color: #333;
-            margin-bottom: 10px;
         }
 
-        #custom-notification p {
-            color: #666;
+        .notification-body p {
+            color: var(--text-color);
             margin-bottom: 15px;
-        }
-        
-        #custom-notification button {
-            background: #2196F3;
-            color: white;
-            border: none;
-            padding: 12px;
-            cursor: pointer;
-            border-radius: 6px;
-            margin-top: 10px;
-            width: 100%;
-            transition: background-color 0.3s ease;
-            font-weight: bold;
-        }
-        
-        #custom-notification button:hover {
-            background: #1976D2;
+            font-size: 15px;
+            line-height: 1.4;
         }
 
-        #custom-notification button:active {
-            transform: scale(0.98);
+        .notification-actions {
+            display: flex;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-actions button {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .notification-actions button:first-child {
+            color: #65676b;
+        }
+
+        .notification-actions button:last-child {
+            color: var(--primary-color);
+        }
+
+        .notification-actions button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 480px) {
+            #notification-container {
+                max-width: 95%;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- نافذة الإشعارات المخصصة -->
-    <div id="custom-notification">
-        <h4>🔔 تفعيل الإشعارات</h4>
-        <p>هل ترغب في تلقي آخر التحديثات والأخبار الهامة؟</p>
-        <button id="acceptBtn">سماح بالإشعارات</button>
+    <div id="notification-container">
+        <div id="custom-notification">
+            <div class="notification-header">
+                <img src="https://via.placeholder.com/40" alt="App Logo" id="notification-logo">
+                <div class="notification-header-text">
+                    <h4>Enable Notifications</h4>
+                    <p>Stay updated with latest news</p>
+                </div>
+            </div>
+            <div class="notification-body">
+                <p>Would you like to receive notifications from our app?</p>
+            </div>
+            <div class="notification-actions">
+                <button id="cancelBtn">Not Now</button>
+                <button id="acceptBtn">Allow</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
@@ -87,8 +163,12 @@
         document.addEventListener("DOMContentLoaded", function() {
             const notification = document.getElementById("custom-notification");
             const acceptBtn = document.getElementById("acceptBtn");
+            const cancelBtn = document.getElementById("cancelBtn");
+            const notificationLogo = document.getElementById("notification-logo");
 
-            // التحقق من حالة الإشعارات
+            // Dynamic logo placeholder (replace with your actual logo)
+            notificationLogo.src = "https://via.placeholder.com/40?text=App";
+
             function checkNotificationStatus() {
                 const isAccepted = localStorage.getItem("notifications_accepted");
                 const permission = Notification.permission;
@@ -100,37 +180,35 @@
                 }
             }
 
+            cancelBtn.addEventListener("click", function() {
+                notification.style.display = "none";
+            });
+
             acceptBtn.addEventListener("click", function() {
                 notification.style.display = "none";
                 localStorage.setItem("notifications_accepted", "true");
 
-                // طلب إذن الإشعارات
                 if ("Notification" in window) {
                     Notification.requestPermission().then(permission => {
                         if (permission === "granted") {
-                            new Notification("تم تفعيل الإشعارات بنجاح!", {
-                                body: "سنبقيك على اطلاع بآخر المستجدات",
-                                icon: "https://example.com/notification-icon.png" // أضف رابط أيقونة
+                            new Notification("Notifications Enabled!", {
+                                body: "You'll now receive updates",
+                                icon: notificationLogo.src
                             });
                         }
                     });
                 }
 
-                // تهيئة OneSignal
                 if (window.OneSignal) {
                     OneSignal.push(function() {
                         OneSignal.init({
                             appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", 
                             autoRegister: false,
-                            notifyButton: { 
-                                enable: true,
-                                size: 'medium',
-                                position: 'bottom-right'
-                            },
+                            notifyButton: { enable: false },
                             promptOptions: {
-                                actionMessage: "سنرسل لك إشعارات مهمة",
-                                acceptButton: "موافق",
-                                cancelButton: "إلغاء"
+                                actionMessage: "Stay updated with our latest news",
+                                acceptButton: "Allow",
+                                cancelButton: "Block"
                             }
                         });
 
@@ -141,7 +219,17 @@
                 }
             });
 
-            // التحقق من حالة الإشعارات عند تحميل الصفحة
+            // Added Android-specific meta tags for better mobile support
+            const androidMeta = document.createElement('meta');
+            androidMeta.name = 'theme-color';
+            androidMeta.content = '#007bff';
+            document.head.appendChild(androidMeta);
+
+            const androidCompatMeta = document.createElement('meta');
+            androidCompatMeta.name = 'mobile-web-app-capable';
+            androidCompatMeta.content = 'yes';
+            document.head.appendChild(androidCompatMeta);
+
             checkNotificationStatus();
         });
     </script>
