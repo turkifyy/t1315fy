@@ -42,21 +42,6 @@
         #custom-notification button:hover {
             background: #0056b3;
         }
-        
-        /* تصميم مانع الإعلانات */
-        #adblock-warning {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: red;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            z-index: 99999;
-        }
     </style>
 </head>
 <body>
@@ -68,79 +53,47 @@
         <button id="acceptBtn">موافق</button>
     </div>
 
-    <!-- تحذير مانع الإعلانات -->
-    <div id="adblock-warning">
-        يرجى تعطيل مانع الإعلانات لمتابعة استخدام الموقع.
-    </div>
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const notification = document.getElementById("custom-notification");
             const acceptBtn = document.getElementById("acceptBtn");
-            
-            // التحقق مما إذا كان المستخدم قد وافق مسبقًا على الإشعارات
+
             if (!localStorage.getItem("notifications_accepted")) {
-                // التحقق مما إذا كنا في متصفح Chrome
-                if (navigator.userAgent.includes("Chrome") && !navigator.userAgent.includes("Edg") && !navigator.userAgent.includes("OPR")) {
-                    // منع ظهور نافذة OneSignal الافتراضية
-                    OneSignal = window.OneSignal || [];
-                    OneSignal.push(function() {
-                        OneSignal.SERVICE_WORKER_PARAM = { scope: '/' };
-                        OneSignal.SERVICE_WORKER_PATH = 'OneSignalSDKWorker.js';
-                        OneSignal.init({ autoRegister: false });
-                    });
-                }
-                
-                // عرض نافذة الإشعارات المخصصة
                 setTimeout(() => {
                     notification.style.display = "block";
                 }, 2000);
             }
 
-            // عند الضغط على زر "موافق"
             acceptBtn.addEventListener("click", function() {
                 notification.style.display = "none";
-                
-                // حفظ الموافقة في LocalStorage
                 localStorage.setItem("notifications_accepted", "true");
 
-                // طلب إذن الإشعارات للمتصفحات غير Chrome
-                if (!navigator.userAgent.includes("Chrome")) {
-                    if ("Notification" in window) {
-                        Notification.requestPermission().then(permission => {
-                            if (permission === "granted") {
-                                new Notification("تم تفعيل الإشعارات بنجاح!");
-                            } else {
-                                alert("لم يتم منح الإذن لتلقي الإشعارات.");
-                            }
-                        });
-                    }
-                } else {
-                    // إرسال طلب الإذن عبر OneSignal للمتصفحات التي تدعمه
+                if ("Notification" in window) {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification("تم تفعيل الإشعارات بنجاح!");
+                        }
+                    });
+                }
+
+                if (window.OneSignal) {
                     OneSignal.push(function() {
-                        OneSignal.showNativePrompt();
+                        OneSignal.init({
+                            appId: "YOUR-ONESIGNAL-APP-ID", // ضع معرف التطبيق الخاص بك هنا
+                            autoRegister: false,
+                            notifyButton: { enable: true },
+                        });
+
+                        setTimeout(() => {
+                            OneSignal.showNativePrompt();
+                        }, 1000);
                     });
                 }
             });
-
-            // اكتشاف مانع الإعلانات
-            const adblockWarning = document.getElementById("adblock-warning");
-            let testAd = document.createElement("div");
-            testAd.innerHTML = "&nbsp;";
-            testAd.className = "adsbox";
-            document.body.appendChild(testAd);
-
-            window.setTimeout(function() {
-                if (testAd.offsetHeight === 0) {
-                    adblockWarning.style.display = "block";
-                }
-                testAd.remove();
-            }, 100);
         });
     </script>
-
-    <!-- كود OneSignal -->
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
 
 </body>
 </html>
