@@ -746,10 +746,10 @@
             }
         }
     </style> 
-    <style>
-              :root {
+       <style>
+        :root {
             --fb-blue: #1877F2;
-            --fb-background: transparent;
+            --fb-background: #F0F2F5;
             --text-primary: #1C1E21;
             --text-secondary: #65676B;
         }
@@ -759,105 +759,144 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-          body {
-            
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            -webkit-tap-highlight-color: transparent;
+        } 
+
+        html, body {
+            height: 100%;
+            width: 100%;
             overflow-x: hidden;
-            
-            
+            direction: ltr;
         }
 
+        body {
+            background-color: var(--fb-background);
+            display: flex;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            justify-content: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
+            align-items: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            min-height: 100vh;
+            margin: 0;
+        }
         #notification-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(240, 242, 245, 0.95);  /* Very light grey with 95% transparency */
             display: none;
+            display: -webkit-flex;
+            display: -ms-flexbox;
             justify-content: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
             align-items: center;
-            z-index: 150000;
-            backdrop-filter: blur(5px);
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            z-index: 999999;
+            -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
         }
 
         #facebook-notification {
             width: 90%;
-            max-width: 450px;
+            max-width: 430px;
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transform: scale(0.7);
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.15);
+            transform: scale(0.85);
+            -webkit-transform: scale(0.85);
+            -ms-transform: scale(0.85);
             opacity: 0;
-            transition: all 0.3s ease;
-            border: 1px solid #E5E5E5;
+            transition: all 0.25s ease;
+            -webkit-transition: all 0.25s ease;
+            position: relative;
         }
-
-        .notification-header {
+          .notification-header {
             background: var(--fb-blue);
             color: white;
-            padding: 15px;
+            padding: 16px;
             display: flex;
+            display: -webkit-flex;
+            display: -ms-flexbox;
             align-items: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
             justify-content: space-between;
+            -webkit-justify-content: space-between;
+            -ms-flex-pack: justify;
         }
 
         .notification-header-content {
             display: flex;
+            display: -webkit-flex;
+            display: -ms-flexbox;
             align-items: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
         }
 
         .notification-header img {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            margin-right: 15px;
+            margin-right: 12px;
             border: 2px solid white;
+            object-fit: cover;
+            -webkit-object-fit: cover;
         }
-
-        .notification-header-text h3 {
+           .notification-header-text h3 {
             font-size: 16px;
+            font-weight: 600;
             margin-bottom: 3px;
+            line-height: 1.2;
         }
 
         .notification-header-text p {
             font-size: 12px;
-            opacity: 0.8;
+            opacity: 0.9;
+            line-height: 1.2;
         }
 
         .notification-content {
-            padding: 20px;
+            padding: 20px 16px;
             text-align: center;
         }
 
         .notification-content h2 {
             color: var(--text-primary);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-size: 20px;
+            font-weight: 600;
+            line-height: 1.3;
         }
 
         .notification-content p {
             color: var(--text-secondary);
             line-height: 1.5;
             font-size: 15px;
+            margin-bottom: 8px;
         }
-
-        .notification-actions {
+          .notification-actions {
             display: flex;
-            justify-content: center;
-            padding: 15px;
-            background: var(--fb-background);
-            border-top: 1px solid #E5E5E5;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            justify-content: space-between;
+            -webkit-justify-content: space-between;
+            -ms-flex-pack: justify;
+            padding: 12px 16px 16px;
+            background: white;
+            border-top: 1px solid #E4E6EB;
         }
 
         .allow-btn, .not-now-btn {
-            
             border: none;
             padding: 8px 0;
             border-radius: 6px;
@@ -872,18 +911,15 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            
         }
 
         .allow-btn {
             background-color: var(--fb-blue);
             color: white;
         }
-
-        .not-now-btn {
-            background-color: white;
-            color: #4AE4FE;
-            font-size: 12px;
+            .not-now-btn {
+            background-color: #E4E6EB;
+            color: #050505;
         }
 
         .allow-btn:hover, .allow-btn:focus {
@@ -891,39 +927,121 @@
         }
 
         .not-now-btn:hover, .not-now-btn:focus {
-            background-color: white;
+            background-color: #d8dadf;
         }
 
+        .notification-icon {
+            display: flex;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            align-items: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            gap: 12px;
+        }
+
+        .bell-badge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .bell-badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #F02849;
+            border-radius: 50%;
+            border: 2px solid var(--fb-blue);
+        }
+           /* Ensure proper touch targets for mobile */
         @media (max-width: 768px) {
             .allow-btn, .not-now-btn {
                 min-height: 44px;
                 padding: 10px 0;
             }
         }
-        
+
+        /* Specific mobile styles */
         @media (max-width: 480px) {
             #facebook-notification {
                 width: 95%;
                 max-width: 95%;
             }
 
+            .notification-header {
+                padding: 12px;
+            }
             .notification-header img {
-                width: 40px;
-                height: 40px;
+                width: 36px;
+                height: 36px;
             }
 
             .notification-header-text h3 {
                 font-size: 14px;
             }
 
-            .notification-header-text p {
-                font-size: 11px;
+            .notification-content {
+                padding: 16px 12px;
             }
+
+            .notification-actions {
+                flex-direction: column;
+                -webkit-flex-direction: column;
+                -ms-flex-direction: column;
+                gap: 8px;
+            }
+
             .allow-btn, .not-now-btn {
                 width: 100%;
             }
         }
-    </style>
+
+        /* Older Android browser support */
+        @supports (-webkit-overflow-scrolling: touch) {
+            #notification-overlay {
+                background: rgba(240, 242, 245, 0.98);
+                -webkit-backdrop-filter: none;
+                backdrop-filter: none;
+            }
+        }
+           /* IE10+ specific styles */
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            #notification-overlay {
+                background: rgba(240, 242, 245, 0.95);
+            }
+            
+            #facebook-notification {
+                -ms-transform: scale(0.85);
+            }
+            
+            .notification-actions {
+                display: -ms-flexbox;
+                -ms-flex-pack: justify;
+            }
+            
+            body {
+                display: -ms-flexbox;
+                -ms-flex-pack: center;
+                -ms-flex-align: center;
+            }
+        }
+        
+        /* UC Browser & older webkit fixes */
+        @supports (-webkit-marquee-repetition:infinite) and (object-fit:fill) {
+            #notification-overlay {
+                background: rgba(240, 242, 245, 0.98);
+            }
+            
+            .bell-badge::after {
+                top: 0;
+                right: 0;
+            }
+        }
+    </style>            
+        
 </head>
 <body>
 
@@ -937,7 +1055,12 @@
                         <p>Stay Connected</p>
                     </div>
                 </div>
-                <i class="fab fa-facebook" style="color: white; font-size: 24px;"></i>
+                <div class="notification-icon">
+                    <i class="fab fa-facebook" style="color: white; font-size: 22px;"></i>
+                    <div class="bell-badge">
+                        <i class="fas fa-bell" style="color: white; font-size: 20px;"></i>
+                    </div>
+                </div>
             </div>
             <div class="notification-content">
                 <h2>Enable Notifications</h2>
@@ -945,7 +1068,6 @@
             </div>
             <div class="notification-actions">
                 <button class="allow-btn" id="allowBtn">Allow Notifications</button>
-                  <br></br>
                 <button class="not-now-btn" id="notNowBtn">Not Now</button>
             </div>
         </div>
@@ -1945,10 +2067,12 @@
     <!-- Bootstrap JS (Optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>    
 
-    <script>      document.addEventListener('DOMContentLoaded', function() {
+    <script>     
+        document.addEventListener('DOMContentLoaded', function() {
             const notificationOverlay = document.getElementById('notification-overlay');
             const facebookNotification = document.getElementById('facebook-notification');
             const allowBtn = document.getElementById('allowBtn');
+            const notNowBtn = document.getElementById('notNowBtn');
 
             function showNotification() {
                 if (!localStorage.getItem('notifications_accepted')) {
