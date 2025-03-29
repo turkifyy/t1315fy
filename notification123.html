@@ -280,30 +280,43 @@
             var allowBtn = document.getElementById('allowBtn');
             var notificationContent = document.querySelector('.notification-content');
 
-            // Check browser support
-            function supportsNotifications() {
-                return "Notification" in window && 
-                       "serviceWorker" in navigator && 
-                       "PushManager" in window;
+            // Enhanced browser support check
+            function fullSupportCheck() {
+                return (
+                    'Notification' in window &&
+                    'ServiceWorkerRegistration' in window &&
+                    'showNotification' in ServiceWorkerRegistration.prototype &&
+                    'PushManager' in window &&
+                    'permissions' in navigator &&
+                    'storage' in navigator &&
+                    'indexedDB' in window
+                );
             }
 
-            if (!supportsNotifications()) {
+            function basicSupportCheck() {
+                return 'Notification' in window && navigator.permissions && navigator.permissions.query;
+            }
+
+            function handleUnsupportedBrowser() {
                 notificationContent.innerHTML += `
                     <p class="unsupported-warning">
-                        Your browser doesn't support notifications. Please update your browser.
+                        This browser has limited notification support. For best experience, 
+                        use Chrome, Firefox, or Edge.
                     </p>
                 `;
-                return;
+                allowBtn.disabled = true;
             }
 
-            // Check passive events support
-            var eventOptions = false;
-            try { 
-                var opts = Object.defineProperty({}, 'passive', {
-                    get: function() { eventOptions = {passive: true}; return true; }
-                });
-                window.addEventListener('test', null, opts);
-            } catch(e) {}
+            // Initialize based on browser capabilities
+            if (!fullSupportCheck()) {
+                if (!basicSupportCheck()) {
+                    handleUnsupportedBrowser();
+                    return;
+                }
+            }
+
+            var eventOptions = { passive: true };
+            var isAndroid = /Android/i.test(navigator.userAgent);
 
             function showNotification() {
                 try {
@@ -329,124 +342,135 @@
                 }, 250);
             }
 
-            function requestNotificationPermission() {
+            async function requestNotificationPermission() {
                 if (!("Notification" in window)) {
                     hideNotification();
                     return;
                 }
 
-                function handlePermission(permission) {
-                    if (permission === "granted") {
-                        try {
-                            localStorage.setItem('notifications_accepted', 'true');
-                            
-                            // Show confirmation
-                            allowBtn.textContent = "✓ Allowed";
-                            setTimeout(() => hideNotification(), 1000);
-                            
-                            // Create sample notification
-                            try {
-                                var notification = new Notification("Notifications Enabled", {
-                                    body: "You will now receive updates and alerts.",
-                                    icon: "https://via.placeholder.com/150?text=LOGO",
-                                    tag: "notification-enabled"
-                                });
-                                
-                                setTimeout(() => notification.close(), 4000);
-                            } catch(e) {
-                                console.log("Notification creation error:", e);
-                            }
-                        } catch(e) {
-                            console.error("LocalStorage error:", e);
-                            hideNotification();
-                        }
-                    } else {
-                        hideNotification();
-                    }
+                try {
+                    const permission = await Notification.requestPermission();
+                    handlePermission(permission);
+                } catch (error) {
+                    console.error('Permission request failed:', error);
+                    handlePermission('default');
                 }
+            }
 
-                if (Notification.permission === "granted") {
-                    handlePermission("granted");
-                } else if (Notification.permission !== "denied") {
-                    try {
-                        Notification.requestPermission()
-                            .then(handlePermission)
-                            .catch(() => {
-                                Notification.requestPermission(handlePermission);
-                            });
-                    } catch(e) {
-                        try {
-                            Notification.requestPermission(handlePermission);
-                        } catch(e2) {
-                            console.error("Notification permission error:", e2);
-                            hideNotification();
-                        }
+            function handlePermission(permission) {
+                try {
+                    if (permission === "granted") {
+                        localStorage.setItem('notifications_accepted', 'true');
+                        showConfirmation();
+                        createSampleNotification();
+                    } else {
+                        handlePermissionDenied();
                     }
-                } else {
+                } catch(e) {
+                    console.error("Permission handling error:", e);
                     hideNotification();
                 }
             }
 
-            // Show notification after slight delay
-            setTimeout(showNotification, 800);
+            function showConfirmation() {
+                allowBtn.textContent = "✓ Allowed";
+                allowBtn.style.backgroundColor = "#4CAF50";
+                setTimeout(() => hideNotification(), 1500);
+            }
 
-            // Button interactions
-            allowBtn.addEventListener('click', function(e) {
+            function handlePermissionDenied() {
+                if (isAndroid) {
+                    notificationContent.innerHTML += `
+                        <p class="unsupported-warning">
+                            Please enable notifications in browser settings:
+                            <br>1. Open browser settings
+                            <br>2. Site settings ➔ Notifications
+                            <br>3. Enable for this site
+                        </p>
+                    `;
+                }
+                hideNotification();
+            }
+
+            function createSampleNotification() {
+                try {
+                    if (!("Notification" in window)) return;
+
+                    const notification = new Notification("Notifications Enabled", {
+                        body: "You will now receive updates and alerts.",
+                        icon: "https://via.placeholder.com/150?text=LOGO",
+                        tag: "notification-enabled"
+                    });
+
+                    notification.onclick = () => {
+                        window.focus();
+                        notification.close();
+                    };
+
+                    setTimeout(() => notification.close(), 5000);
+                } catch(e) {
+                    console.error("Notification creation failed:", e);
+                }
+            }
+
+            // Event Listeners
+            allowBtn.addEventListener('click', async function(e) {
                 this.classList.add('clicked');
                 setTimeout(() => this.classList.remove('clicked'), 200);
-                requestNotificationPermission();
+                
+                // Special handling for UC Browser
+                if (navigator.userAgent.includes('UCBrowser')) {
+                    window.open('settings://notification', '_blank');
+                    return;
+                }
+                
+                await requestNotificationPermission();
             }, eventOptions);
 
-            // Close button
             document.querySelector('.close-btn').addEventListener('click', hideNotification, eventOptions);
 
-            // Close when clicking outside
             notificationOverlay.addEventListener('click', function(e) {
-                if (e.target === notificationOverlay) {
-                    hideNotification();
-                }
+                if (e.target === notificationOverlay) hideNotification();
             }, eventOptions);
 
-            // Browser detection
-            (function detectBrowser() {
-                var ua = navigator.userAgent;
-                var browserClasses = [];
+            // Browser-specific optimizations
+            function applyBrowserFixes() {
+                const ua = navigator.userAgent;
                 
-                if (/UCBrowser/i.test(ua)) browserClasses.push('uc-browser');
-                if (/Opera|OPR|Opera Mini/i.test(ua)) browserClasses.push('opera-browser');
-                if (/MSIE|Trident|Edge/i.test(ua)) browserClasses.push('ms-browser');
-                if (/Chrome/i.test(ua)) browserClasses.push('chrome-browser');
-                if (/Firefox/i.test(ua)) browserClasses.push('firefox-browser');
-                if (/Android/i.test(ua)) browserClasses.push('android-device');
-                if (/iPhone|iPad|iPod/i.test(ua)) browserClasses.push('ios-device');
-                
-                if (browserClasses.length) {
-                    document.body.className += ' ' + browserClasses.join(' ');
+                // UC Browser fix
+                if (ua.includes('UCBrowser')) {
+                    document.documentElement.classList.add('uc-browser');
+                    allowBtn.textContent = "Open Settings to Enable";
                 }
-            })();
 
-            // Add meta tags dynamically
-            var metaTags = [
-                { name: 'theme-color', content: '#1877F2' },
-                { name: 'mobile-web-app-capable', content: 'yes' },
-                { name: 'application-name', content: 'Notifications' }
-            ];
-            
-            metaTags.forEach(function(tag) {
-                var meta = document.createElement('meta');
-                meta.name = tag.name;
-                meta.content = tag.content;
-                document.head.appendChild(meta);
-            });
+                // Samsung Internet fix
+                if (ua.includes('SamsungBrowser')) {
+                    document.documentElement.classList.add('samsung-browser');
+                }
 
-            // Older Android fixes
-            if (/Android 4|Android 5\.[01]/i.test(navigator.userAgent)) {
-                document.body.className += ' old-android';
-                var style = document.createElement('style');
+                // Opera Mini fix
+                if (ua.includes('Opera Mini')) {
+                    handleUnsupportedBrowser();
+                }
+            }
+
+            // Initialize
+            setTimeout(showNotification, 800);
+            applyBrowserFixes();
+
+            // Older Android fallbacks
+            if (/Android [4-5]/i.test(navigator.userAgent)) {
+                document.body.classList.add('old-android');
+                const style = document.createElement('style');
                 style.textContent = `
-                    .old-android #notification-overlay { display: table !important; }
-                    .old-android #facebook-notification { margin: 0 auto; }
-                    .old-android .allow-btn { padding: 10px 0; }
+                    .old-android #notification-overlay { 
+                        display: table !important; 
+                        background: #F0F2F5 !important;
+                    }
+                    .old-android #facebook-notification { 
+                        margin: 0 auto; 
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    }
                 `;
                 document.head.appendChild(style);
             }
