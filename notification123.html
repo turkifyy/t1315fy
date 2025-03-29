@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Facebook-Style Notifications</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Notifications</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -28,6 +29,7 @@
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
+            direction: ltr;
         }
 
         #notification-overlay {
@@ -36,11 +38,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.5);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            -webkit-backdrop-filter: blur(5px);
             backdrop-filter: blur(5px);
         }
 
@@ -48,19 +51,20 @@
             width: 90%;
             max-width: 450px;
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 26px rgba(0, 0, 0, 0.3);
             transform: scale(0.7);
             opacity: 0;
             transition: all 0.3s ease;
             border: 1px solid #E5E5E5;
+            position: relative;
         }
 
         .notification-header {
             background: var(--fb-blue);
             color: white;
-            padding: 15px;
+            padding: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -72,21 +76,23 @@
         }
 
         .notification-header img {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            margin-right: 15px;
+            margin-right: 12px;
             border: 2px solid white;
+            object-fit: cover;
         }
 
         .notification-header-text h3 {
             font-size: 16px;
-            margin-bottom: 3px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
         .notification-header-text p {
             font-size: 12px;
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .notification-content {
@@ -96,40 +102,76 @@
 
         .notification-content h2 {
             color: var(--text-primary);
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             font-size: 20px;
+            font-weight: 600;
         }
 
         .notification-content p {
             color: var(--text-secondary);
             line-height: 1.5;
             font-size: 15px;
+            margin-bottom: 10px;
         }
 
         .notification-actions {
             display: flex;
-            justify-content: center;
-            padding: 15px;
-            background: var(--fb-background);
-            border-top: 1px solid #E5E5E5;
+            justify-content: space-between;
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #E4E6EB;
+        }
+
+        .allow-btn, .not-now-btn {
+            border: none;
+            padding: 10px 0;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 48%;
         }
 
         .allow-btn {
             background-color: var(--fb-blue);
             color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            max-width: 300px;
+        }
+
+        .not-now-btn {
+            background-color: #E4E6EB;
+            color: #050505;
         }
 
         .allow-btn:hover {
             background-color: #166FE5;
+        }
+
+        .not-now-btn:hover {
+            background-color: #d8dadf;
+        }
+
+        .notification-icon {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bell-badge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .bell-badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #F02849;
+            border-radius: 50%;
+            border: 2px solid var(--fb-blue);
         }
 
         @media (max-width: 480px) {
@@ -139,8 +181,8 @@
             }
 
             .notification-header img {
-                width: 40px;
-                height: 40px;
+                width: 36px;
+                height: 36px;
             }
 
             .notification-header-text h3 {
@@ -150,6 +192,33 @@
             .notification-header-text p {
                 font-size: 11px;
             }
+
+            .notification-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .allow-btn, .not-now-btn {
+                width: 100%;
+            }
+        }
+
+        /* IE10+ specific styles */
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            #notification-overlay {
+                background: rgba(0, 0, 0, 0.7);
+            }
+            
+            .notification-actions {
+                display: -ms-flexbox;
+                -ms-flex-pack: justify;
+            }
+            
+            body {
+                display: -ms-flexbox;
+                -ms-flex-pack: center;
+                -ms-flex-align: center;
+            }
         }
     </style>
 </head>
@@ -158,20 +227,26 @@
         <div id="facebook-notification">
             <div class="notification-header">
                 <div class="notification-header-content">
-                    <img src="https://via.placeholder.com/150?text=APP+LOGO" alt="App Logo">
+                    <img src="https://via.placeholder.com/150?text=LOGO" alt="Website Logo">
                     <div class="notification-header-text">
-                        <h3>App Notifications</h3>
-                        <p>Stay Connected</p>
+                        <h3>Notifications</h3>
+                        <p>Stay Updated</p>
                     </div>
                 </div>
-                <i class="fab fa-facebook" style="color: white; font-size: 24px;"></i>
+                <div class="notification-icon">
+                    <i class="fab fa-facebook" style="color: white; font-size: 22px;"></i>
+                    <div class="bell-badge">
+                        <i class="fas fa-bell" style="color: white; font-size: 20px;"></i>
+                    </div>
+                </div>
             </div>
             <div class="notification-content">
                 <h2>Enable Notifications</h2>
                 <p>Get instant updates, messages, and important alerts directly on your device.</p>
             </div>
             <div class="notification-actions">
-                <button class="allow-btn" id="allowBtn">Allow Notifications</button>
+                <button class="allow-btn" id="allowBtn">Allow</button>
+                <button class="not-now-btn" id="notNowBtn">Not Now</button>
             </div>
         </div>
     </div>
@@ -181,9 +256,10 @@
             const notificationOverlay = document.getElementById('notification-overlay');
             const facebookNotification = document.getElementById('facebook-notification');
             const allowBtn = document.getElementById('allowBtn');
+            const notNowBtn = document.getElementById('notNowBtn');
 
             function showNotification() {
-                if (!localStorage.getItem('notifications_accepted')) {
+                if (!localStorage.getItem('notifications_accepted') && !localStorage.getItem('notifications_dismissed')) {
                     notificationOverlay.style.display = 'flex';
                     setTimeout(() => {
                         facebookNotification.style.transform = 'scale(1)';
@@ -200,23 +276,70 @@
                 }, 300);
             }
 
+            // Cross-browser notification function
+            function requestNotificationPermission() {
+                // Check if the browser supports notifications
+                if (!("Notification" in window)) {
+                    alert("This browser does not support desktop notifications");
+                    return;
+                }
+
+                // Function to handle permission
+                function handlePermission(permission) {
+                    if (permission === "granted") {
+                        localStorage.setItem('notifications_accepted', 'true');
+                        hideNotification();
+                        try {
+                            var notification = new Notification("Notifications Enabled", {
+                                body: "You will now receive updates and alerts.",
+                                icon: "https://via.placeholder.com/150?text=LOGO"
+                            });
+                        } catch(e) {
+                            console.log("Notification creation failed:", e);
+                        }
+                    } else {
+                        localStorage.setItem('notifications_dismissed', 'true');
+                        hideNotification();
+                    }
+                }
+
+                // Check if permission is already granted
+                if (Notification.permission === "granted") {
+                    handlePermission("granted");
+                } 
+                // Chrome and other modern browsers
+                else if (Notification.requestPermission) {
+                    try {
+                        Notification.requestPermission()
+                            .then(handlePermission)
+                            .catch(function(error) {
+                                // Fallback for older promise implementations
+                                Notification.requestPermission(handlePermission);
+                            });
+                    } catch(e) {
+                        // Final fallback for very old browsers
+                        Notification.requestPermission(handlePermission);
+                    }
+                }
+                // For older browsers like IE9
+                else {
+                    alert("Notifications are not fully supported in this browser");
+                    hideNotification();
+                }
+            }
+
             // Auto show notification after 2 seconds
             setTimeout(showNotification, 2000);
 
             // Allow Notifications
             allowBtn.addEventListener('click', function() {
-                if ("Notification" in window) {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === "granted") {
-                            localStorage.setItem('notifications_accepted', 'true');
-                            hideNotification();
-                            new Notification('Notifications Enabled', {
-                                body: 'You will now receive updates and alerts.',
-                                icon: 'https://via.placeholder.com/150?text=APP+LOGO'
-                            });
-                        }
-                    });
-                }
+                requestNotificationPermission();
+            });
+
+            // Not Now button
+            notNowBtn.addEventListener('click', function() {
+                localStorage.setItem('notifications_dismissed', 'true');
+                hideNotification();
             });
 
             // Close notification when clicking outside
@@ -226,7 +349,31 @@
                 }
             });
 
-            // Android-specific meta tags
+            // Detect browser type for specific optimizations
+            function detectBrowser() {
+                var isIE = /*@cc_on!@*/false || !!document.documentMode;
+                var isEdge = !isIE && !!window.StyleMedia;
+                var isChrome = !!window.chrome;
+                var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+                var isFirefox = typeof InstallTrigger !== 'undefined';
+                var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                var isUC = navigator.userAgent.indexOf("UCBrowser") != -1;
+                var isPhoenix = navigator.userAgent.indexOf("Phoenix") != -1;
+                
+                if (isIE || isEdge) {
+                    document.body.classList.add('ms-browser');
+                } else if (isOpera) {
+                    document.body.classList.add('opera-browser');
+                } else if (isUC) {
+                    document.body.classList.add('uc-browser');
+                } else if (isPhoenix) {
+                    document.body.classList.add('phoenix-browser');
+                }
+            }
+            
+            detectBrowser();
+
+            // Additional Android-specific meta tags
             const androidMeta = document.createElement('meta');
             androidMeta.name = 'theme-color';
             androidMeta.content = '#1877F2';
@@ -236,6 +383,17 @@
             androidCompatMeta.name = 'mobile-web-app-capable';
             androidCompatMeta.content = 'yes';
             document.head.appendChild(androidCompatMeta);
+
+            // PWA support for better cross-browser experience
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    }, function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
         });
     </script>
 </body>
