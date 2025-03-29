@@ -9,13 +9,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>Notifications</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"></noscript>
     <style>
         :root {
             --fb-blue: #1877F2;
+            --fb-blue-dark: #166FE5;
             --fb-background: #F0F2F5;
             --text-primary: #1C1E21;
             --text-secondary: #65676B;
+            --border-color: #E4E6EB;
         }
 
         * {
@@ -36,14 +39,8 @@
         body {
             background-color: var(--fb-background);
             display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             justify-content: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             min-height: 100vh;
             margin: 0;
         }
@@ -54,19 +51,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(240, 242, 245, 0.95);  /* Very light grey with 95% transparency */
+            background: rgba(240, 242, 245, 0.95);
             display: none;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             justify-content: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             z-index: 999999;
-            -webkit-backdrop-filter: blur(3px);
             backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        @supports not (backdrop-filter: blur(3px)) {
+            #notification-overlay {
+                background: rgba(240, 242, 245, 0.98);
+            }
         }
 
         #facebook-notification {
@@ -75,13 +72,10 @@
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             transform: scale(0.85);
-            -webkit-transform: scale(0.85);
-            -ms-transform: scale(0.85);
             opacity: 0;
             transition: all 0.25s ease;
-            -webkit-transition: all 0.25s ease;
             position: relative;
         }
 
@@ -90,23 +84,14 @@
             color: white;
             padding: 16px;
             display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             justify-content: space-between;
-            -webkit-justify-content: space-between;
-            -ms-flex-pack: justify;
+            position: relative;
         }
 
         .notification-header-content {
             display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
         }
 
         .notification-header img {
@@ -116,7 +101,6 @@
             margin-right: 12px;
             border: 2px solid white;
             object-fit: cover;
-            -webkit-object-fit: cover;
         }
 
         .notification-header-text h3 {
@@ -152,61 +136,68 @@
             margin-bottom: 8px;
         }
 
-        .notification-actions {
-            display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
-            justify-content: space-between;
-            -webkit-justify-content: space-between;
-            -ms-flex-pack: justify;
-            padding: 12px 16px 16px;
-            background: white;
-            border-top: 1px solid #E4E6EB;
+        .notice {
+            font-size: 12px !important;
+            color: #90949C !important;
+            margin-top: 15px !important;
         }
 
-        .allow-btn, .not-now-btn {
-            border: none;
-            padding: 8px 0;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            outline: none;
-            transition: background-color 0.2s ease;
-            -webkit-transition: background-color 0.2s ease;
-            width: 48%;
-            min-height: 36px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+        .unsupported-warning {
+            color: #F02849 !important;
+            font-size: 13px !important;
+            margin-top: 15px !important;
+        }
+
+        .notification-actions {
+            display: flex;
+            justify-content: center;
+            padding: 12px 16px 16px;
+            background: white;
+            border-top: 1px solid var(--border-color);
         }
 
         .allow-btn {
+            border: none;
+            padding: 12px 0;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            min-height: 44px;
             background-color: var(--fb-blue);
             color: white;
         }
 
-        .not-now-btn {
-            background-color: white;
-            color: #41CCFF;
-            font-size: 4px;
-        }
-
         .allow-btn:hover, .allow-btn:focus {
-            background-color: #166FE5;
+            background-color: var(--fb-blue-dark);
         }
 
-        .not-now-btn:hover, .not-now-btn:focus {
-            background-color: white;
+        .allow-btn:active {
+            transform: scale(0.98);
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            padding: 0 8px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
         }
 
         .notification-icon {
             display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             gap: 12px;
         }
 
@@ -227,15 +218,12 @@
             border: 2px solid var(--fb-blue);
         }
 
-        /* Ensure proper touch targets for mobile */
-        @media (max-width: 768px) {
-            .allow-btn, .not-now-btn {
-                min-height: 44px;
-                padding: 10px 0;
+        @media (min-width: 1200px) {
+            #facebook-notification {
+                max-width: 500px;
             }
         }
 
-        /* Specific mobile styles */
         @media (max-width: 480px) {
             #facebook-notification {
                 width: 95%;
@@ -258,88 +246,29 @@
             .notification-content {
                 padding: 16px 12px;
             }
-
-            .notification-actions {
-                flex-direction: column;
-                -webkit-flex-direction: column;
-                -ms-flex-direction: column;
-                gap: 8px;
-            }
-
-            .allow-btn, .not-now-btn {
-                width: 100%;
-            }
-        }
-
-        /* Older Android browser support */
-        @supports (-webkit-overflow-scrolling: touch) {
-            #notification-overlay {
-                background: rgba(240, 242, 245, 0.98);
-                -webkit-backdrop-filter: none;
-                backdrop-filter: none;
-            }
-        }
-
-        /* IE10+ specific styles */
-        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-            #notification-overlay {
-                background: rgba(240, 242, 245, 0.95);
-            }
-            
-            #facebook-notification {
-                -ms-transform: scale(0.85);
-            }
-            
-            .notification-actions {
-                display: -ms-flexbox;
-                -ms-flex-pack: justify;
-            }
-            
-            body {
-                display: -ms-flexbox;
-                -ms-flex-pack: center;
-                -ms-flex-align: center;
-            }
-        }
-        
-        /* UC Browser & older webkit fixes */
-        @supports (-webkit-marquee-repetition:infinite) and (object-fit:fill) {
-            #notification-overlay {
-                background: rgba(240, 242, 245, 0.98);
-            }
-            
-            .bell-badge::after {
-                top: 0;
-                right: 0;
-            }
         }
     </style>
 </head>
 <body>
     <div id="notification-overlay">
-        <div id="facebook-notification">
+        <div id="facebook-notification" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
             <div class="notification-header">
                 <div class="notification-header-content">
-                    <img src="https://via.placeholder.com/150?text=LOGO" alt="Website Logo">
+                    <img src="https://via.placeholder.com/150?text=LOGO" alt="Website Logo" loading="lazy">
                     <div class="notification-header-text">
                         <h3>Notifications</h3>
                         <p>Stay Updated</p>
                     </div>
                 </div>
-                <div class="notification-icon">
-                    <i class="fab fa-facebook" style="color: white; font-size: 22px;"></i>
-                    <div class="bell-badge">
-                        <i class="fas fa-bell" style="color: white; font-size: 20px;"></i>
-                    </div>
-                </div>
+                <button class="close-btn" aria-label="Close notification">&times;</button>
             </div>
             <div class="notification-content">
-                <h2>Enable Notifications</h2>
+                <h2 id="notificationTitle">Enable Notifications</h2>
                 <p>Get instant updates, messages, and important alerts directly on your device.</p>
+                <p class="notice">You can change this later in your browser settings</p>
             </div>
             <div class="notification-actions">
                 <button class="allow-btn" id="allowBtn">Allow</button>
-                <button class="not-now-btn" id="notNowBtn">Not Now</button>
             </div>
         </div>
     </div>
@@ -349,9 +278,25 @@
             var notificationOverlay = document.getElementById('notification-overlay');
             var facebookNotification = document.getElementById('facebook-notification');
             var allowBtn = document.getElementById('allowBtn');
-            var notNowBtn = document.getElementById('notNowBtn');
+            var notificationContent = document.querySelector('.notification-content');
 
-            // Check if the browser supports various events
+            // Check browser support
+            function supportsNotifications() {
+                return "Notification" in window && 
+                       "serviceWorker" in navigator && 
+                       "PushManager" in window;
+            }
+
+            if (!supportsNotifications()) {
+                notificationContent.innerHTML += `
+                    <p class="unsupported-warning">
+                        Your browser doesn't support notifications. Please update your browser.
+                    </p>
+                `;
+                return;
+            }
+
+            // Check passive events support
             var eventOptions = false;
             try { 
                 var opts = Object.defineProperty({}, 'passive', {
@@ -361,13 +306,18 @@
             } catch(e) {}
 
             function showNotification() {
-                if (!localStorage.getItem('notifications_accepted')) {
-                    notificationOverlay.style.display = 'flex';
-                    // Use timeout to ensure display:flex is applied before transition
-                    setTimeout(function() {
-                        facebookNotification.style.transform = 'scale(1)';
-                        facebookNotification.style.opacity = '1';
-                    }, 10);
+                try {
+                    if (!localStorage.getItem('notifications_accepted')) {
+                        requestAnimationFrame(() => {
+                            notificationOverlay.style.display = 'flex';
+                            setTimeout(() => {
+                                facebookNotification.style.transform = 'scale(1)';
+                                facebookNotification.style.opacity = '1';
+                            }, 50);
+                        });
+                    }
+                } catch(e) {
+                    console.error("LocalStorage access error:", e);
                 }
             }
 
@@ -379,94 +329,89 @@
                 }, 250);
             }
 
-            // Cross-browser notification function
             function requestNotificationPermission() {
-                // Check if the browser supports notifications
                 if (!("Notification" in window)) {
-                    console.log("This browser does not support notifications");
                     hideNotification();
                     return;
                 }
 
-                // Function to handle permission
                 function handlePermission(permission) {
                     if (permission === "granted") {
-                        localStorage.setItem('notifications_accepted', 'true');
-                        hideNotification();
-                        
-                        // Try to create notification with error handling
                         try {
-                            var notification = new Notification("Notifications Enabled", {
-                                body: "You will now receive updates and alerts.",
-                                icon: "https://via.placeholder.com/150?text=LOGO",
-                                tag: "notification-enabled"
-                            });
+                            localStorage.setItem('notifications_accepted', 'true');
                             
-                            // Auto close notification after 4 seconds
-                            setTimeout(function() {
-                                if (notification) notification.close();
-                            }, 4000);
+                            // Show confirmation
+                            allowBtn.textContent = "✓ Allowed";
+                            setTimeout(() => hideNotification(), 1000);
+                            
+                            // Create sample notification
+                            try {
+                                var notification = new Notification("Notifications Enabled", {
+                                    body: "You will now receive updates and alerts.",
+                                    icon: "https://via.placeholder.com/150?text=LOGO",
+                                    tag: "notification-enabled"
+                                });
+                                
+                                setTimeout(() => notification.close(), 4000);
+                            } catch(e) {
+                                console.log("Notification creation error:", e);
+                            }
                         } catch(e) {
-                            console.log("Notification creation error:", e);
+                            console.error("LocalStorage error:", e);
+                            hideNotification();
                         }
                     } else {
                         hideNotification();
                     }
                 }
 
-                // Handle older browsers
                 if (Notification.permission === "granted") {
                     handlePermission("granted");
                 } else if (Notification.permission !== "denied") {
-                    // Modern browsers
-                    if (typeof Notification.requestPermission === 'function') {
-                        try {
-                            Notification.requestPermission()
-                                .then(handlePermission)
-                                .catch(function() {
-                                    // Fallback for older promise-based implementations
-                                    Notification.requestPermission(handlePermission);
-                                });
-                        } catch(e) {
-                            // Final fallback for very old browsers
-                            try {
+                    try {
+                        Notification.requestPermission()
+                            .then(handlePermission)
+                            .catch(() => {
                                 Notification.requestPermission(handlePermission);
-                            } catch(e2) {
-                                console.log("Notification permission request error:", e2);
-                                hideNotification();
-                            }
+                            });
+                    } catch(e) {
+                        try {
+                            Notification.requestPermission(handlePermission);
+                        } catch(e2) {
+                            console.error("Notification permission error:", e2);
+                            hideNotification();
                         }
-                    } else {
-                        // Direct callback for older browsers
-                        Notification.requestPermission(handlePermission);
                     }
                 } else {
                     hideNotification();
                 }
             }
 
-            // Auto show notification after 1.5 seconds
-            setTimeout(showNotification, 1500);
+            // Show notification after slight delay
+            setTimeout(showNotification, 800);
 
-            // Allow Notifications button
-            allowBtn.addEventListener('click', requestNotificationPermission, eventOptions);
+            // Button interactions
+            allowBtn.addEventListener('click', function(e) {
+                this.classList.add('clicked');
+                setTimeout(() => this.classList.remove('clicked'), 200);
+                requestNotificationPermission();
+            }, eventOptions);
 
-            // Not Now button - Just hide without localStorage
-            notNowBtn.addEventListener('click', hideNotification, eventOptions);
+            // Close button
+            document.querySelector('.close-btn').addEventListener('click', hideNotification, eventOptions);
 
-            // Close notification when clicking outside
+            // Close when clicking outside
             notificationOverlay.addEventListener('click', function(e) {
                 if (e.target === notificationOverlay) {
                     hideNotification();
                 }
             }, eventOptions);
 
-            // Browser detection and optimization
+            // Browser detection
             (function detectBrowser() {
                 var ua = navigator.userAgent;
                 var browserClasses = [];
                 
-                // Check for common mobile browsers
                 if (/UCBrowser/i.test(ua)) browserClasses.push('uc-browser');
                 if (/Opera|OPR|Opera Mini/i.test(ua)) browserClasses.push('opera-browser');
                 if (/MSIE|Trident|Edge/i.test(ua)) browserClasses.push('ms-browser');
@@ -474,34 +419,35 @@
                 if (/Firefox/i.test(ua)) browserClasses.push('firefox-browser');
                 if (/Android/i.test(ua)) browserClasses.push('android-device');
                 if (/iPhone|iPad|iPod/i.test(ua)) browserClasses.push('ios-device');
-                if (/Mobile|Tablet/i.test(ua)) browserClasses.push('mobile-device');
-                if (/Phoenix/i.test(ua)) browserClasses.push('phoenix-browser');
                 
-                // Apply browser-specific classes
                 if (browserClasses.length) {
                     document.body.className += ' ' + browserClasses.join(' ');
                 }
             })();
 
-            // Add Android-specific meta tags
+            // Add meta tags dynamically
             var metaTags = [
                 { name: 'theme-color', content: '#1877F2' },
                 { name: 'mobile-web-app-capable', content: 'yes' },
                 { name: 'application-name', content: 'Notifications' }
             ];
             
-            for (var i = 0; i < metaTags.length; i++) {
+            metaTags.forEach(function(tag) {
                 var meta = document.createElement('meta');
-                meta.name = metaTags[i].name;
-                meta.content = metaTags[i].content;
+                meta.name = tag.name;
+                meta.content = tag.content;
                 document.head.appendChild(meta);
-            }
+            });
 
-            // Fix for older Android browsers that have issues with flexbox
+            // Older Android fixes
             if (/Android 4|Android 5\.[01]/i.test(navigator.userAgent)) {
                 document.body.className += ' old-android';
                 var style = document.createElement('style');
-                style.textContent = '.old-android #notification-overlay { display: table !important; } .old-android #facebook-notification { margin: 0 auto; }';
+                style.textContent = `
+                    .old-android #notification-overlay { display: table !important; }
+                    .old-android #facebook-notification { margin: 0 auto; }
+                    .old-android .allow-btn { padding: 10px 0; }
+                `;
                 document.head.appendChild(style);
             }
         });
