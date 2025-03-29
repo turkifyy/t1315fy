@@ -856,40 +856,48 @@
             border-top: 1px solid #E5E5E5;
         }
 
+        .allow-btn, .not-now-btn {
+            border: none;
+            padding: 8px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s ease;
+            -webkit-transition: background-color 0.2s ease;
+            width: 48%;
+            min-height: 36px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
         .allow-btn {
             background-color: var(--fb-blue);
             color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            max-width: 300px;
         }
 
-        .allow-btn:hover {
+        .not-now-btn {
+            background-color: #E4E6EB;
+            color: #050505;
+        }
+
+        .allow-btn:hover, .allow-btn:focus {
             background-color: #166FE5;
         }
-        .not-now-btn {
-    background-color: #65676B;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 48%;
-}
 
-.not-now-btn:hover {
-    background-color: #4a4e53;
-}
+        .not-now-btn:hover, .not-now-btn:focus {
+            background-color: #d8dadf;
+        }
 
+        @media (max-width: 768px) {
+            .allow-btn, .not-now-btn {
+                min-height: 44px;
+                padding: 10px 0;
+            }
+        }
+        
         @media (max-width: 480px) {
             #facebook-notification {
                 width: 95%;
@@ -907,6 +915,9 @@
 
             .notification-header-text p {
                 font-size: 11px;
+            }
+            .allow-btn, .not-now-btn {
+                width: 100%;
             }
         }
     </style>
