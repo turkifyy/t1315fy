@@ -801,5 +801,29 @@
             });
         })();
     </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("https://turkify.netlify.app/service-worker.js").then((registration) => {
+    console.log("Service Worker مسجل بنجاح:", registration);
+
+    registration.addEventListener("updatefound", () => {
+      const newWorker = registration.installing;
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          if (confirm("تحديث جديد متاح! هل تريد إعادة تحميل التطبيق؟")) {
+            window.location.reload();
+          }
+        }
+      });
+    });
+  }).catch((error) => {
+    console.error("فشل تسجيل Service Worker:", error);
+  });
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    window.location.reload();
+  });
+}
+    </script>
 </body>
 </html>
