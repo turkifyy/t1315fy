@@ -16,8 +16,9 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"></noscript>
     
-    <!-- OneSignal SDK -->
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" defer></script>
+    <!-- تحميل OneSignal SDK بشكل غير متزامن -->
+    <link rel="preconnect" href="https://cdn.onesignal.com">
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async defer></script>
     
     <style>
         :root {
@@ -32,6 +33,7 @@
             --success-green: #42B72A;
             --error-red: #F02849;
             --warning-yellow: #FFC107;
+            --info-blue: #1877F2;
             
             --bg-light: #F0F2F5;
             --notification-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -49,6 +51,7 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            background-color: var(--bg-light);
         }
             
         #notification-overlay {
@@ -66,6 +69,10 @@
             -webkit-backdrop-filter: blur(3px);
             opacity: 0;
             transition: opacity 0.3s ease;
+        }
+
+        #notification-overlay:focus {
+            outline: 2px solid var(--fb-blue);
         }
 
         #notification-overlay.visible {
@@ -90,6 +97,10 @@
             transition: transform 0.3s ease, opacity 0.25s ease;
             position: relative;
             will-change: transform, opacity;
+        }
+
+        #facebook-notification:focus {
+            outline: none;
         }
 
         #facebook-notification.visible {
@@ -170,6 +181,7 @@
             font-size: 13px !important;
             margin-top: 15px !important;
             text-align: start;
+            display: none;
         }
 
         .error-message {
@@ -178,6 +190,17 @@
             border-radius: 6px;
             padding: 10px;
             color: var(--error-red) !important;
+            font-size: 13px !important;
+            margin-top: 15px !important;
+            display: none;
+        }
+
+        .info-message {
+            background-color: rgba(24, 119, 242, 0.1);
+            border: 1px solid var(--info-blue);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--info-blue) !important;
             font-size: 13px !important;
             margin-top: 15px !important;
             display: none;
@@ -246,9 +269,10 @@
             border-radius: 50%;
         }
 
-        .close-btn:hover {
+        .close-btn:hover, .close-btn:focus {
             opacity: 1;
             background: rgba(255, 255, 255, 0.1);
+            outline: none;
         }
 
         .notification-icon {
@@ -301,10 +325,10 @@
             width: 100%;
             max-width: 150px;
             min-height: 44px;
-            display: none; /* Hidden by default */
+            display: none;
         }
 
-        .cancel-btn:hover {
+        .cancel-btn:hover, .cancel-btn:focus {
             background-color: var(--bg-light);
         }
 
@@ -333,6 +357,10 @@
         
         .steps-container li {
             margin-bottom: 3px;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         @media (min-width: 1200px) {
@@ -396,8 +424,8 @@
     </style>
 </head>
 <body>
-    <div id="notification-overlay" aria-modal="true" role="dialog">
-        <div id="facebook-notification" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
+    <div id="notification-overlay" aria-modal="true" role="dialog" aria-labelledby="notificationTitle" tabindex="-1">
+        <div id="facebook-notification" role="document" aria-modal="true" aria-labelledby="notificationTitle">
             <div class="notification-header">
                 <div class="notification-header-content">
                     <img src="https://via.placeholder.com/150?text=LOGO" alt="شعار الموقع" loading="lazy" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22 viewBox=%220 0 150 150%22%3E%3Crect fill=%22%23F0F2F5%22 width=%22150%22 height=%22150%22/%3E%3Ctext fill=%22%23A0A0A0%22 font-family=%22sans-serif%22 font-size=%2218%22 dy=%22.4em%22 font-weight=%22bold%22 x=%2275%22 y=%2275%22 text-anchor=%22middle%22%3ELOGO%3C/text%3E%3C/svg%3E'">
@@ -412,7 +440,9 @@
                 <h2 id="notificationTitle">تفعيل الإشعارات</h2>
                 <p>احصل على التحديثات الفورية والرسائل والتنبيهات المهمة مباشرة على جهازك.</p>
                 <p class="notice">يمكنك تغيير هذا لاحقًا في إعدادات المتصفح الخاص بك</p>
-                <div id="errorMessage" class="error-message"></div>
+                <div id="errorMessage" class="error-message" role="alert"></div>
+                <div id="infoMessage" class="info-message" role="status"></div>
+                <div id="unsupportedWarning" class="unsupported-warning" role="alert"></div>
                 <div id="stepsContainer" class="steps-container">
                     <h4>كيفية تفعيل الإشعارات:</h4>
                     <ol>
@@ -433,14 +463,27 @@
         (function() {
             // إعداد التكوين الأولي والمتغيرات
             const CONFIG = {
-                appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // استبدل بمعرف OneSignal الخاص بك
-                logo: "https://via.placeholder.com/150?text=LOGO", // استبدل برابط شعارك
-                initialDelay: 2000, // التأخير قبل عرض النافذة (بالميلي ثانية)
-                saveToCookies: true, // تخزين الحالة في ملفات تعريف الارتباط بدلاً من التخزين المحلي
-                cookieExpireDays: 7, // مدة صلاحية الكوكيز بالأيام
-                autoFallback: true, // التحول التلقائي إلى طرق بديلة إذا فشل OneSignal
-                showSampleNotification: true, // إظهار إشعار تجريبي بعد منح الإذن
-                debug: false // وضع التصحيح
+                appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+                logo: "https://via.placeholder.com/150?text=LOGO",
+                initialDelay: 2000,
+                saveToCookies: true,
+                cookieExpireDays: 7,
+                autoFallback: true,
+                showSampleNotification: true,
+                debug: false
+            };
+            
+            // عناصر DOM
+            const DOM = {
+                overlay: document.getElementById('notification-overlay'),
+                notification: document.getElementById('facebook-notification'),
+                allowBtn: document.getElementById('allowBtn'),
+                cancelBtn: document.getElementById('cancelBtn'),
+                closeBtn: document.querySelector('.close-btn'),
+                errorMessage: document.getElementById('errorMessage'),
+                infoMessage: document.getElementById('infoMessage'),
+                unsupportedWarning: document.getElementById('unsupportedWarning'),
+                stepsContainer: document.getElementById('stepsContainer')
             };
             
             // وظيفة مساعدة للتسجيل في وضع التصحيح
@@ -452,24 +495,25 @@
             
             // تحديد توافق المتصفح وإعداده
             function detectBrowserEnvironment() {
+                const userAgent = navigator.userAgent;
                 const env = {
-                    isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
-                    isAndroid: /Android/i.test(navigator.userAgent),
-                    isOldAndroid: /Android [1-5]/i.test(navigator.userAgent),
-                    isUCBrowser: /UCBrowser/i.test(navigator.userAgent),
-                    isSamsung: /SamsungBrowser/i.test(navigator.userAgent),
-                    isOperaMini: /Opera Mini/i.test(navigator.userAgent),
-                    isIE: /MSIE|Trident/i.test(navigator.userAgent),
-                    isMobile: /Mobile|Android|iPhone|iPad|iPod/i.test(navigator.userAgent),
-                    isFirefox: /Firefox/i.test(navigator.userAgent),
-                    isChrome: /Chrome/i.test(navigator.userAgent) && !/Edg/i.test(navigator.userAgent),
-                    isSafari: /Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent),
+                    isIOS: /iPhone|iPad|iPod/i.test(userAgent),
+                    isAndroid: /Android/i.test(userAgent),
+                    isOldAndroid: /Android [1-5]/i.test(userAgent),
+                    isUCBrowser: /UCBrowser/i.test(userAgent),
+                    isSamsung: /SamsungBrowser/i.test(userAgent),
+                    isOperaMini: /Opera Mini/i.test(userAgent),
+                    isIE: /MSIE|Trident/i.test(userAgent),
+                    isMobile: /Mobile|Android|iPhone|iPad|iPod/i.test(userAgent),
+                    isFirefox: /Firefox/i.test(userAgent),
+                    isChrome: /Chrome/i.test(userAgent) && !/Edg/i.test(userAgent),
+                    isSafari: /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent),
                     isLimitedDevice: false
                 };
                 
                 // تحديد الأجهزة القديمة أو محدودة القدرات
                 env.isLimitedDevice = env.isOldAndroid || env.isOperaMini || env.isIE || 
-                                      (env.isIOS && /OS [1-9]_/i.test(navigator.userAgent));
+                                    (env.isIOS && /OS [1-9]_/i.test(userAgent));
                 
                 if (env.isLimitedDevice) {
                     document.documentElement.classList.add('old-device');
@@ -485,12 +529,14 @@
                         const date = new Date();
                         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                         const expires = "expires=" + date.toUTCString();
-                        document.cookie = key + "=" + value + ";" + expires + ";path=/";
+                        document.cookie = key + "=" + value + ";" + expires + ";path=/;SameSite=Lax";
                     } else {
                         try {
                             localStorage.setItem(key, value);
                         } catch (e) {
                             log('Error saving to localStorage:', e);
+                            // Fallback to cookies if localStorage fails
+                            this.set(key, value, days);
                         }
                     }
                 },
@@ -514,7 +560,7 @@
                             return localStorage.getItem(key);
                         } catch (e) {
                             log('Error reading from localStorage:', e);
-                            return null;
+                            return this.get(key); // Fallback to cookies
                         }
                     }
                 },
@@ -526,6 +572,7 @@
                             localStorage.removeItem(key);
                         } catch (e) {
                             log('Error removing from localStorage:', e);
+                            this.remove(key); // Fallback to cookies
                         }
                     }
                 }
@@ -533,40 +580,50 @@
             
             // تهيئة OneSignal بطريقة آمنة
             function initializeOneSignal() {
-                // التحقق من وجود OneSignal
-                if (typeof OneSignal === 'undefined') {
-                    return false;
-                }
-                
-                try {
-                    window.OneSignal = window.OneSignal || [];
-                    OneSignal.push(function() {
-                        log('Initializing OneSignal...');
-                        OneSignal.init({
-                            appId: CONFIG.appId,
-                            notifyButton: { enable: false },
-                            allowLocalhostAsSecureOrigin: true,
-                            autoRegister: false,
-                            welcomeNotification: {
-                                disable: true
-                            },
-                            promptOptions: {
-                                slidedown: {
-                                    enabled: false
+                return new Promise((resolve) => {
+                    if (typeof OneSignal === 'undefined') {
+                        log('OneSignal SDK not loaded');
+                    return resolve(false);
+                    }
+                    
+                    try {
+                        window.OneSignal = window.OneSignal || [];
+                        OneSignal.push(function() {
+                            log('Initializing OneSignal...');
+                            OneSignal.init({
+                                appId: CONFIG.appId,
+                                notifyButton: { enable: false },
+                                allowLocalhostAsSecureOrigin: true,
+                                autoRegister: false,
+                                welcomeNotification: {
+                                    disable: true
+                                },
+                                promptOptions: {
+                                    slidedown: {
+                                        enabled: false
+                                    }
                                 }
-                            }
+                            });
+                            
+                            OneSignal.on('initialized', () => {
+                                log('OneSignal initialized successfully');
+                                resolve(true);
+                            });
+                            
+                            OneSignal.on('initializationFailed', (error) => {
+                                log('OneSignal initialization failed:', error);
+                                resolve(false);
+                            });
                         });
-                    });
-                    return true;
-                } catch (e) {
-                    log('Error initializing OneSignal:', e);
-                    return false;
-                }
+                    } catch (e) {
+                        log('Error initializing OneSignal:', e);
+                        resolve(false);
+                    }
+                });
             }
             
             // التحقق من دعم الإشعارات في المتصفح
             function checkNotificationSupport() {
-                // دعم كامل للإشعارات
                 const fullSupport = (
                     'Notification' in window &&
                     'serviceWorker' in navigator &&
@@ -575,11 +632,10 @@
                     navigator.permissions.query
                 );
                 
-                // دعم أساسي للإشعارات
                 const basicSupport = 'Notification' in window;
                 
-                                return {
-                   full: fullSupport,
+                return {
+                    full: fullSupport,
                     basic: basicSupport,
                     push: 'PushManager' in window,
                     serviceWorker: 'serviceWorker' in navigator
@@ -588,34 +644,28 @@
             
             // عرض واجهة الإشعارات
             function showNotificationUI() {
-                const overlay = document.getElementById('notification-overlay');
-                overlay.style.display = 'flex';
-                overlay.setAttribute('aria-hidden', 'false');
-                const notification = document.getElementById('facebook-notification');
+                DOM.overlay.style.display = 'flex';
+                DOM.overlay.setAttribute('aria-hidden', 'false');
                 
-                overlay.style.display = 'flex';
                 setTimeout(() => {
-                    overlay.classList.add('visible');
-                    notification.classList.add('visible');
+                    DOM.overlay.classList.add('visible');
+                    DOM.notification.classList.add('visible');
+                    DOM.notification.focus();
                 }, 10);
                 
-                // إظهار زر الإلغاء بعد تأخير قصير
                 setTimeout(() => {
-                    document.getElementById('cancelBtn').style.display = 'block';
+                    DOM.cancelBtn.style.display = 'block';
                 }, 1000);
             }
             
             // إخفاء واجهة الإشعارات
             function hideNotificationUI() {
-                const overlay = document.getElementById('notification-overlay');
-                overlay.setAttribute('aria-hidden', 'true');
-                const notification = document.getElementById('facebook-notification');
-                
-                overlay.classList.remove('visible');
-                notification.classList.remove('visible');
+                DOM.overlay.setAttribute('aria-hidden', 'true');
+                DOM.overlay.classList.remove('visible');
+                DOM.notification.classList.remove('visible');
                 
                 setTimeout(() => {
-                    overlay.style.display = 'none';
+                    DOM.overlay.style.display = 'none';
                 }, 300);
             }
             
@@ -628,8 +678,8 @@
                 try {
                     const permission = await OneSignal.Notifications.permission;
                     if (permission) {
-                        await OneSignal.Notifications.requestPermission();
-                        return true;
+                        const result = await OneSignal.Notifications.requestPermission();
+                        return result;
                     }
                     return false;
                 } catch (e) {
@@ -641,23 +691,26 @@
             // تسجيل المستخدم باستخدام Push API العادي
             async function registerWithPushAPI() {
                 try {
+                    if (!('Notification' in window)) {
+                        throw new Error('الإشعارات غير مدعومة في هذا المتصفح');
+                    }
+                    
                     const permission = await Notification.requestPermission();
                     return permission === 'granted';
                 } catch (e) {
                     log('Error requesting notification permission:', e);
-                    return false;
+                    throw e;
                 }
             }
             
             // معالجة النجاح في التسجيل
             function handleSuccess() {
-                const allowBtn = document.getElementById('allowBtn');
-                allowBtn.disabled = true;
-                allowBtn.innerHTML = '<span class="loading-spinner"></span> جاري التفعيل...';
+                DOM.allowBtn.disabled = true;
+                DOM.allowBtn.innerHTML = '<span class="loading-spinner"></span> جاري التفعيل...';
                 
                 setTimeout(() => {
-                    allowBtn.classList.add('success');
-                    allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم التفعيل بنجاح';
+                    DOM.allowBtn.classList.add('success');
+                    DOM.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم التفعيل بنجاح';
                     
                     if (CONFIG.showSampleNotification) {
                         setTimeout(() => {
@@ -673,17 +726,13 @@
             
             // معالجة الفشل في التسجيل
             function handleError(error) {
-                const errorElement = document.getElementById('errorMessage');
-                const allowBtn = document.getElementById('allowBtn');
+                DOM.allowBtn.disabled = false;
+                DOM.allowBtn.innerHTML = 'حاول مرة أخرى';
                 
-                allowBtn.disabled = false;
-                allowBtn.innerHTML = 'حاول مرة أخرى';
+                DOM.errorMessage.textContent = error.message || 'حدث خطأ أثناء محاولة تفعيل الإشعارات';
+                DOM.errorMessage.style.display = 'block';
                 
-                errorElement.textContent = error.message || 'حدث خطأ أثناء محاولة تفعيل الإشعارات';
-                errorElement.style.display = 'block';
-                
-                // إظهار التعليمات للمستخدم
-                document.getElementById('stepsContainer').style.display = 'block';
+                DOM.stepsContainer.style.display = 'block';
             }
             
             // عرض إشعار تجريبي
@@ -700,6 +749,16 @@
                     } catch (e) {
                         log('Error showing sample notification:', e);
                     }
+                } else if (typeof OneSignal !== 'undefined') {
+                    try {
+                        OneSignal.Notifications.addTrigger({
+                            type: 'message',
+                            message: 'شكرًا لتفعيل الإشعارات! ستتلقى الآن آخر التحديثات.',
+                            url: window.location.href
+                        });
+                    } catch (e) {
+                        log('Error showing OneSignal notification:', e);
+                    }
                 }
             }
             
@@ -708,46 +767,47 @@
                 if (typeof Notification !== 'undefined') {
                     return Notification.permission === 'denied';
                 }
+                
+                if (typeof OneSignal !== 'undefined') {
+                    return OneSignal.Notifications.permission === 'denied';
+                }
+                
                 return false;
             }
             
             // التحقق مما إذا كان قد تم تجاوز الحد الأقصى لمحاولات العرض
             function hasExceededMaxAttempts() {
-                const attempts = Storage.get('notification_attempts') || 0;
+                const attempts = parseInt(Storage.get('notification_attempts') || 0;
                 return attempts >= 3;
             }
             
-            // تهيئة النظام
-            async function initNotificationSystem() {
-                const env = detectBrowserEnvironment();
-                const support = checkNotificationSupport();
+            // عرض رسالة عدم التوافق
+            function showUnsupportedMessage(env) {
+                let message = '';
                 
-                log('Environment:', env);
-                log('Support:', support);
-                
-                // إذا كان المتصفح لا يدعم الإشعارات مطلقًا
-                if (!support.basic && !initializeOneSignal()) {
-                    log('Notifications not supported');
-                    return;
+                if (env.isIE) {
+                    message = 'المتصفح Internet Explorer لا يدعم الإشعارات. نوصي باستخدام متصفح حديث مثل Chrome أو Firefox.';
+                } else if (env.isOperaMini) {
+                    message = 'متصفح Opera Mini لا يدعم الإشعارات. نوصي باستخدام متصفح آخر لتفعيل هذه الميزة.';
+                } else if (env.isOldAndroid) {
+                    message = 'إصدار Android الخاص بك قديم ولا يدعم الإشعارات بشكل كامل. نوصي بتحديث نظام التشغيل.';
+                } else if (!env.isMobile && !('Notification' in window)) {
+                    message = 'المتصفح الخاص بك لا يدعم الإشعارات. نوصي باستخدام Chrome أو Firefox أو Edge.';
                 }
                 
-                // إذا تم رفض الإذن مسبقًا أو تجاوز الحد الأقصى للمحاولات
-                if (wasPermissionDenied() || hasExceededMaxAttempts()) {
-                    log('Permission was previously denied or max attempts exceeded');
-                    return;
+                if (message) {
+                    DOM.unsupportedWarning.textContent = message;
+                    DOM.unsupportedWarning.style.display = 'block';
+                    DOM.allowBtn.disabled = true;
+                    return true;
                 }
                 
-                // زيادة عدد المحاولات
-                const attempts = parseInt(Storage.get('notification_attempts') || 0) + 1;
-                Storage.set('notification_attempts', attempts);
-                
-                // تأخير عرض الواجهة
-                setTimeout(() => {
-                    showNotificationUI();
-                }, CONFIG.initialDelay);
-                
-                // إعداد معالج الأحداث للأزرار
-                document.getElementById('allowBtn').addEventListener('click', async function() {
+                return false;
+            }
+            
+            // إعداد معالج الأحداث
+            function setupEventHandlers() {
+                DOM.allowBtn.addEventListener('click', async function() {
                     this.classList.add('clicked');
                     this.innerHTML = '<span class="loading-spinner"></span> جاري المعالجة...';
                     
@@ -760,7 +820,7 @@
                         }
                         
                         // إذا فشل OneSignal، استخدم Push API العادي
-                        if (!registered && support.basic) {
+                        if (!registered && CONFIG.autoFallback) {
                             registered = await registerWithPushAPI();
                         }
                         
@@ -775,15 +835,77 @@
                     }
                 });
                 
-                document.getElementById('cancelBtn').addEventListener('click', function() {
+                DOM.cancelBtn.addEventListener('click', function() {
                     Storage.set('notification_permission', 'dismissed');
                     hideNotificationUI();
                 });
                 
-                document.querySelector('.close-btn').addEventListener('click', function() {
+                DOM.closeBtn.addEventListener('click', function() {
                     Storage.set('notification_permission', 'dismissed');
                     hideNotificationUI();
                 });
+                
+                DOM.overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        Storage.set('notification_permission', 'dismissed');
+                        hideNotificationUI();
+                    }
+                });
+                
+                // إضافة دعم لوحة المفاتيح
+                DOM.overlay.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        Storage.set('notification_permission', 'dismissed');
+                        hideNotificationUI();
+                    }
+                });
+            }
+            
+            // تهيئة النظام
+            async function initNotificationSystem() {
+                const env = detectBrowserEnvironment();
+                const support = checkNotificationSupport();
+                
+                log('Environment:', env);
+                log('Support:', support);
+                
+                // إذا كان المتصفح لا يدعم الإشعارات مطلقًا
+                if (!support.basic && !await initializeOneSignal()) {
+                    log('Notifications not supported');
+                    showUnsupportedMessage(env);
+                    return;
+                }
+                
+                // إذا تم رفض الإذن مسبقًا أو تجاوز الحد الأقصى للمحاولات
+                if (wasPermissionDenied() || hasExceededMaxAttempts()) {
+                    log('Permission was previously denied or max attempts exceeded');
+                    return;
+                }
+                
+                // إذا كان الإذن ممنوحًا بالفعل
+                if ((typeof Notification !== 'undefined' && Notification.permission === 'granted') || 
+                    (typeof OneSignal !== 'undefined' && OneSignal.Notifications.permission === 'granted')) {
+                    log('Permission already granted');
+                    Storage.set('notification_permission', 'granted');
+                    return;
+                }
+                
+                // عرض رسالة عدم التوافق إذا لزم الأمر
+                if (showUnsupportedMessage(env)) {
+                    return;
+                }
+                
+                // زيادة عدد المحاولات
+                const attempts = parseInt(Storage.get('notification_attempts') || 0) + 1;
+                Storage.set('notification_attempts', attempts);
+                
+                // تأخير عرض الواجهة
+                setTimeout(() => {
+                    showNotificationUI();
+                }, CONFIG.initialDelay);
+                
+                // إعداد معالج الأحداث
+                setupEventHandlers();
             }
             
             // بدء النظام عند تحميل الصفحة
@@ -791,39 +913,69 @@
                 // تأخير التهيئة لضمان تحميل جميع الأصول
                 setTimeout(initNotificationSystem, 500);
             });
-            
-            // إغلاق النافذة عند النقر خارجها
-            document.getElementById('notification-overlay').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    Storage.set('notification_permission', 'dismissed');
-                    hideNotificationUI();
-                }
-            });
         })();
     </script>
+    
     <script>
-      if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("https://turkify.netlify.app/service-worker.js").then((registration) => {
-    console.log("Service Worker مسجل بنجاح:", registration);
-
-    registration.addEventListener("updatefound", () => {
-      const newWorker = registration.installing;
-      newWorker.addEventListener("statechange", () => {
-        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-          if (confirm("تحديث جديد متاح! هل تريد إعادة تحميل التطبيق؟")) {
-            window.location.reload();
-          }
-        }
-      });
-    });
-  }).catch((error) => {
-    console.error("فشل تسجيل Service Worker:", error);
-  });
-
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    window.location.reload();
-  });
-}
+        // تسجيل Service Worker بشكل منفصل
+        document.addEventListener('DOMContentLoaded', function() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js').then((registration) => {
+                    console.log('Service Worker مسجل بنجاح:', registration.scope);
+                    
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('New content is available; please refresh.');
+                                
+                                // عرض رسالة للمستخدم عند وجود تحديث
+                                const showUpdateMessage = () => {
+                                    const updateMessage = document.createElement('div');
+                                    updateMessage.style.position = 'fixed';
+                                    updateMessage.style.bottom = '20px';
+                                    updateMessage.style.right = '20px';
+                                    updateMessage.style.left = '20px';
+                                    updateMessage.style.maxWidth = '500px';
+                                    updateMessage.style.margin = '0 auto';
+                                    updateMessage.style.padding = '15px';
+                                    updateMessage.style.backgroundColor = '#fff';
+                                    updateMessage.style.borderRadius = '8px';
+                                    updateMessage.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                                    updateMessage.style.zIndex = '100000';
+                                    updateMessage.style.textAlign = 'center';
+                                    updateMessage.innerHTML = `
+                                        <p style="margin-bottom: 15px;">تحديث جديد متاح! هل تريد تحميله الآن؟</p>
+                                        <button style="padding: 8px 16px; background: #1877F2; color: white; border: none; border-radius: 4px; margin-right: 10px; cursor: pointer;">نعم، تحديث</button>
+                                        <button style="padding: 8px 16px; background: #e4e6eb; color: #1c1e21; border: none; border-radius: 4px; cursor: pointer;">لاحقًا</button>
+                                    `;
+                                    
+                                    document.body.appendChild(updateMessage);
+                                    
+                                    const [updateBtn, laterBtn] = updateMessage.querySelectorAll('button');
+                                    
+                                    updateBtn.addEventListener('click', () => {
+                                        window.location.reload();
+                                    });
+                                    
+                                    laterBtn.addEventListener('click', () => {
+                                        document.body.removeChild(updateMessage);
+                                    });
+                                };
+                                
+                                showUpdateMessage();
+                            }
+                        });
+                    });
+                }).catch((error) => {
+                    console.error('فشل تسجيل Service Worker:', error);
+                });
+                
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    window.location.reload();
+                });
+            }
+        });
     </script>
-</body>
+    </body>
 </html>
