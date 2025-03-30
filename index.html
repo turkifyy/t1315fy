@@ -29,6 +29,11 @@
     <meta content="EgyBest: Free Movies &amp; Series Streaming" property="og:title"></meta>
     <meta content="Discover EgyBest, the ultimate platform for free movie and series streaming in HD with Arabic subtitles. Explore trending content today!" property="og:description"></meta>
     <meta content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgXV-ZxMo3WqbJXAmhUxOt_mTe1S2zI7ipgzbEuGtFCoBBi4fN0f0vPzCTqfVmUTP0IwJZkAH36PCp5nw99nFIMAIjWjSU98W6xlA7Ar6i24CHGeXB-J6rSndTVmeSMVOPVJxvDoRGc2HXT0D2-W_ldQDPNuBSFwCRTKRH_bGU0bE11XphxgxJbetQS6VY/s1200/20250126_192057.png" property="og:image"></meta>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta content="https://example.com/egybest" property="og:url"></meta>
     <meta name="theme-color" content="#007bff">
     <script type="application/ld+json">
@@ -60,10 +65,13 @@
     <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"></link>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"></link>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"></noscript>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.rtl.min.css" rel="stylesheet"></link>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"></link>
     <link rel="manifest" href="https://turkify.netlify.app/manifest.json"></link>
     <link rel="icon" type="image/png" sizes="192x192" href="https://turkify.netlify.app/logo-192%C3%97192-20252026.png"></link>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <style>
     /* Variables */
     :root {
@@ -746,102 +754,97 @@
             }
         }
     </style> 
-       <style>
+       
+                       
+   <style>
         :root {
             --fb-blue: #1877F2;
-            --fb-background: rgba(0, 0, 0, 0.35);
+            --fb-blue-dark: #166FE5;
+            --fb-blue-darker: #1458B8;
+            
             --text-primary: #1C1E21;
             --text-secondary: #65676B;
+            --border-color: #E4E6EB;
+            
+            --success-green: #42B72A;
+            --error-red: #F02849;
+            --warning-yellow: #FFC107;
+            
+            --bg-light: #F0F2F5;
+            --notification-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
-
+       
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
-        } 
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow-x: hidden;
-            direction: ltr;
         }
-
+        
         body {
-            background-color: rgba(0, 0, 0, 0.35);
-            display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
-            justify-content: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
-            align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
-            min-height: 100vh;
-            margin: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        #notification-overlay {
+       #notification-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.1);
             display: none;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             justify-content: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             z-index: 999999;
-            
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #notification-overlay.visible {
+            opacity: 1;
+        }
+       @supports not (backdrop-filter: blur(3px)) {
+            #notification-overlay {
+                background: rgba(240, 242, 245, 0.95);
+            }
         }
 
         #facebook-notification {
             width: 90%;
             max-width: 430px;
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--notification-shadow);
             transform: scale(0.85);
-            -webkit-transform: scale(0.85);
-            -ms-transform: scale(0.85);
             opacity: 0;
-            transition: all 0.25s ease;
-            -webkit-transition: all 0.25s ease;
+            transition: transform 0.3s ease, opacity 0.25s ease;
             position: relative;
+            will-change: transform, opacity;
         }
-          .notification-header {
+       #facebook-notification.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .notification-header {
             background: var(--fb-blue);
             color: white;
             padding: 16px;
             display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             justify-content: space-between;
-            -webkit-justify-content: space-between;
-            -ms-flex-pack: justify;
+            position: relative;
         }
 
         .notification-header-content {
             display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
         }
-
         .notification-header img {
             width: 40px;
             height: 40px;
@@ -849,16 +852,16 @@
             margin-right: 12px;
             border: 2px solid white;
             object-fit: cover;
-            -webkit-object-fit: cover;
+            background-color: #fff;
         }
-           .notification-header-text h3 {
+
+        .notification-header-text h3 {
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 3px;
             line-height: 1.2;
         }
-
-        .notification-header-text p {
+       .notification-header-text p {
             font-size: 12px;
             opacity: 0.9;
             line-height: 1.2;
@@ -876,67 +879,107 @@
             font-weight: 600;
             line-height: 1.3;
         }
-
-        .notification-content p {
+       .notification-content p {
             color: var(--text-secondary);
             line-height: 1.5;
             font-size: 15px;
             margin-bottom: 8px;
         }
-          .notification-actions {
-            display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
-            justify-content: space-between;
-            -webkit-justify-content: space-between;
-            -ms-flex-pack: justify;
-            padding: 12px 16px 16px;
-            background: white;
-            border-top: 1px solid #E4E6EB;
+
+        .notice {
+            font-size: 12px !important;
+            color: #90949C !important;
+            margin-top: 15px !important;
+        }
+       .unsupported-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--warning-yellow);
+            border-radius: 6px;
+            padding: 10px;
+            color: #856404 !important;
+            font-size: 13px !important;
+            margin-top: 15px !important;
+            text-align: start;
         }
 
-        .allow-btn, .not-now-btn {
-            border: none;
-            padding: 8px 0;
+        .error-message {
+            background-color: rgba(240, 40, 73, 0.1);
+            border: 1px solid var(--error-red);
             border-radius: 6px;
-            font-size: 14px;
+            padding: 10px;
+            color: var(--error-red) !important;
+            font-size: 13px !important;
+            margin-top: 15px !important;
+            display: none;
+        }
+       .notification-actions {
+            display: flex;
+            justify-content: center;
+            padding: 12px 16px 20px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            gap: 12px;
+        }
+       .allow-btn {
+            border: none;
+            padding: 12px 0;
+            border-radius: 8px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             outline: none;
-            transition: background-color 0.2s ease;
-            -webkit-transition: background-color 0.2s ease;
-            width: 48%;
-            min-height: 36px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-
-        .allow-btn {
+            transition: all 0.2s ease;
+            width: 100%;
+            min-height: 44px;
             background-color: var(--fb-blue);
             color: white;
         }
-            .not-now-btn {
-            background-color: white;
-            color: #41CCFF;
-            font-size: 10px;
-        }
 
         .allow-btn:hover, .allow-btn:focus {
-            background-color: #166FE5;
+            background-color: var(--fb-blue-dark);
+        }
+         .allow-btn:active {
+            transform: scale(0.98);
         }
 
-        .not-now-btn:hover, .not-now-btn:focus {
-            background-color: white;
+        .allow-btn.success {
+            background-color: var(--success-green);
+        }
+
+        .allow-btn.clicked {
+            transform: scale(0.97);
+        }
+
+        .allow-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+         .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            padding: 0 8px;
+            line-height: 1;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .notification-icon {
             display: flex;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             align-items: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             gap: 12px;
         }
 
@@ -944,27 +987,82 @@
             position: relative;
             display: inline-block;
         }
-
-        .bell-badge::after {
+       .bell-badge::after {
             content: '';
             position: absolute;
             top: -2px;
             right: -2px;
             width: 8px;
             height: 8px;
-            background-color: #F02849;
+            background-color: var(--error-red);
             border-radius: 50%;
             border: 2px solid var(--fb-blue);
         }
-           /* Ensure proper touch targets for mobile */
-        @media (max-width: 768px) {
-            .allow-btn, .not-now-btn {
-                min-height: 44px;
-                padding: 10px 0;
+       .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .cancel-btn {
+            border: 1px solid var(--border-color);
+            background: transparent;
+            padding: 12px 0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 150px;
+            min-height: 44px;
+            display: none; /* Hidden by default */
+        }
+
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+           .steps-container {
+            text-align: start;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+        }
+        
+        .steps-container h4 {
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .steps-container ol {
+            margin-left: 20px;
+            color: var(--text-secondary);
+        }
+        
+        .steps-container li {
+            margin-bottom: 3px;
+        }
+     @media (min-width: 1200px) {
+            #facebook-notification {
+                max-width: 500px;
             }
         }
 
-        /* Specific mobile styles */
         @media (max-width: 480px) {
             #facebook-notification {
                 width: 95%;
@@ -974,6 +1072,7 @@
             .notification-header {
                 padding: 12px;
             }
+
             .notification-header img {
                 width: 36px;
                 height: 36px;
@@ -986,92 +1085,144 @@
             .notification-content {
                 padding: 16px 12px;
             }
-
+            
             .notification-actions {
                 flex-direction: column;
-                -webkit-flex-direction: column;
-                -ms-flex-direction: column;
-                gap: 8px;
-            }
-
-            .allow-btn, .not-now-btn {
-                width: 100%;
-            }
-        }
-
-        /* Older Android browser support */
-        @supports (-webkit-overflow-scrolling: touch) {
-            #notification-overlay {
-                background: rgba(240, 242, 245, 0.98);
-                -webkit-backdrop-filter: none;
-                backdrop-filter: none;
-            }
-        }
-           /* IE10+ specific styles */
-        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-            #notification-overlay {
-                background: rgba(240, 242, 245, 0.95);
             }
             
+            .cancel-btn {
+                max-width: 100%;
+            }
+        }
+       /* فئة خاصة للهواتف القديمة */
+        .old-device #notification-overlay {
+            background: var(--bg-light);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        
+        .old-device #facebook-notification {
+            box-shadow: 0.steps-container {
+            text-align: start;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+        }
+        
+        .steps-container h4 {
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .steps-container ol {
+            margin-left: 20px;
+            color: var(--text-secondary);
+        }
+        
+        .steps-container li {
+            margin-bottom: 3px;
+        }
+
+        @media (min-width: 1200px) {
             #facebook-notification {
-                -ms-transform: scale(0.85);
+                max-width: 500px;
+            }
+        }
+      @media (max-width: 480px) {
+            #facebook-notification {
+                width: 95%;
+                max-width: 95%;
+            }
+
+            .notification-header {
+                padding: 12px;
+            }
+
+            .notification-header img {
+                width: 36px;
+                height: 36px;
+            }
+
+            .notification-header-text h3 {
+                font-size: 14px;
+            }
+
+            .notification-content {
+                padding: 16px 12px;
             }
             
             .notification-actions {
-                display: -ms-flexbox;
-                -ms-flex-pack: justify;
+                flex-direction: column;
             }
             
-            body {
-                display: -ms-flexbox;
-                -ms-flex-pack: center;
-                -ms-flex-align: center;
+            .cancel-btn {
+                max-width: 100%;
             }
+        }
+
+        /* فئة خاصة للهواتف القديمة */
+        .old-device #notification-overlay {
+            background: var(--bg-light);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
         
-        /* UC Browser & older webkit fixes */
-        @supports (-webkit-marquee-repetition:infinite) and (object-fit:fill) {
-            #notification-overlay {
-                background: rgba(240, 242, 245, 0.98);
-            }
-            
-            .bell-badge::after {
-                top: 0;
-                right: 0;
-            }
+        .old-device #facebook-notification {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-    </style>            
+       
+        [dir="rtl"] . 2px 8px rgba(0,0,0,0.1);
+        }
+
+        [dir="rtl"] .notification-header img {
+            margin-right: 0;
+            margin-left: 12px;
+        }
+        
+        [dir="rtl"] .loading-spinner {
+            margin-right: 0;
+            margin-left: 8px;
+        }
+    </style>
+                         
         
 </head>
 <body>
-
-       <div id="notification-overlay">
-        <div id="facebook-notification">
+       <div id="notification-overlay" aria-modal="true" role="dialog">
+        <div id="facebook-notification" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
             <div class="notification-header">
                 <div class="notification-header-content">
-                    <img src="https://via.placeholder.com/150?text=APP+LOGO" alt="App Logo">
+                    <img src="https://via.placeholder.com/150?text=LOGO" alt="شعار الموقع" loading="lazy" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22 viewBox=%220 0 150 150%22%3E%3Crect fill=%22%23F0F2F5%22 width=%22150%22 height=%22150%22/%3E%3Ctext fill=%22%23A0A0A0%22 font-family=%22sans-serif%22 font-size=%2218%22 dy=%22.4em%22 font-weight=%22bold%22 x=%2275%22 y=%2275%22 text-anchor=%22middle%22%3ELOGO%3C/text%3E%3C/svg%3E'">
                     <div class="notification-header-text">
-                        <h3>App Notifications</h3>
-                        <p>Stay Connected</p>
+                        <h3>نظام الإشعارات</h3>
+                        <p>ابق على اطلاع دائم</p>
                     </div>
                 </div>
-                <div class="notification-icon">
-                    <i class="fab fa-facebook" style="color: white; font-size: 22px;"></i>
-                    <div class="bell-badge">
-                        <i class="fas fa-bell" style="color: white; font-size: 20px;"></i>
-                    </div>
-                </div>
+                <button type="button" class="close-btn" aria-label="إغلاق النافذة">&times;</button>
             </div>
             <div class="notification-content">
-                <h2>Enable Notifications</h2>
-                <p>Get instant updates, messages, and important alerts directly on your device.</p>
+                <h2 id="notificationTitle">تفعيل الإشعارات</h2>
+                <p>احصل على التحديثات الفورية والرسائل والتنبيهات المهمة مباشرة على جهازك.</p>
+                <p class="notice">يمكنك تغيير هذا لاحقًا في إعدادات المتصفح الخاص بك</p>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="stepsContainer" class="steps-container">
+                    <h4>كيفية تفعيل الإشعارات:</h4>
+                    <ol>
+                        <li>انقر على زر السماح بالأسفل</li>
+                        <li>اختر "السماح" عند ظهور نافذة المتصفح</li>
+                        <li>استمتع بتلقي أحدث التحديثات</li>
+                    </ol>
+                </div>
             </div>
             <div class="notification-actions">
-                <button class="allow-btn" id="allowBtn">Allow</button>
-                <button class="not-now-btn" id="notNowBtn">Not Now</button>
+                <button type="button" class="allow-btn" id="allowBtn">السماح</button>
+                <button type="button" class="cancel-btn" id="cancelBtn">إلغاء</button>
             </div>
         </div>
-    </div>
+    </div>   
+            
     
        <div class="custom-turkify-banner" id="pwaPromoBanner">
         <img src="https://turkify.netlify.app/logo-512x512-20252026.png" alt="Turkify App Icon" class="app-icon" loading="lazy">
@@ -2067,73 +2218,381 @@
     <!-- Bootstrap JS (Optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>    
 
-    <script>     
-        document.addEventListener('DOMContentLoaded', function() {
-            const notificationOverlay = document.getElementById('notification-overlay');
-            const facebookNotification = document.getElementById('facebook-notification');
-            const allowBtn = document.getElementById('allowBtn');
-
-            function showNotification() {
-                if (!localStorage.getItem('notifications_accepted')) {
-                    notificationOverlay.style.display = 'flex';
-                    setTimeout(() => {
-                        facebookNotification.style.transform = 'scale(1)';
-                        facebookNotification.style.opacity = '1';
-                    }, 100);
+    
+<script>
+        (function() {
+            // إعداد التكوين الأولي والمتغيرات
+            const CONFIG = {
+                appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // استبدل بمعرف OneSignal الخاص بك
+                logo: "https://via.placeholder.com/150?text=LOGO", // استبدل برابط شعارك
+                initialDelay: 2000, // التأخير قبل عرض النافذة (بالميلي ثانية)
+                saveToCookies: true, // تخزين الحالة في ملفات تعريف الارتباط بدلاً من التخزين المحلي
+                cookieExpireDays: 7, // مدة صلاحية الكوكيز بالأيام
+                autoFallback: true, // التحول التلقائي إلى طرق بديلة إذا فشل OneSignal
+                showSampleNotification: true, // إظهار إشعار تجريبي بعد منح الإذن
+                debug: false // وضع التصحيح
+            };
+            
+            // وظيفة مساعدة للتسجيل في وضع التصحيح
+            function log(...args) {
+                if (CONFIG.debug) {
+                    console.log('[NotificationSystem]', ...args);
                 }
             }
-
-            function hideNotification() {
-                facebookNotification.style.transform = 'scale(0.7)';
-                facebookNotification.style.opacity = '0';
+            
+            // تحديد توافق المتصفح وإعداده
+            function detectBrowserEnvironment() {
+                const env = {
+                    isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
+                    isAndroid: /Android/i.test(navigator.userAgent),
+                    isOldAndroid: /Android [1-5]/i.test(navigator.userAgent),
+                    isUCBrowser: /UCBrowser/i.test(navigator.userAgent),
+                    isSamsung: /SamsungBrowser/i.test(navigator.userAgent),
+                    isOperaMini: /Opera Mini/i.test(navigator.userAgent),
+                    isIE: /MSIE|Trident/i.test(navigator.userAgent),
+                    isMobile: /Mobile|Android|iPhone|iPad|iPod/i.test(navigator.userAgent),
+                    isFirefox: /Firefox/i.test(navigator.userAgent),
+                    isChrome: /Chrome/i.test(navigator.userAgent) && !/Edg/i.test(navigator.userAgent),
+                    isSafari: /Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent),
+                    isLimitedDevice: false
+                };
+                
+                // تحديد الأجهزة القديمة أو محدودة القدرات
+                env.isLimitedDevice = env.isOldAndroid || env.isOperaMini || env.isIE || 
+                                      (env.isIOS && /OS [1-9]_/i.test(navigator.userAgent));
+                
+                if (env.isLimitedDevice) {
+                    document.documentElement.classList.add('old-device');
+                }
+                
+                return env;
+            }
+            
+            // واجهة مجردة للتخزين (كوكيز أو تخزين محلي)
+            const Storage = {
+                set: function(key, value, days = CONFIG.cookieExpireDays) {
+                    if (CONFIG.saveToCookies) {
+                        const date = new Date();
+                        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                        const expires = "expires=" + date.toUTCString();
+                        document.cookie = key + "=" + value + ";" + expires + ";path=/";
+                    } else {
+                        try {
+                            localStorage.setItem(key, value);
+                        } catch (e) {
+                            log('Error saving to localStorage:', e);
+                        }
+                    }
+                },
+                get: function(key) {
+                    if (CONFIG.saveToCookies) {
+                        const name = key + "=";
+                        const decodedCookie = decodeURIComponent(document.cookie);
+                        const ca = decodedCookie.split(';');
+                        for (let i = 0; i < ca.length; i++) {
+                            let c = ca[i];
+                            while (c.charAt(0) === ' ') {
+                                c = c.substring(1);
+                            }
+                            if (c.indexOf(name) === 0) {
+                                return c.substring(name.length, c.length);
+                            }
+                        }
+                        return null;
+                    } else {
+                        try {
+                            return localStorage.getItem(key);
+                        } catch (e) {
+                            log('Error reading from localStorage:', e);
+                            return null;
+                        }
+                    }
+                },
+                remove: function(key) {
+                    if (CONFIG.saveToCookies) {
+                        document.cookie = key + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    } else {
+                        try {
+                            localStorage.removeItem(key);
+                        } catch (e) {
+                            log('Error removing from localStorage:', e);
+                        }
+                    }
+                }
+            };
+            
+            // تهيئة OneSignal بطريقة آمنة
+            function initializeOneSignal() {
+                // التحقق من وجود OneSignal
+                if (typeof OneSignal === 'undefined') {
+                    return false;
+                }
+                
+                try {
+                    window.OneSignal = window.OneSignal || [];
+                    OneSignal.push(function() {
+                        log('Initializing OneSignal...');
+                        OneSignal.init({
+                            appId: CONFIG.appId,
+                            notifyButton: { enable: false },
+                            allowLocalhostAsSecureOrigin: true,
+                            autoRegister: false,
+                            welcomeNotification: {
+                                disable: true
+                            },
+                            promptOptions: {
+                                slidedown: {
+                                    enabled: false
+                                }
+                            }
+                        });
+                    });
+                    return true;
+                } catch (e) {
+                    log('Error initializing OneSignal:', e);
+                    return false;
+                }
+            }
+            
+            // التحقق من دعم الإشعارات في المتصفح
+            function checkNotificationSupport() {
+                // دعم كامل للإشعارات
+                const fullSupport = (
+                    'Notification' in window &&
+                    'serviceWorker' in navigator &&
+                    'PushManager' in window &&
+                    'permissions' in navigator &&
+                    navigator.permissions.query
+                );
+                
+                // دعم أساسي للإشعارات
+                const basicSupport = 'Notification' in window;
+                
+                                return {
+                   full: fullSupport,
+                    basic: basicSupport,
+                    push: 'PushManager' in window,
+                    serviceWorker: 'serviceWorker' in navigator
+                };
+            }
+            
+            // عرض واجهة الإشعارات
+            function showNotificationUI() {
+                const overlay = document.getElementById('notification-overlay');
+                overlay.style.display = 'flex';
+                overlay.setAttribute('aria-hidden', 'false');
+                const notification = document.getElementById('facebook-notification');
+                
+                overlay.style.display = 'flex';
                 setTimeout(() => {
-                    notificationOverlay.style.display = 'none';
+                    overlay.classList.add('visible');
+                    notification.classList.add('visible');
+                }, 10);
+                
+                // إظهار زر الإلغاء بعد تأخير قصير
+                setTimeout(() => {
+                    document.getElementById('cancelBtn').style.display = 'block';
+                }, 1000);
+            }
+            
+            // إخفاء واجهة الإشعارات
+            function hideNotificationUI() {
+                const overlay = document.getElementById('notification-overlay');
+                overlay.setAttribute('aria-hidden', 'true');
+                const notification = document.getElementById('facebook-notification');
+                
+                overlay.classList.remove('visible');
+                notification.classList.remove('visible');
+                
+                setTimeout(() => {
+                    overlay.style.display = 'none';
                 }, 300);
             }
-
-           
-            // Auto show notification after 2 seconds
-            setTimeout(showNotification, 2000);
-
-            // Allow Notifications
-            allowBtn.addEventListener('click', function() {
-                if ("Notification" in window) {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === "granted") {
-                            localStorage.setItem('notifications_accepted', 'true');
-                            hideNotification();
-                            new Notification('Notifications Enabled', {
-                                body: 'You will now receive updates and alerts.',
-                                icon: 'https://via.placeholder.com/150?text=APP+LOGO'
-                            });
+            
+            // تسجيل المستخدم في OneSignal
+            async function registerWithOneSignal() {
+                if (typeof OneSignal === 'undefined') {
+                    throw new Error('OneSignal غير متاح');
+                }
+                
+                try {
+                    const permission = await OneSignal.Notifications.permission;
+                    if (permission) {
+                        await OneSignal.Notifications.requestPermission();
+                        return true;
+                    }
+                    return false;
+                } catch (e) {
+                    log('Error registering with OneSignal:', e);
+                    throw e;
+                }
+            }
+            
+            // تسجيل المستخدم باستخدام Push API العادي
+            async function registerWithPushAPI() {
+                try {
+                    const permission = await Notification.requestPermission();
+                    return permission === 'granted';
+                } catch (e) {
+                    log('Error requesting notification permission:', e);
+                    return false;
+                }
+            }
+            
+            // معالجة النجاح في التسجيل
+            function handleSuccess() {
+                const allowBtn = document.getElementById('allowBtn');
+                allowBtn.disabled = true;
+                allowBtn.innerHTML = '<span class="loading-spinner"></span> جاري التفعيل...';
+                
+                setTimeout(() => {
+                    allowBtn.classList.add('success');
+                    allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم التفعيل بنجاح';
+                    
+                    if (CONFIG.showSampleNotification) {
+                        setTimeout(() => {
+                            showSampleNotification();
+                        }, 800);
+                    }
+                    
+                    setTimeout(() => {
+                        hideNotificationUI();
+                    }, 1500);
+                }, 1000);
+            }
+            
+            // معالجة الفشل في التسجيل
+            function handleError(error) {
+                const errorElement = document.getElementById('errorMessage');
+                const allowBtn = document.getElementById('allowBtn');
+                
+                allowBtn.disabled = false;
+                allowBtn.innerHTML = 'حاول مرة أخرى';
+                
+                errorElement.textContent = error.message || 'حدث خطأ أثناء محاولة تفعيل الإشعارات';
+                errorElement.style.display = 'block';
+                
+                // إظهار التعليمات للمستخدم
+                document.getElementById('stepsContainer').style.display = 'block';
+            }
+            
+            // عرض إشعار تجريبي
+            function showSampleNotification() {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    const options = {
+                        body: 'شكرًا لتفعيل الإشعارات! ستتلقى الآن آخر التحديثات.',
+                        icon: CONFIG.logo,
+                        dir: 'rtl'
+                    };
+                    
+                    try {
+                        new Notification('تم التفعيل بنجاح', options);
+                    } catch (e) {
+                        log('Error showing sample notification:', e);
+                    }
+                }
+            }
+            
+            // التحقق مما إذا كان قد تم رفض الإذن مسبقًا
+            function wasPermissionDenied() {
+                if (typeof Notification !== 'undefined') {
+                    return Notification.permission === 'denied';
+                }
+                return false;
+            }
+            
+            // التحقق مما إذا كان قد تم تجاوز الحد الأقصى لمحاولات العرض
+            function hasExceededMaxAttempts() {
+                const attempts = Storage.get('notification_attempts') || 0;
+                return attempts >= 3;
+            }
+            
+            // تهيئة النظام
+            async function initNotificationSystem() {
+                const env = detectBrowserEnvironment();
+                const support = checkNotificationSupport();
+                
+                log('Environment:', env);
+                log('Support:', support);
+                
+                // إذا كان المتصفح لا يدعم الإشعارات مطلقًا
+                if (!support.basic && !initializeOneSignal()) {
+                    log('Notifications not supported');
+                    return;
+                }
+                
+                // إذا تم رفض الإذن مسبقًا أو تجاوز الحد الأقصى للمحاولات
+                if (wasPermissionDenied() || hasExceededMaxAttempts()) {
+                    log('Permission was previously denied or max attempts exceeded');
+                    return;
+                }
+                
+                // زيادة عدد المحاولات
+                const attempts = parseInt(Storage.get('notification_attempts') || 0) + 1;
+                Storage.set('notification_attempts', attempts);
+                
+                // تأخير عرض الواجهة
+                setTimeout(() => {
+                    showNotificationUI();
+                }, CONFIG.initialDelay);
+                
+                // إعداد معالج الأحداث للأزرار
+                document.getElementById('allowBtn').addEventListener('click', async function() {
+                    this.classList.add('clicked');
+                    this.innerHTML = '<span class="loading-spinner"></span> جاري المعالجة...';
+                    
+                    try {
+                        let registered = false;
+                        
+                        // المحاولة مع OneSignal أولاً إذا كان متاحًا
+                        if (typeof OneSignal !== 'undefined') {
+                            registered = await registerWithOneSignal();
                         }
-                    });
+                        
+                        // إذا فشل OneSignal، استخدم Push API العادي
+                        if (!registered && support.basic) {
+                            registered = await registerWithPushAPI();
+                        }
+                        
+                        if (registered) {
+                            handleSuccess();
+                            Storage.set('notification_permission', 'granted');
+                        } else {
+                            throw new Error('لم يتم منح الإذن لعرض الإشعارات');
+                        }
+                    } catch (error) {
+                        handleError(error);
+                    }
+                });
+                
+                document.getElementById('cancelBtn').addEventListener('click', function() {
+                    Storage.set('notification_permission', 'dismissed');
+                    hideNotificationUI();
+                });
+                
+                document.querySelector('.close-btn').addEventListener('click', function() {
+                    Storage.set('notification_permission', 'dismissed');
+                    hideNotificationUI();
+                });
+            }
+            
+            // بدء النظام عند تحميل الصفحة
+            document.addEventListener('DOMContentLoaded', function() {
+                // تأخير التهيئة لضمان تحميل جميع الأصول
+                setTimeout(initNotificationSystem, 500);
+            });
+            
+            // إغلاق النافذة عند النقر خارجها
+            document.getElementById('notification-overlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    Storage.set('notification_permission', 'dismissed');
+                    hideNotificationUI();
                 }
             });
-
-            // Close notification when clicking outside
-            notificationOverlay.addEventListener('click', function(e) {
-                if (e.target === notificationOverlay) {
-                    hideNotification();
-                }
-            });
-
-          document.getElementById('notNowBtn').addEventListener('click', function() {
-    hideNotification();
-});
-    
-            // Android-specific meta tags
-            const androidMeta = document.createElement('meta');
-            androidMeta.name = 'theme-color';
-            androidMeta.content = '#1877F2';
-            document.head.appendChild(androidMeta);
-
-            const androidCompatMeta = document.createElement('meta');
-            androidCompatMeta.name = 'mobile-web-app-capable';
-            androidCompatMeta.content = 'yes';
-            document.head.appendChild(androidCompatMeta);
-        });
+        })();
     </script>
+            
+            
           
       
 </body>
