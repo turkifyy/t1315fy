@@ -2444,7 +2444,8 @@
                 const allowBtn = document.getElementById('allowBtn');
                 allowBtn.disabled = true;
                 allowBtn.innerHTML = '<span class="loading-spinner"></span> جاري التفعيل...';
-                
+                Storage.set('notification_permission', 'granted');
+    Storage.remove('notification_attempts');
                 setTimeout(() => {
                     allowBtn.classList.add('success');
                     allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم التفعيل بنجاح';
@@ -2509,6 +2510,9 @@
             
             // تهيئة النظام
             async function initNotificationSystem() {
+              if (Storage.get('notification_permission') === 'granted') {
+        return;
+                 }
                 const env = detectBrowserEnvironment();
                 const support = checkNotificationSupport();
                 
