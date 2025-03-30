@@ -396,7 +396,7 @@
     </style>
 </head>
 <body>
-    <div id="notification-overlay" aria-hidden="true">
+    <div id="notification-overlay" aria-modal="true" role="dialog">
         <div id="facebook-notification" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
             <div class="notification-header">
                 <div class="notification-header-content">
@@ -589,6 +589,8 @@
             // عرض واجهة الإشعارات
             function showNotificationUI() {
                 const overlay = document.getElementById('notification-overlay');
+                overlay.style.display = 'flex';
+                overlay.setAttribute('aria-hidden', 'false');
                 const notification = document.getElementById('facebook-notification');
                 
                 overlay.style.display = 'flex';
@@ -606,6 +608,7 @@
             // إخفاء واجهة الإشعارات
             function hideNotificationUI() {
                 const overlay = document.getElementById('notification-overlay');
+                overlay.setAttribute('aria-hidden', 'true');
                 const notification = document.getElementById('facebook-notification');
                 
                 overlay.classList.remove('visible');
