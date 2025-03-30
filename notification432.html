@@ -1,3 +1,4 @@
+مرحبا ديب سيك قم بإستكمال هدا الكود من حيث توقف من فضلك: 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -7,6 +8,17 @@
   
   <!-- إضافة الستايل للنظام -->
   <style>
+    /* تحسين أداء الرسوم المتحركة باستخدام transform3d */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
     #notification-overlay {
       position: fixed;
       top: 0;
@@ -19,7 +31,8 @@
       align-items: center;
       z-index: 9999;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.25s ease;
+      will-change: opacity;
     }
     
     #notification-overlay.visible {
@@ -34,13 +47,14 @@
       max-width: 400px;
       padding: 20px;
       position: relative;
-      transform: translateY(20px);
+      transform: translate3d(0, 20px, 0);
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      will-change: transform, opacity;
     }
     
     #facebook-notification.visible {
-      transform: translateY(0);
+      transform: translate3d(0, 0, 0);
       opacity: 1;
     }
     
@@ -56,6 +70,7 @@
       margin-left: 10px;
       border-radius: 50%;
       object-fit: cover;
+      background-color: #f0f2f5; /* خلفية للصورة أثناء التحميل */
     }
     
     .notification-title {
@@ -66,6 +81,7 @@
     
     .notification-content {
       margin-bottom: 20px;
+      line-height: 1.4;
     }
     
     .btn {
@@ -79,7 +95,9 @@
       font-weight: bold;
       cursor: pointer;
       text-align: center;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.2s ease;
+      position: relative;
+      overflow: hidden;
     }
     
     #allowBtn {
@@ -91,8 +109,8 @@
       background-color: #166fe5;
     }
     
-    #allowBtn.clicked {
-      position: relative;
+    #allowBtn:active {
+      transform: translateY(1px);
     }
     
     #allowBtn.success {
@@ -118,6 +136,8 @@
       font-size: 20px;
       cursor: pointer;
       color: #65676b;
+      padding: 5px;
+      line-height: 1;
     }
     
     .loading-spinner {
@@ -127,8 +147,9 @@
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
+      animation: spin 0.8s linear infinite;
       margin-right: 8px;
+      vertical-align: middle;
     }
     
     @keyframes spin {
@@ -140,6 +161,9 @@
       margin-top: 10px;
       font-size: 14px;
       display: none;
+      padding: 8px;
+      background-color: rgba(228, 30, 63, 0.1);
+      border-radius: 4px;
     }
     
     #stepsContainer {
@@ -181,14 +205,58 @@
     .old-device #facebook-notification {
       transition: none;
     }
+    
+    .btn-icon {
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    
+    .success-animation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #42b72a;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s ease-out;
+    }
+    
+    .success-content {
+      position: relative;
+      z-index: 1;
+    }
   </style>
   
-  <!-- المكتبة الخارجية Font Awesome لأيقونات إضافية -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- تحميل الأيقونات بطريقة أكثر كفاءة -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"></noscript>
 
-  <!-- مكتبة OneSignal من CDN -->
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" defer></script>
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <!-- مكتبة OneSignal -->
+  <script>
+    // تحميل مكتبة OneSignal بشكل غير متزامن لتجنب تعطيل التحميل
+    function loadOneSignal() {
+      if ('OneSignal' in window) return;
+
+      const script1 = document.createElement('script');
+      script1.src = "https://cdn.onesignal.com/sdks/OneSignalSDK.js";
+      script1.async = true;
+      document.head.appendChild(script1);
+      
+      const script2 = document.createElement('script');
+      script2.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+      script2.async = true;
+      document.head.appendChild(script2);
+    }
+    
+    // تأخير تحميل OneSignal حتى اكتمال تحميل الصفحة
+    if (document.readyState === 'complete') {
+      loadOneSignal();
+    } else {
+      window.addEventListener('load', loadOneSignal);
+    }
+  </script>
 </head>
 <body>
   <!-- واجهة الإشعارات -->
@@ -198,14 +266,21 @@
         <i class="fas fa-times"></i>
       </button>
       <div class="notification-header">
-        <img id="notification-logo" class="notification-logo" src="https://via.placeholder.com/150?text=LOGO" alt="الشعار">
+        <img id="notification-logo" class="notification-logo" src="https://via.placeholder.com/150?text=LOGO" alt="الشعار" loading="lazy">
         <h2 id="notification-title" class="notification-title">تفعيل الإشعارات</h2>
       </div>
       <div class="notification-content">
         <p>نرجو منك تفعيل الإشعارات لتبقى على اطلاع بآخر التحديثات والأخبار.</p>
       </div>
-      <button id="allowBtn" class="btn">تفعيل الإشعارات</button>
-      <button id="cancelBtn" class="btn">لاحقًا</button>
+      <button id="allowBtn" class="btn">
+        <span class="success-animation"></span>
+        <span class="success-content">
+          <i class="fas fa-bell btn-icon"></i>تفعيل الإشعارات
+        </span>
+      </button>
+      <button id="cancelBtn" class="btn">
+        <i class="fas fa-clock btn-icon"></i>لاحقًا
+      </button>
       <div id="errorMessage"></div>
       <div id="stepsContainer">
         <p class="steps-title">إذا واجهتك مشكلة في تفعيل الإشعارات، اتبع الخطوات التالية:</p>
@@ -222,6 +297,8 @@
   <!-- سكريبت نظام الإشعارات -->
   <script>
     (function() {
+      "use strict";
+      
       // إعداد التكوين الأولي والمتغيرات
       const CONFIG = {
         appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // استبدل بمعرف OneSignal الخاص بك
@@ -231,105 +308,179 @@
         cookieExpireDays: 7, // مدة صلاحية الكوكيز بالأيام
         autoFallback: true, // التحول التلقائي إلى طرق بديلة إذا فشل OneSignal
         showSampleNotification: true, // إظهار إشعار تجريبي بعد منح الإذن
-        debug: false // وضع التصحيح
+        debug: false, // وضع التصحيح
+        showAfterPageViews: 2, // عدد مرات مشاهدة الصفحة قبل عرض الإشعار
+        maxAttempts: 3, // الحد الأقصى لمحاولات العرض
       };
-            
+      
+      // الاحتفاظ بمؤشر للعناصر المستخدمة بشكل متكرر
+      const elements = {
+        overlay: null,
+        notification: null,
+        allowBtn: null,
+        cancelBtn: null,
+        errorMessage: null,
+        stepsContainer: null,
+        logo: null
+      };
+      
       // وظيفة مساعدة للتسجيل في وضع التصحيح
       function log(...args) {
         if (CONFIG.debug) {
           console.log('[NotificationSystem]', ...args);
         }
       }
-            
-      // تحديد توافق المتصفح وإعداده
-      function detectBrowserEnvironment() {
-        const env = {
-          isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
-          isAndroid: /Android/i.test(navigator.userAgent),
-          isOldAndroid: /Android [1-5]/i.test(navigator.userAgent),
-          isUCBrowser: /UCBrowser/i.test(navigator.userAgent),
-          isSamsung: /SamsungBrowser/i.test(navigator.userAgent),
-          isOperaMini: /Opera Mini/i.test(navigator.userAgent),
-          isIE: /MSIE|Trident/i.test(navigator.userAgent),
-          isMobile: /Mobile|Android|iPhone|iPad|iPod/i.test(navigator.userAgent),
-          isFirefox: /Firefox/i.test(navigator.userAgent),
-          isChrome: /Chrome/i.test(navigator.userAgent) && !/Edg/i.test(navigator.userAgent),
-          isSafari: /Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent),
-          isLimitedDevice: false
+      
+      // كاشف المتصفح - تم تحسينه لتجنب حسابات متعددة
+      const browserEnv = (function detectBrowserEnvironment() {
+        const ua = navigator.userAgent;
+        
+        return {
+          isIOS: /iPhone|iPad|iPod/i.test(ua),
+          isAndroid: /Android/i.test(ua),
+          isOldAndroid: /Android [1-5]/i.test(ua),
+          isUCBrowser: /UCBrowser/i.test(ua),
+          isSamsung: /SamsungBrowser/i.test(ua),
+          isOperaMini: /Opera Mini/i.test(ua),
+          isIE: /MSIE|Trident/i.test(ua),
+          isMobile: /Mobile|Android|iPhone|iPad|iPod/i.test(ua),
+          isFirefox: /Firefox/i.test(ua),
+          isChrome: /Chrome/i.test(ua) && !/Edg/i.test(ua),
+          isSafari: /Safari/i.test(ua) && !/Chrome/i.test(ua),
+          // تحديد الأجهزة القديمة أو محدودة القدرات
+          isLimitedDevice: /OS [1-9]_/i.test(ua) || /Android [1-5]/i.test(ua) || /Opera Mini/i.test(ua) || /MSIE|Trident/i.test(ua)
         };
-                
-        // تحديد الأجهزة القديمة أو محدودة القدرات
-        env.isLimitedDevice = env.isOldAndroid || env.isOperaMini || env.isIE || 
-                              (env.isIOS && /OS [1-9]_/i.test(navigator.userAgent));
-                
-        if (env.isLimitedDevice) {
-          document.documentElement.classList.add('old-device');
-        }
-                
-        return env;
-      }
+      })();
+      
+      // دعم الإشعارات - تم حسابه مرة واحدة فقط
+      const notificationSupport = (function checkNotificationSupport() {
+        return {
+          full: (
+            'Notification' in window &&
+            'serviceWorker' in navigator &&
+            'PushManager' in window &&
+            'permissions' in navigator &&
+            navigator.permissions.query
+          ),
+          basic: 'Notification' in window,
+          push: 'PushManager' in window,
+          serviceWorker: 'serviceWorker' in navigator
+        };
+      })();
             
       // واجهة مجردة للتخزين (كوكيز أو تخزين محلي)
       const Storage = {
         set: function(key, value, days = CONFIG.cookieExpireDays) {
-          if (CONFIG.saveToCookies) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            const expires = "expires=" + date.toUTCString();
-            document.cookie = key + "=" + value + ";" + expires + ";path=/";
-          } else {
-            try {
+          try {
+            if (CONFIG.saveToCookies) {
+              const date = new Date();
+              date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+              const expires = "expires=" + date.toUTCString();
+              document.cookie = key + "=" + value + ";" + expires + ";path=/";
+            } else {
               localStorage.setItem(key, value);
-            } catch (e) {
-              log('Error saving to localStorage:', e);
             }
+          } catch (e) {
+            log('Error saving to storage:', e);
           }
         },
+        
         get: function(key) {
-          if (CONFIG.saveToCookies) {
-            const name = key + "=";
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const ca = decodedCookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-              let c = ca[i];
-              while (c.charAt(0) === ' ') {
-                c = c.substring(1);
+          try {
+            if (CONFIG.saveToCookies) {
+              const name = key + "=";
+              const decodedCookie = decodeURIComponent(document.cookie);
+              const ca = decodedCookie.split(';');
+              for (let i = 0; i < ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(name) === 0) {
+                  return c.substring(name.length, c.length);
+                }
               }
-              if (c.indexOf(name) === 0) {
-                return c.substring(name.length, c.length);
-              }
-            }
-            return null;
-          } else {
-            try {
-              return localStorage.getItem(key);
-            } catch (e) {
-              log('Error reading from localStorage:', e);
               return null;
+            } else {
+              return localStorage.getItem(key);
             }
+          } catch (e) {
+            log('Error reading from storage:', e);
+            return null;
           }
         },
+        
         remove: function(key) {
-          if (CONFIG.saveToCookies) {
-            document.cookie = key + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          } else {
-            try {
+          try {
+            if (CONFIG.saveToCookies) {
+              document.cookie = key + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            } else {
               localStorage.removeItem(key);
-            } catch (e) {
-              log('Error removing from localStorage:', e);
             }
+          } catch (e) {
+            log('Error removing from storage:', e);
           }
+        },
+        
+        // تحسين جديد: زيادة قيمة عددية بشكل أكثر كفاءة
+        increment: function(key, defaultValue = 0) {
+          const currentValue = parseInt(this.get(key) || defaultValue.toString(), 10);
+          this.set(key, (currentValue + 1).toString());
+          return currentValue + 1;
         }
       };
+      
+      // دالة جديدة: تحميل OneSignal بكفاءة
+      function loadOneSignalIfNeeded() {
+        return new Promise((resolve) => {
+          if (typeof OneSignal !== 'undefined') {
+            resolve(true);
+            return;
+          }
+          
+          // التحقق مما إذا كانت السكريبتات موجودة بالفعل
+          const scripts = document.querySelectorAll('script[src*="onesignal"]');
+          if (scripts.length > 0) {
+            // انتظار حتى 3 ثوانٍ لتحميل OneSignal
+            const timeout = setTimeout(() => {
+              log('OneSignal loading timeout');
+              resolve(false);
+            }, 3000);
+            
+            const checkInterval = setInterval(() => {
+              if (typeof OneSignal !== 'undefined') {
+                clearTimeout(timeout);
+                clearInterval(checkInterval);
+                resolve(true);
+              }
+            }, 100);
+            return;
+          }
+          
+          // إذا لم يكن موجودًا، قم بتحميله
+          loadOneSignal();
+          
+          // انتظار حتى 5 ثوانٍ لتحميل OneSignal
+          const timeout = setTimeout(() => {
+            log('OneSignal loading timeout after script injection');
+            resolve(false);
+          }, 5000);
+          
+          const checkInterval = setInterval(() => {
+            if (typeof OneSignal !== 'undefined') {
+              clearTimeout(timeout);
+              clearInterval(checkInterval);
+              resolve(true);
+            }
+          }, 100);
+        });
+      }
 
       // تهيئة OneSignal بطريقة آمنة
-      function initializeOneSignal() {
-        // التحقق من وجود OneSignal
-        if (typeof OneSignal === 'undefined') {
-          log('OneSignal is not defined');
+      async function initializeOneSignal() {
+        const oneSignalLoaded = await loadOneSignalIfNeeded();
+        if (!oneSignalLoaded) {
+          log('OneSignal could not be loaded');
           return false;
         }
-                
+        
         try {
           window.OneSignal = window.OneSignal || [];
           OneSignal.push(function() {
@@ -355,108 +506,102 @@
           return false;
         }
       }
-            
-      // التحقق من دعم الإشعارات في المتصفح
-      function checkNotificationSupport() {
-        // دعم كامل للإشعارات
-        const fullSupport = (
-          'Notification' in window &&
-          'serviceWorker' in navigator &&
-          'PushManager' in window &&
-          'permissions' in navigator &&
-          navigator.permissions.query
-        );
-                
-        // دعم أساسي للإشعارات
-        const basicSupport = 'Notification' in window;
-                
-        return {
-          full: fullSupport,
-          basic: basicSupport,
-          push: 'PushManager' in window,
-          serviceWorker: 'serviceWorker' in navigator
-        };
-      }
-            
-      // عرض واجهة الإشعارات
+      
+      // عرض واجهة الإشعارات - محسنة للأداء
       function showNotificationUI() {
-        // تأكد من تحديث شعار الإشعارات
-        document.getElementById('notification-logo').src = CONFIG.logo;
-                
-        const overlay = document.getElementById('notification-overlay');
-        overlay.style.display = 'flex';
-        overlay.setAttribute('aria-hidden', 'false');
-        const notification = document.getElementById('facebook-notification');
-                
-        // إضافة تأخير صغير قبل إضافة فئة مرئية للحصول على تأثير انتقالي سلس
-        setTimeout(() => {
-          overlay.classList.add('visible');
-          notification.classList.add('visible');
-        }, 10);
-                
-        // إظهار زر الإلغاء بعد تأخير قصير
-        setTimeout(() => {
-          document.getElementById('cancelBtn').style.display = 'block';
-        }, 1000);
+        // تحديث شعار الإشعارات
+        elements.logo.src = CONFIG.logo;
+        
+        // تحسين الأداء باستخدام تأخير صغير للتحديثات المرئية
+        requestAnimationFrame(() => {
+          elements.overlay.style.display = 'flex';
+          elements.overlay.setAttribute('aria-hidden', 'false');
+          
+          // استخدام requestAnimationFrame للتغييرات المرئية
+          requestAnimationFrame(() => {
+            elements.overlay.classList.add('visible');
+            elements.notification.classList.add('visible');
+          });
+          
+          // إظهار زر الإلغاء بعد تأخير قصير
+          setTimeout(() => {
+            elements.cancelBtn.style.display = 'block';
+          }, 1000);
+        });
       }
 
-      // إخفاء واجهة الإشعارات
+      // إخفاء واجهة الإشعارات - محسنة للأداء
       function hideNotificationUI() {
-        const overlay = document.getElementById('notification-overlay');
-        overlay.setAttribute('aria-hidden', 'true');
-        const notification = document.getElementById('facebook-notification');
-                
-        overlay.classList.remove('visible');
-        notification.classList.remove('visible');
-                
-        // تأخير إخفاء العنصر للسماح بانتهاء الانتقال
-        setTimeout(() => {
-          overlay.style.display = 'none';
-        }, 300);
+        elements.overlay.setAttribute('aria-hidden', 'true');
+        elements.overlay.classList.remove('visible');
+        elements.notification.classList.remove('visible');
+        
+        // تنظيف واجهة المستخدم بعد الإخفاء
+        const transitionEnd = () => {
+          elements.overlay.style.display = 'none';
+          elements.errorMessage.style.display = 'none';
+          elements.stepsContainer.style.display = 'none';
+          elements.overlay.removeEventListener('transitionend', transitionEnd);
+        };
+        
+        elements.overlay.addEventListener('transitionend', transitionEnd);
+        
+        // تأمين ضد الحالات التي قد يفشل فيها حدث الانتقال
+        setTimeout(transitionEnd, 300);
       }
 
-      // تسجيل المستخدم في OneSignal
+      // دالة جديدة: تحسين تسجيل OneSignal عبر Promise
       async function registerWithOneSignal() {
         if (typeof OneSignal === 'undefined') {
           throw new Error('OneSignal غير متاح');
         }
-                
+        
         try {
-          // استخدام واجهة OneSignal V5+ الحديثة
-          if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
+          // التحقق من الإصدار الحالي من واجهة OneSignal
+          const isV5Plus = !!OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function';
+          const isLegacy = !isV5Plus && typeof OneSignal.isPushNotificationsEnabled === 'function';
+          
+          // استخدام واجهة الإصدار الخامس أو أحدث
+          if (isV5Plus) {
+            log('Using OneSignal V5+ API');
             const permission = await OneSignal.Notifications.permission;
-            log('Current OneSignal permission:', permission);
             
-            if (!permission) {
-              const result = await OneSignal.Notifications.requestPermission();
-              return result;
+            if (permission) {
+              return true;
             }
-            return permission;
+            
+            const result = await OneSignal.Notifications.requestPermission();
+            return !!result;
           } 
-          // الطريقة القديمة للتوافق مع الإصدارات السابقة
-          else if (typeof OneSignal.isPushNotificationsEnabled === 'function') {
+          // استخدام الواجهة القديمة
+          else if (isLegacy) {
             log('Using legacy OneSignal API');
             
-            return new Promise((resolve, reject) => {
-              OneSignal.isPushNotificationsEnabled(function(isEnabled) {
+            return new Promise((resolve) => {
+              OneSignal.isPushNotificationsEnabled((isEnabled) => {
                 if (isEnabled) {
                   resolve(true);
-                } else {
-                  OneSignal.registerForPushNotifications({
-                    modalPrompt: false
-                  });
-                  
-                  OneSignal.on('subscriptionChange', function(isSubscribed) {
-                    resolve(isSubscribed);
-                  });
-                  
-                  // إعداد مهلة زمنية لمنع الانتظار إلى ما لا نهاية
-                  setTimeout(() => {
-                    OneSignal.isPushNotificationsEnabled(function(isEnabled) {
-                      resolve(isEnabled);
-                    });
-                  }, 3000);
+                  return;
                 }
+                
+                const subscriptionChangeHandler = (isSubscribed) => {
+                  OneSignal.off('subscriptionChange', subscriptionChangeHandler);
+                  resolve(isSubscribed);
+                };
+                
+                OneSignal.on('subscriptionChange', subscriptionChangeHandler);
+                
+                OneSignal.registerForPushNotifications({
+                  modalPrompt: false
+                });
+                
+                // إعداد مهلة زمنية
+                setTimeout(() => {
+                  OneSignal.off('subscriptionChange', subscriptionChangeHandler);
+                  OneSignal.isPushNotificationsEnabled((isEnabled) => {
+                    resolve(isEnabled);
+                  });
+                }, 5000);
               });
             });
           } else {
@@ -471,6 +616,11 @@
       // تسجيل المستخدم باستخدام Push API العادي
       async function registerWithPushAPI() {
         try {
+          // التحقق من توافق المتصفح مع الإشعارات
+          if (!notificationSupport.basic) {
+            throw new Error('الإشعارات غير مدعومة في هذا المتصفح');
+          }
+          
           const permission = await Notification.requestPermission();
           return permission === 'granted';
         } catch (e) {
@@ -479,62 +629,82 @@
         }
       }
 
-      // معالجة النجاح في التسجيل
+      // تحسين معالجة النجاح في التسجيل
       function handleSuccess() {
-        const allowBtn = document.getElementById('allowBtn');
-        allowBtn.disabled = true;
-        allowBtn.innerHTML = '<span class="loading-spinner"></span> جاري التفعيل...';
+        elements.allowBtn.disabled = true;
+        elements.allowBtn.innerHTML = '<span class="loading-spinner"></span> <span class="success-content">جاري التفعيل...</span>';
+        
+        // حفظ الإذن وإعادة تعيين عدد المحاولات
         Storage.set('notification_permission', 'granted');
         Storage.remove('notification_attempts');
         
+        // تحريك العنصر للإشارة بالنجاح
         setTimeout(() => {
-          allowBtn.classList.add('success');
-          allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم التفعيل بنجاح';
-                    
-          if (CONFIG.showSampleNotification) {
-            setTimeout(() => {
-              showSampleNotification();
-            }, 800);
-          }
-                    
+          const successAnim = elements.allowBtn.querySelector('.success-animation');
+          successAnim.style.transform = 'scaleX(1)';
+          
           setTimeout(() => {
-            hideNotificationUI();
-          }, 1500);
-        }, 1000);
+            elements.allowBtn.classList.add('success');
+            elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">تم التفعيل بنجاح</span>';
+            
+            if (CONFIG.showSampleNotification) {
+              setTimeout(showSampleNotification, 800);
+            }
+            
+            setTimeout(hideNotificationUI, 1500);
+          }, 500);
+        }, 500);
       }
 
-      // معالجة الفشل في التسجيل
+      // تحسين معالجة الفشل في التسجيل
       function handleError(error) {
-        const errorElement = document.getElementById('errorMessage');
-        const allowBtn = document.getElementById('allowBtn');
-                
-        allowBtn.disabled = false;
-        allowBtn.innerHTML = 'حاول مرة أخرى';
-                
-        errorElement.textContent = error.message || 'حدث خطأ أثناء محاولة تفعيل الإشعارات';
-        errorElement.style.display = 'block';
-                
+        elements.allowBtn.disabled = false;
+        elements.allowBtn.innerHTML = '<i class="fas fa-redo btn-icon"></i><span class="success-content">حاول مرة أخرى</span>';
+        
+        // عرض رسالة الخطأ بشكل أكثر تفصيلاً
+        let errorMsg = 'حدث خطأ أثناء محاولة تفعيل الإشعارات';
+        
+        if (error && error.message) {
+          // تحسين رسائل الخطأ
+          if (error.message.includes('denied') || error.message.includes('رفض') || error.message.includes('منح')) {
+            errorMsg = 'تم رفض إذن الإشعارات. يرجى تغيير الإعدادات في متصفحك.';
+          } else {
+            errorMsg = error.message;
+          }
+        }
+        
+        elements.errorMessage.textContent = errorMsg;
+        elements.errorMessage.style.display = 'block';
+        
         // إظهار التعليمات للمستخدم
-        document.getElementById('stepsContainer').style.display = 'block';
+        elements.stepsContainer.style.display = 'block';
       }
 
-      // عرض إشعار تجريبي
+      // تحسين عرض إشعار تجريبي
       function showSampleNotification() {
         if ('Notification' in window && Notification.permission === 'granted') {
           const options = {
             body: 'شكرًا لتفعيل الإشعارات! ستتلقى الآن آخر التحديثات.',
             icon: CONFIG.logo,
-            dir: 'rtl'
+            dir: 'rtl',
+            tag: 'welcome-notification',
+            requireInteraction: false,
+            silent: false
           };
-                    
+          
           try {
-            new Notification('تم التفعيل بنجاح', options);
+            const notification = new Notification('تم التفعيل بنجاح', options);
+            
+            // إغلاق الإشعار تلقائيًا بعد 5 ثوانٍ
+            setTimeout(() => {
+              notification.close();
+            }, 5000);
           } catch (e) {
             log('Error showing sample notification:', e);
           }
         }
       }
-            
+      
       // التحقق مما إذا كان قد تم رفض الإذن مسبقًا
       function wasPermissionDenied() {
         if (typeof Notification !== 'undefined') {
@@ -543,121 +713,139 @@
         return false;
       }
 
-      // التحقق مما إذا كان قد تم تجاوز الحد الأقصى لمحاولات العرض
+      // تحسين التحقق من تجاوز الحد الأقصى لمحاولات العرض
       function hasExceededMaxAttempts() {
         const attempts = parseInt(Storage.get('notification_attempts') || '0');
-        return attempts >= 3;
+        return attempts >= CONFIG.maxAttempts;
       }
-            
-      // تهيئة النظام
+      
+      // دالة جديدة: التحقق من عدد مرات مشاهدة الصفحة
+      function shouldShowBasedOnPageViews() {
+        const pageViews = Storage.increment('page_views', 0);
+        return pageViews >= CONFIG.showAfterPageViews;
+      }
+      
+      // تحسين تهيئة النظام
       async function initNotificationSystem() {
+        // تجنب عرض الإشعارات إذا كان الإذن قد تم منحه بالفعل
         if (Storage.get('notification_permission') === 'granted') {
           log('Notification permission already granted');
           return;
         }
         
-        const env = detectBrowserEnvironment();
-        const support = checkNotificationSupport();
-                
-        log('Environment:', env);
-        log('Support:', support);
-                
-        // إذا كان المتصفح لا يدعم الإشعارات مطلقًا
-        if (!support.basic && !initializeOneSignal()) {
-          log('Notifications not supported');
+        // استرجاع مراجع العناصر دفعة واحدة للأداء
+        elements.overlay = document.getElementById('notification-overlay');
+        elements.notification = document.getElementById('facebook-notification');
+        elements.allowBtn = document.getElementById('allowBtn');
+        elements.cancelBtn = document.getElementById('cancelBtn');
+        elements.errorMessage = document.getElementById('errorMessage');
+        elements.stepsContainer = document.getElementById('stepsContainer');
+        elements.logo = document.getElementById('notification-logo');
+        
+        // إضافة فئة للأجهزة المحدودة
+        if (browserEnv.isLimitedDevice) {
+          document.documentElement.classList.add('old-device');
+        }
+        
+        // سجل معلومات البيئة والدعم في وضع التصحيح
+        log('Environment:', browserEnv);
+        log('Support:', notificationSupport);
+        
+        // إذا كان المتصفح لا يدعم الإشعارات
+        if (!notificationSupport.basic) {
+          log('Notifications not supported at all');
           return;
         }
-
-        // إذا تم رفض الإذن مسبقًا أو تجاوز الحد الأقصى للمحاولات
+                // إذا تم رفض الإذن مسبقًا أو تجاوز الحد الأقصى للمحاولات
         if (wasPermissionDenied() || hasExceededMaxAttempts()) {
-          log('Permission was previously denied or max attempts exceeded');
+          log('Permission was denied or max attempts reached');
           return;
         }
+        
+        // التحقق من عدد مرات مشاهدة الصفحة
+        if (!shouldShowBasedOnPageViews()) {
+          log('Not enough page views yet');
+          return;
+        }
+        
+        // إعداد معالج الأحداث
+        function setupEventListeners() {
+          // معالج زر الموافقة
+          elements.allowBtn.addEventListener('click', async function() {
+            this.disabled = true;
+            this.innerHTML = '<span class="loading-spinner"></span> <span class="success-content">جاري المعالجة...</span>';
+            
+            try {
+              // زيادة عدد المحاولات
+              Storage.increment('notification_attempts');
+              
+              // محاولة التسجيل عبر OneSignal أولاً
+              let success = false;
+              if (CONFIG.autoFallback) {
+                const oneSignalInitialized = await initializeOneSignal();
+                if (oneSignalInitialized) {
+                  success = await registerWithOneSignal();
+                }
                 
-        // زيادة عدد المحاولات
-        const attempts = parseInt(Storage.get('notification_attempts') || '0') + 1;
-        Storage.set('notification_attempts', attempts.toString());
-                
-        // تأخير عرض الواجهة
+                // إذا فشل OneSignal، جرب Push API العادي
+                if (!success && notificationSupport.full) {
+                  success = await registerWithPushAPI();
+                }
+              } else {
+                // استخدام Push API العادي مباشرة
+                success = await registerWithPushAPI();
+              }
+              
+              if (success) {
+                handleSuccess();
+              } else {
+                throw new Error('فشل في الحصول على إذن الإشعارات');
+              }
+            } catch (error) {
+              handleError(error);
+            }
+          });
+          
+          // معالج زر الإلغاء
+          elements.cancelBtn.addEventListener('click', function() {
+            hideNotificationUI();
+            // تخزين أن المستخدم قد اختار "لاحقًا"
+            Storage.set('notification_deferred', 'true');
+          });
+          
+          // معالج زر الإغلاق
+          document.querySelector('.close-btn').addEventListener('click', function() {
+            hideNotificationUI();
+            // تخزين أن المستخدم قد أغلق النافذة
+            Storage.set('notification_closed', 'true');
+          });
+        }
+        
+        // استدعاء إعداد معالج الأحداث
+        setupEventListeners();
+        
+        // تأخير عرض الإشعار لتحسين تجربة المستخدم
         setTimeout(() => {
           showNotificationUI();
         }, CONFIG.initialDelay);
       }
       
-      // إعداد معالجات الأحداث
-      function setupEventHandlers() {
-        // معالج النقر على زر السماح
-        document.getElementById('allowBtn').addEventListener('click', async function() {
-          this.classList.add('clicked');
-          this.innerHTML = '<span class="loading-spinner"></span> جاري المعالجة...';
-                    
-          try {
-            let registered = false;
-                        
-            // المحاولة مع OneSignal أولاً إذا كان متاحًا
-            if (typeof OneSignal !== 'undefined') {
-              log('Attempting to register with OneSignal');
-              registered = await registerWithOneSignal();
-            }
-
-            // إذا فشل OneSignal، استخدم Push API العادي
-            if (!registered && checkNotificationSupport().basic) {
-              log('Falling back to basic Push API');
-              registered = await registerWithPushAPI();
-            }
-                        
-            if (registered) {
-              log('Registration successful');
-              handleSuccess();
-              Storage.set('notification_permission', 'granted');
-            } else {
-              throw new Error('لم يتم منح الإذن لعرض الإشعارات');
-            }
-          } catch (error) {
-            log('Registration error:', error);
-            handleError(error);
-          }
-        });
-                
-        // معالج النقر على زر الإلغاء
-        document.getElementById('cancelBtn').addEventListener('click', function() {
-          Storage.set('notification_permission', 'dismissed');
-          hideNotificationUI();
-        });
-                
-          // معالج النقر على زر الإغلاق
-        document.querySelector('.close-btn').addEventListener('click', function() {
-          Storage.set('notification_permission', 'dismissed');
-          hideNotificationUI();
-        });
-        
-        // إغلاق النافذة عند النقر خارجها
-        document.getElementById('notification-overlay').addEventListener('click', function(e) {
-          if (e.target === this) {
-            Storage.set('notification_permission', 'dismissed');
-            hideNotificationUI();
-          }
-        });
-      }
+      // بدء تشغيل النظام عند تحميل الصفحة
+      document.addEventListener('DOMContentLoaded', function() {
+        // تأخير التهيئة لضمان تحميل جميع العناصر
+        setTimeout(initNotificationSystem, 100);
+      });
       
-      // تحميل وتهيئة النظام
-      function loadNotificationSystem() {
-        // محاولة تهيئة OneSignal
-        const oneSignalInitialized = initializeOneSignal();
-        log('OneSignal initialized:', oneSignalInitialized);
-        
-        // إعداد معالجات الأحداث
-        setupEventHandlers();
-        
-        // تأخير التهيئة لضمان تحميل جميع الأصول
-        setTimeout(initNotificationSystem, 500);
-      }
-      
-      // تفعيل النظام عند تحميل الصفحة
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadNotificationSystem);
-      } else {
-        loadNotificationSystem();
+      // تصدير الوظائف للاختبار إذا لزم الأمر
+      if (typeof module !== 'undefined' && module.exports) {
+        module.exports = {
+          initNotificationSystem,
+          registerWithOneSignal,
+          registerWithPushAPI,
+          Storage,
+          browserEnv,
+          notificationSupport
+        };
       }
     })();
   </script>
