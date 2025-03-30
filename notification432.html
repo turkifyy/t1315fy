@@ -1320,67 +1320,6 @@
             };
         })();
     </script>
-<script>
-   importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js'); 
-        // تسجيل Service Worker بشكل منفصل
-        document.addEventListener('DOMContentLoaded', function() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('https://turkify.netlify.app/service-worker.js').then((registration) => {
-                    console.log('Service Worker مسجل بنجاح:', registration.scope);
-                    
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                console.log('New content is available; please refresh.');
-                                
-                                // عرض رسالة للمستخدم عند وجود تحديث
-                                const showUpdateMessage = () => {
-                                    const updateMessage = document.createElement('div');
-                                    updateMessage.style.position = 'fixed';
-                                    updateMessage.style.bottom = '20px';
-                                    updateMessage.style.right = '20px';
-                                    updateMessage.style.left = '20px';
-                                    updateMessage.style.maxWidth = '500px';
-                                    updateMessage.style.margin = '0 auto';
-                                    updateMessage.style.padding = '15px';
-                                    updateMessage.style.backgroundColor = '#fff';
-                                    updateMessage.style.borderRadius = '8px';
-                                    updateMessage.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                                    updateMessage.style.zIndex = '100000';
-                                    updateMessage.style.textAlign = 'center';
-                                    updateMessage.innerHTML = `
-                                        <p style="margin-bottom: 15px;">تحديث جديد متاح! هل تريد تحميله الآن؟</p>
-                                        <button style="padding: 8px 16px; background: #1877F2; color: white; border: none; border-radius: 4px; margin-right: 10px; cursor: pointer;">نعم، تحديث</button>
-                                        <button style="padding: 8px 16px; background: #e4e6eb; color: #1c1e21; border: none; border-radius: 4px; cursor: pointer;">لاحقًا</button>
-                                    `;
-                                    
-                                    document.body.appendChild(updateMessage);
-                                    
-                                    const [updateBtn, laterBtn] = updateMessage.querySelectorAll('button');
-                                    
-                                    updateBtn.addEventListener('click', () => {
-                                        window.location.reload();
-                                    });
-                                    
-                                    laterBtn.addEventListener('click', () => {
-                                        document.body.removeChild(updateMessage);
-                                    });
-                                };
-                                
-                                showUpdateMessage();
-                            }
-                        });
-                    });
-                }).catch((error) => {
-                    console.error('فشل تسجيل Service Worker:', error);
-                });
-                
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    window.location.reload();
-                });
-            }
-        });
-</script>
+
 </body>
 </html>
