@@ -278,7 +278,7 @@
       const CONFIG = {
         appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // Replace with your OneSignal ID
         logo: "https://via.placeholder.com/150?text=LOGO", // Replace with your logo
-        initialDelay: 1500, // Delay before showing the prompt (ms)
+        initialDelay: 1000, // Reduced delay for better UX
         saveToCookies: false, // Use localStorage instead of cookies
         cookieExpireDays: 30, // Cookie expiration in days
         autoFallback: true, // Auto fallback to alternative methods
@@ -317,43 +317,66 @@
           isUCBrowser: /UCBrowser/i.test(ua),
           isSamsung: /SamsungBrowser/i.test(ua),
           isOperaMini: /Opera Mini/i.test(ua),
-          isIE: /MSIE|Trident/i.test(ua),
-          isMobile: /Mobile|Android|iPhone|iPad|iPod/i.test(ua),
+          isOpera: /Opera|OPR/i.test(ua),
+          isEdge: /Edg/i.test(ua),
           isFirefox: /Firefox/i.test(ua),
+          isYandex: /YaBrowser/i.test(ua),
           isChrome: /Chrome/i.test(ua) && !/Edg/i.test(ua),
           isSafari: /Safari/i.test(ua) && !/Chrome/i.test(ua),
-          isLimitedDevice: /OS [1-9]_/i.test(ua) || /Android [1-5]/i.test(ua) || /Opera Mini/i.test(ua) || /MSIE|Trident/i.test(ua)
+          isBrave: navigator.brave && navigator.brave.isBrave(),
+          isLimitedDevice: /OS [1-9]_/i.test(ua) || /Android [1-5]/i.test(ua) || /Opera Mini/i.test(ua)
         };
       })();
       
       // Notification support check (cached)
       const notificationSupport = (function checkNotificationSupport() {
+        // Enhanced support detection for various browsers
+        const isSupported = 'Notification' in window;
+        let isPermissionGranted = false;
+        
+        // Special handling for UC Browser
+        if (browserEnv.isUCBrowser) {
+          return {
+            full: false,
+            basic: isSupported,
+            push: false,
+            serviceWorker: false,
+            customPrompt: true // UC Browser needs custom prompt
+          };
+        }
+        
+        // Special handling for Brave browser
+        if (browserEnv.isBrave) {
+          return {
+            full: isSupported && 'serviceWorker' in navigator && 'PushManager' in window,
+            basic: isSupported,
+            push: 'PushManager' in window,
+            serviceWorker: 'serviceWorker' in navigator,
+            customPrompt: false
+          };
+        }
+        
+        // Standard detection for other browsers
         return {
           full: (
-            'Notification' in window &&
+            isSupported &&
             'serviceWorker' in navigator &&
             'PushManager' in window &&
             'permissions' in navigator &&
             navigator.permissions.query
           ),
-          basic: 'Notification' in window,
+          basic: isSupported,
           push: 'PushManager' in window,
-          serviceWorker: 'serviceWorker' in navigator
+          serviceWorker: 'serviceWorker' in navigator,
+          customPrompt: false
         };
       })();
             
       // Storage abstraction (optimized)
       const Storage = {
-        set: function(key, value, days = CONFIG.cookieExpireDays) {
+        set: function(key, value) {
           try {
-            if (CONFIG.saveToCookies) {
-              const date = new Date();
-              date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-              const expires = "expires=" + date.toUTCString();
-              document.cookie = key + "=" + value + ";" + expires + ";path=/";
-            } else {
-              localStorage.setItem(key, value);
-            }
+            localStorage.setItem(key, value);
           } catch (e) {
             log('Storage set error:', e);
           }
@@ -361,20 +384,7 @@
         
         get: function(key) {
           try {
-            if (CONFIG.saveToCookies) {
-              const name = key + "=";
-              const decodedCookie = decodeURIComponent(document.cookie);
-              const ca = decodedCookie.split(';');
-              for (let i = 0; i < ca.length; i++) {
-                let c = ca[i].trim();
-                if (c.indexOf(name) === 0) {
-                  return c.substring(name.length, c.length);
-                }
-              }
-              return null;
-            } else {
-              return localStorage.getItem(key);
-            }
+            return localStorage.getItem(key);
           } catch (e) {
             log('Storage get error:', e);
             return null;
@@ -383,11 +393,7 @@
         
         remove: function(key) {
           try {
-            if (CONFIG.saveToCookies) {
-              document.cookie = key + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            } else {
-              localStorage.removeItem(key);
-            }
+            localStorage.removeItem(key);
           } catch (e) {
             log('Storage remove error:', e);
           }
@@ -575,13 +581,32 @@
         }
       }
 
-      // Register with native Push API
+      // Register with native Push API (optimized for all browsers)
       async function registerWithPushAPI() {
         try {
           if (!notificationSupport.basic) {
             throw new Error('Notifications not supported');
           }
           
+          // Special handling for UC Browser
+          if (browserEnv.isUCBrowser) {
+            // UC Browser needs a click event to trigger the permission prompt
+            return new Promise((resolve) => {
+              const iframe = document.createElement('iframe');
+              iframe.style.display = 'none';
+              document.body.appendChild(iframe);
+              
+              iframe.contentWindow.Notification.requestPermission().then(permission => {
+                document.body.removeChild(iframe);
+                resolve(permission === 'granted');
+              }).catch(() => {
+                document.body.removeChild(iframe);
+                resolve(false);
+              });
+            });
+          }
+          
+          // Standard browsers
           const permission = await Notification.requestPermission();
           return permission === 'granted';
         } catch (e) {
@@ -590,35 +615,24 @@
         }
       }
 
-      // Handle success
+      // Handle success (simplified without processing state)
       function handleSuccess() {
+        // Immediately show browser's native permission prompt
         elements.allowBtn.disabled = true;
-        elements.allowBtn.innerHTML = '<span class="loading-spinner"></span> <span class="success-content">Processing...</span>';
+        elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">Enabled</span>';
         
+        // Store permission in localStorage
         Storage.set('notification_permission', 'granted');
         Storage.remove('notification_attempts');
         
-        setTimeout(() => {
-          const successAnim = elements.allowBtn.querySelector('.success-animation');
-          successAnim.style.transform = 'scaleX(1)';
-          
-          setTimeout(() => {
-            elements.allowBtn.classList.add('success');
-            elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">Enabled Successfully</span>';
-            
-            if (CONFIG.showSampleNotification) {
-              setTimeout(showSampleNotification, 800);
-            }
-            
-            setTimeout(hideNotificationUI, 1500);
-          }, 500);
-        }, 500);
+        // Hide the notification UI
+        setTimeout(hideNotificationUI, 500);
       }
 
       // Handle error
       function handleError(error) {
         elements.allowBtn.disabled = false;
-        elements.allowBtn.innerHTML = '<i class="fas fa-redo btn-icon"></i><span class="success-content">Try Again</span>';
+        elements.allowBtn.innerHTML = '<i class="fas fa-bell btn-icon"></i><span class="success-content">Allow Notifications</span>';
         
         let errorMsg = 'Error enabling notifications';
         
@@ -720,37 +734,26 @@
         }
         
         function setupEventListeners() {
+          // Allow button handler - simplified without processing state
           elements.allowBtn.addEventListener('click', async function() {
-            this.disabled = true;
-            this.innerHTML = '<span class="loading-spinner"></span> <span class="success-content">Processing...</span>';
-            
             try {
-              Storage.increment('notification_attempts');
+              // Immediately trigger the browser's permission prompt
+              const permission = await Notification.requestPermission();
               
-              let success = false;
-              if (CONFIG.autoFallback) {
-                const oneSignalInitialized = await initializeOneSignal();
-                if (oneSignalInitialized) {
-                  success = await registerWithOneSignal();
-                }
-                
-                if (!success && notificationSupport.full) {
-                  success = await registerWithPushAPI();
-                }
-              } else {
-                success = await registerWithPushAPI();
-              }
-              
-              if (success) {
+              if (permission === 'granted') {
                 handleSuccess();
+                if (CONFIG.showSampleNotification) {
+                  showSampleNotification();
+                }
               } else {
-                throw new Error('Failed to get notification permission');
+                throw new Error('Permission not granted');
               }
             } catch (error) {
               handleError(error);
             }
           });
           
+          // Cancel button handler - uses sessionStorage
           elements.cancelBtn.addEventListener('click', function() {
             hideNotificationUI();
             // Store in sessionStorage so it doesn't persist
@@ -760,6 +763,7 @@
         
         setupEventListeners();
         
+        // Show notification with reduced delay
         setTimeout(() => {
           showNotificationUI();
         }, CONFIG.initialDelay);
@@ -769,18 +773,6 @@
       document.addEventListener('DOMContentLoaded', function() {
         setTimeout(initNotificationSystem, 100);
       });
-      
-      // Export for testing if needed
-      if (typeof module !== 'undefined' && module.exports) {
-        module.exports = {
-          initNotificationSystem,
-          registerWithOneSignal,
-          registerWithPushAPI,
-          Storage,
-          browserEnv,
-          notificationSupport
-        };
-      }
     })();
   </script>
 </body>
