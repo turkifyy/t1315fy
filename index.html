@@ -978,14 +978,10 @@
       transition: none;
     }
   </style>
-    <!-- Preload icons efficiently -->
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"></noscript>       
-         <!-- OneSignal SDK -->
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" defer></script>
+           
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"></link>
+    
 </head>
 <body>
        <!-- Notification UI -->
@@ -2197,39 +2193,22 @@
           }, 100);
         });
       }
-        // Initialize OneSignal safely
-      async function initializeOneSignal() {
-        const oneSignalLoaded = await loadOneSignalIfNeeded();
-        if (!oneSignalLoaded) {
-          log('OneSignal failed to load');
-          return false;
-        }
-        
-        try {
-          window.OneSignal = window.OneSignal || [];
-          OneSignal.push(function() {
-            log('Initializing OneSignal...');
-            OneSignal.init({
-              appId: CONFIG.appId,
-              notifyButton: { enable: false },
-              allowLocalhostAsSecureOrigin: true,
-              autoRegister: false,
-              welcomeNotification: {
-                disable: true
-              },
-              promptOptions: {
-                slidedown: {
-                  enabled: false
-                }
-              }
-            });
-          });
-          return true;
-        } catch (e) {
-          log('OneSignal init error:', e);
-          return false;
-        }
-      }
+        async function initializeOneSignal() {
+  window.OneSignal = window.OneSignal || [];
+  
+  return new Promise((resolve) => {
+    window.OneSignal.push(function() {
+      OneSignal.init({
+        appId: CONFIG.appId,
+        notifyButton: false,
+        allowLocalhostAsSecureOrigin: true,
+        serviceWorkerParam: { scope: '/' },
+        serviceWorkerPath: 'OneSignalSDKWorker.js'
+      });
+      resolve(true);
+    });
+  });
+}
         // Show notification UI (optimized)
       function showNotificationUI() {
         elements.logo.src = CONFIG.logo;
@@ -2263,94 +2242,18 @@
       }
         // Register with OneSignal using Promise
       async function registerWithOneSignal() {
-        if (typeof OneSignal === 'undefined') {
-          throw new Error('OneSignal not available');
-        }
-        
-        try {
-          const isV5Plus = !!OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function';
-          const isLegacy = !isV5Plus && typeof OneSignal.isPushNotificationsEnabled === 'function';
-          
-          if (isV5Plus) {
-            log('Using OneSignal V5+ API');
-            const permission = await OneSignal.Notifications.permission;
-            
-            if (permission) {
-              return true;
-            }
-            
-            const result = await OneSignal.Notifications.requestPermission();
-            return !!result;
-          } 
-          else if (isLegacy) {
-            log('Using legacy OneSignal API');
-            
-            return new Promise((resolve) => {
-              OneSignal.isPushNotificationsEnabled((isEnabled) => {
-                if (isEnabled) {
-                  resolve(true);
-                  return;
-                }
-                
-                const subscriptionChangeHandler = (isSubscribed) => {
-                  OneSignal.off('subscriptionChange', subscriptionChangeHandler);
-                  resolve(isSubscribed);
-                };
-                  OneSignal.on('subscriptionChange', subscriptionChangeHandler);
-                
-                OneSignal.registerForPushNotifications({
-                  modalPrompt: false
-                });
-                
-                setTimeout(() => {
-                  OneSignal.off('subscriptionChange', subscriptionChangeHandler);
-                  OneSignal.isPushNotificationsEnabled((isEnabled) => {
-                    resolve(isEnabled);
-                  });
-                }, 5000);
-              });
-            });
-          } else {
-            throw new Error('Unsupported OneSignal API');
-          }
-        } catch (e) {
-          log('OneSignal registration error:', e);
-          throw e;
-        }
-      }
-
-      // Register with native Push API (optimized for all browsers)
-      async function registerWithPushAPI() {
-        try {
-          if (!notificationSupport.basic) {
-            throw new Error('Notifications not supported');
-          }
-              // Special handling for UC Browser
-          if (browserEnv.isUCBrowser) {
-            // UC Browser needs a click event to trigger the permission prompt
-            return new Promise((resolve) => {
-              const iframe = document.createElement('iframe');
-              iframe.style.display = 'none';
-              document.body.appendChild(iframe);
-              
-              iframe.contentWindow.Notification.requestPermission().then(permission => {
-                document.body.removeChild(iframe);
-                resolve(permission === 'granted');
-              }).catch(() => {
-                document.body.removeChild(iframe);
-                resolve(false);
-              });
-            });
-          }
-          
-          // Standard browsers
-          const permission = await Notification.requestPermission();
-          return permission === 'granted';
-        } catch (e) {
-          log('Push API error:', e);
-          return false;
-        }
-      }
+  try {
+    const permission = await OneSignal.Notifications.requestPermission();
+    if (permission === 'granted') {
+      await OneSignal.Notifications.registerForPushNotifications();
+      return true;
+    }
+    return false;
+  } catch (e) {
+    log('OneSignal registration error:', e);
+    throw e;
+  }
+}
 
       // Handle success (simplified without processing state)
       function handleSuccess() {
@@ -2472,22 +2375,20 @@
         function setupEventListeners() {
           // Allow button handler - simplified without processing state
           elements.allowBtn.addEventListener('click', async function() {
-            try {
-              // Immediately trigger the browser's permission prompt
-              const permission = await Notification.requestPermission();
-              
-              if (permission === 'granted') {
-                handleSuccess();
-                if (CONFIG.showSampleNotification) {
-                  showSampleNotification();
-                }
-              } else {
-                throw new Error('Permission not granted');
-              }
-            } catch (error) {
-              handleError(error);
-            }
-          });
+  try {
+    const result = await registerWithOneSignal();
+    if (result) {
+      handleSuccess();
+      if (CONFIG.showSampleNotification) {
+        showSampleNotification();
+      }
+    } else {
+      throw new Error('Permission not granted');
+    }
+  } catch (error) {
+    handleError(error);
+  }
+});
           
           // Cancel button handler - uses sessionStorage
           elements.cancelBtn.addEventListener('click', function() {
