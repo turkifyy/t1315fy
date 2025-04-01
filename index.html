@@ -984,6 +984,7 @@
          <!-- OneSignal SDK -->
     <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" defer></script>
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
 </head>
 <body>
@@ -2014,6 +2015,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>    
 
 <!-- Notification System Script -->
+    
     <script>
     (function() {
       "use strict";
@@ -2027,7 +2029,7 @@
         cookieExpireDays: 30, // Cookie expiration in days
         autoFallback: true, // Auto fallback to alternative methods
         showSampleNotification: true, // Show sample notification after permission
-        debug: false, // Debug mode
+        debug: true, // Debug mode
         showAfterPageViews: 1, // Page views before showing notification
         maxAttempts: 3, // Max display attempts
       };
