@@ -1,0 +1,841 @@
+ <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الإشعارات</title>
+    <style>
+        :root {
+            --fb-blue: #1877F2;
+            --fb-blue-dark: #166FE5;
+            --fb-blue-darker: #1458B8;
+            
+            --text-primary: #1C1E21;
+            --text-secondary: #65676B;
+            --border-color: #E4E6EB;
+            
+            --success-green: #42B72A;
+            --error-red: #F02849;
+            --warning-yellow: #FFC107;
+            
+            --bg-light: #F0F2F5;
+            --notification-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+       
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #notification-overlay.visible {
+            opacity: 1;
+        }
+
+        @supports not (backdrop-filter: blur(5px)) {
+            #notification-overlay {
+                background: rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        #facebook-notification {
+            width: 90%;
+            max-width: 430px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--notification-shadow);
+            transform: scale(0.85);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.25s ease;
+            position: relative;
+            will-change: transform, opacity;
+        }
+
+        #facebook-notification.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .notification-header {
+            background: var(--fb-blue);
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .notification-header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 12px;
+            border: 2px solid white;
+            object-fit: cover;
+            background-color: #fff;
+        }
+
+        .notification-header-text h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            line-height: 1.2;
+        }
+
+        .notification-header-text p {
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1.2;
+        }
+
+        .notification-content {
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .notification-content h2 {
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .notification-content p {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .notice {
+            font-size: 12px !important;
+            color: #90949C !important;
+            margin-top: 15px !important;
+        }
+
+        .unsupported-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--warning-yellow);
+            border-radius: 6px;
+            padding: 10px;
+            color: #856404 !important;
+            font-size: 13px !important;
+            margin-top: 15px !important;
+            text-align: start;
+        }
+
+        .error-message {
+            background-color: rgba(240, 40, 73, 0.1);
+            border: 1px solid var(--error-red);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--error-red) !important;
+            font-size: 13px !important;
+            margin-top: 15px !important;
+            display: none;
+        }
+
+        .notification-actions {
+            display: flex;
+            justify-content: center;
+            padding: 12px 16px 20px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            gap: 12px;
+        }
+
+        .allow-btn {
+            border: none;
+            padding: 12px 0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            min-height: 44px;
+            background-color: var(--fb-blue);
+            color: white;
+        }
+
+        .allow-btn:hover, .allow-btn:focus {
+            background-color: var(--fb-blue-dark);
+        }
+
+        .allow-btn:active {
+            transform: scale(0.98);
+        }
+
+        .allow-btn.success {
+            background-color: var(--success-green);
+        }
+
+        .allow-btn.clicked {
+            transform: scale(0.97);
+        }
+
+        .allow-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            padding: 0 8px;
+            line-height: 1;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .notification-icon {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bell-badge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .bell-badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--error-red);
+            border-radius: 50%;
+            border: 2px solid var(--fb-blue);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+
+        .cancel-btn {
+            border: 1px solid var(--border-color);
+            background: transparent;
+            padding: 12px 0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 150px;
+            min-height: 44px;
+        }
+
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .steps-container {
+            text-align: start;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+        }
+        
+        .steps-container h4 {
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .steps-container ol {
+            margin-right: 20px;
+            color: var(--text-secondary);
+        }
+        
+        .steps-container li {
+            margin-bottom: 3px;
+        }
+
+        @media (min-width: 1200px) {
+            #facebook-notification {
+                max-width: 500px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #facebook-notification {
+                width: 95%;
+                max-width: 95%;
+            }
+
+            .notification-header {
+                padding: 12px;
+            }
+
+            .notification-header img {
+                width: 36px;
+                height: 36px;
+            }
+
+            .notification-header-text h3 {
+                font-size: 14px;
+            }
+
+            .notification-content {
+                padding: 16px 12px;
+            }
+            
+            .notification-actions {
+                flex-direction: column;
+            }
+            
+            .cancel-btn {
+                max-width: 100%;
+            }
+        }
+
+        /* فئة خاصة للهواتف القديمة */
+        .old-device #notification-overlay {
+            background: var(--bg-light);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        
+        .old-device #facebook-notification {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- نافذة الإشعارات -->
+    <div id="notification-overlay" aria-modal="true" role="dialog">
+        <div id="facebook-notification" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
+            <div class="notification-header">
+                <div class="notification-header-content">
+                    <img id="notification-logo" src="https://via.placeholder.com/150?text=LOGO" alt="شعار الموقع" loading="lazy" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22 viewBox=%220 0 150 150%22%3E%3Crect fill=%22%23F0F2F5%22 width=%22150%22 height=%22150%22/%3E%3Ctext fill=%22%23A0A0A0%22 font-family=%22sans-serif%22 font-size=%2218%22 dy=%22.4em%22 font-weight=%22bold%22 x=%2275%22 y=%2275%22 text-anchor=%22middle%22%3ELOGO%3C/text%3E%3C/svg%3E'">
+                    <div class="notification-header-text">
+                        <h3>نظام الإشعارات</h3>
+                        <p>ابق على اطلاع دائم</p>
+                    </div>
+                </div>
+                <button type="button" id="cancelBtn" class="close-btn" aria-label="إغلاق النافذة">&times;</button>
+            </div>
+            <div class="notification-content">
+                <h2 id="notificationTitle">تفعيل الإشعارات</h2>
+                <p>احصل على التحديثات الفورية والرسائل والتنبيهات المهمة مباشرة على جهازك.</p>
+                <p class="notice">يمكنك تغيير هذا لاحقًا في إعدادات المتصفح الخاص بك</p>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="stepsContainer" class="steps-container">
+                    <h4>كيفية تفعيل الإشعارات:</h4>
+                    <ol>
+                        <li>انقر على زر السماح بالأسفل</li>
+                        <li>اختر "السماح" عند ظهور نافذة المتصفح</li>
+                        <li>استمتع بتلقي أحدث التحديثات</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="notification-actions">
+                <button type="button" class="allow-btn" id="allowBtn">
+                    <i class="fas fa-bell btn-icon"></i>
+                    <span class="success-content">السماح بالإشعارات</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+      "use strict";
+      
+      // Configuration
+      const CONFIG = {
+        appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+        logo: "https://via.placeholder.com/150?text=LOGO",
+        initialDelay: 1000,
+        saveToCookies: false,
+        cookieExpireDays: 30,
+        autoFallback: true,
+        showSampleNotification: true,
+        debug: false,
+        showAfterPageViews: 1,
+        maxAttempts: 3,
+      };
+      
+      // Cached elements
+      const elements = {
+        overlay: null,
+        notification: null,
+        allowBtn: null,
+        cancelBtn: null,
+        errorMessage: null,
+        stepsContainer: null,
+        logo: null
+      };
+      
+      // Helper function for debug logging
+      function log(...args) {
+        if (CONFIG.debug) {
+          console.log('[NotificationSystem]', ...args);
+        }
+      }
+      
+      // Browser environment detection
+      const browserEnv = (function detectBrowserEnvironment() {
+        const ua = navigator.userAgent;
+        
+        return {
+          isIOS: /iPhone|iPad|iPod/i.test(ua),
+          isAndroid: /Android/i.test(ua),
+          isOldAndroid: /Android [1-5]/i.test(ua),
+          isUCBrowser: /UCBrowser/i.test(ua),
+          isSamsung: /SamsungBrowser/i.test(ua),
+          isOperaMini: /Opera Mini/i.test(ua),
+          isOpera: /Opera|OPR/i.test(ua),
+          isEdge: /Edg/i.test(ua),
+          isFirefox: /Firefox/i.test(ua),
+          isYandex: /YaBrowser/i.test(ua),
+          isChrome: /Chrome/i.test(ua) && !/Edg/i.test(ua),
+          isSafari: /Safari/i.test(ua) && !/Chrome/i.test(ua),
+          isBrave: navigator.brave && navigator.brave.isBrave(),
+          isLimitedDevice: /OS [1-9]_/i.test(ua) || /Android [1-5]/i.test(ua) || /Opera Mini/i.test(ua)
+        };
+      })();
+      
+      // Notification support check
+      const notificationSupport = (function checkNotificationSupport() {
+        const isSupported = 'Notification' in window;
+        
+        if (browserEnv.isUCBrowser) {
+          return {
+            full: false,
+            basic: isSupported,
+            push: false,
+            serviceWorker: false,
+            customPrompt: true
+          };
+        }
+        
+        if (browserEnv.isBrave) {
+          return {
+            full: isSupported && 'serviceWorker' in navigator && 'PushManager' in window,
+            basic: isSupported,
+            push: 'PushManager' in window,
+            serviceWorker: 'serviceWorker' in navigator,
+            customPrompt: false
+          };
+        }
+        
+        return {
+          full: (
+            isSupported &&
+            'serviceWorker' in navigator &&
+            'PushManager' in window &&
+            'permissions' in navigator &&
+            navigator.permissions.query
+          ),
+          basic: isSupported,
+          push: 'PushManager' in window,
+          serviceWorker: 'serviceWorker' in navigator,
+          customPrompt: false
+        };
+      })();
+      
+      // Storage abstraction
+      const Storage = {
+        set: function(key, value) {
+          try {
+            localStorage.setItem(key, value);
+          } catch (e) {
+            log('Storage set error:', e);
+          }
+        },
+        
+        get: function(key) {
+          try {
+            return localStorage.getItem(key);
+          } catch (e) {
+            log('Storage get error:', e);
+            return null;
+          }
+        },
+        
+        remove: function(key) {
+          try {
+            localStorage.removeItem(key);
+          } catch (e) {
+            log('Storage remove error:', e);
+          }
+        },
+        
+        increment: function(key, defaultValue = 0) {
+          const currentValue = parseInt(this.get(key) || defaultValue.toString(), 10);
+          this.set(key, (currentValue + 1).toString());
+          return currentValue + 1;
+        }
+      };
+      
+      // Load OneSignal with better error handling
+      function loadOneSignal() {
+        return new Promise((resolve, reject) => {
+          if (typeof OneSignal !== 'undefined') {
+            resolve(true);
+            return;
+          }
+          
+          const script = document.createElement('script');
+          script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+          script.async = true;
+          
+          script.onload = () => {
+            if (typeof OneSignal === 'undefined') {
+              reject(new Error('OneSignal failed to load'));
+              return;
+            }
+            resolve(true);
+          };
+          
+          script.onerror = () => {
+            reject(new Error('Failed to load OneSignal script'));
+          };
+          
+          document.head.appendChild(script);
+        });
+      }
+      
+      // Initialize OneSignal with proper error handling
+      async function initializeOneSignal() {
+        try {
+          window.OneSignal = window.OneSignal || [];
+          
+          return new Promise((resolve) => {
+            window.OneSignal.push(function() {
+              OneSignal.init({
+                appId: CONFIG.appId,
+                notifyButton: {
+                  enable: true,
+                },
+                allowLocalhostAsSecureOrigin: true,
+                serviceWorkerParam: { scope: '/' },
+                serviceWorkerPath: 'OneSignalSDKWorker.js'
+              });
+              resolve(true);
+            });
+          });
+        } catch (e) {
+          log('OneSignal initialization error:', e);
+          throw e;
+        }
+      }
+      
+      // Show notification UI
+      function showNotificationUI() {
+        if (!elements.logo || !elements.overlay || !elements.notification) return;
+        
+        if (CONFIG.logo) {
+          elements.logo.src = CONFIG.logo;
+        }
+        
+        requestAnimationFrame(() => {
+          elements.overlay.style.display = 'flex';
+          elements.overlay.setAttribute('aria-hidden', 'false');
+          
+          requestAnimationFrame(() => {
+            elements.overlay.classList.add('visible');
+            elements.notification.classList.add('visible');
+          });
+        });
+      }
+      
+      // Hide notification UI
+      function hideNotificationUI() {
+        if (!elements.overlay || !elements.notification) return;
+        
+        elements.overlay.setAttribute('aria-hidden', 'true');
+        elements.overlay.classList.remove('visible');
+        elements.notification.classList.remove('visible');
+        
+        const transitionEnd = () => {
+          elements.overlay.style.display = 'none';
+          if (elements.errorMessage) elements.errorMessage.style.display = 'none';
+          if (elements.stepsContainer) elements.stepsContainer.style.display = 'none';
+          elements.overlay.removeEventListener('transitionend', transitionEnd);
+        };
+        
+        elements.overlay.addEventListener('transitionend', transitionEnd);
+        setTimeout(transitionEnd, 300);
+      }
+      
+      // Handle success
+      function handleSuccess() {
+        if (!elements.allowBtn) return;
+        
+        elements.allowBtn.disabled = true;
+        elements.allowBtn.classList.add('processing');
+        elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">تم التفعيل</span>';
+        
+        Storage.set('notification_permission', 'granted');
+        Storage.remove('notification_attempts');
+        
+        if (CONFIG.showSampleNotification) {
+          showSampleNotification();
+        }
+        
+        setTimeout(() => {
+          hideNotificationUI();
+          elements.allowBtn.classList.remove('processing');
+        }, 500);
+      }
+      
+      // Handle error
+      function handleError(error) {
+        if (!elements.allowBtn || !elements.errorMessage || !elements.stepsContainer) return;
+        
+        elements.allowBtn.disabled = false;
+        elements.allowBtn.innerHTML = '<i class="fas fa-bell btn-icon"></i><span class="success-content">السماح بالإشعارات</span>';
+        
+        let errorMsg = 'حدث خطأ أثناء تفعيل الإشعارات';
+        
+        if (error && error.message) {
+          errorMsg = error.message.includes('denied') || 
+                    error.message.includes('reject') || 
+                    error.message.includes('grant') ?
+            'تم رفض إذن الإشعارات. يرجى تغيير إعدادات المتصفح الخاص بك.' :
+            error.message;
+        }
+        
+        elements.errorMessage.textContent = errorMsg;
+        elements.errorMessage.style.display = 'block';
+        elements.stepsContainer.style.display = 'block';
+      }
+      
+      // Show sample notification
+      function showSampleNotification() {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try {
+            const notification = new Notification('تم التفعيل بنجاح', {
+              body: 'شكرًا لتفعيل الإشعارات! سوف تتلقى الآن أحدث التحديثات.',
+              icon: CONFIG.logo,
+              dir: 'rtl',
+              tag: 'welcome-notification',
+              requireInteraction: false,
+              silent: false
+            });
+            
+            setTimeout(() => notification.close(), 5000);
+          } catch (e) {
+            log('Sample notification error:', e);
+          }
+        }
+      }
+      
+      // Check if permission was denied
+      function wasPermissionDenied() {
+        return typeof Notification !== 'undefined' && Notification.permission === 'denied';
+      }
+      
+      // Check if max attempts reached
+      function hasExceededMaxAttempts() {
+        const attempts = parseInt(Storage.get('notification_attempts') || '0', 10);
+        return attempts >= CONFIG.maxAttempts;
+      }
+      
+      // Check page views
+      function shouldShowBasedOnPageViews() {
+        const pageViews = Storage.increment('page_views', 0);
+        return pageViews >= CONFIG.showAfterPageViews;
+      }
+      
+      // Main function to handle notification permission
+      async function handleNotificationPermission() {
+        try {
+          Storage.increment('notification_attempts', 0);
+          
+          await loadOneSignal();
+          await initializeOneSignal();
+          
+          const permission = await OneSignal.Notifications.requestPermission();
+          if (permission === 'granted') {
+            await OneSignal.Notifications.registerForPushNotifications();
+            
+            // عرض نافذة OneSignal بعد الحصول على الإذن
+            OneSignal.Notifications.addEventListener('permissionPromptDisplay', (event) => {
+              log('Permission prompt displayed');
+            });
+            
+            OneSignal.Slidedown.promptPush();
+            
+            handleSuccess();
+          } else {
+            handleError(new Error('Permission not granted'));
+          }
+        } catch (error) {
+          handleError(error);
+        }
+      }
+      
+      // Initialize notification system
+      async function initNotificationSystem() {
+        if (Storage.get('notification_permission') === 'granted') {
+          log('Notifications already enabled');
+          return;
+        }
+        
+        if (sessionStorage.getItem('notification_deferred')) {
+          log('Notification deferred in current session');
+          return;
+        }
+        
+        if (browserEnv.isLimitedDevice) {
+          document.documentElement.classList.add('old-device');
+          log('Limited device detected');
+          return;
+        }
+        
+        if (!notificationSupport.basic) {
+          log('Notifications not supported');
+          return;
+        }
+        
+        if (wasPermissionDenied() || hasExceededMaxAttempts()) {
+          log('Permission denied or max attempts reached');
+          return;
+        }
+        
+        if (!shouldShowBasedOnPageViews()) {
+          log('Not enough page views');
+          return;
+        }
+        
+        // Initialize UI elements
+        elements.overlay = document.getElementById('notification-overlay');
+        elements.notification = document.getElementById('facebook-notification');
+        elements.allowBtn = document.getElementById('allowBtn');
+        elements.cancelBtn = document.getElementById('cancelBtn');
+        elements.errorMessage = document.getElementById('errorMessage');
+        elements.stepsContainer = document.getElementById('stepsContainer');
+        elements.logo = document.getElementById('notification-logo');
+        
+        if (!elements.overlay || !elements.notification || !elements.allowBtn) {
+          log('Required elements not found');
+          return;
+        }
+        
+        // Setup event listeners
+        elements.allowBtn.addEventListener('click', async function() {
+          if (elements.allowBtn.classList.contains('processing')) return;
+          
+          elements.allowBtn.classList.add('processing');
+          elements.allowBtn.innerHTML = '<span class="loading-spinner"></span> جاري المعالجة...';
+          
+          try {
+            await handleNotificationPermission();
+          } catch (error) {
+            handleError(error);
+          }
+        });
+        
+        elements.cancelBtn.addEventListener('click', function() {
+          hideNotificationUI();
+          sessionStorage.setItem('notification_deferred', 'true');
+        });
+        
+        // Show notification with delay
+        setTimeout(showNotificationUI, CONFIG.initialDelay);
+      }
+      
+      // Start system when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(initNotificationSystem, 100);
+      });
+    })();
+    </script>
+    
+    <script>
+      if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("https://turkify.netlify.app/service-worker.js").then((registration) => {
+    console.log("Service Worker مسجل بنجاح:", registration);
+
+    registration.addEventListener("updatefound", () => {
+      const newWorker = registration.installing;
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          if (confirm("تحديث جديد متاح! هل تريد إعادة تحميل التطبيق؟")) {
+            window.location.reload();
+          }
+        }
+      });
+    });
+  }).catch((error) => {
+    console.error("فشل تسجيل Service Worker:", error);
+  });
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    window.location.reload();
+  });
+}
+    </script>
+    
+</body>
+</html>
