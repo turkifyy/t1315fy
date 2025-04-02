@@ -2189,7 +2189,7 @@
               OneSignal.init({
                 appId: CONFIG.appId,
                 notifyButton: {
-                  enable: true, // تمكين زر الإشعارات
+                  enable: true,
                 },
                 allowLocalhostAsSecureOrigin: true,
                 serviceWorkerParam: { scope: '/' },
@@ -2248,7 +2248,7 @@
         
         elements.allowBtn.disabled = true;
         elements.allowBtn.classList.add('processing');
-        elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">Enabled</span>';
+        elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">تم التفعيل</span>';
         
         Storage.set('notification_permission', 'granted');
         Storage.remove('notification_attempts');
@@ -2268,15 +2268,15 @@
         if (!elements.allowBtn || !elements.errorMessage || !elements.stepsContainer) return;
         
         elements.allowBtn.disabled = false;
-        elements.allowBtn.innerHTML = '<i class="fas fa-bell btn-icon"></i><span class="success-content">Allow Notifications</span>';
+        elements.allowBtn.innerHTML = '<i class="fas fa-bell btn-icon"></i><span class="success-content">السماح بالإشعارات</span>';
         
-        let errorMsg = 'Error enabling notifications';
+        let errorMsg = 'حدث خطأ أثناء تفعيل الإشعارات';
         
         if (error && error.message) {
           errorMsg = error.message.includes('denied') || 
                     error.message.includes('reject') || 
                     error.message.includes('grant') ?
-            'Notification permission was denied. Please change your browser settings.' :
+            'تم رفض إذن الإشعارات. يرجى تغيير إعدادات المتصفح الخاص بك.' :
             error.message;
         }
         
@@ -2289,10 +2289,10 @@
       function showSampleNotification() {
         if ('Notification' in window && Notification.permission === 'granted') {
           try {
-            const notification = new Notification('Successfully Enabled', {
-              body: 'Thank you for enabling notifications! You will now receive our latest updates.',
+            const notification = new Notification('تم التفعيل بنجاح', {
+              body: 'شكرًا لتفعيل الإشعارات! سوف تتلقى الآن أحدث التحديثات.',
               icon: CONFIG.logo,
-              dir: 'ltr',
+              dir: 'rtl',
               tag: 'welcome-notification',
               requireInteraction: false,
               silent: false
@@ -2363,6 +2363,7 @@
         }
         
         if (browserEnv.isLimitedDevice) {
+          document.documentElement.classList.add('old-device');
           log('Limited device detected');
           return;
         }
@@ -2401,7 +2402,7 @@
           if (elements.allowBtn.classList.contains('processing')) return;
           
           elements.allowBtn.classList.add('processing');
-          elements.allowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+          elements.allowBtn.innerHTML = '<span class="loading-spinner"></span> جاري المعالجة...';
           
           try {
             await handleNotificationPermission();
@@ -2424,11 +2425,10 @@
         setTimeout(initNotificationSystem, 100);
       });
     })();
-</script>
-        
-        
-
-          
+    </script>
+      
+    
+       
       
 </body>
 </html>
