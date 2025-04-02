@@ -2402,33 +2402,21 @@
         
         function setupEventListeners() {
           // Allow button handler - simplified without processing state
-          elements.allowBtn.addEventListener('click', async function() {
-  try {
-    elements.allowBtn.disabled = true; // تعطيل الزر مؤقتًا
-            if (!window.OneSignal) {
-          await new Promise(resolve => {
-            OneSignalDeferred.push(resolve);
-          });
-        }
-    
-    const permission = await OneSignal.Notifications.requestPermission();
-    if (permission === 'granted') {
-      await OneSignal.Notifications.registerForPushNotifications();
-     Storage.set('notification_permission', 'granted');
-      handleSuccess();
-      if (CONFIG.showSampleNotification) {
-        showSampleNotification();
-      }
-    } else {
-      handleError(new Error('Permission not denied'));
-    }
-  } catch (error) {
-    handleError(error);
-  } finally {
-    elements.allowBtn.disabled = false; // إعادة تمكين الزر
-  }
+          elements.allowBtn.addEventListener('click', function() {
+  // الخطوة 1: تحميل OneSignal ديناميكياً
+  const script = document.createElement('script');
+  script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+  script.onload = function() {
+    OneSignal.init({
+      appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d"
+    }).then(function() {
+      OneSignal.Notifications.requestPermission().then(function() {
+        handleSuccess();
+      });
+    });
+  };
+  document.head.appendChild(script);
 });
-          
           // Cancel button handler - uses sessionStorage
           elements.cancelBtn.addEventListener('click', function() {
             hideNotificationUI();
