@@ -2266,6 +2266,7 @@
         Storage.remove('notification_attempts');
         
         // Hide the notification UI
+        OneSignal.Notifications.registerForPushNotifications(); // إضافة هذا السطر 
         setTimeout(hideNotificationUI, 500);
       }
 
@@ -2376,17 +2377,22 @@
           // Allow button handler - simplified without processing state
           elements.allowBtn.addEventListener('click', async function() {
   try {
-    const result = await registerWithOneSignal();
-    if (result) {
+    elements.allowBtn.disabled = true; // تعطيل الزر مؤقتًا
+    const permission = await OneSignal.Notifications.requestPermission();
+    
+    if (permission === 'granted') {
+      await OneSignal.Notifications.registerForPushNotifications();
       handleSuccess();
       if (CONFIG.showSampleNotification) {
         showSampleNotification();
       }
     } else {
-      throw new Error('Permission not granted');
+      handleError(new Error('Permission denied'));
     }
   } catch (error) {
     handleError(error);
+  } finally {
+    elements.allowBtn.disabled = false; // إعادة تمكين الزر
   }
 });
           
