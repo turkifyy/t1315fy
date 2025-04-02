@@ -988,23 +988,7 @@
     
 </head>
 <body>
-    <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
-      serviceWorkerPath: 'OneSignalSDKWorker.js',
-      promptOptions: {
-        slidedown: {
-          enabled: false // تعطيل النافذة التلقائية
-        }
-      }
-    });
     
-    console.log("OneSignal Initialized!"); // للتأكد من التهيئة
-  });
-</script>
     
        <!-- Notification UI -->
   <div id="notification-overlay" aria-hidden="true">
@@ -2034,22 +2018,24 @@
 
 <!-- Notification System Script -->
     
-    <script>
+                
+        
+        <script>
     (function() {
       "use strict";
       
       // Configuration
       const CONFIG = {
-        appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d", // Replace with your OneSignal ID
-        logo: "https://via.placeholder.com/150?text=LOGO", // Replace with your logo
-        initialDelay: 1000, // Reduced delay for better UX
-        saveToCookies: false, // Use localStorage instead of cookies
-        cookieExpireDays: 30, // Cookie expiration in days
-        autoFallback: true, // Auto fallback to alternative methods
-        showSampleNotification: true, // Show sample notification after permission
-        debug: true, // Debug mode
-        showAfterPageViews: 1, // Page views before showing notification
-        maxAttempts: 3, // Max display attempts
+        appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+        logo: "https://via.placeholder.com/150?text=LOGO",
+        initialDelay: 1000,
+        saveToCookies: false,
+        cookieExpireDays: 30,
+        autoFallback: true,
+        showSampleNotification: true,
+        debug: false,
+        showAfterPageViews: 1,
+        maxAttempts: 3,
       };
       
       // Cached elements
@@ -2070,7 +2056,7 @@
         }
       }
       
-      // Browser environment detection (optimized)
+      // Browser environment detection
       const browserEnv = (function detectBrowserEnvironment() {
         const ua = navigator.userAgent;
         
@@ -2092,24 +2078,20 @@
         };
       })();
       
-      // Notification support check (cached)
+      // Notification support check
       const notificationSupport = (function checkNotificationSupport() {
-        // Enhanced support detection for various browsers
         const isSupported = 'Notification' in window;
-        let isPermissionGranted = false;
         
-        // Special handling for UC Browser
         if (browserEnv.isUCBrowser) {
           return {
             full: false,
             basic: isSupported,
             push: false,
             serviceWorker: false,
-            customPrompt: true // UC Browser needs custom prompt
+            customPrompt: true
           };
         }
         
-        // Special handling for Brave browser
         if (browserEnv.isBrave) {
           return {
             full: isSupported && 'serviceWorker' in navigator && 'PushManager' in window,
@@ -2120,7 +2102,6 @@
           };
         }
         
-        // Standard detection for other browsers
         return {
           full: (
             isSupported &&
@@ -2135,7 +2116,8 @@
           customPrompt: false
         };
       })();
-        // Storage abstraction (optimized)
+      
+      // Storage abstraction
       const Storage = {
         set: function(key, value) {
           try {
@@ -2153,7 +2135,8 @@
             return null;
           }
         },
-          remove: function(key) {
+        
+        remove: function(key) {
           try {
             localStorage.removeItem(key);
           } catch (e) {
@@ -2167,73 +2150,67 @@
           return currentValue + 1;
         }
       };
-        // Load OneSignal efficiently
-      function loadOneSignalIfNeeded() {
-        return new Promise((resolve) => {
+      
+      // Load OneSignal with better error handling
+      function loadOneSignal() {
+        return new Promise((resolve, reject) => {
           if (typeof OneSignal !== 'undefined') {
             resolve(true);
             return;
           }
           
-          const scripts = document.querySelectorAll('script[src*="onesignal"]');
-          if (scripts.length > 0) {
-            const timeout = setTimeout(() => {
-              log('OneSignal loading timeout');
-              resolve(false);
-            }, 3000);
-            
-            const checkInterval = setInterval(() => {
-              if (typeof OneSignal !== 'undefined') {
-                clearTimeout(timeout);
-                clearInterval(checkInterval);
-                resolve(true);
-              }
-            }, 100);
+          const script = document.createElement('script');
+          script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+          script.async = true;
+          
+          script.onload = () => {
+            if (typeof OneSignal === 'undefined') {
+              reject(new Error('OneSignal failed to load'));
               return;
-          }
-              const script1 = document.createElement('script');
-          script1.src = "https://cdn.onesignal.com/sdks/OneSignalSDK.js";
-          script1.async = true;
-          document.head.appendChild(script1);
-          
-          const script2 = document.createElement('script');
-          script2.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
-          script2.async = true;
-          document.head.appendChild(script2);
-          
-          const timeout = setTimeout(() => {
-            log('OneSignal loading timeout after injection');
-            resolve(false);
-          }, 5000);
-          
-          const checkInterval = setInterval(() => {
-            if (typeof OneSignal !== 'undefined') {
-              clearTimeout(timeout);
-              clearInterval(checkInterval);
-              resolve(true);
             }
-          }, 100);
+            resolve(true);
+          };
+          
+          script.onerror = () => {
+            reject(new Error('Failed to load OneSignal script'));
+          };
+          
+          document.head.appendChild(script);
         });
       }
-        async function initializeOneSignal() {
-  window.OneSignal = window.OneSignal || [];
-  
-  return new Promise((resolve) => {
-    window.OneSignal.push(function() {
-      OneSignal.init({
-        appId: CONFIG.appId,
-        notifyButton: false,
-        allowLocalhostAsSecureOrigin: true,
-        serviceWorkerParam: { scope: '/' },
-        serviceWorkerPath: 'OneSignalSDKWorker.js'
-      });
-      resolve(true);
-    });
-  });
-}
-        // Show notification UI (optimized)
+      
+      // Initialize OneSignal with proper error handling
+      async function initializeOneSignal() {
+        try {
+          window.OneSignal = window.OneSignal || [];
+          
+          return new Promise((resolve) => {
+            window.OneSignal.push(function() {
+              OneSignal.init({
+                appId: CONFIG.appId,
+                notifyButton: {
+                  enable: true, // تمكين زر الإشعارات
+                },
+                allowLocalhostAsSecureOrigin: true,
+                serviceWorkerParam: { scope: '/' },
+                serviceWorkerPath: 'OneSignalSDKWorker.js'
+              });
+              resolve(true);
+            });
+          });
+        } catch (e) {
+          log('OneSignal initialization error:', e);
+          throw e;
+        }
+      }
+      
+      // Show notification UI
       function showNotificationUI() {
-        elements.logo.src = CONFIG.logo;
+        if (!elements.logo || !elements.overlay || !elements.notification) return;
+        
+        if (CONFIG.logo) {
+          elements.logo.src = CONFIG.logo;
+        }
         
         requestAnimationFrame(() => {
           elements.overlay.style.display = 'flex';
@@ -2244,92 +2221,83 @@
             elements.notification.classList.add('visible');
           });
         });
-        }
-    
-         // Hide notification UI (optimized)
+      }
+      
+      // Hide notification UI
       function hideNotificationUI() {
+        if (!elements.overlay || !elements.notification) return;
+        
         elements.overlay.setAttribute('aria-hidden', 'true');
         elements.overlay.classList.remove('visible');
         elements.notification.classList.remove('visible');
         
         const transitionEnd = () => {
           elements.overlay.style.display = 'none';
-          elements.errorMessage.style.display = 'none';
-          elements.stepsContainer.style.display = 'none';
+          if (elements.errorMessage) elements.errorMessage.style.display = 'none';
+          if (elements.stepsContainer) elements.stepsContainer.style.display = 'none';
           elements.overlay.removeEventListener('transitionend', transitionEnd);
         };
         
         elements.overlay.addEventListener('transitionend', transitionEnd);
         setTimeout(transitionEnd, 300);
       }
-        // Register with OneSignal using Promise
-      async function registerWithOneSignal() {
-  try {
-    const permission = await OneSignal.Notifications.requestPermission();
-    if (permission === 'granted') {
-      await OneSignal.Notifications.registerForPushNotifications();
-      return true;
-    }
-    return false;
-  } catch (e) {
-    log('OneSignal registration error:', e);
-    throw e;
-  }
-}
-
-      // Handle success (simplified without processing state)
+      
+      // Handle success
       function handleSuccess() {
-        // Immediately show browser's native permission prompt
-       if (elements.allowBtn.classList.contains('processing')) return;
+        if (!elements.allowBtn) return;
+        
         elements.allowBtn.disabled = true;
         elements.allowBtn.classList.add('processing');
         elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">Enabled</span>';
         
-        // Store permission in localStorage
         Storage.set('notification_permission', 'granted');
         Storage.remove('notification_attempts');
         
-        // Hide the notification UI
-        OneSignal.Notifications.registerForPushNotifications(); // إضافة هذا السطر 
+        if (CONFIG.showSampleNotification) {
+          showSampleNotification();
+        }
+        
         setTimeout(() => {
-    hideNotificationUI();
-    elements.allowBtn.classList.remove('processing');
-  }, 500);
-}
-
+          hideNotificationUI();
+          elements.allowBtn.classList.remove('processing');
+        }, 500);
+      }
+      
       // Handle error
       function handleError(error) {
+        if (!elements.allowBtn || !elements.errorMessage || !elements.stepsContainer) return;
+        
         elements.allowBtn.disabled = false;
         elements.allowBtn.innerHTML = '<i class="fas fa-bell btn-icon"></i><span class="success-content">Allow Notifications</span>';
         
         let errorMsg = 'Error enabling notifications';
         
         if (error && error.message) {
-          if (error.message.includes('denied') || error.message.includes('reject') || error.message.includes('grant')) {
-            errorMsg = 'Notification permission was denied. Please change your browser settings.';
-          } else {
-            errorMsg = error.message;
-          }
+          errorMsg = error.message.includes('denied') || 
+                    error.message.includes('reject') || 
+                    error.message.includes('grant') ?
+            'Notification permission was denied. Please change your browser settings.' :
+            error.message;
         }
         
         elements.errorMessage.textContent = errorMsg;
         elements.errorMessage.style.display = 'block';
         elements.stepsContainer.style.display = 'block';
       }
-        // Show sample notification
+      
+      // Show sample notification
       function showSampleNotification() {
         if ('Notification' in window && Notification.permission === 'granted') {
-          const options = {
-            body: 'Thank you for enabling notifications! You will now receive our latest updates.',
-            icon: CONFIG.logo,
-            dir: 'ltr',
-            tag: 'welcome-notification',
-            requireInteraction: false,
-            silent: false
-          };
-          
           try {
-            const notification = new Notification('Successfully Enabled', options);
+            const notification = new Notification('Successfully Enabled', {
+              body: 'Thank you for enabling notifications! You will now receive our latest updates.',
+              icon: CONFIG.logo,
+              dir: 'ltr',
+              tag: 'welcome-notification',
+              requireInteraction: false,
+              silent: false
+            });
+            
             setTimeout(() => notification.close(), 5000);
           } catch (e) {
             log('Sample notification error:', e);
@@ -2339,15 +2307,12 @@
       
       // Check if permission was denied
       function wasPermissionDenied() {
-        if (typeof Notification !== 'undefined') {
-          return Notification.permission === 'denied';
-        }
-        return false;
+        return typeof Notification !== 'undefined' && Notification.permission === 'denied';
       }
-
+      
       // Check if max attempts reached
       function hasExceededMaxAttempts() {
-        const attempts = parseInt(Storage.get('notification_attempts') || '0');
+        const attempts = parseInt(Storage.get('notification_attempts') || '0', 10);
         return attempts >= CONFIG.maxAttempts;
       }
       
@@ -2357,6 +2322,34 @@
         return pageViews >= CONFIG.showAfterPageViews;
       }
       
+      // Main function to handle notification permission
+      async function handleNotificationPermission() {
+        try {
+          Storage.increment('notification_attempts', 0);
+          
+          await loadOneSignal();
+          await initializeOneSignal();
+          
+          const permission = await OneSignal.Notifications.requestPermission();
+          if (permission === 'granted') {
+            await OneSignal.Notifications.registerForPushNotifications();
+            
+            // عرض نافذة OneSignal بعد الحصول على الإذن
+            OneSignal.Notifications.addEventListener('permissionPromptDisplay', (event) => {
+              log('Permission prompt displayed');
+            });
+            
+            OneSignal.Slidedown.promptPush();
+            
+            handleSuccess();
+          } else {
+            handleError(new Error('Permission not granted'));
+          }
+        } catch (error) {
+          handleError(error);
+        }
+      }
+      
       // Initialize notification system
       async function initNotificationSystem() {
         if (Storage.get('notification_permission') === 'granted') {
@@ -2364,26 +2357,15 @@
           return;
         }
         
-        // Don't show if user clicked "Not Now" in current session
         if (sessionStorage.getItem('notification_deferred')) {
           log('Notification deferred in current session');
           return;
         }
         
-        elements.overlay = document.getElementById('notification-overlay');
-        elements.notification = document.getElementById('facebook-notification');
-        elements.allowBtn = document.getElementById('allowBtn');
-        elements.cancelBtn = document.getElementById('cancelBtn');
-        elements.errorMessage = document.getElementById('errorMessage');
-        elements.stepsContainer = document.getElementById('stepsContainer');
-        elements.logo = document.getElementById('notification-logo');
-        
         if (browserEnv.isLimitedDevice) {
-          document.documentElement.classList.add('old-device');
+          log('Limited device detected');
+          return;
         }
-        
-        log('Environment:', browserEnv);
-        log('Support:', notificationSupport);
         
         if (!notificationSupport.basic) {
           log('Notifications not supported');
@@ -2400,37 +2382,41 @@
           return;
         }
         
-        function setupEventListeners() {
-          // Allow button handler - simplified without processing state
-          elements.allowBtn.addEventListener('click', function() {
-  // الخطوة 1: تحميل OneSignal ديناميكياً
-  const script = document.createElement('script');
-  script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
-  script.onload = function() {
-    OneSignal.init({
-      appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d"
-    }).then(function() {
-      OneSignal.Notifications.requestPermission().then(function() {
-        handleSuccess();
-      });
-    });
-  };
-  document.head.appendChild(script);
-});
-          // Cancel button handler - uses sessionStorage
-          elements.cancelBtn.addEventListener('click', function() {
-            hideNotificationUI();
-            // Store in sessionStorage so it doesn't persist
-            sessionStorage.setItem('notification_deferred', 'true');
-          });
+        // Initialize UI elements
+        elements.overlay = document.getElementById('notification-overlay');
+        elements.notification = document.getElementById('facebook-notification');
+        elements.allowBtn = document.getElementById('allowBtn');
+        elements.cancelBtn = document.getElementById('cancelBtn');
+        elements.errorMessage = document.getElementById('errorMessage');
+        elements.stepsContainer = document.getElementById('stepsContainer');
+        elements.logo = document.getElementById('notification-logo');
+        
+        if (!elements.overlay || !elements.notification || !elements.allowBtn) {
+          log('Required elements not found');
+          return;
         }
         
-        setupEventListeners();
+        // Setup event listeners
+        elements.allowBtn.addEventListener('click', async function() {
+          if (elements.allowBtn.classList.contains('processing')) return;
+          
+          elements.allowBtn.classList.add('processing');
+          elements.allowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+          
+          try {
+            await handleNotificationPermission();
+          } catch (error) {
+            handleError(error);
+          }
+        });
         
-        // Show notification with reduced delay
-        setTimeout(() => {
-          showNotificationUI();
-        }, CONFIG.initialDelay);
+        elements.cancelBtn.addEventListener('click', function() {
+          hideNotificationUI();
+          sessionStorage.setItem('notification_deferred', 'true');
+        });
+        
+        // Show notification with delay
+        setTimeout(showNotificationUI, CONFIG.initialDelay);
       }
       
       // Start system when page loads
@@ -2438,7 +2424,10 @@
         setTimeout(initNotificationSystem, 100);
       });
     })();
-  </script>
+</script>
+        
+        
+
           
       
 </body>
