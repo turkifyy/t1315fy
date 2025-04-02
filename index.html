@@ -783,8 +783,8 @@
       z-index: 999999;
       opacity: 0;
       transition: opacity 0.15s ease;
-     transform: translateZ(0);
-      will-change: opacity;
+     
+    
     }
     
     #notification-overlay.visible {
@@ -802,7 +802,7 @@
       opacity: 0;
       transition: transform 0.2s ease, opacity 0.2s ease;
       will-change: transform, opacity;
-      contain: strict;   
+         
     }
     
     #facebook-notification.visible {
@@ -852,8 +852,7 @@
       transition: background-color 0.1s ease, transform 0.05s ease;
       position: relative;
       overflow: hidden;
-      backface-visibility: hidden;
-      transform:  translateZ(0);
+      
     }
     
     #allowBtn {
