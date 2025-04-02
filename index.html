@@ -985,6 +985,24 @@
     
 </head>
 <body>
+    <script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+      serviceWorkerPath: 'OneSignalSDKWorker.js',
+      promptOptions: {
+        slidedown: {
+          enabled: false // تعطيل النافذة التلقائية
+        }
+      }
+    });
+    
+    console.log("OneSignal Initialized!"); // للتأكد من التهيئة
+  });
+</script>
+    
        <!-- Notification UI -->
   <div id="notification-overlay" aria-hidden="true">
     <div id="facebook-notification" role="dialog" aria-labelledby="notification-title">
@@ -2259,7 +2277,9 @@
       // Handle success (simplified without processing state)
       function handleSuccess() {
         // Immediately show browser's native permission prompt
+       if (elements.allowBtn.classList.contains('processing')) return;
         elements.allowBtn.disabled = true;
+        elements.allowBtn.classList.add('processing');
         elements.allowBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span class="success-content">Enabled</span>';
         
         // Store permission in localStorage
@@ -2268,8 +2288,11 @@
         
         // Hide the notification UI
         OneSignal.Notifications.registerForPushNotifications(); // إضافة هذا السطر 
-        setTimeout(hideNotificationUI, 500);
-      }
+        setTimeout(() => {
+    hideNotificationUI();
+    elements.allowBtn.classList.remove('processing');
+  }, 500);
+}
 
       // Handle error
       function handleError(error) {
@@ -2379,16 +2402,22 @@
           elements.allowBtn.addEventListener('click', async function() {
   try {
     elements.allowBtn.disabled = true; // تعطيل الزر مؤقتًا
-    const permission = await OneSignal.Notifications.requestPermission();
+            if (!window.OneSignal) {
+          await new Promise(resolve => {
+            OneSignalDeferred.push(resolve);
+          });
+        }
     
+    const permission = await OneSignal.Notifications.requestPermission();
     if (permission === 'granted') {
       await OneSignal.Notifications.registerForPushNotifications();
+     Storage.set('notification_permission', 'granted');
       handleSuccess();
       if (CONFIG.showSampleNotification) {
         showSampleNotification();
       }
     } else {
-      handleError(new Error('Permission denied'));
+      handleError(new Error('Permission not denied'));
     }
   } catch (error) {
     handleError(error);
