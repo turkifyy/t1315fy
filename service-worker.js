@@ -1,4 +1,4 @@
-importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');
+importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
 // تحديد اسم الكاش وإصداره
 const CACHE_NAME = "turkify-cache-v3"; // قم بتحديث رقم الإصدار عند تحديث الموقع
 
