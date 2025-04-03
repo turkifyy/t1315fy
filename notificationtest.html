@@ -1,0 +1,1049 @@
+مرحبا ديب سيك اريدك ان تعطيني سيناريو عمل هدا الكود والكود كتالي :
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Notification System</title>
+  
+  <!-- Preload OneSignal SDK -->
+  <link rel="preload" href="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" as="script">
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" async></script>
+  
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+  
+  <!-- Optimized CSS -->
+  <style>
+    :root {
+      --primary-color: #1877F2;
+      --success-color: #42B72A;
+      --error-color: #E41E3F;
+      --text-color: #050505;
+      --secondary-text: #65676B;
+      --light-bg: #F0F2F5;
+      --button-hover: #166FE5;
+      --button-active: #1460D1;
+      --border-radius: 12px;
+      --box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+      --transition: 0.2s ease;
+      --thank-you-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    #notification-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.98);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.15s var(--transition);
+    }
+    
+    #notification-overlay.visible {
+      opacity: 1;
+    }
+    
+    #onesignal-notification {
+      background-color: #ffffff;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: min(90%, 420px);
+      padding: 24px;
+      position: relative;
+      transform: translate3d(0, 10px, 0);
+      opacity: 0;
+      transition: transform var(--transition), opacity var(--transition);
+    }
+    
+    #onesignal-notification.visible {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+    
+    .notification-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+    
+    .notification-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: var(--light-bg);
+    }
+    
+    .notification-title {
+      font-size: clamp(1.125rem, 2vw, 1.25rem);
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-color);
+    }
+    
+    .notification-content {
+      margin-bottom: 24px;
+      color: var(--secondary-text);
+      font-size: 0.9375rem;
+    }
+    
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #allowBtn {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    #allowBtn:hover {
+      background-color: var(--button-hover);
+    }
+    
+    #allowBtn:active {
+      background-color: var(--button-active);
+      transform: translateY(1px);
+    }
+    
+    #allowBtn.success {
+      background-color: var(--success-color);
+    }
+    
+    #cancelBtn {
+      background-color: #E4E6EB;
+      color: #4B4F56;
+    }
+    
+    #cancelBtn:hover {
+      background-color: #D8DADF;
+    }
+    
+    #cancelBtn:active {
+      background-color: #BCC0C4;
+      transform: translateY(1px);
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    #errorMessage {
+      color: var(--error-color);
+      margin-top: 12px;
+      font-size: 0.875rem;
+      display: none;
+      padding: 8px;
+      background-color: rgba(228, 30, 63, 0.1);
+      border-radius: 6px;
+    }
+    
+    #stepsContainer {
+      margin-top: 16px;
+      padding: 16px;
+      background-color: var(--light-bg);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      display: none;
+    }
+    
+    .steps-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+    
+    .steps-list {
+      padding-left: 20px;
+      margin: 0;
+      color: var(--secondary-text);
+    }
+    
+    .steps-list li {
+      margin-bottom: 6px;
+    }
+    
+    .success-animation {
+      position: absolute;
+      inset: 0;
+      background-color: var(--success-color);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease-out;
+    }
+    
+    .success-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .btn-icon {
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    
+    /* Thank you notification */
+    #thank-you-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--thank-you-bg);
+      color: white;
+      padding: 16px 24px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      display: none;
+      z-index: 10000;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      max-width: 300px;
+    }
+    
+    #thank-you-notification.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .thank-you-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .thank-you-icon {
+      font-size: 24px;
+    }
+    
+    /* Offline indicator */
+    .offline-indicator {
+      display: none;
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 8px;
+      border-radius: 4px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    
+    /* Emotional feedback buttons */
+    .feedback-buttons {
+      display: none;
+      margin-top: 12px;
+    }
+    
+    .feedback-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      margin-right: 8px;
+      padding: 4px;
+      transition: transform 0.2s ease;
+    }
+    
+    .feedback-btn:hover {
+      transform: scale(1.2);
+    }
+    
+    /* Reduced motion preferences */
+    @media (prefers-reduced-motion) {
+      #notification-overlay,
+      #onesignal-notification,
+      .success-animation,
+      #thank-you-notification {
+        transition: none !important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #thank-you-notification {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Notification UI -->
+  <div id="notification-overlay" aria-hidden="true" aria-modal="true" role="dialog">
+    <div id="onesignal-notification" aria-labelledby="notification-title">
+      <div class="notification-header">
+        <img id="notification-logo" class="notification-logo" src="https://via.placeholder.com/150?text=LOGO" alt="App Logo" loading="lazy" width="48" height="48">
+        <h2 id="notification-title" class="notification-title">Enable Notifications</h2>
+      </div>
+      <div class="notification-content">
+        <p>Stay updated with our latest news and features!</p>
+      </div>
+      <button id="allowBtn" class="btn" aria-label="Allow notifications">
+        <span class="success-animation" aria-hidden="true"></span>
+        <span class="success-content">
+          <span class="btn-icon" aria-hidden="true">🔔</span>
+          <span data-i18n="allow_button">Allow Notifications</span>
+        </span>
+      </button>
+      <button id="cancelBtn" class="btn" aria-label="Postpone notifications">
+        <span class="btn-icon" aria-hidden="true">⏱</span>
+        <span data-i18n="cancel_button">Not Now</span>
+      </button>
+      <div id="errorMessage" role="alert"></div>
+      <div id="stepsContainer">
+        <p class="steps-title" data-i18n="troubleshooting_title">Having trouble?</p>
+        <ol class="steps-list">
+          <li data-i18n="troubleshooting_step1">Click the lock icon in your browser</li>
+          <li data-i18n="troubleshooting_step2">Select "Site settings"</li>
+          <li data-i18n="troubleshooting_step3">Allow notifications</li>
+          <li data-i18n="troubleshooting_step4">Refresh and try again</li>
+        </ol>
+      </div>
+      <div class="offline-indicator" data-i18n="offline_message">You appear to be offline. Please check your connection.</div>
+      <div class="feedback-buttons">
+        <p data-i18n="feedback_question">Why don't you want notifications?</p>
+        <button class="feedback-btn" data-reason="annoying" aria-label="Notifications are annoying">😠</button>
+        <button class="feedback-btn" data-reason="irrelevant" aria-label="Content is irrelevant">🤷‍♂️</button>
+        <button class="feedback-btn" data-reason="privacy" aria-label="Privacy concerns">🛡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thank You Notification -->
+  <div id="thank-you-notification">
+    <div class="thank-you-content">
+      <span class="thank-you-icon">🎉</span>
+      <div>
+        <strong data-i18n="thank_you_title">Thank You!</strong>
+        <p data-i18n="thank_you_message">You'll now receive our updates</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Notification System -->
+  <script>
+    (function() {
+      "use strict";
+      
+      // ======================
+      // 1. CONFIGURATION
+      // ======================
+      const CONFIG = {
+        appId: "9925d3a5-a4d6-4d93-a93a-072629ac557d",
+        logo: "https://via.placeholder.com/150?text=LOGO",
+        initialDelay: 800,
+        cookieExpireDays: 365,
+        showSampleNotification: true,
+        debug: true,
+        showAfterPageViews: 1,
+        maxAttempts: 2,
+        oneSignalLoadTimeout: 3000,
+        permissionCheckInterval: 200,
+        networkCheckInterval: 5000,
+        rePromptDays: 14,
+        thankYouDuration: 5000,
+        abTestVariations: ['control', 'benefits', 'social-proof'],
+        currentVariation: null,
+        languages: {
+          en: {
+            allow_button: "Allow Notifications",
+            cancel_button: "Not Now",
+            troubleshooting_title: "Having trouble?",
+            troubleshooting_step1: "Click the lock icon in your browser",
+            troubleshooting_step2: "Select 'Site settings'",
+            troubleshooting_step3: "Allow notifications",
+            troubleshooting_step4: "Refresh and try again",
+            offline_message: "You appear to be offline. Please check your connection.",
+            processing_text: "Processing...",
+            success_text: "Successfully Enabled",
+            try_again_text: "Try Again",
+            denied_error: "Notifications permission was denied.",
+            timeout_error: "Notification system loading timeout.",
+            default_error: "An error occurred",
+            feedback_question: "Why don't you want notifications?",
+            thank_you_title: "Thank You!",
+            thank_you_message: "You'll now receive our updates"
+          },
+          ar: {
+            allow_button: "السماح بالإشعارات",
+            cancel_button: "ليس الآن"
+          }
+        }
+      };
+      
+      // ======================
+      // 2. CORE COMPONENTS
+      // ======================
+      
+      // DOM elements cache
+      const elements = {
+        overlay: document.getElementById('notification-overlay'),
+        notification: document.getElementById('onesignal-notification'),
+        allowBtn: document.getElementById('allowBtn'),
+        cancelBtn: document.getElementById('cancelBtn'),
+        errorMessage: document.getElementById('errorMessage'),
+        stepsContainer: document.getElementById('stepsContainer'),
+        logo: document.getElementById('notification-logo'),
+        offlineIndicator: document.querySelector('.offline-indicator'),
+        feedbackButtons: document.querySelector('.feedback-buttons'),
+        thankYouNotification: document.getElementById('thank-you-notification')
+      };
+      
+      // Browser environment detection
+      const browserEnv = {
+        isMobile: /Mobile|Android|iPhone|iPad|iPod/i.test(navigator.userAgent),
+        isLimitedDevice: /OS [1-9]_|Android [1-5]|Opera Mini|MSIE|Trident/i.test(navigator.userAgent),
+        supportsPush: 'Notification' in window && 'serviceWorker' in navigator,
+        language: navigator.language.split('-')[0] || 'en',
+        pageUrl: window.location.href,
+        pagePath: window.location.pathname
+      };
+      
+      // ======================
+      // 3. ADVANCED ALGORITHMS
+      // ======================
+      
+      // Algorithm 1: Smart Exponential Backoff
+      const BackoffAlgorithm = {
+        calculateDelay(attempt) {
+          const baseDelay = 1000;
+          const maxDelay = 30000;
+          return Math.min(maxDelay, baseDelay * Math.pow(2, attempt));
+        }
+      };
+      
+      // Algorithm 2: Network Resilience Checker
+      const NetworkMonitor = {
+        isOnline: navigator.onLine,
+        init() {
+          window.addEventListener('online', () => this.handleConnectionChange(true));
+          window.addEventListener('offline', () => this.handleConnectionChange(false));
+          setInterval(() => this.checkConnection(), CONFIG.networkCheckInterval);
+        },
+        checkConnection() {
+          fetch('https://httpbin.org/get', { method: 'HEAD', cache: 'no-store' })
+            .then(() => this.isOnline = true)
+            .catch(() => this.isOnline = false);
+        },
+        handleConnectionChange(online) {
+          this.isOnline = online;
+          if (online) {
+            this.hideOfflineIndicator();
+          } else {
+            this.showOfflineIndicator();
+          }
+        },
+        showOfflineIndicator() {
+          if (elements.offlineIndicator) {
+            elements.offlineIndicator.style.display = 'block';
+          }
+        },
+        hideOfflineIndicator() {
+          if (elements.offlineIndicator) {
+            elements.offlineIndicator.style.display = 'none';
+          }
+        }
+      };
+      
+      // Algorithm 3: Intelligent Permission Predictor
+      const PermissionPredictor = {
+        getLikelihood() {
+          const attempts = parseInt(Storage.get('notification_attempts') || '0', 10);
+          const lastRejectReason = Storage.get('last_reject_reason');
+          
+          let baseLikelihood = 0.7; // Base 70% chance
+          
+          // Adjust based on previous attempts
+          baseLikelihood -= (attempts * 0.15);
+          
+          // Adjust based on rejection reason
+          if (lastRejectReason === 'annoying') baseLikelihood *= 0.6;
+          if (lastRejectReason === 'privacy') baseLikelihood *= 0.8;
+          
+          return Math.max(0.1, Math.min(0.9, baseLikelihood));
+        },
+        shouldShowPrompt() {
+          // Context-aware decision
+          if (browserEnv.pagePath.includes('/checkout')) return true;
+          if (browserEnv.pagePath.includes('/blog')) return this.getLikelihood() > 0.4;
+          
+          return this.getLikelihood() > 0.3;
+        }
+      };
+      
+      // Algorithm 4: A/B Testing Engine
+      const ABTestEngine = {
+        currentVariation: null,
+        init() {
+          // Get or assign test variation
+          this.currentVariation = Storage.get('ab_test_variation');
+          
+          if (!this.currentVariation) {
+            this.currentVariation = CONFIG.abTestVariations[
+              Math.floor(Math.random() * CONFIG.abTestVariations.length)
+            ];
+            Storage.set('ab_test_variation', this.currentVariation);
+          }
+          
+          this.applyVariation();
+        },
+        applyVariation() {
+          switch(this.currentVariation) {
+            case 'benefits':
+              document.querySelector('.notification-content').innerHTML = `
+                <p>Enable notifications to get:</p>
+                <ul style="margin-top: 8px; padding-left: 20px;">
+                  <li>Exclusive offers</li>
+                  <li>Important updates</li>
+                  <li>Personalized content</li>
+                </ul>
+              `;
+              break;
+            case 'social-proof':
+              document.querySelector('.notification-content').innerHTML = `
+                <p>Join 85% of our users who enable notifications to stay updated!</p>
+              `;
+              break;
+            // Default 'control' variation uses original content
+          }
+          
+          // Track in analytics
+          Analytics.trackEvent('ab_test', 'view', this.currentVariation);
+        }
+      };
+      
+      // Algorithm 5: Time-based Re-prompt Scheduler
+      const RepromptScheduler = {
+        init() {
+          const lastPromptDate = Storage.get('last_prompt_date');
+          if (lastPromptDate) {
+            const daysSinceLastPrompt = (new Date() - new Date(lastPromptDate)) / (1000 * 60 * 60 * 24);
+            if (daysSinceLastPrompt < CONFIG.rePromptDays) {
+              console.log(`Too soon to re-prompt. Days remaining: ${CONFIG.rePromptDays - daysSinceLastPrompt}`);
+              return false;
+            }
+          }
+          Storage.set('last_prompt_date', new Date().toISOString());
+          return true;
+        }
+      };
+      
+      // ======================
+      // 4. ANALYTICS SYSTEM
+      // ======================
+      const Analytics = {
+        init() {
+          // Initialize analytics platforms
+          this.setupGoogleAnalytics();
+        },
+        setupGoogleAnalytics() {
+          // Already initialized in head
+        },
+        trackEvent(category, action, label, value) {
+          // Send to Google Analytics
+          gtag('event', action, {
+            event_category: category,
+            event_label: label,
+            value: value
+          });
+          
+          // Can be extended with other analytics platforms
+          console.log(`[Analytics] ${category} - ${action} - ${label}`);
+        },
+        trackRejection(reason) {
+          this.trackEvent('notification', 'rejected', reason);
+          Storage.set('last_reject_reason', reason);
+        },
+        trackAcceptance() {
+          this.trackEvent('notification', 'accepted', CONFIG.currentVariation);
+        },
+        trackImpression() {
+          this.trackEvent('notification', 'impression', CONFIG.currentVariation);
+        }
+      };
+      
+      // ======================
+      // 5. STORAGE SYSTEM
+      // ======================
+      const Storage = {
+        set(key, value, days = CONFIG.cookieExpireDays) {
+          try {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 864e5));
+            document.cookie = `${key}=${value};expires=${date.toUTCString()};path=/;SameSite=Lax;Secure`;
+            localStorage.setItem(key, value);
+            return true;
+          } catch (e) {
+            console.error('Storage error:', e);
+            return false;
+          }
+        },
+        
+        get(key) {
+          try {
+            // Check cookie first
+            const cookieValue = document.cookie.split('; ').find(row => row.startsWith(`${key}=`))?.split('=')[1];
+            if (cookieValue) return cookieValue;
+            
+            // Fallback to localStorage
+            return localStorage.getItem(key);
+          } catch (e) {
+            console.error('Storage error:', e);
+            return null;
+          }
+        },
+        
+        remove(key) {
+          document.cookie = `${key}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+          localStorage.removeItem(key);
+        },
+        
+        increment(key) {
+          const current = parseInt(this.get(key) || '0', 10);
+          this.set(key, current + 1);
+          return current + 1;
+        }
+      };
+      
+      // ======================
+      // 6. I18N TRANSLATION SYSTEM
+      // ======================
+      const I18n = {
+        currentLanguage: browserEnv.language in CONFIG.languages ? browserEnv.language : 'en',
+        t(key) {
+          return CONFIG.languages[this.currentLanguage]?.[key] || 
+                 CONFIG.languages['en'][key] || 
+                 key;
+        },
+        applyTranslations() {
+          document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            el.textContent = this.t(key);
+          });
+        },
+        setLanguage(lang) {
+          if (CONFIG.languages[lang]) {
+            this.currentLanguage = lang;
+            this.applyTranslations();
+            return true;
+          }
+          return false;
+        }
+      };
+      
+      // ======================
+      // 7. ONESIGNAL MANAGER
+      // ======================
+      const OneSignalManager = {
+        isInitialized: false,
+        isRegistered: false,
+        pendingInitialization: null,
+        
+        async initialize() {
+          if (this.isInitialized) return true;
+          
+          if (this.pendingInitialization) {
+            return this.pendingInitialization;
+          }
+          
+          this.pendingInitialization = new Promise(async (resolve) => {
+            if (!window.OneSignal) {
+              const loaded = await new Promise(resolveLoad => {
+                const startTime = Date.now();
+                const checkInterval = setInterval(() => {
+                  if (window.OneSignal) {
+                    clearInterval(checkInterval);
+                    resolveLoad(true);
+                  } else if (Date.now() - startTime > CONFIG.oneSignalLoadTimeout) {
+                    clearInterval(checkInterval);
+                    resolveLoad(false);
+                  }
+                }, 100);
+              });
+              
+              if (!loaded) {
+                this.pendingInitialization = null;
+                resolve(false);
+                return;
+              }
+            }
+            
+            window.OneSignal = window.OneSignal || [];
+            
+            OneSignal.push(function() {
+              OneSignal.init({
+                appId: CONFIG.appId,
+                notifyButton: { enable: false },
+                allowLocalhostAsSecureOrigin: true,
+                autoRegister: false,
+                welcomeNotification: { disable: true },
+                promptOptions: { slidedown: { enabled: false } }
+              });
+              
+              OneSignal.on('initialized', () => {
+                this.isInitialized = true;
+                this.pendingInitialization = null;
+                resolve(true);
+              });
+              
+              OneSignal.on('initFailed', () => {
+                this.pendingInitialization = null;
+                resolve(false);
+              });
+            }.bind(this));
+          });
+          
+          return this.pendingInitialization;
+        },
+        
+        async register() {
+          if (this.isRegistered) return true;
+          
+          try {
+            // Modern API (v5+)
+            if (OneSignal.Notifications) {
+              const permission = await OneSignal.Notifications.permission;
+              if (permission) {
+                this.isRegistered = true;
+                return true;
+              }
+              
+              const result = await OneSignal.Notifications.requestPermission();
+              this.isRegistered = result;
+              return result;
+            }
+            // Legacy API
+            else if (OneSignal.isPushNotificationsEnabled) {
+              return new Promise(resolve => {
+                OneSignal.isPushNotificationsEnabled(enabled => {
+                  if (enabled) {
+                    this.isRegistered = true;
+                    return resolve(true);
+                  }
+                  
+                  OneSignal.registerForPushNotifications();
+                  
+                  const timeout = setTimeout(() => {
+                    OneSignal.isPushNotificationsEnabled(resolve);
+                  }, CONFIG.permissionCheckInterval);
+                  
+                  OneSignal.on('notificationPermissionChange', permission => {
+                    clearTimeout(timeout);
+                    this.isRegistered = permission === 'granted';
+                    resolve(this.isRegistered);
+                  });
+                });
+              });
+            }
+            throw new Error('Unsupported OneSignal API');
+          } catch (error) {
+            console.error('Registration error:', error);
+            throw error;
+          }
+        },
+        
+        async checkPermission() {
+          return new Promise(resolve => {
+            if (OneSignal.Notifications) {
+              resolve(OneSignal.Notifications.permission);
+            } else if (OneSignal.isPushNotificationsEnabled) {
+              OneSignal.isPushNotificationsEnabled(resolve);
+            } else {
+              resolve(false);
+            }
+          });
+        }
+      };
+      
+      // ======================
+      // 8. UI MANAGER
+      // ======================
+      const UIManager = {
+        show() {
+          if (!elements.logo.src) elements.logo.src = CONFIG.logo;
+          elements.overlay.style.display = 'flex';
+          elements.overlay.setAttribute('aria-hidden', 'false');
+          
+          requestAnimationFrame(() => {
+            elements.overlay.classList.add('visible');
+            elements.notification.classList.add('visible');
+          });
+          
+          Analytics.trackImpression();
+        },
+        
+        hide() {
+          elements.overlay.setAttribute('aria-hidden', 'true');
+          elements.overlay.classList.remove('visible');
+          elements.notification.classList.remove('visible');
+          
+          setTimeout(() => {
+            elements.overlay.style.display = 'none';
+            elements.errorMessage.style.display = 'none';
+            elements.stepsContainer.style.display = 'none';
+          }, 300);
+        },
+        
+        showLoading() {
+          elements.allowBtn.disabled = true;
+          elements.allowBtn.innerHTML = `
+            <span class="loading-spinner" aria-hidden="true"></span>
+            <span class="success-content">${I18n.t('processing_text')}</span>
+          `;
+        },
+        
+        showSuccess() {
+          const successAnim = elements.allowBtn.querySelector('.success-animation');
+          successAnim.style.transform = 'scaleX(1)';
+          
+          setTimeout(() => {
+            elements.allowBtn.classList.add('success');
+            elements.allowBtn.innerHTML = `
+              <span class="btn-icon" aria-hidden="true">✓</span>
+              <span class="success-content">${I18n.t('success_text')}</span>
+            `;
+            
+            setTimeout(() => {
+              this.hide();
+              this.showThankYou();
+            }, 800);
+          }, 400);
+        },
+        
+        showError(error) {
+          elements.allowBtn.disabled = false;
+          elements.allowBtn.innerHTML = `
+            <span class="btn-icon" aria-hidden="true">↻</span>
+            <span class="success-content">${I18n.t('try_again_text')}</span>
+          `;
+          
+          let errorMsg = I18n.t('default_error');
+          
+          if (error?.message) {
+            if (error.message.includes('denied') || error.message.includes('reject')) {
+              errorMsg = I18n.t('denied_error');
+            } else if (error.message.includes('timeout')) {
+              errorMsg = I18n.t('timeout_error');
+            }
+          }
+          
+          elements.errorMessage.textContent = errorMsg;
+          elements.errorMessage.style.display = 'block';
+          elements.stepsContainer.style.display = 'block';
+          
+          if (!NetworkMonitor.isOnline) {
+            elements.offlineIndicator.style.display = 'block';
+          }
+          
+          // Show feedback buttons on cancel
+          if (error?.message?.includes('denied')) {
+            elements.feedbackButtons.style.display = 'block';
+          }
+        },
+        
+        showThankYou() {
+          elements.thankYouNotification.style.display = 'block';
+          requestAnimationFrame(() => {
+            elements.thankYouNotification.classList.add('visible');
+          });
+          
+          setTimeout(() => {
+            elements.thankYouNotification.classList.remove('visible');
+            setTimeout(() => {
+              elements.thankYouNotification.style.display = 'none';
+            }, 300);
+          }, CONFIG.thankYouDuration);
+        }
+      };
+      
+      // ======================
+      // 9. PERMISSION MANAGER
+      // ======================
+      const PermissionManager = {
+        async request() {
+          try {
+            Storage.increment('notification_attempts');
+            
+            if (!NetworkMonitor.isOnline) {
+              throw new Error('Offline');
+            }
+            
+            if (!OneSignalManager.isInitialized) {
+              const initialized = await OneSignalManager.initialize();
+              if (!initialized) throw new Error('Failed to initialize OneSignal');
+            }
+            
+            const registered = await OneSignalManager.register();
+            if (!registered) throw new Error('Failed to get notification permission');
+            
+            Storage.set('notification_permission', 'granted');
+            Storage.remove('notification_attempts');
+            Analytics.trackAcceptance();
+            
+            return true;
+          } catch (error) {
+            console.error('Permission error:', error);
+            throw error;
+          }
+        },
+        
+        shouldShowPrompt() {
+          if (Storage.get('notification_permission') === 'granted') {
+            console.log('Notifications already enabled');
+            return false;
+          }
+          
+          if (sessionStorage.getItem('notification_deferred')) {
+            console.log('Notifications deferred for this session');
+            return false;
+          }
+          
+          const attempts = parseInt(Storage.get('notification_attempts') || '0', 10);
+          if (attempts >= CONFIG.maxAttempts) {
+            console.log('Max attempts exceeded');
+            return false;
+          }
+          
+          const pageViews = Storage.increment('page_views');
+          if (pageViews < CONFIG.showAfterPageViews) {
+            console.log('Page views threshold not reached');
+            return false;
+          }
+          
+          if (!browserEnv.supportsPush) {
+            console.log('Push notifications not supported');
+            return false;
+          }
+          
+          if (!PermissionPredictor.shouldShowPrompt()) {
+            console.log('Smart predictor suggests not to show prompt');
+            return false;
+          }
+          
+          if (!RepromptScheduler.init()) {
+            console.log('Too soon to re-prompt');
+            return false;
+          }
+          
+          return true;
+        }
+      };
+      
+      // ======================
+      // 10. EVENT HANDLERS
+      // ======================
+      function setupEventListeners() {
+        elements.allowBtn.addEventListener('click', async function() {
+          UIManager.showLoading();
+          
+          try {
+            const granted = await PermissionManager.request();
+            if (granted) {
+              UIManager.showSuccess();
+            } else {
+              throw new Error('Permission not granted');
+            }
+          } catch (error) {
+            UIManager.showError(error);
+          }
+        });
+        
+        elements.cancelBtn.addEventListener('click', function() {
+          UIManager.hide();
+          sessionStorage.setItem('notification_deferred', 'true');
+          Analytics.trackEvent('notification', 'deferred');
+        });
+        
+        // Feedback buttons
+        document.querySelectorAll('.feedback-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const reason = this.getAttribute('data-reason');
+            Analytics.trackRejection(reason);
+            UIManager.hide();
+          });
+        });
+      }
+      
+      // ======================
+      // 11. MAIN INITIALIZATION
+      // ======================
+      async function initNotificationSystem() {
+        // Initialize systems
+        I18n.applyTranslations();
+        NetworkMonitor.init();
+        Analytics.init();
+        ABTestEngine.init();
+        
+        // Check if we should show prompt
+        if (!PermissionManager.shouldShowPrompt()) return;
+        
+        // Setup event listeners
+        setupEventListeners();
+        
+        // Pre-initialize OneSignal in background
+        OneSignalManager.initialize().catch(error => {
+          console.error('Background initialization error:', error);
+        });
+        
+        // Show UI after optimized delay
+        setTimeout(() => {
+          if (PermissionManager.shouldShowPrompt()) {
+            UIManager.show();
+          }
+        }, CONFIG.initialDelay);
+      }
+      
+      // Start initialization
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNotificationSystem);
+      } else {
+        initNotificationSystem();
+      }
+    })();
+  </script>
+</body>
+</html>
