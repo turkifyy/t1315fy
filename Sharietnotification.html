@@ -1,197 +1,197 @@
+ <!DOCTYPE html>
+ <html>
+ <head>
+	 <title>Untitled</title>
+	 <meta charset="UTF-8"/>
+	 <link rel="stylesheet" href="" type="text/css"/>
+ </head>
+	 <body>
+	<!-- 📌 Widget نافذة PWA متوافقة مع بلوجر -->
+<style>
+  .custom13-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    width: 90%;
+    max-width: 400px;
+    background-color: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 60000; /* ✅ Z-INDEX عالي لضمان ظهورها فوق أي عنصر */
+    text-align: center;
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  }
 
-<html lang="en">
-<head>
-    <meta charset="UTF-8"></meta>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
-    <!-- استبدل الرابط الخام برابط صحيح لملف manifest.json -->
-    <link href="https://raw.githubusercontent.com/Oussamazucker/manifest.json/refs/heads/main/manifest.json" rel="manifest"></link>
-    <title>PWA Notification</title>
-    <style>
-        :root {
-            --primary-color: #ff4747;
-            --text-color: #333;
-            --bg-color: #fff;
+  .custom13-popup.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .custom13-popup .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    position: relative;
+  }
+
+  .custom13-popup .header img {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    transition: transform 0.2s ease;
+  }
+
+  .custom13-popup h5 {
+    margin: 12px 0;
+    font-size: 1.3em;
+    color: #262626;
+    font-weight: 600;
+  }
+
+  .custom13-popup p {
+    margin-bottom: 20px;
+    color: #8e8e8e;
+    font-size: 1.1em;
+    line-height: 1.4;
+  }
+
+  .custom13-popup .btn {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 0 auto 12px;
+    padding: 12px 0;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+
+  .custom13-popup .btn-primary {
+    background-color: #0095f6;
+    color: #fff;
+    border: none;
+  }
+
+  .custom13-popup .btn-primary:hover {
+    background-color: #1877f2;
+    transform: translateY(-1px);
+  }
+
+  .custom13-popup .btn-secondary {
+    background-color: transparent;
+    color: #0095f6;
+    border: none;
+    font-size: 0.9em;
+    text-decoration: none;
+    margin-top: 10px;
+  }
+
+  .custom13-popup .btn-secondary:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="custom13-popup" id="custom13-popup">
+  <div class="header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo" loading="lazy" />
+  </div>
+  <h5>See full profile in the app</h5>
+  <p>Enjoy photos, videos, and more from Facebook</p>
+  <button class="btn btn-primary" onclick="custom13_handlePrimaryButtonClick()" type="button">Open the Instagram app</button>
+  <button class="btn btn-secondary" onclick="custom13_closePopup()" type="button">Not now</button>
+</div>
+
+<script>
+  let custom13_deferredPrompt;
+  const custom13_popup = document.getElementById('custom13-popup');
+  let custom13_popupTimeout;
+
+  // ✅ التحقق مما إذا كان المستخدم داخل PWA
+  function custom13_isPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           window.navigator.standalone || 
+           document.referrer.includes('android-app://');
+  }
+
+  // ✅ تحميل النافذة بعد 3 ثوانٍ من فتح الصفحة
+  function custom13_initializePopup() {
+    if (!custom13_isPWA() && !localStorage.getItem('custom13_popupDismissed')) {
+      custom13_popupTimeout = setTimeout(() => {
+        custom13_popup.style.display = 'block';
+        custom13_popup.offsetHeight;
+        custom13_popup.classList.add('show');
+      }, 50000);
+    }
+  }
+
+  // ✅ التعامل مع تثبيت PWA
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    custom13_deferredPrompt = e;
+    
+    if (!custom13_isPWA() && !localStorage.getItem('custom13_popupDismissed')) {
+      custom13_showPopup();
+    }
+  });
+
+  function custom13_showPopup() {
+    if (custom13_popup.style.display !== 'block') {
+      custom13_popup.style.display = 'block';
+      custom13_popup.offsetHeight;
+      custom13_popup.classList.add('show');
+    }
+  }
+
+  function custom13_closePopup() {
+    custom13_popup.classList.remove('show');
+    clearTimeout(custom13_popupTimeout);
+    
+    localStorage.setItem('custom13_popupDismissed', 'true');
+    
+    setTimeout(() => {
+      custom13_popup.style.display = 'none';
+    }, 300);
+  }
+
+  // ✅ التعامل مع النقر على الزر الرئيسي
+  function custom13_handlePrimaryButtonClick() {
+    if (custom13_isPWA()) {
+      // إذا كان التطبيق مثبتًا، يتم توجيه المستخدم إلى التطبيق عبر رابط خارجي
+      window.location.href = "intent://turkifyy.blogspot.com/2025/01/test59.html/#Intent;scheme=https;package=org.chromium.webapk.a778eb5b209c4adaf_v2;end";
+    } else if (custom13_deferredPrompt) {
+      // إذا لم يكن التطبيق مثبتًا، يتم عرض رسالة التثبيت
+      custom13_showInstallPrompt();
+    } else {
+      // إذا لم يكن التثبيت متاحًا، يتم إغلاق النافذة
+      custom13_closePopup();
+    }
+  }
+
+  async function custom13_showInstallPrompt() {
+    if (custom13_deferredPrompt) {
+      try {
+        const { outcome } = await custom13_deferredPrompt.prompt();
+        console.log(`User ${outcome === 'accepted' ? 'accepted' : 'dismissed'} the install prompt`);
+        custom13_deferredPrompt = null;
+        
+        if (outcome === 'accepted') {
+          custom13_closePopup();
         }
+      } catch (error) {
+        console.error('Install prompt error:', error);
+      }
+    }
+    custom13_closePopup();
+  }
 
-        .ad-container {
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: var(--bg-color);
-            padding: 12px 20px;
-            border-bottom: 1px solid #eee;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            z-index: 53000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            direction: ltr; /* الاتجاه بالإنجليزية (LTR) */
-        }
-
-        .ad-content {
-            display: flex;
-            align-items: center;
-            gap: 15px; /* المسافة بين الشعار والنص */
-        }
-
-        .ad-logo {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-        }
-
-        .ad-text {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-right: 20px; /* تحريك النص قليلاً نحو الشعار */
-        }
-
-        .ad-subtitle {
-            font-size: 14px;
-            color: var(--text-color);
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            margin: 0; /* إزالة الهوامش الافتراضية */
-        }
-
-        .install-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-
-        .install-button:hover {
-            background-color: #e03e3e;
-            transform: translateY(-1px);
-        }
-
-        /* Media Queries للتجاوب مع الأجهزة المختلفة */
-        @media (max-width: 768px) {
-            .ad-container {
-                padding: 10px;
-            }
-
-            .ad-subtitle {
-                font-size: 13px;
-            }
-
-            .install-button {
-                padding: 8px 20px;
-                font-size: 13px;
-            }
-
-            .ad-text {
-                margin-right: 10px; /* تقليل المسافة للأجهزة الصغيرة */
-            }
-        }
-    </style>
-    <div class="pwa-notification" id="pwa-notification">
-        <div class="ad-container" id="bazaar-bar">
-            <div class="ad-content">
-                <img alt="App Logo" class="ad-logo" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgVX2KCikDH9anKTusX9-G6t6_2gww0uNEswiabgS5l5SXt1LFVtsaYpgKnJop3LiXNYMYk0Jl1Z6g-oOF9_upykPVnS9u6SOM9xkfs9E0EUJ8xVeWxgJyC5wE5sF099LG6LwXlwvuYAta2RfmOPaJL9EwQcapXsDa3-NW3UbzGepDpNeAVt0fqy6CFPRY/s256/logo-256x256.png" />
-                <div class="ad-text">
-                    <span class="ad-subtitle">Better deals on our app - Download now!</span>
-                </div>
-            </div>
-            <button class="install-button" id="install-button">Install</button>
-        </div>
-    </div>
-
-    <script>
-        let deferredPrompt;
-        const installButton = document.getElementById('install-button');
-        const notification = document.getElementById('pwa-notification');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            notification.style.display = 'block';
-        });
-
-        installButton.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                try {
-                    // عرض نافذة التثبيت
-                    deferredPrompt.prompt();
-                    // انتظار اختيار المستخدم
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        notification.style.display = 'none';
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
-                } catch (err) {
-                    console.error('Error:', err);
-                }
-                deferredPrompt = null;
-            }
-        });
-
-        window.addEventListener('load', () => {
-            if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone)) {
-                notification.style.display = 'block';
-            } else {
-                notification.style.display = 'none';
-            }
-        });
-    </script>
-
-    <script>
-        // Lazy Loading للصور
-        document.addEventListener('DOMContentLoaded', function() {
-            const images = document.querySelectorAll('img[data-src]');
-            const config = {
-                rootMargin: '50px 0px',
-                threshold: 0.01
-            };
-
-            if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver(onIntersection, config);
-                images.forEach(image => observer.observe(image));
-            }
-
-            function onIntersection(entries) {
-                entries.forEach(entry => {
-                    if (entry.intersectionRatio > 0) {
-                        observer.unobserve(entry.target);
-                        preloadImage(entry.target);
-                    }
-                });
-            }
-
-            function preloadImage(img) {
-                const src = img.getAttribute('data-src');
-                if (!src) return;
-                img.src = src;
-            }
-        });
-    </script>
-
-    <script>
-        // تسجيل Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('https://raw.githubusercontent.com/Oussamazucker/turkify-pwa/refs/heads/main/sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
-            });
-        }
-    </script>
-</body>
-</html>
+  document.addEventListener('DOMContentLoaded', custom13_initializePopup);
+</script>
+	 </body>
+ </html>
