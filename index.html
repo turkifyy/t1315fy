@@ -2,7 +2,6 @@
 <head>
     <meta charset="UTF-8"></meta>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
-    
     <meta content="Explore EgyBest: The best platform to stream and download movies and series for free in HD quality, including Arabic subtitles. Watch trending content like Avatar, John Wick, and more." name="description"></meta>
     <meta content="EgyBest,إيجي بيست,Free movie streaming, Download series, Arabic subtitles, افلام مترجمة, مسلسلات مترجمة , فيلم مترجم , مسلسل مترجم , Squid game season 2 ,Latest movies, Avatar: The Way of Water, John Wick 4, Squid Game, Breaking Bad" name="keywords"></meta>
     <meta content="turkify" name="author"></meta>
@@ -44,7 +43,14 @@
     }
     </script>
     
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    </noscript>
+    <!-- Prefetch لصفحات التحميل -->
+    <link rel="prefetch" href="https://turkify.netlify.app/apk.html" as="document">
+    <link rel="prefetch" href="https://turkify.netlify.app/ios.html" as="document">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"></link>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"></link>
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -735,7 +741,112 @@
             }
         }
     </style> 
-       
+  <style>
+  .custom13-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    width: 90%;
+    max-width: 400px;
+    background-color: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 120000;
+    text-align: center;
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .custom13-popup.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .custom13-popup .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    position: relative;
+  }
+
+  .custom13-popup .header img {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    transition: transform 0.2s ease;
+  }
+
+  .custom13-popup h5 {
+    margin: 12px 0;
+    font-size: 1.3em;
+    color: #262626;
+    font-weight: 600;
+  }
+
+  .custom13-popup p {
+    margin-bottom: 20px;
+    color: #8e8e8e;
+    font-size: 1.1em;
+    line-height: 1.4;
+  }
+
+  .custom13-popup .btn {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 0 auto 12px;
+    padding: 12px 0;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+
+  .custom13-popup .btn-primary {
+    background-color: #0095f6;
+    color: #fff;
+    border: none;
+  }
+
+  .custom13-popup .btn-primary:hover {
+    background-color: #1877f2;
+    transform: translateY(-1px);
+  }
+
+  .custom13-popup .btn-secondary {
+    background-color: transparent;
+    color: #0095f6;
+    border: none;
+    font-size: 0.9em;
+    text-decoration: none;
+    margin-top: 10px;
+  }
+
+  .custom13-popup .btn-secondary:hover {
+    text-decoration: underline;
+  }
+
+  .custom13-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    z-index: 121000;
+    display: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+</style>     
                        
    
 
@@ -763,7 +874,19 @@
 
         <button class="install-btn" id="installButton" aria-label="Install Turkify app">Install</button>
     </div>
+<div class="custom13-popup" id="custom13-popup" role="dialog" aria-modal="true" aria-labelledby="custom13-popup-title">
+  <div class="header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo" loading="lazy" width="60" height="60"/>
+  </div>
+  <h5 id="custom13-popup-title">See full profile in the app</h5>
+  <p>Enjoy photos, videos, and more from Facebook</p>
+  <button class="btn btn-primary" onclick="custom13_handlePrimaryButtonClick()" type="button" aria-label="Open the Instagram app">Open the Instagram app</button>
+  <button class="btn btn-secondary" onclick="custom13_closePopup()" type="button" aria-label="Not now">Not now</button>
+</div>
 
+<div class="custom13-notification" id="custom13-notification">
+  App installed successfully! Redirecting...
+</div>
     <!-- Swipe Up Prompt -->
     <div class="swipe-up-prompt" id="swipeUpPrompt">
         <div class="content-container">
@@ -1746,7 +1869,158 @@
     <!-- Bootstrap JS (Optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>    
 
+<script>
+  let custom13_deferredPrompt = null;
+  const custom13_popup = document.getElementById('custom13-popup');
+  const custom13_notification = document.getElementById('custom13-notification');
+  let custom13_popupTimeout = null;
+  const CUSTOM13_STORAGE_KEY = 'custom13_popupDismissed';
+  const CUSTOM13_DELAY = 3000;
+  const ANDROID_APK_URL = 'https://turkify.netlify.app/apk.html';
+  const IOS_APP_URL = 'https://turkify.netlify.app/ios.html';
 
+  // ✅ الكشف عن دعم PWA بطريقة متوافقة مع جميع المتصفحات
+  function custom13_isPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           window.navigator.standalone || 
+           document.referrer.includes('android-app://');
+  }
+
+  function custom13_isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  function custom13_supportsPWA() {
+    // دعم أوسع لمتصفحات مختلفة
+    return ('BeforeInstallPromptEvent' in window) || 
+           (window.matchMedia('(display-mode: standalone)').matches) ||
+           (navigator.standalone) ||
+           (window.cordova) ||
+           (window.Capacitor);
+  }
+
+  function custom13_initializePopup() {
+    if (!custom13_isPWA() && !sessionStorage.getItem(CUSTOM13_STORAGE_KEY)) {
+      custom13_popupTimeout = setTimeout(() => {
+        // تحميل الخط عند أول عرض للنافذة
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+        
+        custom13_showPopup();
+      }, CUSTOM13_DELAY);
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    custom13_deferredPrompt = e;
+    
+    if (!custom13_isPWA() && !sessionStorage.getItem(CUSTOM13_STORAGE_KEY)) {
+      clearTimeout(custom13_popupTimeout);
+      custom13_showPopup();
+    }
+  });
+
+  function custom13_showPopup() {
+    if (custom13_popup.style.display !== 'block') {
+      custom13_popup.style.display = 'block';
+      requestAnimationFrame(() => {
+        custom13_popup.classList.add('show');
+        custom13_popup.focus();
+      });
+    }
+  }
+
+  function custom13_closePopup() {
+    custom13_popup.classList.remove('show');
+    clearTimeout(custom13_popupTimeout);
+    
+    sessionStorage.setItem(CUSTOM13_STORAGE_KEY, 'true');
+    
+    setTimeout(() => {
+      custom13_popup.style.display = 'none';
+    }, 300);
+  }
+
+  function custom13_handlePrimaryButtonClick() {
+    if (custom13_isPWA()) {
+      // محاولة فتح التطبيق مباشرة بطرق مختلفة
+      const appUrl = "intent://turkifyy.blogspot.com/2025/01/test59.html/#Intent;scheme=https;package=org.chromium.webapk.a778eb5b209c4adaf_v2;end";
+      
+      // محاولة فتح التطبيق
+      window.location.href = appUrl;
+      
+      // إذا فشل فتح التطبيق، إعادة التوجيه بعد فترة
+      setTimeout(() => {
+        if (!document.hidden) {
+          window.location.href = "https://turkifyy.blogspot.com/2025/01/test59.html";
+        }
+      }, 500);
+    } else if (custom13_deferredPrompt) {
+      custom13_showInstallPrompt();
+    } else {
+      custom13_redirectToAppDownload();
+    }
+  }
+
+  function custom13_redirectToAppDownload() {
+    const url = custom13_isIOS() ? IOS_APP_URL : ANDROID_APK_URL;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    custom13_closePopup();
+  }
+
+  async function custom13_showInstallPrompt() {
+    if (!custom13_deferredPrompt) {
+      custom13_redirectToAppDownload();
+      return;
+    }
+
+    try {
+      const { outcome } = await custom13_deferredPrompt.prompt();
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      }
+    } catch (error) {
+      console.error('Install prompt error:', error);
+      custom13_redirectToAppDownload();
+    } finally {
+      custom13_deferredPrompt = null;
+    }
+  }
+
+  function custom13_showSuccessNotification() {
+    custom13_notification.style.display = 'block';
+    setTimeout(() => {
+      custom13_notification.style.display = 'none';
+    }, 3000);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!custom13_supportsPWA() && !custom13_isPWA() && !sessionStorage.getItem(CUSTOM13_STORAGE_KEY)) {
+      setTimeout(custom13_redirectToAppDownload, CUSTOM13_DELAY);
+    } else {
+      custom13_initializePopup();
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    sessionStorage.setItem(CUSTOM13_STORAGE_KEY, 'true');
+    custom13_showSuccessNotification();
+    setTimeout(() => {
+      window.location.href = '/'; // إعادة التوجيه للصفحة الرئيسية
+    }, 2000);
+  });
+
+  // إغلاق النافذة بالزر ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && custom13_popup.classList.contains('show')) {
+      custom13_closePopup();
+    }
+  });
+</script>
     
                 
 </body>
