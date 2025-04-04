@@ -1,12 +1,13 @@
- <!DOCTYPE html>
- <html>
- <head>
-	 <title>Untitled</title>
-	 <meta charset="UTF-8"/>
-	 <link rel="stylesheet" href="" type="text/css"/>
- </head>
-	 <body>
-	<!-- 📌 Widget نافذة PWA متوافقة مع بلوجر -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PWA Installation Prompt</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="" type="text/css"/>
+</head>
+<body>
+
 <style>
   .custom13-popup {
     position: fixed;
@@ -21,7 +22,7 @@
     padding: 20px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     display: none;
-    z-index: 60000; /* ✅ Z-INDEX عالي لضمان ظهورها فوق أي عنصر */
+    z-index: 60000;
     text-align: center;
     opacity: 0;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
@@ -100,43 +101,39 @@
 
 <div class="custom13-popup" id="custom13-popup">
   <div class="header">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo" loading="lazy" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo" loading="lazy" width="60" height="60"/>
   </div>
   <h5>See full profile in the app</h5>
   <p>Enjoy photos, videos, and more from Facebook</p>
-  <button class="btn btn-primary" onclick="custom13_handlePrimaryButtonClick()" type="button">Open the Instagram app</button>
-  <button class="btn btn-secondary" onclick="custom13_closePopup()" type="button">Not now</button>
+  <button class="btn btn-primary" onclick="custom13_handlePrimaryButtonClick()" type="button" aria-label="Open the Instagram app">Open the Instagram app</button>
+  <button class="btn btn-secondary" onclick="custom13_closePopup()" type="button" aria-label="Not now">Not now</button>
 </div>
 
 <script>
-  let custom13_deferredPrompt;
+  let custom13_deferredPrompt = null;
   const custom13_popup = document.getElementById('custom13-popup');
-  let custom13_popupTimeout;
+  let custom13_popupTimeout = null;
+  const CUSTOM13_STORAGE_KEY = 'custom13_popupDismissed';
+  const CUSTOM13_DELAY = 3000;
 
-  // ✅ التحقق مما إذا كان المستخدم داخل PWA
   function custom13_isPWA() {
     return window.matchMedia('(display-mode: standalone)').matches || 
            window.navigator.standalone || 
            document.referrer.includes('android-app://');
   }
 
-  // ✅ تحميل النافذة بعد 3 ثوانٍ من فتح الصفحة
   function custom13_initializePopup() {
-    if (!custom13_isPWA() && !localStorage.getItem('custom13_popupDismissed')) {
-      custom13_popupTimeout = setTimeout(() => {
-        custom13_popup.style.display = 'block';
-        custom13_popup.offsetHeight;
-        custom13_popup.classList.add('show');
-      }, 50000);
+    if (!custom13_isPWA() && !localStorage.getItem(CUSTOM13_STORAGE_KEY)) {
+      custom13_popupTimeout = setTimeout(custom13_showPopup, CUSTOM13_DELAY);
     }
   }
 
-  // ✅ التعامل مع تثبيت PWA
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     custom13_deferredPrompt = e;
     
-    if (!custom13_isPWA() && !localStorage.getItem('custom13_popupDismissed')) {
+    if (!custom13_isPWA() && !localStorage.getItem(CUSTOM13_STORAGE_KEY)) {
+      clearTimeout(custom13_popupTimeout);
       custom13_showPopup();
     }
   });
@@ -144,8 +141,9 @@
   function custom13_showPopup() {
     if (custom13_popup.style.display !== 'block') {
       custom13_popup.style.display = 'block';
-      custom13_popup.offsetHeight;
-      custom13_popup.classList.add('show');
+      requestAnimationFrame(() => {
+        custom13_popup.classList.add('show');
+      });
     }
   }
 
@@ -153,45 +151,49 @@
     custom13_popup.classList.remove('show');
     clearTimeout(custom13_popupTimeout);
     
-    localStorage.setItem('custom13_popupDismissed', 'true');
+    localStorage.setItem(CUSTOM13_STORAGE_KEY, 'true');
     
     setTimeout(() => {
       custom13_popup.style.display = 'none';
     }, 300);
   }
 
-  // ✅ التعامل مع النقر على الزر الرئيسي
   function custom13_handlePrimaryButtonClick() {
     if (custom13_isPWA()) {
-      // إذا كان التطبيق مثبتًا، يتم توجيه المستخدم إلى التطبيق عبر رابط خارجي
       window.location.href = "intent://turkifyy.blogspot.com/2025/01/test59.html/#Intent;scheme=https;package=org.chromium.webapk.a778eb5b209c4adaf_v2;end";
     } else if (custom13_deferredPrompt) {
-      // إذا لم يكن التطبيق مثبتًا، يتم عرض رسالة التثبيت
       custom13_showInstallPrompt();
     } else {
-      // إذا لم يكن التثبيت متاحًا، يتم إغلاق النافذة
       custom13_closePopup();
     }
   }
 
   async function custom13_showInstallPrompt() {
-    if (custom13_deferredPrompt) {
-      try {
-        const { outcome } = await custom13_deferredPrompt.prompt();
-        console.log(`User ${outcome === 'accepted' ? 'accepted' : 'dismissed'} the install prompt`);
-        custom13_deferredPrompt = null;
-        
-        if (outcome === 'accepted') {
-          custom13_closePopup();
-        }
-      } catch (error) {
-        console.error('Install prompt error:', error);
-      }
+    if (!custom13_deferredPrompt) {
+      custom13_closePopup();
+      return;
     }
-    custom13_closePopup();
+
+    try {
+      const { outcome } = await custom13_deferredPrompt.prompt();
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        custom13_closePopup();
+      }
+    } catch (error) {
+      console.error('Install prompt error:', error);
+    } finally {
+      custom13_deferredPrompt = null;
+      custom13_closePopup();
+    }
   }
 
   document.addEventListener('DOMContentLoaded', custom13_initializePopup);
+
+  window.addEventListener('appinstalled', () => {
+    localStorage.setItem(CUSTOM13_STORAGE_KEY, 'true');
+    custom13_closePopup();
+  });
 </script>
-	 </body>
- </html>
+</body>
+</html>
