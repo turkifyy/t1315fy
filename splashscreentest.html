@@ -2,87 +2,106 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Turkify Splash Screen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splash Screen مثل إنستغرام</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --transition-duration: 1.5s;
-        }
-
-        * {
+        /* تنسيقات مخصصة */
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            width: 100%;
-            height: 100%;
+            font-family: Arial, sans-serif;
             overflow: hidden;
-            background: #000;
         }
-
-        #turkify-splash-screen {
+        
+        .splash-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-color: #ffffff;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             z-index: 9999;
-            background: #000;
-            opacity: 1;
-            transition: 
-                opacity var(--transition-duration) ease-in-out,
-                visibility var(--transition-duration) ease-in-out;
+            transition: opacity 0.5s ease-out;
         }
-
-        #turkify-splash-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+        
+        .splash-content {
+            text-align: center;
         }
-
-        #turkify-splash-screen img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        
+        .splash-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            animation: pulse 2s infinite;
         }
-
-        @media (orientation: portrait) {
-            #turkify-splash-screen img {
-                object-position: center;
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .main-content {
+            display: none;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* Media Queries للتكيف مع مختلف أحجام الشاشات */
+        @media (max-width: 768px) {
+            .splash-logo {
+                width: 120px;
+                height: 120px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .splash-logo {
+                width: 100px;
+                height: 100px;
             }
         }
     </style>
 </head>
 <body>
-    <div id="turkify-splash-screen">
-        <img 
-            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjt8qAKLG5TrzRM3e1BAdxhloJAto6O62sw3fvJRiQdo_X25pmz2jwcHfzU3xgNuXe8dLFYLLaTt3pPzkbY3ixZ6M2xHXoZACMAPtC2IlrWAsPIqGg2TTR4SvSDrmeCCeBytGW0llntk46UrqAQ2wb6jKUZowveL1_HLD-gUK11e3mAUVhpjgrin3thoLw/s1920/Turkify%20football.webp" 
-            alt="Turkify Splash Screen" 
-            loading="eager"
-            decoding="async" />
+    <!-- شاشة الترحيب (Splash Screen) -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjt8qAKLG5TrzRM3e1BAdxhloJAto6O62sw3fvJRiQdo_X25pmz2jwcHfzU3xgNuXe8dLFYLLaTt3pPzkbY3ixZ6M2xHXoZACMAPtC2IlrWAsPIqGg2TTR4SvSDrmeCCeBytGW0llntk46UrqAQ2wb6jKUZowveL1_HLD-gUK11e3mAUVhpjgrin3thoLw/s1920/Turkify%20football.webp" alt="App Logo" class="splash-logo" id="splashLogo">
+            <!-- يمكنك استبدال الرابط أعلاه برابط صورتك الخاصة -->
+        </div>
     </div>
-
+    
+    <!-- المحتوى الرئيسي للتطبيق -->
+    <div class="main-content" id="mainContent">
+        <h1>مرحباً بك في التطبيق!</h1>
+        <p>هذا هو المحتوى الرئيسي بعد انتهاء شاشة الترحيب.</p>
+    </div>
+    
+    <!-- Bootstrap JS + Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const splashScreen = document.getElementById('turkify-splash-screen');
-            const splashImg = splashScreen.querySelector('img');
+        document.addEventListener('DOMContentLoaded', function() {
+            // تغيير مصدر الصورة هنا إذا كنت تريد استخدام صورة مختلفة
+            // document.getElementById('splashLogo').src = 'مسار/إلى/صورتك.png';
             
-            // إخفاء الشاشة بعد تحميل الصورة أو بعد 3 ثواني (قابلة للتعديل)
-            Promise.race([
-                new Promise(resolve => {
-                    if (splashImg.complete) resolve();
-                    else splashImg.addEventListener('load', resolve);
-                }),
-                new Promise(resolve => setTimeout(resolve, 15000))
-            ]).then(() => {
-                splashScreen.classList.add('hidden');
-                setTimeout(() => splashScreen.remove(), 15000);
-            });
+            // إخفاء شاشة الترحيب بعد 15 ثانية
+            setTimeout(function() {
+                var splashScreen = document.getElementById('splashScreen');
+                splashScreen.style.opacity = '0';
+                
+                // إزالة شاشة الترحيب بعد انتهاء الانتقال
+                setTimeout(function() {
+                    splashScreen.style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                }, 500); // هذا يتوافق مع مدة الانتقال في CSS
+            }, 15000); // 15000 ميلي ثانية = 15 ثانية
         });
     </script>
 </body>
