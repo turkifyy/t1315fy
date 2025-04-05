@@ -2040,7 +2040,7 @@
   function custom13_handlePrimaryButtonClick() {
     if (custom13_isPWA()) {
       // محاولة فتح التطبيق مباشرة بطرق مختلفة
-      const appUrl = "intent://turkifyy.blogspot.com/2025/01/test59.html/#Intent;scheme=https;package=org.chromium.webapk.a778eb5b209c4adaf_v2;end";
+      const appUrl = "intent://turkify.netlify.app/#Intent;scheme=https;package=org.chromium.webapk.a6535b4ae1aa63593_v2;end";
       
       // محاولة فتح التطبيق
       window.location.href = appUrl;
@@ -2048,7 +2048,7 @@
       // إذا فشل فتح التطبيق، إعادة التوجيه بعد فترة
       setTimeout(() => {
         if (!document.hidden) {
-          window.location.href = "https://turkifyy.blogspot.com/2025/01/test59.html";
+          window.location.href = "https://turkify.netlify.app";
         }
       }, 500);
     } else if (custom13_deferredPrompt) {
@@ -2102,7 +2102,7 @@
     sessionStorage.setItem(CUSTOM13_STORAGE_KEY, 'true');
     custom13_showSuccessNotification();
     setTimeout(() => {
-      window.location.href = '/'; // إعادة التوجيه للصفحة الرئيسية
+      window.location.href = 'https://turkify.netlify.app'; // إعادة التوجيه للصفحة الرئيسية
     }, 2000);
   });
 
