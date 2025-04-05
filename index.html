@@ -2043,12 +2043,12 @@
       const appUrl = "https://turkify.netlify.app";
       
       // محاولة فتح التطبيق
-      window.location.href = appUrl;
+      window.location.href = appUrl = "https://turkify.netlify.app";
       
       // إذا فشل فتح التطبيق، إعادة التوجيه بعد فترة
       setTimeout(() => {
         if (!document.hidden) {
-          window.location.href = "/";
+          window.location.href = "https://turkify.netlify.app";
         }
       }, 500);
     } else if (custom13_deferredPrompt) {
