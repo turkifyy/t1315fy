@@ -9,7 +9,7 @@
     <style>
         :root {
             --transition-duration: 1.5s;
-            --splash-z-index: 94000;
+            --splash-z-index: 100000;
             --video-z-index: 93000;
             --logo-z-index: 95000;
         }
@@ -86,8 +86,8 @@
         /* New Logo Container Styles */
         .logo-container {
             position: fixed;
-            top: 15px;
-            left: 15px;
+            top: 25px;
+            left: 25px;
             z-index: var(--logo-z-index);
             width: auto;
             height: auto;
@@ -111,8 +111,8 @@
             .logo-container {
                 max-width: 80px;
                 max-height: 40px;
-                top: 10px;
-                left: 10px;
+                top: 25px;
+                left: 25px;
             }
         }
 
@@ -181,7 +181,7 @@
                         splashScreen.classList.add('hidden');
                         localStorage.setItem(SPLASH_SHOW_KEY, 'true');
                         setTimeout(() => splashScreen.remove(), 1500);
-                    }, 25000);
+                    }, 1000);
                 });
             }
 
