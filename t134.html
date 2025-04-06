@@ -94,6 +94,15 @@
             max-width: 328px;
             max-height: 60px;
             transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+            will-change: transform, opacity;
+        }
+
+        .logo-container.hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+            pointer-events: none;
         }
 
         .logo-container img {
@@ -167,7 +176,14 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const splashScreen = document.getElementById('unique-splash-screen');
+            const logoContainer = document.querySelector('.logo-container');
             const SPLASH_SHOW_KEY = 'splashShown';
+            
+            // متغيرات لتتبع حالة التمرير
+            let lastScrollPosition = 0;
+            let scrollCount = 0;
+            const SCROLL_THRESHOLD = 100; // الحد الأدنى للتمرير لاعتباره "تمريرة"
+            let isLogoHidden = false;
 
             function handleSplashScreen() {
                 const img = new Image();
@@ -185,6 +201,35 @@
                 });
             }
 
+            // دالة لمعالجة حدث التمرير
+            function handleScroll() {
+                const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // حساب الفرق بين موضع التمرير الحالي والسابق
+                const scrollDifference = currentScrollPosition - lastScrollPosition;
+                
+                // تحديث عدد مرات التمرير فقط إذا كان المستخدم يمرر لأسفل
+                if (scrollDifference > 5) { // تمرير لأسفل
+                    scrollCount++;
+                } else if (scrollDifference < -5 && currentScrollPosition <= 0) { // عند الوصول لأعلى الصفحة
+                    scrollCount = 0;
+                    if (isLogoHidden) {
+                        logoContainer.classList.remove('hidden');
+                        isLogoHidden = false;
+                    }
+                }
+                
+                // إخفاء الشعار بعد تمريرتين
+                if (scrollCount >= 2 && !isLogoHidden) {
+                    logoContainer.classList.add('hidden');
+                    isLogoHidden = true;
+                }
+                
+                lastScrollPosition = currentScrollPosition <= 0 ? 0 : currentScrollPosition;
+            }
+
+            // تهيئة الحدث
+            window.addEventListener('scroll', handleScroll);
             handleSplashScreen();
         });
     </script>
