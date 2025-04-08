@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,8 +9,9 @@
     <style>
         :root {
             --transition-duration: 1.5s;
-            --splash-z-index: 94000;
+            --splash-z-index: 96000;
             --video-z-index: 93000;
+            --logo-z-index: 95000;
         }
 
         * {
@@ -93,6 +94,56 @@
                 height: -webkit-fill-available;
             }
         }
+           .logo-container {
+            position: fixed;
+            top: 0px;
+            left: 95px;
+            z-index: var(--logo-z-index);
+            width: auto;
+            height: auto;
+            max-width: 328px;
+            max-height: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container img {
+            width: 180px;
+            height: auto;
+            object-fit: contain;
+            }
+
+        @media (orientation: portrait) {
+            #unique-splash-screen img {
+                object-position: center;
+            }
+            
+            .logo-container {
+                max-width: 80px;
+                max-height: 40px;
+                top: 0px;
+                left: 95px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo-container {
+                max-width: 100px;
+                max-height: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-container {
+                max-width: 70px;
+                max-height: 35px;
+            }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            .video-container {
+                height: -webkit-fill-available;
+            }
+        }
     </style>
 </head>
 <body>
@@ -102,7 +153,12 @@
              loading="eager"
              decoding="async" />
     </div>
-
+        <div class="logo-container">
+        <img src="https://turkify.netlify.app/logo-recipes.webp" 
+             alt="Turkify Logo" 
+             loading="lazy"
+             decoding="async"/>
+         </div>
     <div class="video-container">
         <iframe 
             class="video-iframe1" 
