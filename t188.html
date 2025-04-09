@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Youtube-Like Navigation</title>
+    <title>تطبيق مثل يوتيوب</title>
     <style>
         /* Reset وتنسيقات عامة */
         * {
@@ -85,54 +85,67 @@
             margin-bottom: 4px;
         }
         
-        /* تأثيرات للفيديوهات */
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
+        /* تصميم خاص للشورتس */
+        .shorts-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin-top: 20px;
         }
         
-        .video-card {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .video-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .thumbnail {
+        .short-video {
             width: 100%;
-            height: 140px;
-            background-color: #eee;
+            max-width: 350px;
+            height: 500px;
+            background: #000;
+            border-radius: 10px;
+            margin-bottom: 20px;
             position: relative;
             overflow: hidden;
         }
         
-        .shorts-thumbnail {
-            height: 300px;
+        .short-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
-        .video-info {
-            padding: 10px;
+        .short-info {
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        .short-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            margin: 10px 0;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .action-btn i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: block;
         }
         
         /* تجاوبية متقدمة */
         @media (max-width: 768px) {
-            .video-grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
-            
-            .thumbnail {
-                height: 120px;
-            }
-            
-            .shorts-thumbnail {
-                height: 250px;
+            .short-video {
+                height: 450px;
             }
         }
         
@@ -145,16 +158,10 @@
                 font-size: 20px;
             }
             
-            .video-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .thumbnail {
-                height: 200px;
-            }
-            
-            .shorts-thumbnail {
-                height: 350px;
+            .short-video {
+                height: 400px;
+                max-width: 100%;
+                border-radius: 0;
             }
         }
         
@@ -178,34 +185,6 @@
         .dark-mode .nav-item {
             color: #aaa;
         }
-        
-        .dark-mode .video-card {
-            background: #282828;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* رسالة Shorts */
-        .shorts-message {
-            text-align: center;
-            margin-top: 50px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .shorts-message.dark {
-            background: #282828;
-            color: #fff;
-        }
-        
-        .shorts-link {
-            color: #ff0000;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 10px;
-            display: inline-block;
-        }
     </style>
 </head>
 <body>
@@ -214,40 +193,65 @@
         <!-- قسم الفيديوهات الرئيسية -->
         <section id="videos" class="content-section active">
             <h2>الفيديوهات</h2>
-            <div class="video-grid">
-                <div class="video-card">
-                    <div class="thumbnail"></div>
-                    <div class="video-info">
-                        <h3>فيديو تجريبي 1</h3>
-                        <p>100K مشاهدة • منذ يومين</p>
-                    </div>
-                </div>
-                <div class="video-card">
-                    <div class="thumbnail"></div>
-                    <div class="video-info">
-                        <h3>فيديو تجريبي 2</h3>
-                        <p>250K مشاهدة • منذ أسبوع</p>
-                    </div>
-                </div>
-                <div class="video-card">
-                    <div class="thumbnail"></div>
-                    <div class="video-info">
-                        <h3>فيديو تجريبي 3</h3>
-                        <p>500K مشاهدة • منذ شهر</p>
-                    </div>
-                </div>
+            <div style="text-align: center; margin-top: 50px;">
+                <p>هذا قسم الفيديوهات الرئيسية</p>
+                <p>يمكنك إضافة فيديوهات هنا كما تريد</p>
             </div>
         </section>
         
         <!-- قسم الشورتس -->
         <section id="shorts" class="content-section">
-            <div class="shorts-message">
-                <h2>Shorts Content</h2>
-                <p>سيتم توجيهك إلى صفحة YouTube Shorts الرسمية</p>
-                <p>للعودة، أغلق علامة التبويب الجديدة</p>
-                <a href="https://m.youtube.com/shorts/117e_nr3vF0" class="shorts-link" target="_blank">
-                    <i class="fas fa-external-link-alt"></i> انتقل إلى Shorts الآن
-                </a>
+            <h2>Shorts</h2>
+            <div class="shorts-container">
+                <div class="short-video">
+                    <video loop controls>
+                        <source src="https://example.com/short1.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو
+                    </video>
+                    <div class="short-info">
+                        <h3>فيديو قصير ممتع</h3>
+                        <p>1.2M مشاهدة</p>
+                    </div>
+                    <div class="short-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-heart"></i>
+                            125K
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-comment"></i>
+                            5K
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-share"></i>
+                            مشاركة
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="short-video">
+                    <video loop controls>
+                        <source src="https://example.com/short2.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو
+                    </video>
+                    <div class="short-info">
+                        <h3>تجربة مضحكة</h3>
+                        <p>2.5M مشاهدة</p>
+                    </div>
+                    <div class="short-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-heart"></i>
+                            350K
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-comment"></i>
+                            12K
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-share"></i>
+                            مشاركة
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -258,7 +262,7 @@
             <i class="fas fa-home"></i>
             <span>الرئيسية</span>
         </a>
-        <a href="#shorts" class="nav-item" id="shorts-btn">
+        <a href="#shorts" class="nav-item">
             <i class="fas fa-play-circle"></i>
             <span>Shorts</span>
         </a>
@@ -283,8 +287,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const navItems = document.querySelectorAll('.nav-item');
             const contentSections = document.querySelectorAll('.content-section');
-            const shortsBtn = document.getElementById('shorts-btn');
-            const shortsMessage = document.querySelector('.shorts-message');
             
             // تبديل الأقسام عند النقر على الشريط
             navItems.forEach(item => {
@@ -298,18 +300,7 @@
                     // تفعيل العنصر المحدد
                     this.classList.add('active');
                     const targetId = this.getAttribute('href').substring(1);
-                    
-                    if (targetId === 'shorts') {
-                        // فتح رابط Shorts في نافذة جديدة
-                        window.open('https://m.youtube.com/shorts/117e_nr3vF0', '_blank');
-                        
-                        // إظهار رسالة Shorts في الصفحة الرئيسية
-                        document.getElementById('videos').classList.add('active');
-                        this.classList.remove('active');
-                        document.querySelector('[href="#videos"]').classList.add('active');
-                    } else if (targetId) {
-                        document.getElementById(targetId).classList.add('active');
-                    }
+                    document.getElementById(targetId).classList.add('active');
                     
                     // تأثير سلس للانتقال
                     window.scrollTo({
@@ -335,21 +326,24 @@
             darkModeToggle.style.zIndex = '1000';
             darkModeToggle.addEventListener('click', function() {
                 document.body.classList.toggle('dark-mode');
-                shortsMessage.classList.toggle('dark');
                 this.innerHTML = document.body.classList.contains('dark-mode') ? 
                     '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             });
             document.body.appendChild(darkModeToggle);
             
-            // محاكاة تحميل الفيديوهات
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            thumbnails.forEach(thumb => {
-                const isShort = thumb.classList.contains('shorts-thumbnail');
-                const color = isShort ? '#ff0000' : '#555';
-                thumb.style.background = `linear-gradient(135deg, ${color} 0%, ${isShort ? '#ff6b6b' : '#888'} 100%)`;
-                thumb.innerHTML = `<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; font-size:${
-                    isShort ? '2em' : '1.2em'
-                }">${isShort ? 'SHORTS' : 'VIDEO'}</div>`;
+            // محاكاة تشغيل الفيديو عند الظهور
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.play();
+                    } else {
+                        entry.target.pause();
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('.short-video video').forEach(video => {
+                observer.observe(video);
             });
         });
     </script>
