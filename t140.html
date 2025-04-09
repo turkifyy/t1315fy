@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,8 +9,9 @@
     <style>
         :root {
             --transition-duration: 1.5s;
-            --splash-z-index: 94000;
+            --splash-z-index: 96000;
             --video-z-index: 93000;
+            --logo-z-index: 95000;
         }
 
         * {
@@ -93,6 +94,50 @@
                 height: -webkit-fill-available;
             }
         }
+           .logo-container {
+            position: fixed;
+            top: 10px;
+            left: 115px;
+            z-index: var(--logo-z-index);
+            width: auto;
+            height: auto;
+            max-width: 328px;
+            max-height: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container img {
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            }
+
+        @media (orientation: portrait) {
+            #unique-splash-screen img {
+                object-position: center;
+            }
+            
+            .logo-container {
+                max-width: 80px;
+                max-height: 40px;
+                top: 10px;
+                left: 115px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo-container {
+                max-width: 100px;
+                max-height: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-container {
+                max-width: 70px;
+                max-height: 35px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -102,7 +147,7 @@
              loading="eager"
              decoding="async" />
     </div>
-
+     
     <div class="video-container">
         <iframe 
             class="video-iframe1" 
@@ -113,7 +158,12 @@
             sandbox="allow-scripts allow-same-origin allow-forms allow-downloads">
         </iframe>
     </div>
-
+   <div class="logo-container">
+        <img src="https://turkify.netlify.app/logo-music.webp" 
+             alt="Turkify Logo" 
+             loading="lazy"
+             decoding="async">
+         </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const splashScreen = document.getElementById('unique-splash-screen');
