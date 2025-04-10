@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="منصة شورتس لمشاهدة ومشاركة الفيديوهات القصيرة">
+    <meta name="theme-color" content="#FF0000">
+    <title>شورتس - منصة الفيديوهات القصيرة</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "شورتس",
+        "description": "منصة لمشاهدة ومشاركة الفيديوهات القصيرة",
+        "applicationCategory": "SocialMediaPlatform",
+        "operatingSystem": "Web"
+    }
+    </script>
+    
+    <style>
+        /* CSS Reset */
+        :root {
+            --primary-color: #FF0000;
+            --secondary-color: #25F4EE;
+            --text-color: #333333;
+            --text-light: #777777;
+            --bg-color: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --border-color: #EEEEEE;
+            --dark-bg: #121212;
+            --dark-card: #1E1E1E;
+            --dark-text: #F0F0F0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #FF3333;
+            --text-color: var(--dark-text);
+            --bg-color: var(--dark-bg);
+            --card-bg: var(--dark-card);
+            --border-color: #333333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            overscroll-behavior-y: contain;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 30px;
+            width: auto;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .header-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-container {
+            padding-top: 60px;
+            padding-bottom: 70px;
+            min-height: 100vh;
+        }
+
+        /* Video Feed */
+        .video-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 15px;
+        }
+
+        .video-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: #000000;
+            transition: var(--transition);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 177.78%; /* 16:9 Aspect Ratio */
+        }
+
+        .video-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000000;
+        }
+
+        /* Video Progress */
+        .video-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 10;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-color);
+            transition: width 0.1s linear;
+        }
+
+        /* Video Info */
+        .video-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            z-index: 5;
+        }
+
+        .video-title {
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .video-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Video Actions */
+        .video-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 5;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            transition: var(--transition);
+        }
+
+        .action-btn:hover .action-icon {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .action-text {
+            font-size: 0.7rem;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Filters */
+        .filters-container {
+            position: sticky;
+            top: 60px;
+            background: var(--card-bg);
+            z-index: 900;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--card-bg);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.7rem;
+            gap: 5px;
+            transition: var(--transition);
+            width: 25%;
+            height: 100%;
+        }
+
+        .nav-btn.active {
+            color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+        }
+
+        .upload-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-15px);
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+        }
+
+        /* Auth Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .auth-modal {
+            background: var(--card-bg);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .auth-modal {
+            transform: translateY(0);
+        }
+
+        .auth-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .auth-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        .auth-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .google-btn {
+            background: #4285F4;
+            color: white;
+        }
+
+        .facebook-btn {
+            background: #3B5998;
+            color: white;
+        }
+
+        .apple-btn {
+            background: #000000;
+            color: white;
+        }
+
+        .email-btn {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .close-auth {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        /* Upload Modal */
+        .upload-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+            transition: bottom 0.3s ease;
+            z-index: 2000;
+        }
+
+        .upload-modal.active {
+            bottom: 0;
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .upload-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .close-upload {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .upload-options {
+            display: flex;
+            gap: 15px;
+        }
+
+        .upload-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            background: var(--bg-color);
+            border: 1px dashed var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .upload-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .upload-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Loading */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 0, 0, 0.1);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error Message */
+        .error-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .error-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .error-text {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .retry-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .retry-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            .main-container {
+                max-width: 500px;
+                margin: 0 auto;
+                border-left: 1px solid var(--border-color);
+                border-right: 1px solid var(--border-color);
+            }
+            
+            .video-item {
+                border-radius: 0;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <a href="#" class="logo">
+            <img src="https://i.ibb.co/0jQH5Pv/shorts-cover.jpg" alt="Shorts Logo">
+            <span>شورتس</span>
+        </a>
+        <div class="header-actions">
+            <button class="header-btn" id="searchBtn">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="header-btn" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="filters-container">
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-filter="all">الكل</button>
+            <button class="filter-btn" data-filter="trending">الرائجة</button>
+            <button class="filter-btn" data-filter="music">موسيقى</button>
+            <button class="filter-btn" data-filter="gaming">ألعاب</button>
+            <button class="filter-btn" data-filter="sports">رياضة</button>
+            <button class="filter-btn" data-filter="comedy">كوميديا</button>
+            <button class="filter-btn" data-filter="education">تعليم</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="video-feed" id="videoFeed">
+            <!-- Videos will be loaded here dynamically -->
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-btn active">
+            <i class="fas fa-home nav-icon"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="#" class="nav-btn">
+            <i class="fas fa-compass nav-icon"></i>
+            <span>اكتشف</span>
+        </a>
+        <div class="upload-btn" id="uploadBtn">
+            <i class="fas fa-plus"></i>
+        </div>
+        <a href="#" class="nav-btn">
+            <i class="fas fa-bell nav-icon"></i>
+            <span>إشعارات</span>
+        </a>
+        <a href="#" class="nav-btn" id="profileBtn">
+            <i class="fas fa-user nav-icon"></i>
+            <span>حسابي</span>
+        </a>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-modal">
+            <h2 class="auth-title">تسجيل الدخول</h2>
+            <p class="auth-subtitle">سجل الدخول لحفظ الفيديوهات المفضلة وإنشاء محتواك الخاص</p>
+            
+            <button class="auth-btn google-btn" id="googleLogin">
+                <i class="fab fa-google"></i>
+                <span>تسجيل الدخول بجوجل</span>
+            </button>
+            
+            <button class="auth-btn facebook-btn" id="facebookLogin">
+                <i class="fab fa-facebook-f"></i>
+                <span>تسجيل الدخول بفيسبوك</span>
+            </button>
+            
+            <button class="auth-btn apple-btn" id="appleLogin">
+                <i class="fab fa-apple"></i>
+                <span>تسجيل الدخول بأبل</span>
+            </button>
+            
+            <button class="auth-btn email-btn" id="emailLogin">
+                <i class="fas fa-envelope"></i>
+                <span>تسجيل الدخول بالبريد</span>
+            </button>
+            
+            <button class="close-auth" id="closeAuthModal">
+                <span>تخطي الآن</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-header">
+            <h3 class="upload-title">رفع فيديو جديد</h3>
+            <button class="close-upload" id="closeUploadModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="upload-options">
+            <div class="upload-option" id="recordVideo">
+                <div class="upload-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <span class="upload-text">تسجيل فيديو</span>
+            </div>
+            <div class="upload-option" id="uploadVideo">
+                <div class="upload-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <span class="upload-text">رفع من الجهاز</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <!-- Main App Script -->
+    <script>
+        // Firebase Configuration (Replace with your config)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // App State
+        const APP_STATE = {
+            currentUser: null,
+            videos: [],
+            filteredVideos: [],
+            likedVideos: [],
+            watchedVideos: [],
+            currentVideoIndex: 0,
+            isLoading: false,
+            theme: localStorage.getItem('theme') || 'light',
+            currentFilter: 'all',
+            videoPlayers: {},
+            observers: []
+        };
+
+        // DOM Elements
+        const DOM = {
+            videoFeed: document.getElementById('videoFeed'),
+            filters: document.getElementById('filters'),
+            themeToggle: document.getElementById('themeToggle'),
+            authModal: document.getElementById('authModal'),
+            uploadModal: document.getElementById('uploadModal'),
+            profileBtn: document.getElementById('profileBtn'),
+            uploadBtn: document.getElementById('uploadBtn'),
+            closeAuthModal: document.getElementById('closeAuthModal'),
+            closeUploadModal: document.getElementById('closeUploadModal'),
+            googleLogin: document.getElementById('googleLogin'),
+            facebookLogin: document.getElementById('facebookLogin'),
+            appleLogin: document.getElementById('appleLogin'),
+            emailLogin: document.getElementById('emailLogin'),
+            recordVideo: document.getElementById('recordVideo'),
+            uploadVideo: document.getElementById('uploadVideo')
+        };
+
+        // Initialize the app
+        function initApp() {
+            // Set theme
+            document.documentElement.setAttribute('data-theme', APP_STATE.theme);
+            updateThemeIcon();
+
+            // Check auth state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    APP_STATE.currentUser = user;
+                    loadUserData(user.uid);
+                } else {
+                    // Show auth modal after 3 seconds if not logged in
+                    setTimeout(() => {
+                        if (!APP_STATE.currentUser) {
+                            showAuthModal();
+                        }
+                    }, 3000);
+                }
+            });
+
+            // Load videos
+            loadVideos();
+
+            // Initialize event listeners
+            initEventListeners();
+
+            // Initialize service worker for PWA
+            initServiceWorker();
+        }
+
+        // Load videos from API
+        async function loadVideos() {
+            try {
+                APP_STATE.isLoading = true;
+                showLoading();
+                
+                // In a real app, fetch from your API
+                // const response = await fetch('https://your-api-endpoint.com/videos');
+                // APP_STATE.videos = await response.json();
+                
+                // Mock data for demonstration
+                APP_STATE.videos = Array.from({ length: 15 }, (_, i) => ({
+                    id: `video_${i}`,
+                    title: `فيديو تجريبي ${i + 1}`,
+                    description: `هذا وصف الفيديو التجريبي رقم ${i + 1}`,
+                    source: "youtube",
+                    videoId: `abc123xyz${i}`,
+                    author: {
+                        id: `user_${i % 5}`,
+                        name: `مستخدم ${i % 5 + 1}`,
+                        avatar: `https://i.pravatar.cc/150?img=${i % 10}`
+                    },
+                    likes: Math.floor(Math.random() * 1000),
+                    comments: Math.floor(Math.random() * 100),
+                    views: Math.floor(Math.random() * 10000),
+                    duration: Math.floor(Math.random() * 120) + 30,
+                    category: ['music', 'gaming', 'sports', 'comedy', 'education'][Math.floor(Math.random() * 5)],
+                    uploadDate: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
+                    tags: ['فيديو', 'تجربة', 'قصير']
+                }));
+                
+                // Add some trending videos
+                APP_STATE.videos.push({
+                    id: 'video_trending_1',
+                    title: 'فيديو رائج هذا الأسبوع',
+                    description: 'هذا الفيديو يحظى بشعبية كبيرة هذا الأسبوع',
+                    source: "youtube",
+                    videoId: 'trending123',
+                    author: {
+                        id: 'user_trending',
+                        name: 'قناة رائجة',
+                        avatar: 'https://i.pravatar.cc/150?img=11'
+                    },
+                    likes: 15000,
+                    comments: 3200,
+                    views: 2500000,
+                    duration: 45,
+                    category: 'trending',
+                    uploadDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+                    tags: ['رائج', 'ترند', 'مشهور']
+                });
+                
+                filterVideos(APP_STATE.currentFilter);
+                
+                // Load from localStorage
+                const savedPosition = JSON.parse(localStorage.getItem('videoPosition'));
+                if (savedPosition) {
+                    APP_STATE.currentVideoIndex = savedPosition.index;
+                }
+                
+                renderVideos();
+                
+                // Initialize intersection observer
+                initIntersectionObserver();
+                
+                APP_STATE.isLoading = false;
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                showError('حدث خطأ أثناء تحميل الفيديوهات');
+                APP_STATE.isLoading = false;
+            }
+        }
+
+        // Filter videos by category
+        function filterVideos(filter) {
+            APP_STATE.currentFilter = filter;
+            
+            if (filter === 'all') {
+                APP_STATE.filteredVideos = [...APP_STATE.videos];
+            } else if (filter === 'trending') {
+                APP_STATE.filteredVideos = APP_STATE.videos.filter(video => 
+                    video.likes > 5000 || video.views > 1000000
+                ).sort((a, b) => b.views - a.views);
+            } else {
+                APP_STATE.filteredVideos = APP_STATE.videos.filter(video => 
+                    video.category === filter
+                );
+            }
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            
+            return APP_STATE.filteredVideos;
+        }
+
+        // Render videos to the feed
+        function renderVideos() {
+            DOM.videoFeed.innerHTML = '';
+            
+            if (APP_STATE.filteredVideos.length === 0) {
+                DOM.videoFeed.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-video-slash error-icon"></i>
+                        <p class="error-text">لا توجد فيديوهات متاحة في هذا القسم</p>
+                        <button class="retry-btn" onclick="loadVideos()">إعادة المحاولة</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            APP_STATE.filteredVideos.forEach((video, index) => {
+                const isLiked = APP_STATE.likedVideos.includes(video.id);
+                const isWatched = APP_STATE.watchedVideos.includes(video.id);
+                
+                const videoElement = document.createElement('div');
+                videoElement.className = 'video-item fade-in';
+                videoElement.style.animationDelay = `${index * 0.1}s`;
+                videoElement.dataset.videoId = video.id;
+                videoElement.dataset.index = index;
+                
+                videoElement.innerHTML = `
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/${video.videoId}?enablejsapi=1&autoplay=0&mute=1&controls=0&modestbranding=1&rel=0" 
+                                class="video-iframe"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                loading="lazy">
+                            </iframe>
+                            <div class="video-progress">
+                                <div class="progress-bar" id="progress-${video.id}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">${video.title}</h3>
+                        <div class="video-author">
+                            <img src="${video.author.avatar}" alt="${video.author.name}" class="author-avatar">
+                            <span>${video.author.name}</span>
+                        </div>
+                        <div class="video-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-eye"></i>
+                                <span>${formatNumber(video.views)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-heart ${isLiked ? 'active' : ''}"></i>
+                                <span>${formatNumber(video.likes)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-comment"></i>
+                                <span>${formatNumber(video.comments)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-actions">
+                        <button class="action-btn like-btn" data-video-id="${video.id}">
+                            <div class="action-icon">
+                                <i class="fas fa-heart ${isLiked ? 'active' : ''}"></i>
+                            </div>
+                            <span class="action-text">إعجاب</span>
+                        </button>
+                        <button class="action-btn comment-btn" data-video-id="${video.id}">
+                            <div class="action-icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <span class="action-text">تعليق</span>
+                        </button>
+                        <button class="action-btn share-btn" data-video-id="${video.id}">
+                            <div class="action-icon">
+                                <i class="fas fa-share"></i>
+                            </div>
+                            <span class="action-text">مشاركة</span>
+                        </button>
+                        <button class="action-btn report-btn" data-video-id="${video.id}">
+                            <div class="action-icon">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <span class="action-text">إبلاغ</span>
+                        </button>
+                    </div>
+                `;
+                
+                DOM.videoFeed.appendChild(videoElement);
+                
+                // Add event listeners
+                const likeBtn = videoElement.querySelector('.like-btn');
+                const commentBtn = videoElement.querySelector('.comment-btn');
+                const shareBtn = videoElement.querySelector('.share-btn');
+                const reportBtn = videoElement.querySelector('.report-btn');
+                
+                likeBtn.addEventListener('click', () => toggleLike(video.id));
+                commentBtn.addEventListener('click', () => showComments(video.id));
+                shareBtn.addEventListener('click', () => shareVideo(video.id));
+                reportBtn.addEventListener('click', () => reportVideo(video.id));
+                
+                // Initialize video player
+                initVideoPlayer(videoElement, video.id);
+            });
+            
+            // Scroll to current video
+            setTimeout(() => {
+                const currentVideoElement = document.querySelector(`.video-item[data-index="${APP_STATE.currentVideoIndex}"]`);
+                if (currentVideoElement) {
+                    currentVideoElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 300);
+        }
+
+        // Initialize YouTube player for a video
+        function initVideoPlayer(videoElement, videoId) {
+            const iframe = videoElement.querySelector('iframe');
+            const progressBar = videoElement.querySelector('.progress-bar');
+            
+            // Create YouTube player
+            const player = new YT.Player(iframe, {
+                events: {
+                    'onReady': () => onPlayerReady(player, videoId),
+                    'onStateChange': (event) => onPlayerStateChange(event, player, videoId)
+                }
+            });
+            
+            APP_STATE.videoPlayers[videoId] = player;
+            
+            // Track progress
+            const progressInterval = setInterval(() => {
+                if (player.getCurrentTime && player.getDuration) {
+                    const progress = (player.getCurrentTime() / player.getDuration()) * 100;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Save playback position if this is the current video
+                    if (videoId === APP_STATE.filteredVideos[APP_STATE.currentVideoIndex]?.id) {
+                        localStorage.setItem('videoPosition', JSON.stringify({
+                            index: APP_STATE.currentVideoIndex,
+                            time: player.getCurrentTime()
+                        }));
+                    }
+                }
+            }, 500);
+            
+            APP_STATE.observers.push({
+                videoId,
+                interval: progressInterval
+            });
+        }
+
+        // YouTube player ready callback
+        function onPlayerReady(player, videoId) {
+            // Auto-play the first video
+            if (videoId === APP_STATE.filteredVideos[0]?.id) {
+                player.playVideo();
+            }
+        }
+
+        // YouTube player state change callback
+        function onPlayerStateChange(event, player, videoId) {
+            const videoIndex = APP_STATE.filteredVideos.findIndex(v => v.id === videoId);
+            
+            if (event.data === YT.PlayerState.PLAYING) {
+                // Pause other videos when this one plays
+                Object.keys(APP_STATE.videoPlayers).forEach(id => {
+                    if (id !== videoId && APP_STATE.videoPlayers[id].pauseVideo) {
+                        APP_STATE.videoPlayers[id].pauseVideo();
+                    }
+                });
+                
+                // Update current video index
+                APP_STATE.currentVideoIndex = videoIndex;
+                
+                // Mark as watched
+                if (!APP_STATE.watchedVideos.includes(videoId)) {
+                    APP_STATE.watchedVideos.push(videoId);
+                    if (APP_STATE.currentUser) {
+                        db.collection('users').doc(APP_STATE.currentUser.uid).update({
+                            watchedVideos: firebase.firestore.FieldValue.arrayUnion(videoId)
+                        });
+                    }
+                }
+            }
+            
+            if (event.data === YT.PlayerState.ENDED) {
+                // Auto-play next video when current ends
+                if (videoIndex < APP_STATE.filteredVideos.length - 1) {
+                    const nextVideoElement = document.querySelector(`.video-item[data-index="${videoIndex + 1}"]`);
+                    if (nextVideoElement) {
+                        nextVideoElement.scrollIntoView({ behavior: 'smooth' });
+                        APP_STATE.videoPlayers[APP_STATE.filteredVideos[videoIndex + 1].id].playVideo();
+                    }
+                }
+            }
+        }
+
+        // Initialize intersection observer for lazy loading
+        function initIntersectionObserver() {
+            // Clear existing observers
+            APP_STATE.observers.forEach(obs => {
+                if (obs.interval) clearInterval(obs.interval);
+            });
+            APP_STATE.observers = [];
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const videoId = entry.target.dataset.videoId;
+                        const videoIndex = parseInt(entry.target.dataset.index);
+                        
+                        // Play video when it's in view
+                        if (APP_STATE.videoPlayers[videoId] && APP_STATE.videoPlayers[videoId].playVideo) {
+                            APP_STATE.videoPlayers[videoId].playVideo();
+                        }
+                        
+                        // Update current video index
+                        APP_STATE.currentVideoIndex = videoIndex;
+                        
+                        // Load more videos when approaching the end
+                        if (videoIndex >= APP_STATE.filteredVideos.length - 3 && !APP_STATE.isLoading) {
+                            loadMoreVideos();
+                        }
+                    } else {
+                        const videoId = entry.target.dataset.videoId;
+                        
+                        // Pause video when it's not in view
+                        if (APP_STATE.videoPlayers[videoId] && APP_STATE.videoPlayers[videoId].pauseVideo) {
+                            APP_STATE.videoPlayers[videoId].pauseVideo();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('.video-item').forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        // Load more videos when reaching the end
+        function loadMoreVideos() {
+            if (APP_STATE.isLoading) return;
+            
+            APP_STATE.isLoading = true;
+            showLoading();
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // In a real app, fetch more videos from your API
+                const newVideos = Array.from({ length: 5 }, (_, i) => {
+                    const newIndex = APP_STATE.videos.length + i;
+                    return {
+                        id: `video_${newIndex}`,
+                        title: `فيديو جديد ${newIndex + 1}`,
+                        description: `هذا وصف الفيديو الجديد رقم ${newIndex + 1}`,
+                        source: "youtube",
+                        videoId: `newvid${newIndex}`,
+                        author: {
+                            id: `user_${newIndex % 5}`,
+                            name: `مستخدم ${newIndex % 5 + 1}`,
+                            avatar: `https://i.pravatar.cc/150?img=${newIndex % 10 + 15}`
+                        },
+                        likes: Math.floor(Math.random() * 1000),
+                        comments: Math.floor(Math.random() * 100),
+                        views: Math.floor(Math.random() * 10000),
+                        duration: Math.floor(Math.random() * 120) + 30,
+                        category: ['music', 'gaming', 'sports', 'comedy', 'education'][Math.floor(Math.random() * 5)],
+                        uploadDate: new Date().toISOString(),
+                        tags: ['جديد', 'محتوى', 'حصري']
+                    };
+                });
+                
+                APP_STATE.videos = [...APP_STATE.videos, ...newVideos];
+                filterVideos(APP_STATE.currentFilter);
+                renderVideos();
+                
+                APP_STATE.isLoading = false;
+            }, 1000);
+        }
+
+        // Toggle like on a video
+        function toggleLike(videoId) {
+            const video = APP_STATE.videos.find(v => v.id === videoId);
+            if (!video) return;
+            
+            const likeIndex = APP_STATE.likedVideos.indexOf(videoId);
+            const isLiked = likeIndex !== -1;
+            
+            // Update UI
+            document.querySelectorAll(`.like-btn[data-video-id="${videoId}"]`).forEach(btn => {
+                const icon = btn.querySelector('i');
+                const countElement = btn.querySelector('span');
+                
+                if (isLiked) {
+                    // Unlike
+                    icon.classList.remove('active');
+                    countElement.textContent = formatNumber(video.likes - 1);
+                    APP_STATE.likedVideos.splice(likeIndex, 1);
+                } else {
+                    // Like
+                    icon.classList.add('active');
+                    countElement.textContent = formatNumber(video.likes + 1);
+                    APP_STATE.likedVideos.push(videoId);
+                }
+            });
+            
+            // Update in database if logged in
+            if (APP_STATE.currentUser) {
+                if (isLiked) {
+                    db.collection('users').doc(APP_STATE.currentUser.uid).update({
+                        likedVideos: firebase.firestore.FieldValue.arrayRemove(videoId)
+                    });
+                } else {
+                    db.collection('users').doc(APP_STATE.currentUser.uid).update({
+                        likedVideos: firebase.firestore.FieldValue.arrayUnion(videoId)
+                    });
+                }
+            }
+        }
+
+        // Show comments for a video
+        function showComments(videoId) {
+            if (!APP_STATE.currentUser) {
+                showAuthModal();
+                return;
+            }
+            
+            alert(`نظام التعليقات للفيديو ${videoId} سيتم تفعيله قريبًا`);
+            // In a real app, you would show a comments section
+        }
+
+        // Share a video
+        function shareVideo(videoId) {
+            const video = APP_STATE.videos.find(v => v.id === videoId);
+            if (!video) return;
+            
+            const shareData = {
+                title: video.title,
+                text: 'شاهد هذا الفيديو الرائع على منصة شورتس',
+                url: `https://youtube.com/watch?v=${video.videoId}`
+            };
+            
+            if (navigator.share) {
+                navigator.share(shareData)
+                    .then(() => console.log('Shared successfully'))
+                    .catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                prompt('انسخ الرابط لمشاركته:', shareData.url);
+            }
+        }
+
+        // Report a video
+        function reportVideo(videoId) {
+            const reason = prompt('الرجاء تحديد سبب الإبلاغ عن هذا الفيديو:');
+            if (reason) {
+                alert('شكرًا على إبلاغك، سنراجع هذا المحتوى قريبًا.');
+                
+                // In a real app, you would send this to your backend
+                if (APP_STATE.currentUser) {
+                    db.collection('reports').add({
+                        videoId,
+                        reason,
+                        userId: APP_STATE.currentUser.uid,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            }
+        }
+
+        // Load user data from Firestore
+        function loadUserData(userId) {
+            db.collection('users').doc(userId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        APP_STATE.likedVideos = userData.likedVideos || [];
+                        APP_STATE.watchedVideos = userData.watchedVideos || [];
+                        
+                        // Update UI to reflect liked videos
+                        APP_STATE.likedVideos.forEach(videoId => {
+                            document.querySelectorAll(`.like-btn[data-video-id="${videoId}"] i`).forEach(icon => {
+                                icon.classList.add('active');
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading user data:', error);
+                });
+        }
+
+        // Show auth modal
+        function showAuthModal() {
+            DOM.authModal.classList.add('active');
+        }
+
+        // Hide auth modal
+        function hideAuthModal() {
+            DOM.authModal.classList.remove('active');
+        }
+
+        // Show upload modal
+        function showUploadModal() {
+            if (!APP_STATE.currentUser) {
+                showAuthModal();
+                return;
+            }
+            
+            DOM.uploadModal.classList.add('active');
+        }
+
+        // Hide upload modal
+        function hideUploadModal() {
+            DOM.uploadModal.classList.remove('active');
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            APP_STATE.theme = APP_STATE.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', APP_STATE.theme);
+            localStorage.setItem('theme', APP_STATE.theme);
+            updateThemeIcon();
+        }
+
+        // Update theme icon
+        function updateThemeIcon() {
+            const icon = DOM.themeToggle.querySelector('i');
+            icon.className = APP_STATE.theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // Show loading indicator
+        function showLoading() {
+            const loadingHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                </div>
+            `;
+            
+            if (DOM.videoFeed.children.length === 0) {
+                DOM.videoFeed.innerHTML = loadingHTML;
+            } else {
+                const loadingElement = document.createElement('div');
+                loadingElement.className = 'loading-container';
+                loadingElement.innerHTML = '<div class="loading-spinner"></div>';
+                DOM.videoFeed.appendChild(loadingElement);
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            DOM.videoFeed.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle error-icon"></i>
+                    <p class="error-text">${message}</p>
+                    <button class="retry-btn" onclick="loadVideos()">إعادة المحاولة</button>
+                </div>
+            `;
+        }
+
+        // Format numbers with commas
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ar-EG').format(num);
+        }
+
+        // Initialize service worker for PWA
+        function initServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful');
+                            
+                            // Subscribe to push notifications
+                            if ('PushManager' in window) {
+                                Notification.requestPermission().then(permission => {
+                                    if (permission === 'granted') {
+                                        console.log('Notification permission granted');
+                                    }
+                                });
+                            }
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                });
+            }
+        }
+
+        // Initialize event listeners
+        function initEventListeners() {
+            // Theme toggle
+            DOM.themeToggle.addEventListener('click', toggleTheme);
+            
+            // Auth modal
+            DOM.closeAuthModal.addEventListener('click', hideAuthModal);
+            DOM.googleLogin.addEventListener('click', () => signInWithProvider(new firebase.auth.GoogleAuthProvider()));
+            DOM.facebookLogin.addEventListener('click', () => signInWithProvider(new firebase.auth.FacebookAuthProvider()));
+            DOM.appleLogin.addEventListener('click', () => signInWithProvider(new firebase.auth.OAuthProvider('apple.com')));
+            DOM.emailLogin.addEventListener('click', () => {
+                hideAuthModal();
+                alert('سيتم تنفيذ تسجيل الدخول بالبريد الإلكتروني في التحديثات القادمة');
+            });
+            
+            // Upload modal
+            DOM.uploadBtn.addEventListener('click', showUploadModal);
+            DOM.closeUploadModal.addEventListener('click', hideUploadModal);
+            DOM.recordVideo.addEventListener('click', () => {
+                hideUploadModal();
+                alert('سيتم تنفيذ تسجيل فيديو مباشر في التحديثات القادمة');
+            });
+            DOM.uploadVideo.addEventListener('click', () => {
+                hideUploadModal();
+                alert('سيتم تنفيذ رفع فيديو من الجهاز في التحديثات القادمة');
+            });
+            
+            // Profile button
+            DOM.profileBtn.addEventListener('click', (e) => {
+                if (!APP_STATE.currentUser) {
+                    e.preventDefault();
+                    showAuthModal();
+                } else {
+                    // Go to profile page
+                    alert('صفحة الملف الشخصي سيتم تنفيذها في التحديثات القادمة');
+                }
+            });
+            
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.dataset.filter;
+                    filterVideos(filter);
+                    renderVideos();
+                });
+            });
+            
+            // Handle swipe gestures
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            document.addEventListener('touchstart', e => {
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+            
+            document.addEventListener('touchend', e => {
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            }, { passive: true });
+            
+            function handleSwipe() {
+                const threshold = 50;
+                const delta = touchEndY - touchStartY;
+                
+                if (delta > threshold && APP_STATE.currentVideoIndex > 0) {
+                    // Swipe down - previous video
+                    const prevVideo = document.querySelector(`.video-item[data-index="${APP_STATE.currentVideoIndex - 1}"]`);
+                    if (prevVideo) {
+                        prevVideo.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } else if (delta < -threshold && APP_STATE.currentVideoIndex < APP_STATE.filteredVideos.length - 1) {
+                    // Swipe up - next video
+                    const nextVideo = document.querySelector(`.video-item[data-index="${APP_STATE.currentVideoIndex + 1}"]`);
+                    if (nextVideo) {
+                        nextVideo.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            }
+            
+            // Infinite scroll
+            window.addEventListener('scroll', () => {
+                if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 500 && !APP_STATE.isLoading) {
+                    loadMoreVideos();
+                }
+            });
+        }
+
+        // Sign in with provider
+        function signInWithProvider(provider) {
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    // Save user data to Firestore
+                    const user = result.user;
+                    const userData = {
+                        name: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        likedVideos: [],
+                        watchedVideos: [],
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    db.collection('users').doc(user.uid).set(userData, { merge: true });
+                    
+                    hideAuthModal();
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    alert(`حدث خطأ أثناء تسجيل الدخول: ${error.message}`);
+                });
+        }
+
+        // YouTube API callback
+        function onYouTubeIframeAPIReady() {
+            console.log('YouTube API is ready');
+        }
+
+        // Initialize the app
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
