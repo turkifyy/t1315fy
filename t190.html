@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>يوتيوب شورتس - مشغل مخصص</title>
-    <!-- مكتبة Plyr.js -->
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <!-- خطوط وأيقونات Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- تخصيصات CSS -->
     <style>
         :root {
-            --plyr-color-main: #FF0000; /* اللون الرئيسي (أحمر يوتيوب) */
-            --plyr-control-radius: 8px;
-            --plyr-video-controls-background: rgba(0, 0, 0, 0.7);
+            --primary-color: #FF0000;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
         }
 
         * {
@@ -24,12 +22,12 @@
         }
 
         body {
-            background: #f9f9f9;
-            color: #333;
+            background: var(--bg-color);
+            color: var(--text-color);
         }
 
         header {
-            background: #FF0000;
+            background: var(--primary-color);
             color: white;
             padding: 15px;
             text-align: center;
@@ -64,12 +62,13 @@
             padding-bottom: 177.78%; /* نسبة 9:16 للشورتات */
         }
 
-        .short-video div {
+        .short-video iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            border: none;
         }
 
         .short-info {
@@ -100,15 +99,6 @@
             grid-column: 1 / -1;
         }
 
-        /* تخصيصات Plyr */
-        .plyr--video .plyr__controls button:hover {
-            background: rgba(255, 0, 0, 0.5) !important;
-        }
-
-        .plyr__progress--played, .plyr__volume--display {
-            color: var(--plyr-color-main) !important;
-        }
-
         /* شريط التنقل السفلي */
         .bottom-nav {
             position: fixed;
@@ -136,7 +126,7 @@
         }
 
         .nav-btn.active {
-            color: #FF0000;
+            color: var(--primary-color);
         }
 
         @media (max-width: 600px) {
@@ -173,12 +163,18 @@
         </a>
     </nav>
 
-    <!-- مكتبة Plyr.js -->
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <!-- YouTube Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     <!-- الكود الرئيسي -->
     <script>
         const WORKER_URL = "https://turkify2.osamalovirboy.workers.dev/";
-        
+        let players = []; // لتخزين جميع المشغلات
+
+        // تهيئة YouTube Player API
+        function onYouTubeIframeAPIReady() {
+            loadShorts();
+        }
+
         async function loadShorts() {
             try {
                 const response = await fetch(WORKER_URL);
@@ -186,35 +182,35 @@
                 const container = document.getElementById('shorts-container');
                 container.innerHTML = '';
                 
-                shorts.forEach(video => {
+                shorts.forEach((video, index) => {
                     const shortItem = document.createElement('div');
                     shortItem.className = 'short-item';
                     shortItem.innerHTML = `
                         <div class="short-video">
-                            <div class="plyr__video-embed" id="player-${video.id.videoId}">
-                                <iframe
-                                    src="https://www.youtube.com/embed/${video.id.videoId}?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
-                                    allowfullscreen
-                                    loading="lazy"
-                                ></iframe>
-                            </div>
+                            <div id="player-${index}"></div>
                         </div>
                         <div class="short-info">
                             <div class="short-title">${video.snippet.title}</div>
                         </div>
                     `;
                     container.appendChild(shortItem);
-                });
-                
-                // تهيئة Plyr لكل فيديو
-                document.querySelectorAll('.plyr__video-embed').forEach(el => {
-                    const player = new Plyr(el, {
-                        autoplay: false,
-                        muted: true,
-                        loop: { active: true },
-                        controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-                        keyboard: { focused: true, global: true },
-                        tooltips: { controls: true },
+
+                    // تهيئة مشغل YouTube لكل فيديو
+                    players[index] = new YT.Player(`player-${index}`, {
+                        videoId: video.id.videoId,
+                        playerVars: {
+                            autoplay: 0,
+                            controls: 1,
+                            modestbranding: 1,
+                            rel: 0,
+                            enablejsapi: 1,
+                            fs: 1,
+                            playsinline: 1
+                        },
+                        events: {
+                            onReady: (event) => onPlayerReady(event, index),
+                            onStateChange: (event) => onPlayerStateChange(event, index)
+                        }
                     });
                 });
                 
@@ -229,9 +225,33 @@
                 `;
             }
         }
-        
+
+        // عند جاهزية المشغل
+        function onPlayerReady(event, index) {
+            console.log(`المشغل ${index} جاهز`);
+        }
+
+        // عند تغيير حالة التشغيل
+        function onPlayerStateChange(event, index) {
+            // يمكنك إضافة ردود فعل حسب حالة التشغيل
+            // event.data يمكن أن يكون:
+            // -1 (غير بدأ)
+            // 0 (انتهى)
+            // 1 (يعمل)
+            // 2 (مؤقت)
+            // 3 (جاري التحميل)
+            // 5 (تم التخزين المؤقت)
+        }
+
         // تحميل الشورتات عند فتح الصفحة
-        window.addEventListener('DOMContentLoaded', loadShorts);
+        window.addEventListener('load', () => {
+            if (typeof YT === 'undefined') {
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            }
+        });
     </script>
 </body>
 </html>
