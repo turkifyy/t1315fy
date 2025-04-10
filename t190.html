@@ -35,6 +35,14 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo {
+            height: 30px;
         }
 
         #shorts-container {
@@ -51,6 +59,7 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            position: relative;
         }
 
         .short-item:hover {
@@ -129,6 +138,18 @@
             color: var(--primary-color);
         }
 
+        .view-count {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1;
+        }
+
         @media (max-width: 600px) {
             #shorts-container {
                 grid-template-columns: 1fr;
@@ -139,7 +160,8 @@
 </head>
 <body>
     <header>
-        <h1><i class="fas fa-play-circle"></i> يوتيوب شورتس</h1>
+        <img src="https://www.youtube.com/s/desktop/d5a0a1e5/img/favicon_32x32.png" alt="YouTube Logo" class="logo">
+        <h1>يوتيوب شورتس</h1>
     </header>
     
     <div id="shorts-container">
@@ -169,6 +191,7 @@
     <script>
         const WORKER_URL = "https://turkify2.osamalovirboy.workers.dev/";
         let players = []; // لتخزين جميع المشغلات
+        let currentPlayingIndex = -1; // لتتبع الفيديو المشغّل حالياً
 
         // تهيئة YouTube Player API
         function onYouTubeIframeAPIReady() {
@@ -186,6 +209,9 @@
                     const shortItem = document.createElement('div');
                     shortItem.className = 'short-item';
                     shortItem.innerHTML = `
+                        <div class="view-count">
+                            <i class="fas fa-eye"></i> ${Math.floor(Math.random() * 10000)} مشاهدة
+                        </div>
                         <div class="short-video">
                             <div id="player-${index}"></div>
                         </div>
@@ -199,13 +225,15 @@
                     players[index] = new YT.Player(`player-${index}`, {
                         videoId: video.id.videoId,
                         playerVars: {
-                            autoplay: 0,
-                            controls: 1,
-                            modestbranding: 1,
-                            rel: 0,
-                            enablejsapi: 1,
-                            fs: 1,
-                            playsinline: 1
+                            autoplay: 0,          // لا تشغيل تلقائي
+                            controls: 1,          // إظهار عناصر التحكم
+                            modestbranding: 1,    // تقليل شعار YouTube
+                            rel: 0,               // عدم عرض فيديوهات مقترحة في النهاية
+                            enablejsapi: 1,       // تمكين JavaScript API
+                            fs: 1,                // تمكين وضع ملء الشاشة
+                            playsinline: 1,       // التشغيل داخل الصفحة (مهم للآيفون)
+                            iv_load_policy: 3,    // إخفاء التعليقات التوضيحية
+                            disablekb: 1          // تعطيل مفاتيح لوحة المفاتيح
                         },
                         events: {
                             onReady: (event) => onPlayerReady(event, index),
@@ -229,18 +257,30 @@
         // عند جاهزية المشغل
         function onPlayerReady(event, index) {
             console.log(`المشغل ${index} جاهز`);
+            // يمكنك هنا إضافة أي إعدادات إضافية عند جاهزية المشغل
         }
 
         // عند تغيير حالة التشغيل
         function onPlayerStateChange(event, index) {
-            // يمكنك إضافة ردود فعل حسب حالة التشغيل
-            // event.data يمكن أن يكون:
-            // -1 (غير بدأ)
-            // 0 (انتهى)
-            // 1 (يعمل)
-            // 2 (مؤقت)
-            // 3 (جاري التحميل)
-            // 5 (تم التخزين المؤقت)
+            // إذا بدأ الفيديو التشغيل
+            if (event.data === YT.PlayerState.PLAYING) {
+                // إيقاف أي فيديو آخر مشغّل
+                if (currentPlayingIndex !== -1 && currentPlayingIndex !== index) {
+                    players[currentPlayingIndex].pauseVideo();
+                }
+                currentPlayingIndex = index;
+                
+                // إضافة تأثير للفيديو النشط
+                document.querySelectorAll('.short-item').forEach(item => {
+                    item.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                });
+                event.target.getIframe().parentElement.parentElement.style.boxShadow = '0 0 0 2px #FF0000';
+            }
+            
+            // إذا انتهى الفيديو
+            if (event.data === YT.PlayerState.ENDED) {
+                // يمكنك هنا إضافة أي رد فعل عند انتهاء الفيديو
+            }
         }
 
         // تحميل الشورتات عند فتح الصفحة
