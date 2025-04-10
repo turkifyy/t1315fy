@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="منصة متكاملة لمشاهدة ومشاركة الفيديوهات القصيرة">
+    <meta property="og:title" content="شورتس - منصة الفيديوهات القصيرة">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yoursite.com">
+    <meta property="og:image" content="https://i.ibb.co/0jQH5Pv/shorts-cover.jpg">
+    <title>شورتس - منصة الفيديوهات القصيرة</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Swiper JS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
+    
+    <!-- LazyLoad -->
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.3/dist/lazyload.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #FF0000;
+            --secondary-color: #FE2C55;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
+            --card-bg: #fff;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #FF3333;
+            --secondary-color: #FE2C55;
+            --text-color: #f0f0f0;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --border-color: #333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            overscroll-behavior-y: contain;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 30px;
+        }
+
+        /* Main Container */
+        .swiper-container {
+            width: 100%;
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+
+        .swiper-slide {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            background: #000;
+        }
+
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .video-info {
+            position: relative;
+            z-index: 2;
+            color: white;
+            padding-bottom: 80px;
+        }
+
+        .video-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 3;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Auth Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .auth-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .google-btn {
+            background: #4285F4;
+            color: white;
+        }
+
+        .facebook-btn {
+            background: #3b5998;
+            color: white;
+        }
+
+        .apple-btn {
+            background: #000;
+            color: white;
+        }
+
+        /* Upload Modal */
+        .upload-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .upload-modal.show {
+            bottom: 0;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 900;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 12px;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active {
+            opacity: 1;
+            color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* Animation Classes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .swiper-container {
+                height: calc(100vh - 80px);
+            }
+            
+            .video-actions {
+                right: 10px;
+                bottom: 80px;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="https://i.ibb.co/0jQH5Pv/shorts-cover.jpg" alt="Shorts Logo">
+            <span>شورتس</span>
+        </div>
+        <div class="header-actions">
+            <button id="themeToggle"><i class="fas fa-moon"></i></button>
+            <button id="searchBtn"><i class="fas fa-search"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Content - Swiper Container -->
+    <div class="swiper-container">
+        <div class="swiper-wrapper" id="videosContainer">
+            <!-- Videos will be loaded here dynamically -->
+            <div class="loading" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <i class="fas fa-spinner fa-spin"></i> جاري تحميل الفيديوهات...
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-content">
+            <h2>تسجيل الدخول</h2>
+            <p>سجل الدخول لحفظ الفيديوهات المفضلة وإنشاء محتواك الخاص</p>
+            
+            <button class="auth-btn google-btn" id="googleLogin">
+                <i class="fab fa-google"></i>
+                <span>تسجيل الدخول بجوجل</span>
+            </button>
+            
+            <button class="auth-btn facebook-btn" id="facebookLogin">
+                <i class="fab fa-facebook-f"></i>
+                <span>تسجيل الدخول بفيسبوك</span>
+            </button>
+            
+            <button class="auth-btn apple-btn" id="appleLogin">
+                <i class="fab fa-apple"></i>
+                <span>تسجيل الدخول بأبل</span>
+            </button>
+            
+            <button class="auth-btn" id="closeAuthModal" style="background: var(--bg-color); color: var(--text-color);">
+                <span>تخطي الآن</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="upload-modal" id="uploadModal">
+        <h3>رفع فيديو جديد</h3>
+        <div class="upload-options">
+            <button class="upload-option">
+                <i class="fas fa-video"></i>
+                <span>تسجيل فيديو</span>
+            </button>
+            <button class="upload-option">
+                <i class="fas fa-upload"></i>
+                <span>رفع من الجهاز</span>
+            </button>
+        </div>
+        <button class="close-upload" id="closeUploadModal">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-btn active">
+            <i class="fas fa-home nav-icon"></i>
+            <span>اكتشف</span>
+        </a>
+        <a href="#" class="nav-btn">
+            <i class="fas fa-search nav-icon"></i>
+            <span>بحث</span>
+        </a>
+        <a href="#" class="nav-btn" id="uploadBtn">
+            <i class="fas fa-plus nav-icon"></i>
+            <span>رفع</span>
+        </a>
+        <a href="#" class="nav-btn">
+            <i class="fas fa-bell nav-icon"></i>
+            <span>إشعارات</span>
+        </a>
+        <a href="#" class="nav-btn" id="profileBtn">
+            <i class="fas fa-user nav-icon"></i>
+            <span>حسابي</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Initialize Swiper
+        const swiper = new Swiper('.swiper-container', {
+            direction: 'vertical',
+            slidesPerView: 1,
+            spaceBetween: 0,
+            mousewheel: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            on: {
+                init: function() {
+                    loadVideos();
+                },
+                slideChange: function() {
+                    // AI recommendations based on watched videos
+                    recommendVideos();
+                }
+            }
+        });
+
+        // Initialize LazyLoad
+        const lazyLoadInstance = new LazyLoad({
+            elements_selector: ".lazy"
+        });
+
+        // App State
+        const appState = {
+            currentUser: null,
+            videos: [],
+            likedVideos: [],
+            watchedVideos: [],
+            theme: localStorage.getItem('theme') || 'light',
+            currentVideoIndex: 0
+        };
+
+        // DOM Elements
+        const DOM = {
+            authModal: document.getElementById('authModal'),
+            uploadModal: document.getElementById('uploadModal'),
+            videosContainer: document.getElementById('videosContainer'),
+            themeToggle: document.getElementById('themeToggle'),
+            profileBtn: document.getElementById('profileBtn'),
+            uploadBtn: document.getElementById('uploadBtn'),
+            googleLogin: document.getElementById('googleLogin'),
+            facebookLogin: document.getElementById('facebookLogin'),
+            appleLogin: document.getElementById('appleLogin'),
+            closeAuthModal: document.getElementById('closeAuthModal'),
+            closeUploadModal: document.getElementById('closeUploadModal')
+        };
+
+        // Initialize App
+        function initApp() {
+            // Set theme
+            document.documentElement.setAttribute('data-theme', appState.theme);
+            updateThemeIcon();
+
+            // Check auth state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    appState.currentUser = user;
+                    loadUserData(user.uid);
+                } else {
+                    showAuthModal();
+                }
+            });
+
+            // Event Listeners
+            DOM.themeToggle.addEventListener('click', toggleTheme);
+            DOM.profileBtn.addEventListener('click', toggleProfile);
+            DOM.uploadBtn.addEventListener('click', showUploadModal);
+            DOM.googleLogin.addEventListener('click', () => signInWithProvider(new firebase.auth.GoogleAuthProvider()));
+            DOM.facebookLogin.addEventListener('click', () => signInWithProvider(new firebase.auth.FacebookAuthProvider()));
+            DOM.appleLogin.addEventListener('click', () => signInWithProvider(new firebase.auth.OAuthProvider('apple.com')));
+            DOM.closeAuthModal.addEventListener('click', hideAuthModal);
+            DOM.closeUploadModal.addEventListener('click', hideUploadModal);
+
+            // Load initial data
+            loadVideos();
+        }
+
+        // Load Videos from multiple sources
+        async function loadVideos() {
+            try {
+                // Load from YouTube
+                const youtubeRes = await fetch('https://turkify2.osamalovirboy.workers.dev/');
+                const youtubeVideos = await youtubeRes.json();
+                
+                // Load from TikTok (example)
+                const tiktokVideos = await fetchTikTokVideos();
+                
+                // Load from Vimeo (example)
+                const vimeoVideos = await fetchVimeoVideos();
+                
+                // Combine all videos
+                appState.videos = [
+                    ...youtubeVideos.map(v => ({ ...v, source: 'youtube' })),
+                    ...tiktokVideos.map(v => ({ ...v, source: 'tiktok' })),
+                    ...vimeoVideos.map(v => ({ ...v, source: 'vimeo' }))
+                ];
+                
+                renderVideos();
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                // Fallback to cached videos
+                const cachedVideos = JSON.parse(localStorage.getItem('cachedVideos')) || [];
+                if (cachedVideos.length > 0) {
+                    appState.videos = cachedVideos;
+                    renderVideos();
+                }
+            }
+        }
+
+        // Render Videos to Swiper
+        function renderVideos() {
+            DOM.videosContainer.innerHTML = '';
+            
+            appState.videos.forEach((video, index) => {
+                const isLiked = appState.likedVideos.includes(video.id.videoId || video.id);
+                
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide fade-in';
+                slide.style.animationDelay = `${index * 0.1}s`;
+                slide.innerHTML = `
+                    <div class="video-container">
+                        ${getVideoEmbedCode(video)}
+                    </div>
+                    <div class="video-info">
+                        <h3>${video.snippet?.title || video.title}</h3>
+                        <p>${video.snippet?.channelTitle || video.author}</p>
+                    </div>
+                    <div class="video-actions">
+                        <button class="action-btn like-btn" data-video-id="${video.id.videoId || video.id}">
+                            <div class="action-icon">
+                                <i class="fas fa-heart ${isLiked ? 'active' : ''}"></i>
+                            </div>
+                            <span>${video.statistics?.likeCount || '0'}</span>
+                        </button>
+                        <button class="action-btn comment-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <span>${video.statistics?.commentCount || '0'}</span>
+                        </button>
+                        <button class="action-btn share-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-share"></i>
+                            </div>
+                            <span>مشاركة</span>
+                        </button>
+                    </div>
+                `;
+                
+                DOM.videosContainer.appendChild(slide);
+            });
+            
+            // Reinitialize Swiper
+            swiper.update();
+            
+            // Add event listeners
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', toggleLike);
+            });
+            
+            document.querySelectorAll('.comment-btn').forEach(btn => {
+                btn.addEventListener('click', showComments);
+            });
+            
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', shareVideo);
+            });
+            
+            // Cache videos
+            localStorage.setItem('cachedVideos', JSON.stringify(appState.videos));
+        }
+
+        // Get appropriate embed code based on video source
+        function getVideoEmbedCode(video) {
+            switch(video.source) {
+                case 'youtube':
+                    return `
+                        <iframe 
+                            src="https://www.youtube.com/embed/${video.id.videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&enablejsapi=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                case 'tiktok':
+                    return `
+                        <iframe
+                            src="https://www.tiktok.com/embed/v2/${video.id}"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                case 'vimeo':
+                    return `
+                        <iframe
+                            src="https://player.vimeo.com/video/${video.id}?autoplay=1&muted=1"
+                            frameborder="0"
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        // AI Video Recommendations
+        function recommendVideos() {
+            // Simple recommendation based on watched videos
+            const recommended = appState.videos
+                .filter(v => appState.watchedVideos.includes(v.id.videoId || v.id))
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 5);
+            
+            // In a real app, you would use more sophisticated AI algorithms
+            console.log('Recommended videos:', recommended);
+        }
+
+        // Auth Functions
+        function signInWithProvider(provider) {
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    hideAuthModal();
+                    // Save user data to Firestore
+                    db.collection('users').doc(result.user.uid).set({
+                        name: result.user.displayName,
+                        email: result.user.email,
+                        photoURL: result.user.photoURL,
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    alert('حدث خطأ أثناء تسجيل الدخول: ' + error.message);
+                });
+        }
+
+        // Load User Data
+        function loadUserData(userId) {
+            db.collection('users').doc(userId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        appState.likedVideos = userData.likedVideos || [];
+                        appState.watchedVideos = userData.watchedVideos || [];
+                    }
+                });
+        }
+
+        // UI Functions
+        function toggleTheme() {
+            appState.theme = appState.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', appState.theme);
+            localStorage.setItem('theme', appState.theme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = DOM.themeToggle.querySelector('i');
+            icon.className = appState.theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        function showAuthModal() {
+            DOM.authModal.style.display = 'flex';
+        }
+
+        function hideAuthModal() {
+            DOM.authModal.style.display = 'none';
+        }
+
+        function showUploadModal() {
+            if (!appState.currentUser) {
+                showAuthModal();
+                return;
+            }
+            DOM.uploadModal.classList.add('show');
+        }
+
+        function hideUploadModal() {
+            DOM.uploadModal.classList.remove('show');
+        }
+
+        function toggleProfile() {
+            if (!appState.currentUser) {
+                showAuthModal();
+                return;
+            }
+            // Show profile page
+            alert(`مرحبًا ${appState.currentUser.displayName}`);
+        }
+
+        // Video Interaction Functions
+        function toggleLike(e) {
+            const videoId = e.currentTarget.dataset.videoId;
+            const icon = e.currentTarget.querySelector('i');
+            const countElement = e.currentTarget.querySelector('span');
+            
+            if (appState.likedVideos.includes(videoId)) {
+                // Unlike
+                appState.likedVideos = appState.likedVideos.filter(id => id !== videoId);
+                icon.classList.remove('active');
+                countElement.textContent = parseInt(countElement.textContent) - 1;
+            } else {
+                // Like
+                appState.likedVideos.push(videoId);
+                icon.classList.add('active');
+                countElement.textContent = parseInt(countElement.textContent) + 1;
+            }
+            
+            // Save to Firestore
+            if (appState.currentUser) {
+                db.collection('users').doc(appState.currentUser.uid).update({
+                    likedVideos: appState.likedVideos
+                });
+            }
+        }
+
+        function showComments() {
+            // Implement comment system with Firebase
+            alert('نظام التعليقات سيتم تنفيذه باستخدام Firebase');
+        }
+
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'شاهد هذا الفيديو الرائع',
+                    text: 'تأكد من متابعة حسابي على منصة شورتس!',
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback
+                prompt('انسخ هذا الرابط لمشاركته:', window.location.href);
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                        
+                        // Subscribe to push notifications
+                        if ('PushManager' in window) {
+                            Notification.requestPermission().then(permission => {
+                                if (permission === 'granted') {
+                                    console.log('Notification permission granted');
+                                }
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Example functions for other platforms (would need actual implementations)
+        async function fetchTikTokVideos() {
+            // In a real app, you would call TikTok API
+            return [
+                {
+                    id: '12345',
+                    title: 'فيديو تيك توك ممتع',
+                    author: 'مستخدم تيك توك',
+                    statistics: {
+                        likeCount: '10K',
+                        commentCount: '500'
+                    }
+                }
+            ];
+        }
+
+        async function fetchVimeoVideos() {
+            // In a real app, you would call Vimeo API
+            return [
+                {
+                    id: '67890',
+                    title: 'فيديو فيمو رائع',
+                    author: 'مستخدم فيمو',
+                    statistics: {
+                        likeCount: '5K',
+                        commentCount: '200'
+                    }
+                }
+            ];
+        }
+    </script>
+</body>
+</html>
