@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="منصة متكاملة لمشاهدة ومشاركة الفيديوهات القصيرة">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.youtube.com https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com; img-src 'self' https://i.ibb.co data:; media-src 'self' https://www.youtube.com https://*.googlevideo.com; connect-src 'self' https://your-api-endpoint.com; frame-src 'self' https://www.youtube.com">
+    <title>شورتس - منصة الفيديوهات القصيرة</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        "name": "منصة شورتس للفيديوهات القصيرة",
+        "description": "منصة لمشاهدة ومشاركة الفيديوهات القصيرة بتجربة مستخدم ممتازة",
+        "thumbnailUrl": "https://i.ibb.co/0jQH5Pv/shorts-cover.jpg",
+        "uploadDate": "2023-01-01",
+        "contentUrl": "https://yoursite.com"
+    }
+    </script>
+    
+    <style>
+        :root {
+            --primary-color: #FF0000;
+            --secondary-color: #FE2C55;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
+            --card-bg: #fff;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #FF3333;
+            --secondary-color: #FE2C55;
+            --text-color: #f0f0f0;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --border-color: #333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            overscroll-behavior-y: contain;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Video Container */
+        .video-feed {
+            position: relative;
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+
+        .video-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        .video-progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Video Info */
+        .video-info {
+            position: absolute;
+            bottom: 60px;
+            left: 15px;
+            right: 15px;
+            color: white;
+            z-index: 5;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Video Actions */
+        .video-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 5;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-color);
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 900;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 12px;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active {
+            opacity: 1;
+            color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .video-feed {
+                height: calc(100vh - 80px);
+            }
+            
+            .video-actions {
+                right: 10px;
+                bottom: 80px;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+        <button class="lang-btn" id="langToggle">EN</button>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-play-circle"></i>
+            <span data-i18n="app_name">شورتس</span>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+
+    <!-- Main Content - Video Feed -->
+    <div class="video-feed" id="videoFeed">
+        <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span data-i18n="loading">جاري تحميل الفيديوهات...</span>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-btn active">
+            <i class="fas fa-home nav-icon"></i>
+            <span data-i18n="home">الرئيسية</span>
+        </a>
+        <a href="#" class="nav-btn">
+            <i class="fas fa-compass nav-icon"></i>
+            <span data-i18n="discover">اكتشف</span>
+        </a>
+        <a href="#" class="nav-btn" id="uploadBtn">
+            <i class="fas fa-plus nav-icon"></i>
+            <span data-i18n="upload">رفع</span>
+        </a>
+        <a href="#" class="nav-btn">
+            <i class="fas fa-bell nav-icon"></i>
+            <span data-i18n="notifications">إشعارات</span>
+        </a>
+        <a href="#" class="nav-btn" id="profileBtn">
+            <i class="fas fa-user nav-icon"></i>
+            <span data-i18n="profile">حسابي</span>
+        </a>
+    </nav>
+
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="/manifest.webmanifest">
+
+    <!-- Scripts -->
+    <script>
+        // App Configuration
+        const CONFIG = {
+            apiEndpoint: "https://your-api-endpoint.com/videos",
+            lazyLoadOffset: 3, // Load videos 3 ahead
+            videoBufferSize: 5, // Number of videos to keep in buffer
+            defaultLanguage: 'ar',
+            savedPosition: JSON.parse(localStorage.getItem('videoPosition')) || { index: 0, time: 0 }
+        };
+
+        // App State
+        const APP_STATE = {
+            videos: [],
+            currentVideoIndex: CONFIG.savedPosition.index,
+            isPlaying: false,
+            language: localStorage.getItem('language') || CONFIG.defaultLanguage,
+            theme: localStorage.getItem('theme') || 'light',
+            loadedVideos: new Set(),
+            intersectionObserver: null
+        };
+
+        // Translations
+        const TRANSLATIONS = {
+            en: {
+                app_name: "Shorts",
+                loading: "Loading videos...",
+                home: "Home",
+                discover: "Discover",
+                upload: "Upload",
+                notifications: "Notifications",
+                profile: "Profile",
+                like: "Like",
+                comment: "Comment",
+                share: "Share",
+                report: "Report"
+            },
+            ar: {
+                app_name: "شورتس",
+                loading: "جاري تحميل الفيديوهات...",
+                home: "الرئيسية",
+                discover: "اكتشف",
+                upload: "رفع",
+                notifications: "إشعارات",
+                profile: "حسابي",
+                like: "إعجاب",
+                comment: "تعليق",
+                share: "مشاركة",
+                report: "إبلاغ"
+            }
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initLanguage();
+            loadVideos();
+            initIntersectionObserver();
+            initServiceWorker();
+            initEventListeners();
+        });
+
+        // Theme Management
+        function initTheme() {
+            document.documentElement.setAttribute('data-theme', APP_STATE.theme);
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            APP_STATE.theme = APP_STATE.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', APP_STATE.theme);
+            localStorage.setItem('theme', APP_STATE.theme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('themeToggle').querySelector('i');
+            icon.className = APP_STATE.theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // Language Management
+        function initLanguage() {
+            document.getElementById('langToggle').textContent = APP_STATE.language === 'ar' ? 'EN' : 'AR';
+            applyTranslations();
+        }
+
+        function toggleLanguage() {
+            APP_STATE.language = APP_STATE.language === 'ar' ? 'en' : 'ar';
+            localStorage.setItem('language', APP_STATE.language);
+            document.getElementById('langToggle').textContent = APP_STATE.language === 'ar' ? 'EN' : 'AR';
+            applyTranslations();
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = TRANSLATIONS[APP_STATE.language][key] || key;
+            });
+        }
+
+        // Video Loading and Management
+        async function loadVideos() {
+            try {
+                // In a real app, you would fetch from your API
+                // const response = await fetch(CONFIG.apiEndpoint);
+                // APP_STATE.videos = await response.json();
+                
+                // Mock data for demonstration
+                APP_STATE.videos = Array.from({ length: 20 }, (_, i) => ({
+                    id: `video_${i}`,
+                    title: APP_STATE.language === 'ar' ? `فيديو تجريبي ${i + 1}` : `Demo Video ${i + 1}`,
+                    source: "youtube",
+                    videoId: `abc123xyz${i}`,
+                    likes: Math.floor(Math.random() * 1000),
+                    comments: Math.floor(Math.random() * 100),
+                    duration: 60
+                }));
+                
+                renderVideos();
+            } catch (error) {
+                console.error("Failed to load videos:", error);
+                showError(APP_STATE.language === 'ar' ? "فشل تحميل الفيديوهات" : "Failed to load videos");
+            }
+        }
+
+        function renderVideos() {
+            const feed = document.getElementById('videoFeed');
+            feed.innerHTML = '';
+            
+            // Load initial videos (current + buffer)
+            const start = Math.max(0, APP_STATE.currentVideoIndex - 1);
+            const end = Math.min(APP_STATE.videos.length, APP_STATE.currentVideoIndex + CONFIG.videoBufferSize);
+            
+            for (let i = start; i < end; i++) {
+                if (!APP_STATE.loadedVideos.has(i)) {
+                    createVideoElement(i);
+                    APP_STATE.loadedVideos.add(i);
+                }
+            }
+            
+            // Scroll to saved position
+            scrollToVideo(APP_STATE.currentVideoIndex);
+        }
+
+        function createVideoElement(index) {
+            const video = APP_STATE.videos[index];
+            const feed = document.getElementById('videoFeed');
+            
+            const videoItem = document.createElement('div');
+            videoItem.className = 'video-item';
+            videoItem.id = `video-${index}`;
+            videoItem.dataset.index = index;
+            videoItem.style.transform = `translateY(${index * 100}%)`;
+            
+            videoItem.innerHTML = `
+                <div class="video-container">
+                    <iframe 
+                        src="https://www.youtube.com/embed/${video.videoId}?enablejsapi=1&autoplay=0&mute=1&controls=0&modestbranding=1&rel=0" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        loading="lazy"
+                        class="video-iframe">
+                    </iframe>
+                    <div class="video-progress">
+                        <div class="video-progress-bar" id="progress-${index}"></div>
+                    </div>
+                </div>
+                <div class="video-info">
+                    <h3>${video.title}</h3>
+                </div>
+                <div class="video-actions">
+                    <button class="action-btn like-btn" data-video-id="${video.videoId}">
+                        <div class="action-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <span>${video.likes}</span>
+                    </button>
+                    <button class="action-btn comment-btn">
+                        <div class="action-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <span>${video.comments}</span>
+                    </button>
+                    <button class="action-btn share-btn">
+                        <div class="action-icon">
+                            <i class="fas fa-share"></i>
+                        </div>
+                        <span data-i18n="share">مشاركة</span>
+                    </button>
+                    <button class="action-btn report-btn">
+                        <div class="action-icon">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <span data-i18n="report">إبلاغ</span>
+                    </button>
+                </div>
+            `;
+            
+            feed.appendChild(videoItem);
+            
+            // Add event listeners
+            videoItem.querySelector('.like-btn').addEventListener('click', toggleLike);
+            videoItem.querySelector('.comment-btn').addEventListener('click', showComments);
+            videoItem.querySelector('.share-btn').addEventListener('click', shareVideo);
+            videoItem.querySelector('.report-btn').addEventListener('click', reportVideo);
+            
+            // Initialize video progress tracking
+            initVideoProgress(index);
+        }
+
+        function initVideoProgress(index) {
+            const iframe = document.querySelector(`#video-${index} .video-iframe`);
+            const progressBar = document.getElementById(`progress-${index}`);
+            
+            iframe.onload = function() {
+                const player = new YT.Player(iframe);
+                
+                setInterval(() => {
+                    if (player.getCurrentTime) {
+                        const progress = (player.getCurrentTime() / player.getDuration()) * 100;
+                        progressBar.style.width = `${progress}%`;
+                    }
+                }, 500);
+            };
+        }
+
+        function scrollToVideo(index) {
+            const feed = document.getElementById('videoFeed');
+            const video = document.getElementById(`video-${index}`);
+            
+            if (video) {
+                feed.scrollTo({
+                    top: index * window.innerHeight,
+                    behavior: 'smooth'
+                });
+                
+                // Play video when it's in view
+                playVideo(index);
+            }
+        }
+
+        function playVideo(index) {
+            // Pause all other videos
+            document.querySelectorAll('.video-item').forEach((item, i) => {
+                if (i !== index && item.querySelector('iframe')) {
+                    const iframe = item.querySelector('iframe');
+                    if (iframe.contentWindow) {
+                        iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                    }
+                }
+            });
+            
+            // Play current video
+            const iframe = document.querySelector(`#video-${index} iframe`);
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            }
+            
+            // Update current video index
+            APP_STATE.currentVideoIndex = index;
+            localStorage.setItem('videoPosition', JSON.stringify({ index, time: 0 }));
+        }
+
+        // Intersection Observer for Lazy Loading
+        function initIntersectionObserver() {
+            APP_STATE.intersectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const index = parseInt(entry.target.dataset.index);
+                        playVideo(index);
+                        
+                        // Load more videos when approaching the end
+                        if (index >= APP_STATE.videos.length - CONFIG.lazyLoadOffset) {
+                            loadMoreVideos();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('.video-item').forEach(item => {
+                APP_STATE.intersectionObserver.observe(item);
+            });
+        }
+
+        function loadMoreVideos() {
+            // In a real app, you would fetch more videos from your API
+            const newVideos = Array.from({ length: 10 }, (_, i) => ({
+                id: `video_${APP_STATE.videos.length + i}`,
+                title: APP_STATE.language === 'ar' ? 
+                    `فيديو جديد ${APP_STATE.videos.length + i + 1}` : 
+                    `New Video ${APP_STATE.videos.length + i + 1}`,
+                source: "youtube",
+                videoId: `xyz456abc${APP_STATE.videos.length + i}`,
+                likes: Math.floor(Math.random() * 1000),
+                comments: Math.floor(Math.random() * 100),
+                duration: 60
+            }));
+            
+            APP_STATE.videos = [...APP_STATE.videos, ...newVideos];
+            
+            // Render new videos
+            const start = APP_STATE.videos.length - newVideos.length;
+            const end = APP_STATE.videos.length;
+            
+            for (let i = start; i < end; i++) {
+                if (!APP_STATE.loadedVideos.has(i)) {
+                    createVideoElement(i);
+                    APP_STATE.loadedVideos.add(i);
+                }
+            }
+        }
+
+        // Video Interactions
+        function toggleLike(e) {
+            const videoId = e.currentTarget.dataset.videoId;
+            const icon = e.currentTarget.querySelector('i');
+            const countElement = e.currentTarget.querySelector('span');
+            
+            if (icon.classList.contains('active')) {
+                // Unlike
+                icon.classList.remove('active');
+                countElement.textContent = parseInt(countElement.textContent) - 1;
+            } else {
+                // Like
+                icon.classList.add('active');
+                countElement.textContent = parseInt(countElement.textContent) + 1;
+            }
+        }
+
+        function showComments() {
+            alert(APP_STATE.language === 'ar' ? "نظام التعليقات سيتم تفعيله قريبًا" : "Comments feature coming soon");
+        }
+
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({
+                    title: APP_STATE.videos[APP_STATE.currentVideoIndex].title,
+                    text: APP_STATE.language === 'ar' ? 
+                        "شاهد هذا الفيديو الرائع على منصة شورتس" : 
+                        "Check out this awesome video on Shorts",
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback
+                prompt(
+                    APP_STATE.language === 'ar' ? "انسخ الرابط لمشاركته:" : "Copy link to share:",
+                    window.location.href
+                );
+            }
+        }
+
+        function reportVideo() {
+            const reason = prompt(
+                APP_STATE.language === 'ar' ? 
+                    "الرجاء تحديد سبب الإبلاغ:" : 
+                    "Please specify the reason for reporting:",
+                ""
+            );
+            
+            if (reason) {
+                alert(APP_STATE.language === 'ar' ? 
+                    "شكرًا على إبلاغك. سنراجع هذا المحتوى." : 
+                    "Thank you for reporting. We'll review this content.");
+            }
+        }
+
+        // Service Worker for PWA
+        function initServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            }
+        }
+
+        // Event Listeners
+        function initEventListeners() {
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // Language toggle
+            document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+            
+            // Profile button
+            document.getElementById('profileBtn').addEventListener('click', () => {
+                alert(APP_STATE.language === 'ar' ? 
+                    "صفحة الملف الشخصي ستظهر هنا بعد تسجيل الدخول" : 
+                    "Profile page will appear here after login");
+            });
+            
+            // Upload button
+            document.getElementById('uploadBtn').addEventListener('click', () => {
+                alert(APP_STATE.language === 'ar' ? 
+                    "نظام رفع الفيديوهات سيتم تفعيله قريبًا" : 
+                    "Video upload feature coming soon");
+            });
+            
+            // Handle swipe gestures
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            document.addEventListener('touchstart', e => {
+                touchStartY = e.changedTouches[0].screenY;
+            }, false);
+            
+            document.addEventListener('touchend', e => {
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                const threshold = 50; // Minimum swipe distance
+                const delta = touchEndY - touchStartY;
+                
+                if (delta > threshold) {
+                    // Swipe down - previous video
+                    if (APP_STATE.currentVideoIndex > 0) {
+                        scrollToVideo(APP_STATE.currentVideoIndex - 1);
+                    }
+                } else if (delta < -threshold) {
+                    // Swipe up - next video
+                    if (APP_STATE.currentVideoIndex < APP_STATE.videos.length - 1) {
+                        scrollToVideo(APP_STATE.currentVideoIndex + 1);
+                    }
+                }
+            }
+            
+            // Handle keyboard navigation
+            document.addEventListener('keydown', e => {
+                if (e.key === 'ArrowUp' && APP_STATE.currentVideoIndex > 0) {
+                    scrollToVideo(APP_STATE.currentVideoIndex - 1);
+                } else if (e.key === 'ArrowDown' && APP_STATE.currentVideoIndex < APP_STATE.videos.length - 1) {
+                    scrollToVideo(APP_STATE.currentVideoIndex + 1);
+                }
+            });
+        }
+
+        // Error Handling
+        function showError(message) {
+            const feed = document.getElementById('videoFeed');
+            feed.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>${message}</span>
+                    <button onclick="loadVideos()" style="margin-top: 10px; padding: 8px 15px; background: var(--primary-color); color: white; border: none; border-radius: 5px;">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>${APP_STATE.language === 'ar' ? "إعادة المحاولة" : "Retry"}</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        // YouTube API callback
+        function onYouTubeIframeAPIReady() {
+            // This function is required by YouTube API
+            console.log('YouTube API is ready');
+        }
+    </script>
+    
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
