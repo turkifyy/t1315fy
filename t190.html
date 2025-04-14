@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="منصة فيديوهات قصيرة مع استوديو منشئ المحتوى">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="قصير - منصة الفيديوهات القصيرة">
+    <meta property="og:description" content="استكشف وعرض وإنشاء فيديوهات قصيرة مع منصة قصير">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://qasir.app">
+    <title>قصير - منصة الفيديوهات القصيرة</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" as="style">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- Firebase SDK (Deferred Loading) -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    
+    <!-- Inline Critical CSS -->
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #FE2C55;
+            --secondary-color: #25F4EE;
+            --text-color: #FFFFFF;
+            --text-secondary: #AAAAAA;
+            --bg-color: #000000;
+            --card-bg: #161616;
+            --border-color: #333333;
+            --action-btn-size: 48px;
+            --header-height: 60px;
+            --nav-height: 65px;
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --transition-speed: 0.3s;
+            --creator-primary: #9147FF;
+            --creator-secondary: #772CE8;
+            --error-color: #ff4444;
+            --success-color: #00C851;
+            --warning-color: #ffbb33;
+            --info-color: #33b5e5;
+        }
+
+        /* Base Reset */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            height: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Accessibility Improvements */
+        a, button, input, textarea {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        a:focus, button:focus, input:focus, textarea:focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .scroll-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Utility Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Layout Components */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 0 15px;
+            padding-top: env(safe-area-inset-top, 0px);
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            color: var(--secondary-color);
+        }
+
+        .header-actions {
+            position: absolute;
+            left: 15px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color var(--transition-speed);
+        }
+
+        .header-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Content */
+        .main-container {
+            padding-top: var(--header-height);
+            padding-bottom: calc(var(--nav-height) + var(--safe-area-inset-bottom));
+            min-height: 100vh;
+            overflow-x: hidden;
+            flex: 1;
+        }
+
+        /* Video Feed Styles */
+        .video-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: calc(100vh - var(--header-height) - var(--nav-height) - var(--safe-area-inset-bottom));
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Video Item Styles */
+        .video-item {
+            position: relative;
+            width: 100vw;
+            height: calc(100vh - var(--header-height) - var(--nav-height) - var(--safe-area-inset-bottom));
+            overflow: hidden;
+            scroll-snap-align: start;
+            flex-shrink: 0;
+        }
+
+        /* Video Player Styles */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        .video-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        /* Loading States */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(254, 44, 85, 0.1);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Error States */
+        .error-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: calc(var(--nav-height) + var(--safe-area-inset-bottom));
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: var(--safe-area-inset-bottom);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-speed) ease;
+            padding: 20px;
+            padding-top: calc(var(--header-height) + 20px);
+            padding-bottom: calc(var(--nav-height) + 20px + var(--safe-area-inset-bottom));
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Connection Banner */
+        .connection-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            text-align: center;
+            background: var(--error-color);
+            color: white;
+            z-index: 2500;
+            transform: translateY(-100%);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            .video-item {
+                max-width: 450px;
+                margin: 0 auto;
+                height: calc(100vh - var(--header-height) - var(--nav-height));
+            }
+        }
+
+        /* Dark/Light Mode */
+        body.light-mode {
+            --text-color: #000000;
+            --text-secondary: #555555;
+            --bg-color: #FFFFFF;
+            --card-bg: #F5F5F5;
+            --border-color: #DDDDDD;
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Status Banner -->
+    <div class="connection-banner" id="connectionBanner">
+        <i class="fas fa-wifi"></i>
+        <span>تم فقدان الاتصال بالإنترنت</span>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-actions">
+            <button class="header-btn" id="searchBtn" aria-label="بحث">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <a href="#" class="logo" aria-label="قصير - الصفحة الرئيسية">
+            <i class="fas fa-play-circle logo-icon"></i>
+            <span>قصير</span>
+        </a>
+        <div class="header-actions">
+            <button class="header-btn" id="themeToggle" aria-label="تبديل الوضع الليلي">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Video Feed (Main Page) -->
+        <div class="video-feed scroll-container" id="videoFeed">
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loader-text">جاري تحميل الفيديوهات...</p>
+            </div>
+        </div>
+        
+        <!-- Creator Studio (Hidden by default) -->
+        <div class="creator-studio hidden" id="creatorStudio">
+            <!-- Studio content will be loaded dynamically -->
+        </div>
+        
+        <!-- Discover Section (Hidden by default) -->
+        <div class="discover-container hidden" id="discoverContainer">
+            <!-- Discover content will be loaded dynamically -->
+        </div>
+        
+        <!-- Load More Button -->
+        <div class="load-more-container hidden" id="loadMoreContainer">
+            <button class="load-more-btn" id="loadMoreBtn">تحميل المزيد</button>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-btn active" id="homeBtn" aria-label="الصفحة الرئيسية">
+            <i class="fas fa-home nav-icon"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="#" class="nav-btn" id="discoverBtn" aria-label="اكتشف">
+            <i class="fas fa-compass nav-icon"></i>
+            <span>اكتشف</span>
+        </a>
+        <button class="upload-btn" id="uploadBtn" aria-label="رفع فيديو">
+            <i class="fas fa-plus"></i>
+        </button>
+        <a href="#" class="nav-btn" id="notificationsBtn" aria-label="الإشعارات">
+            <i class="fas fa-bell nav-icon"></i>
+            <span>الإشعارات</span>
+        </a>
+        <a href="#" class="nav-btn" id="profileBtn" aria-label="حسابي">
+            <i class="fas fa-user nav-icon"></i>
+            <span>حسابي</span>
+        </a>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-modal">
+            <h2 class="auth-title">تسجيل الدخول</h2>
+            <p class="auth-subtitle">سجل الدخول للتفاعل مع المحتوى وإنشاء فيديوهاتك الخاصة</p>
+            
+            <button class="auth-btn google-btn" id="googleLogin">
+                <i class="fab fa-google"></i>
+                <span>تسجيل الدخول بجوجل</span>
+            </button>
+            
+            <button class="close-auth" id="closeAuthModal">
+                <span>تخطي الآن</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main App Script -->
+    <script>
+        // Strict Mode for better error handling
+        'use strict';
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxAsJt7qc0jJgi2k4mvXDGWKY34wGm60k",
+            authDomain: "turkify-afa2f.firebaseapp.com",
+            projectId: "turkify-afa2f",
+            storageBucket: "turkify-afa2f.appspot.com",
+            messagingSenderId: "387845497284",
+            appId: "1:387845497284:web:ff1d1022e8eac9db374491",
+            measurementId: "G-6TEB65D72V"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        // Firebase Services
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        // Enable Firestore offline persistence
+        db.enablePersistence()
+            .catch(err => {
+                console.error('Firestore offline persistence failed:', err);
+            });
+
+        // App Configuration
+        const APP_CONFIG = {
+            maxRetries: 3,
+            retryDelay: 1000,
+            pageSize: 5,
+            videoBuffer: 2,
+            maxVideoDuration: 300, // 5 minutes in seconds
+            defaultThumbnail: '/images/default-thumbnail.jpg',
+            youtubeApiKey: 'AIzaSyDaeQ66IuSda11Mo5Bbte56uG_wOPflNAY',
+            autoImport: {
+                enabled: true,
+                checkInterval: 3600000, // 1 hour
+                maxVideosPerRun: 20
+            },
+            cacheTTL: {
+                videos: 3600000, // 1 hour
+                userData: 1800000 // 30 minutes
+            }
+        };
+
+        // App State Management
+        const APP_STATE = {
+            currentUser: null,
+            videos: [],
+            visibleVideos: [],
+            likedVideos: [],
+            watchedVideos: [],
+            currentVideoIndex: 0,
+            isLoading: false,
+            videoPlayers: {},
+            observers: [],
+            hasMoreVideos: true,
+            isDarkMode: localStorage.getItem('darkMode') !== 'false',
+            muted: true,
+            connectionStatus: navigator.onLine ? 'online' : 'offline',
+            userPreferences: JSON.parse(localStorage.getItem('userPreferences')) || {
+                videoQuality: 'auto',
+                autoplay: true,
+                dataSaver: false,
+                darkMode: localStorage.getItem('darkMode') !== 'false'
+            },
+            isCreator: false,
+            currentTab: 'home',
+            userLocation: null,
+            lastVideoLoadTime: 0
+        };
+
+        // DOM Elements Cache
+        const DOM = {
+            // Main elements
+            body: document.body,
+            videoFeed: document.getElementById('videoFeed'),
+            loadMoreBtn: document.getElementById('loadMoreBtn'),
+            loadMoreContainer: document.getElementById('loadMoreContainer'),
+            connectionBanner: document.getElementById('connectionBanner'),
+            toastContainer: document.getElementById('toastContainer'),
+            
+            // Navigation
+            homeBtn: document.getElementById('homeBtn'),
+            discoverBtn: document.getElementById('discoverBtn'),
+            uploadBtn: document.getElementById('uploadBtn'),
+            notificationsBtn: document.getElementById('notificationsBtn'),
+            profileBtn: document.getElementById('profileBtn'),
+            
+            // Auth
+            authModal: document.getElementById('authModal'),
+            googleLogin: document.getElementById('googleLogin'),
+            closeAuthModal: document.getElementById('closeAuthModal'),
+            
+            // Theme
+            themeToggle: document.getElementById('themeToggle'),
+            
+            // Sections
+            creatorStudio: document.getElementById('creatorStudio'),
+            discoverContainer: document.getElementById('discoverContainer')
+        };
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Main App Initialization
+        function initApp() {
+            // Set initial theme
+            setTheme(APP_STATE.isDarkMode);
+            
+            // Initialize Firebase Auth state listener
+            initAuthStateListener();
+            
+            // Initialize network monitoring
+            initNetworkMonitor();
+            
+            // Load initial videos
+            loadVideos();
+
+            // Initialize event listeners
+            initEventListeners();
+
+            // Initialize service worker for PWA
+            initServiceWorker();
+            
+            // Load user preferences
+            loadUserPreferences();
+            
+            // Try to get user location
+            getUserLocation();
+        }
+
+        // Firebase Auth State Listener
+        function initAuthStateListener() {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    // User is signed in
+                    APP_STATE.currentUser = {
+                        id: user.uid,
+                        name: user.displayName || 'مستخدم جديد',
+                        email: user.email,
+                        avatar: user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`
+                    };
+                    
+                    // Check if user is a creator
+                    await checkCreatorStatus();
+                    
+                    // Load user data
+                    await loadUserData();
+                    
+                    showToast(`مرحباً ${APP_STATE.currentUser.name}`, 'success');
+                } else {
+                    // User is signed out
+                    APP_STATE.currentUser = null;
+                    APP_STATE.isCreator = false;
+                }
+            });
+        }
+
+        // Check if user is a content creator
+        async function checkCreatorStatus() {
+            if (!APP_STATE.currentUser) return;
+            
+            try {
+                const userDoc = await db.collection('users').doc(APP_STATE.currentUser.id).get();
+                if (userDoc.exists) {
+                    APP_STATE.isCreator = userDoc.data().isCreator || false;
+                }
+            } catch (error) {
+                console.error('Error checking creator status:', error);
+                showToast('حدث خطأ أثناء تحميل بيانات المستخدم', 'error');
+            }
+        }
+
+        // Load user data and preferences
+        async function loadUserData() {
+            if (!APP_STATE.currentUser) return;
+            
+            try {
+                const userDoc = await db.collection('users').doc(APP_STATE.currentUser.id).get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    
+                    // Update user preferences
+                    if (userData.preferences) {
+                        APP_STATE.userPreferences = {
+                            ...APP_STATE.userPreferences,
+                            ...userData.preferences
+                        };
+                        localStorage.setItem('userPreferences', JSON.stringify(APP_STATE.userPreferences));
+                    }
+                    
+                    // Load liked videos
+                    if (userData.likedVideos) {
+                        APP_STATE.likedVideos = userData.likedVideos;
+                    }
+                    
+                    // Load watched videos
+                    if (userData.watchedVideos) {
+                        APP_STATE.watchedVideos = userData.watchedVideos;
+                    }
+                    
+                    // Apply preferences
+                    if (userData.preferences?.darkMode !== undefined) {
+                        setTheme(userData.preferences.darkMode);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Load user preferences from localStorage
+        function loadUserPreferences() {
+            try {
+                const preferences = localStorage.getItem('userPreferences');
+                if (preferences) {
+                    APP_STATE.userPreferences = JSON.parse(preferences);
+                }
+                
+                const likedVideos = localStorage.getItem('likedVideos');
+                if (likedVideos) {
+                    APP_STATE.likedVideos = JSON.parse(likedVideos);
+                }
+                
+                const watchedVideos = localStorage.getItem('watchedVideos');
+                if (watchedVideos) {
+                    APP_STATE.watchedVideos = JSON.parse(watchedVideos);
+                }
+            } catch (e) {
+                console.error('Error loading user preferences:', e);
+            }
+        }
+
+        // Save user preferences to Firebase and localStorage
+        async function saveUserPreferences() {
+            if (!APP_STATE.currentUser) return;
+            
+            try {
+                await db.collection('users').doc(APP_STATE.currentUser.id).set({
+                    preferences: APP_STATE.userPreferences,
+                    likedVideos: APP_STATE.likedVideos,
+                    watchedVideos: APP_STATE.watchedVideos,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                
+                localStorage.setItem('userPreferences', JSON.stringify(APP_STATE.userPreferences));
+                localStorage.setItem('likedVideos', JSON.stringify(APP_STATE.likedVideos));
+                localStorage.setItem('watchedVideos', JSON.stringify(APP_STATE.watchedVideos));
+            } catch (error) {
+                console.error('Error saving user preferences:', error);
+            }
+        }
+
+        // Set theme (dark/light)
+        function setTheme(isDark) {
+            if (isDark) {
+                DOM.body.classList.remove('light-mode');
+                DOM.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            } else {
+                DOM.body.classList.add('light-mode');
+                DOM.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            APP_STATE.isDarkMode = isDark;
+            APP_STATE.userPreferences.darkMode = isDark;
+            
+            // Save to localStorage and Firestore
+            localStorage.setItem('darkMode', isDark);
+            saveUserPreferences();
+        }
+
+        // Initialize network monitoring
+        function initNetworkMonitor() {
+            const updateOnlineStatus = () => {
+                APP_STATE.connectionStatus = navigator.onLine ? 'online' : 'offline';
+                
+                if (navigator.onLine) {
+                    hideConnectionBanner();
+                    showToast('تم استعادة الاتصال بالإنترنت', 'success');
+                    
+                    // Reload videos if none are loaded
+                    if (APP_STATE.videos.length === 0) {
+                        loadVideos();
+                    }
+                } else {
+                    showConnectionBanner('تم فقدان الاتصال بالإنترنت');
+                    showToast('تم فقدان الاتصال بالإنترنت', 'error');
+                }
+            };
+
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            
+            // Initial check
+            updateOnlineStatus();
+        }
+
+        // Show connection banner
+        function showConnectionBanner(message) {
+            DOM.connectionBanner.querySelector('span').textContent = message;
+            DOM.connectionBanner.classList.add('show');
+        }
+
+        // Hide connection banner
+        function hideConnectionBanner() {
+            DOM.connectionBanner.classList.remove('show');
+        }
+
+        // Load videos from Firestore
+        async function loadVideos() {
+            try {
+                if (APP_STATE.isLoading) return;
+                
+                // Check if we have recent cached data
+                const now = Date.now();
+                if (now - APP_STATE.lastVideoLoadTime < APP_CONFIG.cacheTTL.videos && APP_STATE.videos.length > 0) {
+                    renderVideos();
+                    return;
+                }
+                
+                APP_STATE.isLoading = true;
+                showLoading();
+                
+                let videosQuery = db.collection('videos')
+                    .where('isPublic', '==', true)
+                    .orderBy('createdAt', 'desc')
+                    .limit(APP_CONFIG.pageSize);
+                
+                const videosSnapshot = await videosQuery.get();
+                
+                if (videosSnapshot.empty) {
+                    showError('لا توجد فيديوهات متاحة حالياً');
+                    return;
+                }
+                
+                APP_STATE.videos = [];
+                videosSnapshot.forEach(doc => {
+                    const videoData = doc.data();
+                    APP_STATE.videos.push({
+                        id: doc.id,
+                        title: videoData.title,
+                        description: videoData.description,
+                        url: videoData.url,
+                        thumbnail: videoData.thumbnail || APP_CONFIG.defaultThumbnail,
+                        author: {
+                            id: videoData.authorId,
+                            name: videoData.authorName,
+                            avatar: videoData.authorAvatar
+                        },
+                        likes: videoData.likes || 0,
+                        comments: videoData.comments || 0,
+                        views: videoData.views || 0,
+                        duration: videoData.duration || 0,
+                        music: videoData.music || "الصوت الأصلي",
+                        category: videoData.category || "عام",
+                        createdAt: videoData.createdAt?.toDate() || new Date()
+                    });
+                });
+                
+                renderVideos();
+                APP_STATE.lastVideoLoadTime = Date.now();
+                
+                if (APP_STATE.videos.length >= APP_CONFIG.pageSize) {
+                    DOM.loadMoreContainer.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                showToast('حدث خطأ أثناء تحميل الفيديوهات', 'error');
+            } finally {
+                APP_STATE.isLoading = false;
+            }
+        }
+
+        // Render videos to the feed
+        function renderVideos() {
+            if (APP_STATE.videos.length === 0) {
+                showError('لا توجد فيديوهات متاحة حالياً');
+                return;
+            }
+            
+            // Clear existing videos except those that should stay
+            const startIndex = Math.max(0, APP_STATE.currentVideoIndex - 2);
+            const endIndex = Math.min(APP_STATE.videos.length, APP_STATE.currentVideoIndex + 3);
+            
+            // Remove videos that are out of view
+            const videosToRemove = APP_STATE.visibleVideos.filter(videoId => {
+                const videoIndex = APP_STATE.videos.findIndex(v => v.id === videoId);
+                return videoIndex < startIndex || videoIndex >= endIndex;
+            });
+            
+            videosToRemove.forEach(videoId => {
+                const videoElement = document.querySelector(`.video-item[data-video-id="${videoId}"]`);
+                if (videoElement) {
+                    videoElement.remove();
+                }
+                
+                APP_STATE.visibleVideos = APP_STATE.visibleVideos.filter(id => id !== videoId);
+            });
+            
+            // Add new videos that should be visible
+            for (let i = startIndex; i < endIndex; i++) {
+                const video = APP_STATE.videos[i];
+                
+                if (APP_STATE.visibleVideos.includes(video.id)) continue;
+                
+                const isLiked = APP_STATE.likedVideos.includes(video.id);
+                const isWatched = APP_STATE.watchedVideos.includes(video.id);
+                
+                const videoElement = document.createElement('div');
+                videoElement.className = 'video-item';
+                videoElement.dataset.videoId = video.id;
+                videoElement.dataset.index = i;
+                
+                videoElement.innerHTML = `
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video class="video-player" playsinline webkit-playsinline muted loop preload="metadata">
+                                <source src="${video.url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        
+                        <button class="sound-control" data-video-id="${video.id}">
+                            <i class="fas fa-volume-mute"></i>
+                        </button>
+                        
+                        <div class="video-actions">
+                            <button class="action-btn like-btn ${isLiked ? 'active' : ''}" data-video-id="${video.id}" aria-label="إعجاب">
+                                <div class="action-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <span class="action-text">${formatNumber(video.likes)}</span>
+                            </button>
+                            <button class="action-btn comment-btn" data-video-id="${video.id}" aria-label="تعليقات">
+                                <div class="action-icon">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <span class="action-text">${formatNumber(video.comments)}</span>
+                            </button>
+                            <button class="action-btn share-btn" data-video-id="${video.id}" aria-label="مشاركة">
+                                <div class="action-icon">
+                                    <i class="fas fa-share"></i>
+                                </div>
+                                <span class="action-text">مشاركة</span>
+                            </button>
+                        </div>
+                        
+                        <div class="video-info">
+                            <div class="video-author">
+                                <img src="${video.author.avatar}" alt="${video.author.name}" class="author-avatar" loading="lazy">
+                                <span class="author-name">${video.author.name}</span>
+                                <button class="follow-btn">متابعة</button>
+                            </div>
+                            <p class="video-title">${video.title}</p>
+                            <div class="video-music">
+                                <i class="fas fa-music music-note"></i>
+                                <span>${video.music}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                DOM.videoFeed.appendChild(videoElement);
+                initVideoPlayer(videoElement, video);
+                APP_STATE.visibleVideos.push(video.id);
+            }
+            
+            initIntersectionObserver();
+        }
+
+        // Initialize video player
+        function initVideoPlayer(videoElement, video) {
+            const videoPlayer = videoElement.querySelector('.video-player');
+            const soundControl = videoElement.querySelector('.sound-control');
+            
+            // Set video source
+            videoPlayer.src = video.url;
+            videoPlayer.muted = APP_STATE.muted;
+            
+            // Play/pause based on visibility
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        videoPlayer.play().catch(e => console.log('Autoplay prevented:', e));
+                    } else {
+                        videoPlayer.pause();
+                    }
+                });
+            }, { threshold: 0.8 });
+            
+            observer.observe(videoElement);
+            
+            // Sound control
+            soundControl.addEventListener('click', () => {
+                APP_STATE.muted = !APP_STATE.muted;
+                videoPlayer.muted = APP_STATE.muted;
+                soundControl.innerHTML = APP_STATE.muted ? 
+                    '<i class="fas fa-volume-mute"></i>' : 
+                    '<i class="fas fa-volume-up"></i>';
+            });
+            
+            // Track video view when played
+            videoPlayer.addEventListener('play', () => {
+                if (!APP_STATE.watchedVideos.includes(video.id)) {
+                    APP_STATE.watchedVideos.push(video.id);
+                    saveUserPreferences();
+                    recordVideoView(video.id);
+                }
+            });
+            
+            // Store player reference
+            APP_STATE.videoPlayers[video.id] = videoPlayer;
+        }
+
+        // Record video view in Firestore
+        async function recordVideoView(videoId) {
+            if (!APP_STATE.currentUser) return;
+            
+            try {
+                await db.collection('videos').doc(videoId).update({
+                    views: firebase.firestore.FieldValue.increment(1),
+                    lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Record in user's history
+                await db.collection('users').doc(APP_STATE.currentUser.id)
+                    .collection('history')
+                    .doc(videoId)
+                    .set({
+                        videoId: videoId,
+                        viewedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+            } catch (error) {
+                console.error('Error recording view:', error);
+            }
+        }
+
+        // Initialize intersection observer for video playback
+        function initIntersectionObserver() {
+            // Clean up existing observers
+            APP_STATE.observers.forEach(obs => obs.disconnect());
+            APP_STATE.observers = [];
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const videoId = entry.target.dataset.videoId;
+                        const videoIndex = parseInt(entry.target.dataset.index);
+                        
+                        APP_STATE.currentVideoIndex = videoIndex;
+                        
+                        // Play the current video
+                        const videoPlayer = APP_STATE.videoPlayers[videoId];
+                        if (videoPlayer) {
+                            videoPlayer.play().catch(e => console.log('Autoplay prevented:', e));
+                        }
+                        
+                        // Check if we need to load more videos
+                        if (videoIndex >= APP_STATE.videos.length - APP_CONFIG.videoBuffer && 
+                            !APP_STATE.isLoading && 
+                            APP_STATE.hasMoreVideos) {
+                            loadMoreVideos();
+                        }
+                    }
+                });
+            }, { 
+                threshold: 0.8,
+                rootMargin: '0px 0px 100px 0px'
+            });
+            
+            document.querySelectorAll('.video-item').forEach(item => {
+                observer.observe(item);
+                APP_STATE.observers.push(observer);
+            });
+        }
+
+        // Load more videos
+        async function loadMoreVideos() {
+            try {
+                if (APP_STATE.isLoading || !APP_STATE.hasMoreVideos) return;
+                
+                APP_STATE.isLoading = true;
+                DOM.loadMoreBtn.disabled = true;
+                DOM.loadMoreBtn.textContent = 'جاري التحميل...';
+                
+                const lastVideo = APP_STATE.videos[APP_STATE.videos.length - 1];
+                
+                let videosQuery = db.collection('videos')
+                    .where('isPublic', '==', true)
+                    .orderBy('createdAt', 'desc')
+                    .startAfter(lastVideo.createdAt)
+                    .limit(APP_CONFIG.pageSize);
+                
+                const videosSnapshot = await videosQuery.get();
+                
+                if (videosSnapshot.empty) {
+                    APP_STATE.hasMoreVideos = false;
+                    DOM.loadMoreContainer.classList.add('hidden');
+                    return;
+                }
+                
+                const newVideos = [];
+                videosSnapshot.forEach(doc => {
+                    const videoData = doc.data();
+                    newVideos.push({
+                        id: doc.id,
+                        title: videoData.title,
+                        description: videoData.description,
+                        url: videoData.url,
+                        thumbnail: videoData.thumbnail || APP_CONFIG.defaultThumbnail,
+                        author: {
+                            id: videoData.authorId,
+                            name: videoData.authorName,
+                            avatar: videoData.authorAvatar
+                        },
+                        likes: videoData.likes || 0,
+                        comments: videoData.comments || 0,
+                        views: videoData.views || 0,
+                        duration: videoData.duration || 0,
+                        music: videoData.music || "الصوت الأصلي",
+                        category: videoData.category || "عام",
+                        createdAt: videoData.createdAt?.toDate() || new Date()
+                    });
+                });
+                
+                APP_STATE.videos = [...APP_STATE.videos, ...newVideos];
+                renderVideos();
+                
+                if (newVideos.length < APP_CONFIG.pageSize) {
+                    APP_STATE.hasMoreVideos = false;
+                    DOM.loadMoreContainer.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading more videos:', error);
+                showToast('حدث خطأ أثناء تحميل المزيد من الفيديوهات', 'error');
+            } finally {
+                DOM.loadMoreBtn.disabled = false;
+                DOM.loadMoreBtn.textContent = 'تحميل المزيد';
+                APP_STATE.isLoading = false;
+            }
+        }
+
+        // Toggle like on a video
+        async function toggleLike(videoId) {
+            if (!APP_STATE.currentUser) {
+                showAuthModal();
+                return;
+            }
+            
+            const video = APP_STATE.videos.find(v => v.id === videoId);
+            if (!video) return;
+            
+            const isLiked = APP_STATE.likedVideos.includes(videoId);
+            
+            try {
+                const videoRef = db.collection('videos').doc(videoId);
+                const likeRef = videoRef.collection('likes').doc(APP_STATE.currentUser.id);
+                
+                if (isLiked) {
+                    // Unlike
+                    await likeRef.delete();
+                    await videoRef.update({
+                        likes: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    
+                    video.likes--;
+                    APP_STATE.likedVideos = APP_STATE.likedVideos.filter(id => id !== videoId);
+                } else {
+                    // Like
+                    await likeRef.set({
+                        userId: APP_STATE.currentUser.id,
+                        likedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    await videoRef.update({
+                        likes: firebase.firestore.FieldValue.increment(1)
+                    });
+                    
+                    video.likes++;
+                    APP_STATE.likedVideos.push(videoId);
+                    
+                    // Send notification to creator if not self
+                    if (video.author.id !== APP_STATE.currentUser.id) {
+                        await db.collection('users').doc(video.author.id)
+                            .collection('notifications')
+                            .add({
+                                message: `${APP_STATE.currentUser.name} أعجب بفيديو "${video.title}"`,
+                                type: 'like',
+                                videoId: videoId,
+                                read: false,
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                    }
+                }
+                
+                // Update UI
+                document.querySelectorAll(`.like-btn[data-video-id="${videoId}"]`).forEach(btn => {
+                    btn.classList.toggle('active', !isLiked);
+                    btn.querySelector('.action-text').textContent = formatNumber(video.likes);
+                    btn.querySelector('.action-icon').classList.add('pulse');
+                    
+                    setTimeout(() => {
+                        btn.querySelector('.action-icon').classList.remove('pulse');
+                    }, 300);
+                });
+                
+                // Save to localStorage and Firestore
+                saveUserPreferences();
+                
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                showToast('حدث خطأ أثناء تسجيل الإعجاب', 'error');
+            }
+        }
+
+        // Show auth modal
+        function showAuthModal() {
+            DOM.authModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide auth modal
+        function hideAuthModal() {
+            DOM.authModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Show loading indicator
+        function showLoading() {
+            DOM.videoFeed.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="loader-text">جاري تحميل الفيديوهات...</p>
+                </div>
+            `;
+        }
+
+        // Show error message
+        function showError(message) {
+            DOM.videoFeed.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle error-icon"></i>
+                    <p class="error-text">${message}</p>
+                    <button class="retry-btn" id="retryBtn">إعادة المحاولة</button>
+                </div>
+            `;
+            
+            document.getElementById('retryBtn').addEventListener('click', loadVideos);
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                success: 'check-circle',
+                info: 'info-circle'
+            };
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icons[type] || 'info-circle'} toast-icon"></i>
+                <span>${message}</span>
+                <button class="toast-close" aria-label="إغلاق">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            DOM.toastContainer.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Auto-hide after 5 seconds
+            const hideTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5000);
+            
+            // Close button
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                clearTimeout(hideTimeout);
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            });
+        }
+
+        // Format numbers with commas
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ar-EG').format(num);
+        }
+
+        // Get user location
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        APP_STATE.userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                    },
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                    },
+                    { timeout: 5000 }
+                );
+            }
+        }
+
+        // Initialize service worker for PWA
+        function initServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registered:', registration.scope);
+                            
+                            // Check for updates
+                            registration.update();
+                            
+                            // Subscribe to push notifications
+                            if ('PushManager' in window) {
+                                subscribeToPushNotifications(registration);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('ServiceWorker registration failed:', error);
+                        });
+                });
+            }
+        }
+
+        // Subscribe to push notifications
+        async function subscribeToPushNotifications(registration) {
+            try {
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: 'YOUR_VAPID_PUBLIC_KEY'
+                });
+                
+                // Send subscription to server
+                await db.collection('users').doc(APP_STATE.currentUser?.id)
+                    .collection('pushSubscriptions')
+                    .add({
+                        subscription: JSON.stringify(subscription),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (error) {
+                console.error('Push subscription failed:', error);
+            }
+        }
+
+        // Initialize event listeners
+        function initEventListeners() {
+            // Theme toggle
+            DOM.themeToggle.addEventListener('click', () => {
+                setTheme(!APP_STATE.isDarkMode);
+            });
+            
+            // Auth modal
+            DOM.closeAuthModal.addEventListener('click', hideAuthModal);
+            
+            // Google login
+            DOM.googleLogin.addEventListener('click', () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider)
+                    .catch(error => {
+                        console.error('Google login error:', error);
+                        showToast('حدث خطأ أثناء تسجيل الدخول بجوجل', 'error');
+                    });
+            });
+            
+            // Navigation buttons
+            DOM.homeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab('home');
+            });
+            
+            DOM.discoverBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab('discover');
+            });
+            
+            DOM.profileBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!APP_STATE.currentUser) {
+                    showAuthModal();
+                } else {
+                    switchTab('profile');
+                }
+            });
+            
+            DOM.uploadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!APP_STATE.currentUser) {
+                    showAuthModal();
+                } else if (APP_STATE.isCreator) {
+                    openCreatorStudio();
+                } else {
+                    showToast('هذه الميزة متاحة فقط للمنشئين', 'error');
+                }
+            });
+            
+            // Load more button
+            DOM.loadMoreBtn.addEventListener('click', loadMoreVideos);
+            
+            // Handle keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    scrollToPreviousVideo();
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    scrollToNextVideo();
+                } else if (e.key === ' ') {
+                    e.preventDefault();
+                    toggleCurrentVideoPlayback();
+                }
+            });
+            
+            // Handle swipe gestures for mobile
+            let touchStartY = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+            
+            document.addEventListener('touchend', (e) => {
+                const touchEndY = e.changedTouches[0].screenY;
+                const diff = touchStartY - touchEndY;
+                
+                if (Math.abs(diff) > 50) { // Minimum swipe distance
+                    if (diff > 0) {
+                        scrollToNextVideo();
+                    } else {
+                        scrollToPreviousVideo();
+                    }
+                }
+            }, { passive: true });
+            
+            // Handle mouse wheel for desktop
+            let wheelTimeout;
+            
+            document.addEventListener('wheel', (e) => {
+                clearTimeout(wheelTimeout);
+                
+                wheelTimeout = setTimeout(() => {
+                    if (Math.abs(e.deltaY) > 5) {
+                        if (e.deltaY > 0) {
+                            scrollToNextVideo();
+                        } else {
+                            scrollToPreviousVideo();
+                        }
+                    }
+                }, 100);
+            }, { passive: true });
+        }
+
+        // Switch between tabs
+        function switchTab(tab) {
+            APP_STATE.currentTab = tab;
+            
+            // Update active button
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show/hide sections
+            DOM.videoFeed.classList.add('hidden');
+            DOM.creatorStudio.classList.add('hidden');
+            DOM.discoverContainer.classList.add('hidden');
+            
+            switch (tab) {
+                case 'home':
+                    DOM.homeBtn.classList.add('active');
+                    DOM.videoFeed.classList.remove('hidden');
+                    break;
+                    
+                case 'discover':
+                    DOM.discoverBtn.classList.add('active');
+                    DOM.discoverContainer.classList.remove('hidden');
+                    loadDiscoverContent();
+                    break;
+                    
+                case 'profile':
+                    DOM.profileBtn.classList.add('active');
+                    if (APP_STATE.isCreator) {
+                        DOM.creatorStudio.classList.remove('hidden');
+                        loadCreatorContent();
+                    } else {
+                        // Show user profile
+                    }
+                    break;
+            }
+        }
+
+        // Scroll to next video
+        function scrollToNextVideo() {
+            if (APP_STATE.currentVideoIndex < APP_STATE.videos.length - 1) {
+                APP_STATE.currentVideoIndex++;
+                scrollToVideo(APP_STATE.currentVideoIndex);
+            }
+        }
+
+        // Scroll to previous video
+        function scrollToPreviousVideo() {
+            if (APP_STATE.currentVideoIndex > 0) {
+                APP_STATE.currentVideoIndex--;
+                scrollToVideo(APP_STATE.currentVideoIndex);
+            }
+        }
+
+        // Toggle current video playback
+        function toggleCurrentVideoPlayback() {
+            const currentVideo = APP_STATE.videos[APP_STATE.currentVideoIndex];
+            if (!currentVideo) return;
+            
+            const videoPlayer = APP_STATE.videoPlayers[currentVideo.id];
+            if (!videoPlayer) return;
+            
+            if (videoPlayer.paused) {
+                videoPlayer.play().catch(e => console.log('Play failed:', e));
+            } else {
+                videoPlayer.pause();
+            }
+        }
+
+        // Scroll to video by index
+        function scrollToVideo(index) {
+            const videoElement = document.querySelector(`.video-item[data-index="${index}"]`);
+            if (videoElement) {
+                videoElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Load discover content
+        async function loadDiscoverContent() {
+            try {
+                // Load categories
+                const categoriesSnapshot = await db.collection('categories')
+                    .where('isActive', '==', true)
+                    .orderBy('order')
+                    .limit(10)
+                    .get();
+                
+                const categories = [];
+                categoriesSnapshot.forEach(doc => {
+                    categories.push(doc.data());
+                });
+                
+                // Load trending videos
+                const trendingSnapshot = await db.collection('videos')
+                    .where('isPublic', '==', true)
+                    .orderBy('views', 'desc')
+                    .limit(6)
+                    .get();
+                
+                const trendingVideos = [];
+                trendingSnapshot.forEach(doc => {
+                    trendingVideos.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Render discover content
+                renderDiscoverContent(categories, trendingVideos);
+            } catch (error) {
+                console.error('Error loading discover content:', error);
+                showToast('حدث خطأ أثناء تحميل المحتوى', 'error');
+            }
+        }
+
+        // Render discover content
+        function renderDiscoverContent(categories, trendingVideos) {
+            DOM.discoverContainer.innerHTML = `
+                <h2 class="section-title">اكتشف الفيديوهات</h2>
+                
+                <div class="categories-container" id="categoriesContainer"></div>
+                
+                <div class="trending-container">
+                    <h3 class="section-subtitle">فيديوهات رائجة</h3>
+                    <div class="trending-videos" id="trendingVideos"></div>
+                </div>
+            `;
+            
+            // Render categories
+            const categoriesContainer = document.getElementById('categoriesContainer');
+            categories.forEach(category => {
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'category-card';
+                categoryElement.dataset.category = category.id;
+                categoryElement.innerHTML = `
+                    <i class="fas fa-${category.icon} category-icon"></i>
+                    <div class="category-name">${category.name}</div>
+                `;
+                
+                categoryElement.addEventListener('click', () => {
+                    filterVideosByCategory(category.id);
+                });
+                
+                categoriesContainer.appendChild(categoryElement);
+            });
+            
+            // Render trending videos
+            const trendingContainer = document.getElementById('trendingVideos');
+            trendingVideos.forEach(video => {
+                const videoElement = document.createElement('div');
+                videoElement.className = 'trending-video';
+                videoElement.innerHTML = `
+                    <img src="${video.thumbnail || APP_CONFIG.defaultThumbnail}" class="trending-thumbnail" alt="${video.title}" loading="lazy">
+                    <div class="trending-info">
+                        <h4 class="video-title">${video.title}</h4>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> ${formatNumber(video.views)}</span>
+                            <span><i class="fas fa-heart"></i> ${formatNumber(video.likes)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                videoElement.addEventListener('click', () => {
+                    playVideo(video.id);
+                });
+                
+                trendingContainer.appendChild(videoElement);
+            });
+        }
+
+        // Filter videos by category
+        function filterVideosByCategory(categoryId) {
+            APP_STATE.currentCategory = categoryId;
+            loadVideos();
+        }
+
+        // Play specific video
+        function playVideo(videoId) {
+            const videoIndex = APP_STATE.videos.findIndex(v => v.id === videoId);
+            
+            if (videoIndex !== -1) {
+                APP_STATE.currentVideoIndex = videoIndex;
+                scrollToVideo(videoIndex);
+                switchTab('home');
+            } else {
+                // Load video if not in current list
+                loadVideoById(videoId);
+            }
+        }
+
+        // Load video by ID
+        async function loadVideoById(videoId) {
+            try {
+                const videoDoc = await db.collection('videos').doc(videoId).get();
+                
+                if (!videoDoc.exists) {
+                    showToast('الفيديو غير موجود', 'error');
+                    return;
+                }
+                
+                const videoData = videoDoc.data();
+                const video = {
+                    id: videoDoc.id,
+                    title: videoData.title,
+                    description: videoData.description,
+                    url: videoData.url,
+                    thumbnail: videoData.thumbnail || APP_CONFIG.defaultThumbnail,
+                    author: {
+                        id: videoData.authorId,
+                        name: videoData.authorName,
+                        avatar: videoData.authorAvatar
+                    },
+                    likes: videoData.likes || 0,
+                    comments: videoData.comments || 0,
+                    views: videoData.views || 0,
+                    duration: videoData.duration || 0,
+                    music: videoData.music || "الصوت الأصلي",
+                    category: videoData.category || "عام",
+                    createdAt: videoData.createdAt?.toDate() || new Date()
+                };
+                
+                // Add to videos array and set as current
+                APP_STATE.videos.unshift(video);
+                APP_STATE.currentVideoIndex = 0;
+                
+                // Render videos and switch to home
+                renderVideos();
+                switchTab('home');
+            } catch (error) {
+                console.error('Error loading video:', error);
+                showToast('حدث خطأ أثناء تحميل الفيديو', 'error');
+            }
+        }
+
+        // Load creator studio content
+        async function loadCreatorContent() {
+            try {
+                // Load creator videos
+                const videosSnapshot = await db.collection('videos')
+                    .where('authorId', '==', APP_STATE.currentUser.id)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                const videos = [];
+                videosSnapshot.forEach(doc => {
+                    videos.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Load analytics
+                const analyticsDoc = await db.collection('users')
+                    .doc(APP_STATE.currentUser.id)
+                    .collection('analytics')
+                    .doc('overview')
+                    .get();
+                
+                const analytics = analyticsDoc.exists ? analyticsDoc.data() : null;
+                
+                // Render creator studio
+                renderCreatorStudio(videos, analytics);
+            } catch (error) {
+                console.error('Error loading creator content:', error);
+                showToast('حدث خطأ أثناء تحميل استوديو المنشئ', 'error');
+            }
+        }
+
+        // Render creator studio
+        function renderCreatorStudio(videos, analytics) {
+            DOM.creatorStudio.innerHTML = `
+                <div class="studio-header">
+                    <h1 class="studio-title">استوديو المنشئ</h1>
+                    <button class="studio-btn" id="returnToFeed">
+                        <i class="fas fa-arrow-left"></i> العودة
+                    </button>
+                </div>
+                
+                <div class="studio-tabs">
+                    <button class="studio-tab active" data-tab="videos">فيديوهاتي</button>
+                    <button class="studio-tab" data-tab="analytics">التحليلات</button>
+                    <button class="studio-tab" data-tab="upload">رفع فيديو</button>
+                </div>
+                
+                <div class="studio-content active" id="videosTab">
+                    <div class="videos-grid" id="videosGrid"></div>
+                </div>
+                
+                <div class="studio-content" id="analyticsTab">
+                    ${analytics ? renderAnalytics(analytics) : '<p>لا توجد بيانات تحليلية متاحة</p>'}
+                </div>
+                
+                <div class="studio-content" id="uploadTab">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>اسحب وأفلت الفيديو هنا</h3>
+                        <p>أو</p>
+                        <button class="upload-btn-large" id="selectFileBtn">اختر ملف</button>
+                        <input type="file" id="fileInput" accept="video/*" style="display: none;">
+                    </div>
+                </div>
+            `;
+            
+            // Render videos
+            const videosGrid = document.getElementById('videosGrid');
+            if (videos.length === 0) {
+                videosGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-video-slash"></i>
+                        <p>لا توجد فيديوهات حتى الآن</p>
+                    </div>
+                `;
+            } else {
+                videos.forEach(video => {
+                    const videoElement = document.createElement('div');
+                    videoElement.className = 'video-card';
+                    videoElement.innerHTML = `
+                        <img src="${video.thumbnail || APP_CONFIG.defaultThumbnail}" class="video-thumbnail" alt="${video.title}" loading="lazy">
+                        <div class="video-info">
+                            <h4 class="video-title">${video.title || 'فيديو بدون عنوان'}</h4>
+                            <div class="video-stats">
+                                <span><i class="fas fa-eye"></i> ${formatNumber(video.views)}</span>
+                                <span><i class="fas fa-heart"></i> ${formatNumber(video.likes)}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    videoElement.addEventListener('click', () => {
+                        playVideo(video.id);
+                    });
+                    
+                    videosGrid.appendChild(videoElement);
+                });
+            }
+            
+            // Tab switching
+            document.querySelectorAll('.studio-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    
+                    // Update active tab
+                    document.querySelectorAll('.studio-tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    tab.classList.add('active');
+                    
+                    // Show corresponding content
+                    document.querySelectorAll('.studio-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`${tabId}Tab`).classList.add('active');
+                });
+            });
+            
+            // Return to feed button
+            document.getElementById('returnToFeed').addEventListener('click', () => {
+                switchTab('home');
+            });
+            
+            // File upload handling
+            document.getElementById('selectFileBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            
+            // Drag and drop upload
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length) {
+                    handleFileUpload({ target: { files: e.dataTransfer.files } });
+                }
+            });
+        }
+
+        // Render analytics
+        function renderAnalytics(analytics) {
+            return `
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3 class="card-title">إجمالي المشاهدات</h3>
+                        <div class="card-value">${formatNumber(analytics.totalViews)}</div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3 class="card-title">إجمالي الإعجابات</h3>
+                        <div class="card-value">${formatNumber(analytics.totalLikes)}</div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3 class="card-title">معدل التفاعل</h3>
+                        <div class="card-value">${analytics.engagementRate?.toFixed(1) || 0}%</div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3 class="card-title">المتابعون</h3>
+                        <div class="card-value">${formatNumber(analytics.followers)}</div>
+                    </div>
+                </div>
+                
+                <div class="analytics-charts">
+                    <!-- Charts would be rendered here with a library like Chart.js -->
+                </div>
+            `;
+        }
+
+        // Handle file upload
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type and size
+            if (!file.type.startsWith('video/')) {
+                showToast('الرجاء اختيار ملف فيديو', 'error');
+                return;
+            }
+            
+            if (file.size > 100 * 1024 * 1024) { // 100MB limit
+                showToast('حجم الفيديو يجب أن يكون أقل من 100MB', 'error');
+                return;
+            }
+            
+            try {
+                // Show upload progress
+                const uploadArea = document.getElementById('uploadArea');
+                uploadArea.innerHTML = `
+                    <div class="upload-progress">
+                        <div class="progress-bar" id="progressBar"></div>
+                        <p class="progress-text">جاري رفع الفيديو...</p>
+                    </div>
+                `;
+                
+                // Upload file to Firebase Storage
+                const storageRef = storage.ref();
+                const fileRef = storageRef.child(`videos/${APP_STATE.currentUser.id}/${Date.now()}_${file.name}`);
+                const uploadTask = fileRef.put(file);
+                
+                // Track upload progress
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        document.getElementById('progressBar').style.width = `${progress}%`;
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        showToast('حدث خطأ أثناء رفع الفيديو', 'error');
+                        resetUploadArea();
+                    },
+                    async () => {
+                        // Upload complete
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        
+                        // Create video document in Firestore
+                        const videoDoc = await db.collection('videos').add({
+                            title: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
+                            url: downloadURL,
+                            authorId: APP_STATE.currentUser.id,
+                            authorName: APP_STATE.currentUser.name,
+                            authorAvatar: APP_STATE.currentUser.avatar,
+                            likes: 0,
+                            comments: 0,
+                            views: 0,
+                            duration: 0, // Would extract from video metadata
+                            isPublic: true,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        showToast('تم رفع الفيديو بنجاح', 'success');
+                        resetUploadArea();
+                        
+                        // Refresh videos list
+                        loadCreatorContent();
+                    }
+                );
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast('حدث خطأ أثناء رفع الفيديو', 'error');
+                resetUploadArea();
+            }
+        }
+
+        // Reset upload area
+        function resetUploadArea() {
+            document.getElementById('uploadArea').innerHTML = `
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <h3>اسحب وأفلت الفيديو هنا</h3>
+                <p>أو</p>
+                <button class="upload-btn-large" id="selectFileBtn">اختر ملف</button>
+                <input type="file" id="fileInput" accept="video/*" style="display: none;">
+            `;
+            
+            // Reattach event listeners
+            document.getElementById('selectFileBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+        }
+
+        // Open creator studio
+        function openCreatorStudio() {
+            if (!APP_STATE.currentUser) {
+                showAuthModal();
+                return;
+            }
+            
+            if (!APP_STATE.isCreator) {
+                showToast('هذه الميزة متاحة فقط للمنشئين', 'error');
+                return;
+            }
+            
+            switchTab('profile');
+        }
+    </script>
+</body>
+</html>
