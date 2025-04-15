@@ -1344,19 +1344,28 @@
                         </div>
                         
                         <div class="video-info">
-                            <div class="video-author">
-                                <img src="${video.author.avatar}" alt="${video.author.name}" class="author-avatar">
-                                <span class="author-name">${video.author.name}</span>
-                                ${video.author.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
-                                <button class="follow-btn" data-author-id="${video.author.id}">Follow</button>
-                            </div>
-                            <p class="video-title">${video.title}</p>
-                            <div class="video-music">
-                                <i class="fas fa-music"></i>
-                                <span>${video.music}</span>
-                            </div>
-                        </div>
-                    </div>
+  <div class="video-author">
+    <img src="${video.author.avatar}" alt="${video.author.name}" class="author-avatar">
+    <div class="author-info">
+      <div class="author-name-container">
+        <span class="author-name">${video.author.name}</span>
+        ${video.author.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+        ${video.country ? `<span class="country-flag">${video.country}</span>` : ''}
+      </div>
+      <button class="follow-btn" data-author-id="${video.author.id}">Follow</button>
+    </div>
+  </div>
+  <p class="video-title">${video.title}</p>
+  ${video.description ? `<p class="video-desc">${video.description}</p>` : ''}
+  <div class="video-meta">
+    <span>${video.duration}</span>
+    <span>${video.quality === 'hd' ? 'HD' : 'SD'}</span>
+    <div class="video-music">
+      <i class="fas fa-music"></i>
+      <span>${video.music}</span>
+    </div>
+  </div>
+</div>
                 `;
                 
                 DOM.videoFeed.appendChild(videoElement);
