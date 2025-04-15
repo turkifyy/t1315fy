@@ -1730,11 +1730,20 @@
             });
             
             // Robot control button (admin only)
-            DOM.robotControlBtn.addEventListener('click', () => {
-                if (APP_STATE.isAdmin) {
-                    showAdminDashboard();
-                }
-            });
+            DOM.robotControlBtn.addEventListener('click', async () => {
+  try {
+    // تأكيد حالة المسؤول أولاً
+    const userDoc = await db.collection('users').doc(APP_STATE.currentUser.id).get();
+    if (userDoc.exists && userDoc.data().isAdmin) {
+      showAdminDashboard();
+    } else {
+      showToast('أنت لست مسؤولاً في النظام', 'error');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('حدث خطأ، حاول لاحقاً', 'error');
+  }
+});
             
             // Close admin dashboard
             DOM.closeAdmin.addEventListener('click', () => {
