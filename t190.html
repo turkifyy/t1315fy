@@ -1974,23 +1974,61 @@
 
         // Import YouTube video
         async function importYouTubeVideo(videoData, category) {
-            try {
-                const videoInfo = await fetchYouTubeVideoInfo(videoData.id.videoId);
-                
-                // Check if the creator exists, if not create them
-                const creatorRef = db.collection('users').doc(videoInfo.channelId);
-                const creatorDoc = await creatorRef.get();
-                
-                if (!creatorDoc.exists) {
-                    await creatorRef.set({
-                        name: videoInfo.channelTitle,
-                        avatar: videoInfo.channelThumbnail,
-                        isCreator: true,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        verified: false,
-                        followers: 0
-                    });
-                }
+  try {
+    // 1. البحث عن الروبوت المربوط بالقناة
+    const botSnapshot = await db.collection('contentBots')
+      .where('channelId', '==', videoData.snippet.channelId)
+      .limit(1)
+      .get();
+
+    if (botSnapshot.empty) {
+      console.log('⚠️ لا يوجد روبوت لهذه القناة:', videoData.snippet.channelTitle);
+      return;
+    }
+
+    const botDoc = botSnapshot.docs[0];
+    const botData = botDoc.data();
+
+    // 2. تحضير بيانات الفيديو
+    const videoInfo = {
+      title: videoData.snippet.title,
+      description: videoData.snippet.description || 'لا يوجد وصف',
+      url: `https://youtu.be/${videoData.id.videoId}`,
+      thumbnail: videoData.snippet.thumbnails?.medium?.url || APP_CONFIG.defaultThumbnail,
+      authorId: botDoc.id,
+      authorName: botData.name || videoData.snippet.channelTitle,
+      authorAvatar: botData.avatar || 'https://i.pravatar.cc/150',
+      channelDescription: botData.description || '',
+      isPublic: true,
+      category: category,
+      quality: botData.importQuality || 'hd',
+      country: botData.country || '',
+      duration: formatDuration(videoData.contentDetails.duration),
+      views: 0,
+      likes: 0,
+      comments: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // 3. حفظ الفيديو في Firestore
+    await db.collection('videos').add(videoInfo);
+    
+    console.log('✅ تم استيراد الفيديو:', videoInfo.title);
+    
+  } catch (error) {
+    console.error('❌ خطأ في استيراد الفيديو:', error);
+    showToast('فشل استيراد الفيديو', 'error');
+  }
+}
+
+// دالة مساعدة لتحويل المدة
+function formatDuration(ytDuration) {
+  const match = ytDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  const h = match[1] ? match[1] + ':' : '';
+  const m = match[2] ? match[2].padStart(2, '0') + ':' : '00:';
+  const s = match[3] ? match[3].padStart(2, '0') : '00';
+  return h + m + s;
+}
                 
                 // Add the video
                 await db.collection('videos').add({
