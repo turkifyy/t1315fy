@@ -1778,16 +1778,16 @@
             // Robot control button (admin only)
             DOM.robotControlBtn.addEventListener('click', async () => {
   try {
-    // تأكيد حالة المسؤول أولاً
+    // Confirm the administrator's status first
     const userDoc = await db.collection('users').doc(APP_STATE.currentUser.id).get();
     if (userDoc.exists && userDoc.data().isAdmin) {
       showAdminDashboard();
     } else {
-      showToast('أنت لست مسؤولاً في النظام', 'error');
+      showToast('You are not an administrator of the system.', 'error');
     }
   } catch (error) {
     console.error('Error:', error);
-    showToast('حدث خطأ، حاول لاحقاً', 'error');
+    showToast('An error occurred, try again later.', 'error');
   }
 });
             
