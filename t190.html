@@ -928,8 +928,14 @@
             videoBuffer: 2,
             youtubeApiKey: 'AIzaSyDaeQ66IuSda11Mo5Bbte56uG_wOPflNAY',
             defaultThumbnail: 'https://via.placeholder.com/300x500/161616/AAAAAA?text=ClipNow'
+            defaultAvatar: 'https://i.pravatar.cc/150?img=0'
         };
-        
+        function formatDuration(seconds) {
+  if (!seconds) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
         // App State
         const APP_STATE = {
             currentUser: null,
