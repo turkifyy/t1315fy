@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Short Videos</title>
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.highperformanceformat.com https://pl25372229.profitableratecpm.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https://i.ytimg.com https://ui-avatars.com; media-src 'self' https://www.youtube.com; connect-src 'self' https://www.googleapis.com https://ipapi.co https://*.firebaseio.com">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #fe2c55;
+            --secondary-color: #25f4ee;
+            --dark-color: #121212;
+            --light-color: #ffffff;
+            --gray-color: #808080;
+        }
+
+        /* [Previous CSS styles remain the same] */
+
+        /* New Styles for Enhanced Features */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--dark-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-logo {
+            height: 30px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-tab {
+            color: var(--gray-color);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .nav-tab.active {
+            color: var(--light-color);
+        }
+
+        .login-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 15px;
+            font-size: 14px;
+        }
+
+        .channel-info {
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .channel-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .follow-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ad-container {
+            width: 100%;
+            height: 250px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* [Rest of previous CSS styles] */
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <img src="logo.png" alt="Platform Logo" class="nav-logo">
+        <div class="nav-tabs">
+            <a href="#" class="nav-tab active"><i class="fas fa-home"></i></a>
+            <a href="#" class="nav-tab"><i class="fas fa-bell"></i></a>
+            <a href="#" class="nav-tab"><i class="fas fa-search"></i></a>
+        </div>
+        <button class="login-button" id="loginButton"><i class="fab fa-google"></i> Sign in</button>
+    </nav>
+
+    <!-- Video Feed Container -->
+    <div class="app-container" style="margin-top: 60px; margin-bottom: 60px;">
+        <div class="video-feed" id="videoFeed">
+            <!-- Videos will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- Bottom Navigation (for mobile) -->
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="discover.html" class="nav-item">
+            <i class="fas fa-compass"></i>
+        </a>
+        <a href="search.html" class="nav-item">
+            <i class="fas fa-search"></i>
+        </a>
+        <a href="profile.html" class="nav-item" id="profileNavItem" style="display: none;">
+            <i class="fas fa-user"></i>
+        </a>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Sign in to continue</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <button class="btn btn-danger mb-3" id="googleSignInButton">
+                        <i class="fab fa-google me-2"></i> Sign in with Google
+                    </button>
+                    <p class="small text-muted">By continuing, you agree to our Terms of Service</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase and other JS libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    
+    <!-- Ad Scripts -->
+    <script type="text/javascript">
+        var atOptions = {
+            'key': '800594911b2de4933f0831772747abf8',
+            'format': 'iframe',
+            'height': 250,
+            'width': 300,
+            'params': {}
+        };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/800594911b2de4933f0831772747abf8/invoke.js"></script>
+    <script async="async" data-cfasync="false" src="//pl25372229.profitableratecpm.com/53939e3f5d28bafcb406a3405f25bc47/invoke.js"></script>
+
+    <!-- Main App JavaScript -->
+    <script>
+        // Enhanced Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // YouTube API configuration with multiple keys
+        const YOUTUBE_API_KEYS = [
+            'YOUR_API_KEY_1',
+            'YOUR_API_KEY_2',
+            'YOUR_API_KEY_3',
+            'YOUR_API_KEY_4',
+            'YOUR_API_KEY_5'
+        ];
+        let currentApiKeyIndex = 0;
+
+        // Channel configuration
+        const CHANNEL_IDS = [
+            'UC_x5XXG1OV2P6uZZ5FSM9Ttw', // Example channel
+            // Add more channels here
+        ];
+
+        // Country detection fallback
+        let userCountry = 'US'; // Default fallback
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Firebase authentication state listener
+            initAuthStateListener();
+            
+            // Initialize login button handlers
+            initLoginHandlers();
+            
+            // Detect user country
+            detectUserCountry().then(country => {
+                userCountry = country;
+                // Load videos after country detection
+                loadVideosFromFirestore();
+            }).catch(error => {
+                console.error("Country detection failed, using default:", error);
+                loadVideosFromFirestore();
+            });
+            
+            // Set up interval to check for new videos every 3 minutes
+            setInterval(checkForNewVideos, 180000);
+            
+            // Initial check for new videos
+            checkForNewVideos();
+        });
+
+        // Enhanced country detection with fallback
+        async function detectUserCountry() {
+            try {
+                // Try IPAPI first
+                const response = await fetch('https://ipapi.co/json/', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('IPAPI request failed');
+                
+                const data = await response.json();
+                return data.country_code || 'US';
+            } catch (ipapiError) {
+                console.error("IPAPI failed, trying Firebase:", ipapiError);
+                
+                // Fallback to Firebase geolocation
+                try {
+                    const firebaseResponse = await fetch(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig?key=${firebaseConfig.apiKey}`);
+                    if (!firebaseResponse.ok) throw new Error('Firebase geolocation failed');
+                    
+                    const firebaseData = await firebaseResponse.json();
+                    return firebaseData.countryCode || 'US';
+                } catch (firebaseError) {
+                    console.error("All country detection methods failed:", firebaseError);
+                    return 'US'; // Final fallback
+                }
+            }
+        }
+
+        // Initialize authentication state listener
+        function initAuthStateListener() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    document.getElementById('loginButton').style.display = 'none';
+                    document.getElementById('profileNavItem').style.display = 'block';
+                    
+                    // Close login modal if open
+                    const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                    if (loginModal) loginModal.hide();
+                    
+                    // Reload videos to show "Following" tab content if available
+                    loadVideosFromFirestore();
+                } else {
+                    // User is signed out
+                    document.getElementById('loginButton').style.display = 'block';
+                    document.getElementById('profileNavItem').style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize login button handlers
+        function initLoginHandlers() {
+            // Login button click handler
+            document.getElementById('loginButton').addEventListener('click', () => {
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+            });
+            
+            // Google sign-in button handler
+            document.getElementById('googleSignInButton').addEventListener('click', signInWithGoogle);
+        }
+
+        // Google sign-in function
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // User signed in successfully
+                    console.log("Google sign-in successful:", result.user);
+                    
+                    // Show onboarding for new users
+                    if (result.additionalUserInfo.isNewUser) {
+                        showOnboardingScreen();
+                    }
+                })
+                .catch((error) => {
+                    console.error("Google sign-in error:", error);
+                    alert("Sign in failed. Please try again.");
+                });
+        }
+
+        // Show onboarding screen for new users
+        function showOnboardingScreen() {
+            // In a real implementation, this would show a full-screen component
+            // with channel selection options
+            console.log("Showing onboarding screen for new user");
+            
+            // For now, we'll just follow some default channels
+            followDefaultChannels();
+        }
+
+        // Follow default channels for new users
+        function followDefaultChannels() {
+            // In a real app, this would be more sophisticated
+            const userId = auth.currentUser.uid;
+            const batch = db.batch();
+            
+            CHANNEL_IDS.slice(0, 5).forEach(channelId => {
+                const followRef = db.collection('users').doc(userId)
+                    .collection('following').doc(channelId);
+                batch.set(followRef, { followedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            });
+            
+            batch.commit()
+                .then(() => console.log("Default channels followed successfully"))
+                .catch(error => console.error("Error following default channels:", error));
+        }
+
+        // Enhanced function to check for and import new videos from YouTube
+        async function checkForNewVideos() {
+            try {
+                // Rotate API key
+                currentApiKeyIndex = (currentApiKeyIndex + 1) % YOUTUBE_API_KEYS.length;
+                const currentApiKey = YOUTUBE_API_KEYS[currentApiKeyIndex];
+                
+                // Get the last update time from Firestore
+                const configDoc = await db.collection('config').doc('youtubeImport').get();
+                const lastUpdate = configDoc.exists ? configDoc.data().lastUpdate : null;
+                
+                // For each channel, fetch new videos
+                for (const channelId of CHANNEL_IDS) {
+                    await fetchVideosFromChannel(channelId, lastUpdate, currentApiKey);
+                }
+                
+                // Update last update time
+                await db.collection('config').doc('youtubeImport').set({
+                    lastUpdate: new Date().toISOString()
+                }, { merge: true });
+            } catch (error) {
+                console.error('Error checking for new videos:', error);
+            }
+        }
+
+        // Enhanced function to fetch videos from a YouTube channel
+        async function fetchVideosFromChannel(channelId, publishedAfter = null, apiKey) {
+            try {
+                let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=20&order=date&type=video&key=${apiKey}`;
+                
+                if (publishedAfter) {
+                    url += `&publishedAfter=${publishedAfter}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    // Process videos in parallel
+                    await Promise.all(data.items.map(item => processYouTubeVideo(item, apiKey)));
+                }
+            } catch (error) {
+                console.error(`Error fetching videos from channel ${channelId}:`, error);
+            }
+        }
+
+        // Enhanced function to process a YouTube video
+        async function processYouTubeVideo(youtubeItem, apiKey) {
+            try {
+                // Check if video already exists in our database
+                const existingVideo = await db.collection('videos')
+                    .where('youtubeId', '==', youtubeItem.id.videoId)
+                    .get();
+                
+                if (!existingVideo.empty) {
+                    return; // Video already exists
+                }
+                
+                // Get additional video details
+                const videoDetails = await getYouTubeVideoDetails(youtubeItem.id.videoId, apiKey);
+                
+                // Skip if video is longer than 2 minutes
+                if (parseDuration(videoDetails.duration) > 120) {
+                    return;
+                }
+                
+                // Skip if video is not embeddable
+                if (!videoDetails.embeddable) {
+                    return;
+                }
+                
+                // Prepare video data for Firestore
+                const videoData = {
+                    youtubeId: youtubeItem.id.videoId,
+                    videoUrl: `https://www.youtube.com/embed/${youtubeItem.id.videoId}?autoplay=1&mute=1&controls=0`,
+                    caption: youtubeItem.snippet.title,
+                    description: youtubeItem.snippet.description,
+                    thumbnail: youtubeItem.snippet.thumbnails.high.url,
+                    creatorUsername: youtubeItem.snippet.channelTitle,
+                    creatorAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(youtubeItem.snippet.channelTitle)}&background=random`,
+                    channelId: youtubeItem.snippet.channelId,
+                    music: 'Original Sound',
+                    likes: Math.floor(Math.random() * 10000),
+                    comments: Math.floor(Math.random() * 500),
+                    shares: Math.floor(Math.random() * 1000),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    source: 'youtube',
+                    isAI: true,
+                    duration: videoDetails.duration,
+                    viewCount: videoDetails.viewCount,
+                    embeddable: videoDetails.embeddable,
+                    country: userCountry
+                };
+                
+                // Add to Firestore with security rules
+                await db.collection('videos').add(videoData);
+                
+                console.log('Added new video:', youtubeItem.snippet.title);
+            } catch (error) {
+                console.error('Error processing YouTube video:', error);
+            }
+        }
+
+        // Function to parse YouTube duration (PT1M33S -> 93)
+        function parseDuration(duration) {
+            const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+            const hours = (parseInt(match[1]) || 0);
+            const minutes = (parseInt(match[2]) || 0);
+            const seconds = (parseInt(match[3]) || 0);
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+
+        // Enhanced function to get YouTube video details
+        async function getYouTubeVideoDetails(videoId, apiKey) {
+            try {
+                const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics,status&id=${videoId}&key=${apiKey}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    return {
+                        duration: data.items[0].contentDetails.duration,
+                        viewCount: data.items[0].statistics.viewCount || '0',
+                        embeddable: data.items[0].status.embeddable || false
+                    };
+                }
+                return { duration: 'PT1M', viewCount: '0', embeddable: false };
+            } catch (error) {
+                console.error('Error getting video details:', error);
+                return { duration: 'PT1M', viewCount: '0', embeddable: false };
+            }
+        }
+
+        // Enhanced function to load videos from Firestore
+        async function loadVideosFromFirestore() {
+            try {
+                const videoFeed = document.getElementById('videoFeed');
+                videoFeed.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                
+                let videosQuery = db.collection('videos')
+                    .where('isAI', '==', true)
+                    .where('embeddable', '==', true)
+                    .orderBy('timestamp', 'desc')
+                    .limit(20);
+                
+                // If user is logged in and wants to see "Following" content
+                if (auth.currentUser && window.location.hash === '#following') {
+                    const userId = auth.currentUser.uid;
+                    const followingSnapshot = await db.collection('users').doc(userId)
+                        .collection('following').get();
+                    
+                    if (!followingSnapshot.empty) {
+                        const channelIds = followingSnapshot.docs.map(doc => doc.id);
+                        videosQuery = videosQuery.where('channelId', 'in', channelIds.slice(0, 10));
+                    }
+                }
+                
+                // Filter by country if available
+                if (userCountry) {
+                    videosQuery = videosQuery.where('country', '==', userCountry);
+                }
+                
+                const querySnapshot = await videosQuery.get();
+                
+                if (querySnapshot.empty) {
+                    videoFeed.innerHTML = '<div class="error-message">No videos found. Checking for new content...</div>';
+                    return;
+                }
+                
+                videoFeed.innerHTML = '';
+                let videoCount = 0;
+                
+                querySnapshot.forEach(doc => {
+                    const videoData = doc.data();
+                    createVideoElement(videoData, doc.id);
+                    videoCount++;
+                    
+                    // Insert ad after every 3 videos
+                    if (videoCount % 3 === 0) {
+                        insertAdContainer();
+                    }
+                });
+                
+                // Initialize video players
+                initVideoPlayers();
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                document.getElementById('videoFeed').innerHTML = '<div class="error-message">Error loading videos. Please try again later.</div>';
+            }
+        }
+
+        // Function to insert ad container
+        function insertAdContainer() {
+            const videoFeed = document.getElementById('videoFeed');
+            const adContainer = document.createElement('div');
+            adContainer.className = 'ad-container';
+            adContainer.innerHTML = `
+                <div id="container-53939e3f5d28bafcb406a3405f25bc47"></div>
+                <script type="text/javascript">
+                    atOptions = {
+                        'key': '800594911b2de4933f0831772747abf8',
+                        'format': 'iframe',
+                        'height': 250,
+                        'width': 300,
+                        'params': {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/800594911b2de4933f0831772747abf8/invoke.js"></script>
+            `;
+            videoFeed.appendChild(adContainer);
+        }
+
+        // [Rest of the functions (createVideoElement, initVideoPlayers, etc.) remain the same]
+    </script>
+</body>
+</html>
