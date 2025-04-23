@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https://*.ytimg.com https://*.googleusercontent.com https://ui-avatars.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://www.googleapis.com https://*.firebaseio.com; frame-src 'self' https://www.youtube.com; media-src 'self' https://*.googlevideo.com;">
+    <title>AI Short Videos</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #fe2c55;
+            --secondary-color: #25f4ee;
+            --dark-color: #121212;
+            --light-color: #ffffff;
+            --gray-color: #808080;
+            --nav-height: 60px;
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            overflow-x: hidden;
+            padding-top: var(--nav-height);
+            min-height: 100vh;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1100;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background-color: var(--dark-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .login-btn {
+            background: none;
+            border: none;
+            color: var(--light-color);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .login-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Video Feed */
+        .video-feed {
+            width: 100%;
+            height: calc(100vh - var(--nav-height));
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .video-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            padding-bottom: 177.78%; /* 16:9 aspect ratio */
+            position: relative;
+        }
+
+        .video-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000;
+        }
+
+        .video-info {
+            position: absolute;
+            bottom: 100px;
+            left: 15px;
+            z-index: 10;
+            max-width: 70%;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-creator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .creator-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .creator-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .creator-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .video-caption {
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .video-music {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--light-color);
+        }
+
+        .video-music i {
+            margin-right: 5px;
+        }
+
+        .video-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--light-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .action-button:active {
+            transform: scale(0.95);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s ease;
+        }
+
+        .action-button:hover .action-icon {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .action-count {
+            font-size: 12px;
+        }
+
+        .liked {
+            color: var(--primary-color) !important;
+        }
+
+        /* Login Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .login-modal {
+            background-color: var(--dark-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .login-modal {
+            transform: translateY(0);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--light-color);
+        }
+
+        .google-login-btn {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: background-color 0.2s ease;
+        }
+
+        .google-login-btn:hover {
+            background-color: #3367d6;
+        }
+
+        .google-login-btn i {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--gray-color);
+            line-height: 1.5;
+        }
+
+        /* Comment Modal */
+        .comment-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70vh;
+            background-color: var(--dark-color);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            z-index: 2000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comment-modal.active {
+            transform: translateY(0);
+        }
+
+        .comment-header {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comment-close {
+            background: none;
+            border: none;
+            color: var(--light-color);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .comment-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .comment-count {
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+
+        .comments-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .comment-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-user {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        .comment-form {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .comment-input {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: var(--light-color);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .comment-submit {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 16px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error message */
+        .error-message {
+            color: var(--primary-color);
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Success message */
+        .success-message {
+            color: var(--secondary-color);
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Tap effect */
+        .tap-effect {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: tap 0.5s ease-out;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes tap {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* New video notification */
+        .new-videos-notification {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .new-videos-notification.visible {
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .video-info {
+                max-width: 65%;
+            }
+            
+            .video-actions {
+                right: 10px;
+                bottom: 120px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .video-caption {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast notifications container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="logo">AI Shorts</div>
+        <button class="login-btn" id="loginBtnTop" aria-label="User profile">
+            <i class="fas fa-user-circle"></i>
+        </button>
+    </nav>
+
+    <!-- New videos notification -->
+    <div class="new-videos-notification" id="newVideosNotification">
+        <span>New videos available!</span>
+        <i class="fas fa-sync-alt"></i>
+    </div>
+
+    <!-- Video Feed -->
+    <div class="video-feed" id="videoFeed">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <h2 class="modal-title">Log in to AI Shorts</h2>
+            <button class="google-login-btn" id="googleLoginBtn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+            <p class="modal-footer">
+                By continuing, you agree to our <a href="#" style="color: var(--light-color);">Terms of Service</a> and <a href="#" style="color: var(--light-color);">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Comment Modal -->
+    <div class="comment-modal" id="commentModal">
+        <div class="comment-header">
+            <button class="comment-close" id="commentCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="comment-title">Comments</div>
+            <div class="comment-count" id="commentCount">0 comments</div>
+        </div>
+        <div class="comments-list" id="commentsList"></div>
+        <div class="comment-form">
+            <input type="text" class="comment-input" id="commentInput" placeholder="Add a comment...">
+            <button class="comment-submit" id="commentSubmitBtn">Post</button>
+        </div>
+    </div>
+
+    <!-- Firebase and other JS libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
+    <!-- Main App JavaScript -->
+    <script>
+        // Firebase configuration - IMPORTANT: Replace with your actual config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxAsJt7qc0jJgi2k4mvXDGWKY34wGm60k",
+            authDomain: "turkify-afa2f.firebaseapp.com",
+            projectId: "turkify-afa2f",
+            storageBucket: "turkify-afa2f.appspot.com",
+            messagingSenderId: "387845497284",
+            appId: "1:387845497284:web:ff1d1022e8eac9db374491",
+            measurementId: "G-6TEB65D72V"
+        };
+
+        // Initialize Firebase
+        const firebaseApp = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // YouTube API configuration with key rotation and fallback
+        const YOUTUBE_API_KEYS = [
+            'AIzaSyAre88KKhL_izC0nJjbWSakvmIOPSleGhs',
+            'AIzaSyCk4XNcGoqSSAZMCNmar6B2bFUMfN0lxok',
+            'AIzaSyAKuYPfahrDzfAZFv5WOOv1FRIle8aSwiQ',
+            'AIzaSyARtyC6riNolI0cayoId61SUNSO-VuUSoU',
+            'AIzaSyAU7UQiJ__3hojf28zdYDZpDtDwyLxhJGo'
+        ];
+        let currentApiKeyIndex = 0;
+        let youtubeApiErrorCount = 0;
+        const MAX_YOUTUBE_API_ERRORS = 3;
+        const API_KEY_QUOTA_LIMIT = 9000; // Switch keys at 9000 requests to stay under 10,000 limit
+
+        // Channels to import videos from
+        const CHANNEL_IDS = [
+            'UC_x5XG1OV2P6uZZ5FSM9Ttw', // Google Developers
+            'UCsooa4yRKGN_zEE8iknghZA', // TED-Ed
+            'UCXuqSBlHAE6Xw-yeJA0Tunw'   // Linus Tech Tips
+        ];
+
+        // Banned words for comments
+        const BANNED_WORDS = ['spam', 'scam', 'fraud', 'hack', 'cheat', 'virus', 'malware'];
+
+        // DOM elements
+        const videoFeed = document.getElementById('videoFeed');
+        const loginModal = document.getElementById('loginModal');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const loginBtnTop = document.getElementById('loginBtnTop');
+        const newVideosNotification = document.getElementById('newVideosNotification');
+        const commentModal = document.getElementById('commentModal');
+        const commentCloseBtn = document.getElementById('commentCloseBtn');
+        const commentsList = document.getElementById('commentsList');
+        const commentInput = document.getElementById('commentInput');
+        const commentSubmitBtn = document.getElementById('commentSubmitBtn');
+        const commentCount = document.getElementById('commentCount');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // App state
+        let currentUser = null;
+        let videoObserver = null;
+        let lastVideoFetchTime = null;
+        let isLoadingVideos = false;
+        let newVideosAvailable = false;
+        let unsubscribeVideos = null;
+        let unsubscribeComments = null;
+        let currentVideoId = null;
+        let youtubePlayers = {};
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up auth state listener
+            initAuthStateListener();
+            
+            // Set up UI event listeners
+            setupEventListeners();
+            
+            // Initial load of videos
+            loadVideosFromFirestore();
+            
+            // Set up real-time listener for new videos
+            setupVideoListener();
+            
+            // Initialize Intersection Observer for videos
+            initVideoObserver();
+        });
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Auto remove after hide
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                bsToast.hide();
+            }, 3000);
+        }
+
+        // Parse YouTube duration (PT1M30S -> 90 seconds)
+        function parseYouTubeDuration(duration) {
+            if (!duration) return 0; // Handle missing duration
+            
+            const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+            const hours = parseInt(match?.[1] || 0);
+            const minutes = parseInt(match?.[2] || 0);
+            const seconds = parseInt(match?.[3] || 0);
+            
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+
+        // Set up real-time listener for new videos
+        function setupVideoListener() {
+            // Unsubscribe from any existing listener
+            if (unsubscribeVideos) {
+                unsubscribeVideos();
+            }
+
+            // Set up new listener
+            unsubscribeVideos = db.collection('videos')
+                .where('isAI', '==', true)
+                .orderBy('timestamp', 'desc')
+                .limit(1)
+                .onSnapshot(snapshot => {
+                    if (!snapshot.empty) {
+                        const latestVideo = snapshot.docs[0].data();
+                        const latestVideoTime = latestVideo.timestamp.toDate().getTime();
+                        
+                        // Only show notification if the video is new since the user started browsing
+                        if (!lastVideoFetchTime || latestVideoTime > lastVideoFetchTime) {
+                            showNewVideosNotification();
+                        }
+                    }
+                }, error => {
+                    console.error('Error setting up video listener:', error.message);
+                    
+                    // Handle permission errors
+                    if (error.code === 'permission-denied') {
+                        console.error('Firebase permission denied. Please check your Firestore rules.');
+                        videoFeed.innerHTML = '<div class="error-message">Permission error. Please refresh the page.</div>';
+                        showToast('Permission error. Please refresh the page.', 'danger');
+                    }
+                });
+        }
+
+        // Show new videos notification
+        function showNewVideosNotification() {
+            newVideosAvailable = true;
+            newVideosNotification.classList.add('visible');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                newVideosNotification.classList.remove('visible');
+            }, 5000);
+        }
+
+        // Initialize auth state listener
+        function initAuthStateListener() {
+            auth.onAuthStateChanged(user => {
+                currentUser = user;
+                updateUIForAuthState();
+                
+                if (user) {
+                    // Show login success toast
+                    showToast(`Welcome, ${user.displayName || 'User'}!`, 'success');
+                    
+                    // Update user last active time
+                    updateUserLastActive();
+                    
+                    // Create/update user document
+                    db.collection('users').doc(user.uid).set({
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true }).catch(error => {
+                        console.error('Error updating user:', error.message);
+                    });
+                } else {
+                    // Show logout toast
+                    showToast('You have been signed out.', 'info');
+                }
+                
+                // Reinitialize video listener when auth state changes
+                setupVideoListener();
+                
+                // Reload videos when auth state changes
+                loadVideosFromFirestore();
+            });
+        }
+
+        // Update user last active time
+        function updateUserLastActive() {
+            if (currentUser) {
+                db.collection('users').doc(currentUser.uid).set({
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(error => {
+                    console.error('Error updating user last active:', error.message);
+                });
+            }
+        }
+
+        // Update UI based on auth state
+        function updateUIForAuthState() {
+            if (currentUser) {
+                // User is logged in
+                const avatarUrl = currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName || 'User')}&background=random`;
+                loginBtnTop.innerHTML = `<img src="${avatarUrl}" alt="User avatar" style="width: 30px; height: 30px; border-radius: 50%;">`;
+                
+                // Hide login modal if visible
+                hideLoginModal();
+            } else {
+                // User is not logged in
+                loginBtnTop.innerHTML = '<i class="fas fa-user-circle"></i>';
+            }
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Login button
+            loginBtnTop.addEventListener('click', function() {
+                if (currentUser) {
+                    // Show logout option
+                    if (confirm('Do you want to sign out?')) {
+                        auth.signOut().catch(error => {
+                            console.error('Sign out error:', error.message);
+                            showToast('Error signing out. Please try again.', 'danger');
+                        });
+                    }
+                } else {
+                    showLoginModal();
+                }
+            });
+
+            // Google login button
+            googleLoginBtn.addEventListener('click', function() {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.addScope('profile');
+                provider.addScope('email');
+                
+                auth.signInWithPopup(provider)
+                    .then(() => {
+                        hideLoginModal();
+                        // Page will reload automatically due to auth state change
+                    })
+                    .catch(error => {
+                        console.error('Login error:', error.message);
+                        showToast('Login failed. Please try again.', 'danger');
+                    });
+            });
+
+            // Tap effect for video interactions
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.action-button') || e.target.closest('.video-container')) {
+                    createTapEffect(e);
+                }
+            });
+
+            // Close modal when clicking outside
+            loginModal.addEventListener('click', function(e) {
+                if (e.target === loginModal) {
+                    hideLoginModal();
+                }
+            });
+
+            // New videos notification click
+            newVideosNotification.addEventListener('click', function() {
+                this.classList.remove('visible');
+                newVideosAvailable = false;
+                loadVideosFromFirestore();
+            });
+
+            // Comment modal close button
+            commentCloseBtn.addEventListener('click', function() {
+                hideCommentModal();
+            });
+
+            // Comment submit
+            commentSubmitBtn.addEventListener('click', postComment);
+            commentInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    postComment();
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', debounce(handleResize, 200));
+        }
+
+        // Post a new comment
+        async function postComment() {
+            if (!currentUser) {
+                showLoginModal();
+                return;
+            }
+            
+            const commentText = commentInput.value.trim();
+            if (!commentText) return;
+            
+            // Validate comment
+            if (containsBannedWords(commentText)) {
+                showToast('Your comment contains banned words and cannot be posted.', 'danger');
+                return;
+            }
+            
+            if (containsInvalidLinks(commentText)) {
+                showToast('Your comment contains invalid links. Only https links with .com, .ma, .org, or .net domains are allowed.', 'danger');
+                return;
+            }
+            
+            try {
+                // Save comment to Firestore
+                await db.collection('comments').add({
+                    videoId: currentVideoId,
+                    userId: currentUser.uid,
+                    username: currentUser.displayName || 'Anonymous',
+                    avatar: currentUser.photoURL || '',
+                    text: sanitizeInput(commentText),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Update comment count
+                await db.collection('videos').doc(currentVideoId).update({
+                    comments: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                // Clear input
+                commentInput.value = '';
+                
+                // Show success
+                showToast('Comment posted!', 'success');
+            } catch (error) {
+                console.error('Error posting comment:', error.message);
+                showToast('Error posting comment. Please try again.', 'danger');
+            }
+        }
+
+        // Show comment modal
+        function showCommentModal(videoId) {
+            currentVideoId = videoId;
+            commentModal.classList.add('active');
+            
+            // Load comments
+            loadComments(videoId);
+        }
+
+        // Hide comment modal
+        function hideCommentModal() {
+            commentModal.classList.remove('active');
+            
+            // Unsubscribe from comments listener
+            if (unsubscribeComments) {
+                unsubscribeComments();
+                unsubscribeComments = null;
+            }
+        }
+
+        // Load comments for a video
+        function loadComments(videoId) {
+            // Clear existing comments
+            commentsList.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+            
+            // Set up real-time listener for comments
+            unsubscribeComments = db.collection('comments')
+                .where('videoId', '==', videoId)
+                .orderBy('timestamp', 'desc')
+                .limit(50)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        commentsList.innerHTML = '<div class="text-center py-3 text-muted">No comments yet</div>';
+                        commentCount.textContent = '0 comments';
+                        return;
+                    }
+                    
+                    commentsList.innerHTML = '';
+                    commentCount.textContent = `${snapshot.size} ${snapshot.size === 1 ? 'comment' : 'comments'}`;
+                    
+                    snapshot.forEach(doc => {
+                        const comment = doc.data();
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment-item';
+                        
+                        const avatarUrl = comment.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.username)}&background=random`;
+                        
+                        commentElement.innerHTML = `
+                            <img src="${avatarUrl}" class="comment-avatar" alt="${comment.username}">
+                            <div class="comment-content">
+                                <div class="comment-user">${comment.username}</div>
+                                <div class="comment-text">${comment.text}</div>
+                                <div class="comment-time">${formatTime(comment.timestamp.toDate())}</div>
+                            </div>
+                        `;
+                        
+                        commentsList.appendChild(commentElement);
+                    });
+                }, error => {
+                    console.error('Error loading comments:', error.message);
+                    commentsList.innerHTML = '<div class="error-message">Error loading comments</div>';
+                });
+        }
+
+        // Format time for comments
+        function formatTime(date) {
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days}d ago`;
+            if (hours > 0) return `${hours}h ago`;
+            if (minutes > 0) return `${minutes}m ago`;
+            return 'Just now';
+        }
+
+        // Check if comment contains banned words
+        function containsBannedWords(text) {
+            const lowerText = text.toLowerCase();
+            return BANNED_WORDS.some(word => lowerText.includes(word));
+        }
+
+        // Check if comment contains invalid links
+        function containsInvalidLinks(text) {
+            // Check for http: links
+            if (text.includes('http:')) {
+                return true;
+            }
+            
+            // Check for links that don't end with allowed domains
+            const urlRegex = /https?:\/\/[^\s]+/g;
+            const matches = text.match(urlRegex);
+            
+            if (matches) {
+                return matches.some(url => {
+                    try {
+                        const domain = new URL(url).hostname;
+                        return !(/\.(com|ma|org|net)$/i.test(domain));
+                    } catch {
+                        return true;
+                    }
+                });
+            }
+            
+            return false;
+        }
+
+        // Initialize YouTube players
+        function initVideoPlayers() {
+            const videoContainers = document.querySelectorAll('.video-container');
+            
+            videoContainers.forEach(container => {
+                const videoId = container.dataset.videoId;
+                const playerId = `player-${videoId}`;
+                
+                if (!youtubePlayers[videoId] && document.getElementById(playerId)) {
+                    youtubePlayers[videoId] = new YT.Player(playerId, {
+                        height: '100%',
+                        width: '100%',
+                        videoId: videoId,
+                        playerVars: {
+                            'autoplay': 0,
+                            'controls': 0,
+                            'disablekb': 1,
+                            'fs': 0,
+                            'loop': 1,
+                            'modestbranding': 1,
+                            'playsinline': 1,
+                            'rel': 0,
+                            'enablejsapi': 1,
+                            'origin': window.location.origin
+                        },
+                        events: {
+                            'onReady': (event) => {
+                                event.target.mute(); // Mute by default
+                            },
+                            'onStateChange': (event) => {
+                                // Loop video when it ends
+                                if (event.data === YT.PlayerState.ENDED) {
+                                    event.target.playVideo();
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Click to pause/play
+                container.addEventListener('click', function(e) {
+                    // Don't pause if clicking on action buttons
+                    if (e.target.closest('.action-button')) {
+                        return;
+                    }
+                    
+                    const player = youtubePlayers[videoId];
+                    if (player) {
+                        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                            player.pauseVideo();
+                        } else {
+                            player.playVideo();
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize Intersection Observer for videos
+        function initVideoObserver() {
+            videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const videoId = entry.target.dataset.videoId;
+                    const player = youtubePlayers[videoId];
+                    
+                    if (entry.isIntersecting) {
+                        // Play video when visible
+                        if (player) {
+                            player.playVideo();
+                        }
+                    } else {
+                        // Pause video when not visible
+                        if (player) {
+                            player.pauseVideo();
+                        }
+                    }
+                });
+            }, { 
+                threshold: 0.7,
+                rootMargin: '0px 0px 100px 0px' // Load videos slightly before they come into view
+            });
+        }
+
+        // Sanitize input to prevent XSS
+        function sanitizeInput(input) {
+            if (!input) return '';
+            
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        }
+
+        // Debounce function for resize events
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this, args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(context, args);
+                }, wait);
+            };
+        }
+
+        // Handle window resize
+        function handleResize() {
+            // Reinitialize video observer
+            if (videoObserver) {
+                videoObserver.disconnect();
+            }
+            initVideoObserver();
+        }
+
+        // Create tap effect animation
+        function createTapEffect(event) {
+            const tapEffect = document.createElement('div');
+            tapEffect.className = 'tap-effect';
+            tapEffect.style.left = `${event.clientX - 30}px`;
+            tapEffect.style.top = `${event.clientY - 30}px`;
+            document.body.appendChild(tapEffect);
+            
+            setTimeout(() => {
+                tapEffect.remove();
+            }, 500);
+        }
+
+        // Show login modal
+        function showLoginModal() {
+            loginModal.classList.add('active');
+        }
+
+        // Hide login modal
+        function hideLoginModal() {
+            loginModal.classList.remove('active');
+        }
+
+        // Load videos from Firestore
+        async function loadVideosFromFirestore() {
+            if (isLoadingVideos) return;
+            
+            try {
+                isLoadingVideos = true;
+                videoFeed.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                
+                let query = db.collection('videos')
+                    .where('isAI', '==', true)
+                    .orderBy('timestamp', 'desc')
+                    .limit(20);
+                
+                const querySnapshot = await query.get();
+                
+                if (querySnapshot.empty) {
+                    videoFeed.innerHTML = '<div class="error-message">No videos found. Checking for new content...</div>';
+                    return;
+                }
+                
+                videoFeed.innerHTML = '';
+                
+                querySnapshot.forEach(doc => {
+                    const videoData = doc.data();
+                    createVideoElement(videoData, doc.id);
+                });
+                
+                // Initialize video players
+                initVideoPlayers();
+                
+                // Update last fetch time
+                lastVideoFetchTime = new Date();
+            } catch (error) {
+                console.error('Error loading videos:', error.message);
+                videoFeed.innerHTML = '<div class="error-message">Error loading videos. Please try again later.</div>';
+                
+                // Handle permission errors
+                if (error.code === 'permission-denied') {
+                    console.error('Firebase permission denied. Please check your Firestore rules.');
+                    showToast('Permission error. Please refresh the page.', 'danger');
+                }
+            } finally {
+                isLoadingVideos = false;
+            }
+        }
+
+        // Create a video element in the feed
+        function createVideoElement(videoData, videoId) {
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'video-container';
+            videoContainer.dataset.videoId = videoId;
+            videoContainer.dataset.duration = parseYouTubeDuration(videoData.duration);
+            
+            videoContainer.innerHTML = `
+                <div class="video-loading">
+                    <div class="spinner"></div>
+                </div>
+                <div class="video-wrapper">
+                    <div id="player-${videoId}" class="video-player"></div>
+                </div>
+                <div class="video-info">
+                    <div class="video-creator">
+                        <img src="${videoData.creatorAvatar}" class="creator-avatar" alt="${videoData.creatorUsername}">
+                        <div class="creator-info">
+                            <span class="creator-name">@${videoData.creatorUsername}</span>
+                        </div>
+                    </div>
+                    <p class="video-caption">${videoData.caption}</p>
+                    <div class="video-music">
+                        <i class="fas fa-music"></i>
+                        <span>${videoData.music}</span>
+                    </div>
+                </div>
+                <div class="video-actions">
+                    <button class="action-button like-button" aria-label="Like video">
+                        <div class="action-icon">
+                            <i class="far fa-heart"></i>
+                        </div>
+                        <span class="action-count">${videoData.likes.toLocaleString()}</span>
+                    </button>
+                    <button class="action-button comment-button" aria-label="Comment on video">
+                        <div class="action-icon">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <span class="action-count">${videoData.comments.toLocaleString()}</span>
+                    </button>
+                    <button class="action-button share-button" aria-label="Share video">
+                        <div class="action-icon">
+                            <i class="fas fa-share"></i>
+                        </div>
+                        <span class="action-count">${videoData.shares.toLocaleString()}</span>
+                    </button>
+                </div>
+            `;
+            
+            // Add event listeners for interactions
+            const likeButton = videoContainer.querySelector('.like-button');
+            const commentButton = videoContainer.querySelector('.comment-button');
+            const shareButton = videoContainer.querySelector('.share-button');
+            
+            likeButton.addEventListener('click', async function() {
+                const icon = this.querySelector('i');
+                const countElement = this.querySelector('.action-count');
+                
+                if (!currentUser) {
+                    showLoginModal();
+                    return;
+                }
+                
+                if (icon.classList.contains('liked')) {
+                    // Unlike
+                    icon.classList.remove('liked', 'fas');
+                    icon.classList.add('far');
+                    countElement.textContent = (parseInt(countElement.textContent.replace(/,/g, '')) - 1).toLocaleString();
+                    
+                    // Update in Firestore
+                    try {
+                        await db.collection('videos').doc(videoId).update({
+                            likes: firebase.firestore.FieldValue.increment(-1)
+                        });
+                    } catch (error) {
+                        console.error('Error updating likes:', error.message);
+                        // Revert UI change
+                        icon.classList.add('liked', 'fas');
+                        icon.classList.remove('far');
+                        countElement.textContent = (parseInt(countElement.textContent.replace(/,/g, '')) + 1).toLocaleString();
+                    }
+                } else {
+                    // Like
+                    icon.classList.add('liked', 'fas');
+                    icon.classList.remove('far');
+                    countElement.textContent = (parseInt(countElement.textContent.replace(/,/g, '')) + 1).toLocaleString();
+                    
+                    // Update in Firestore
+                    try {
+                        await db.collection('videos').doc(videoId).update({
+                            likes: firebase.firestore.FieldValue.increment(1)
+                        });
+                    } catch (error) {
+                        console.error('Error updating likes:', error.message);
+                        // Revert UI change
+                        icon.classList.remove('liked', 'fas');
+                        icon.classList.add('far');
+                        countElement.textContent = (parseInt(countElement.textContent.replace(/,/g, '')) - 1).toLocaleString();
+                    }
+                }
+            });
+            
+            commentButton.addEventListener('click', function() {
+                showCommentModal(videoId);
+            });
+            
+            shareButton.addEventListener('click', async function() {
+                try {
+                    // Share via WhatsApp only as requested
+                    const shareUrl = `https://wa.me/?text=Check%20out%20this%20AI-generated%20short%20video:%20${window.location.origin}/?video=${videoId}`;
+                    window.open(shareUrl, '_blank');
+                    
+                    // Update share count
+                    await db.collection('videos').doc(videoId).update({
+                        shares: firebase.firestore.FieldValue.increment(1)
+                    });
+                    
+                    // Update UI
+                    const countElement = this.querySelector('.action-count');
+                    countElement.textContent = (parseInt(countElement.textContent.replace(/,/g, '')) + 1).toLocaleString();
+                } catch (error) {
+                    console.error('Error sharing video:', error.message);
+                    showToast('Error sharing video. Please try again.', 'danger');
+                }
+            });
+            
+            videoFeed.appendChild(videoContainer);
+            
+            // Observe the video container for visibility changes
+            if (videoObserver) {
+                videoObserver.observe(videoContainer);
+            }
+        }
+
+        // Fallback for Bootstrap and Font Awesome
+        function loadFallbacks() {
+            // Check if Bootstrap loaded
+            if (typeof bootstrap === 'undefined') {
+                console.warn('Bootstrap not loaded, using fallback');
+                const fallbackCSS = document.createElement('link');
+                fallbackCSS.rel = 'stylesheet';
+                fallbackCSS.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css';
+                document.head.appendChild(fallbackCSS);
+                
+                const fallbackJS = document.createElement('script');
+                fallbackJS.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
+                fallbackJS.onerror = () => {
+                    console.error('Bootstrap JS failed, using minimal fallback');
+                    // Minimal UI fallback here
+                };
+                document.body.appendChild(fallbackJS);
+            }
+            
+            // Check if Font Awesome loaded
+            if (typeof FontAwesome === 'undefined') {
+                console.warn('Font Awesome not loaded, using fallback');
+                const fallbackFA = document.createElement('link');
+                fallbackFA.rel = 'stylesheet';
+                fallbackFA.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+                fallbackFA.onerror = () => {
+                    console.error('Font Awesome failed, using system icons');
+                    // System icon fallback here
+                };
+                document.head.appendChild(fallbackFA);
+            }
+            
+            // Check if Firebase loaded
+            if (typeof firebase === 'undefined') {
+                console.error('Firebase failed to load');
+                // Show error to user
+                document.getElementById('videoFeed').innerHTML = `
+                    <div class="error-message">
+                        System error. Please refresh the page or try again later.
+                    </div>
+                `;
+                showToast('System error. Please refresh the page.', 'danger');
+            }
+            
+            // Check if YouTube API loaded
+            if (typeof YT === 'undefined') {
+                console.error('YouTube IFrame API failed to load');
+                // Fallback to regular iframes
+                const videoContainers = document.querySelectorAll('.video-container');
+                videoContainers.forEach(container => {
+                    const videoId = container.dataset.videoId;
+                    const playerDiv = container.querySelector('.video-player');
+                    if (playerDiv) {
+                        playerDiv.innerHTML = `
+                            <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&rel=0"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        `;
+                    }
+                });
+            }
+        }
+
+        // Initialize fallbacks
+        window.addEventListener('load', loadFallbacks);
+    </script>
+</body>
+</html>
