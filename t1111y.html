@@ -597,7 +597,7 @@
                                 if (!existingVideo.exists) {
                                     // Save to Firestore
                                     await db.collection('videos').doc(videoId).set({
-                                        videoUrl: `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&color=white&controls=0&disablekb=1&fs=0&loop=1&modestbranding=0&rel=0`,
+                                        videoUrl: `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&color=white&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playlist=${videoId}&playsinline=1&rel=0`,
                                         creatorUsername: item.snippet.channelTitle,
                                         creatorAvatar: item.snippet.thumbnails.default.url,
                                         caption: item.snippet.title,
