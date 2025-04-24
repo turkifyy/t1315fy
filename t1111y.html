@@ -668,6 +668,7 @@
 
         // App state
         let currentUser = null;
+        let lastVisibleDoc = null;
         let videoObserver = null;
         let lastVideoFetchTime = null;
         let isLoadingVideos = false;
@@ -693,6 +694,14 @@
             
             // Initialize Intersection Observer for videos
             initVideoObserver();
+
+            window.addEventListener('scroll', () => {
+    const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
+    if (nearBottom) {
+        loadMoreVideos();
+    }
+});
+            
         });
 
         // Show toast notification
@@ -1226,6 +1235,7 @@
                     .limit(20);
                 
                 const querySnapshot = await query.get();
+                lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
                 
                 if (querySnapshot.empty) {
                     videoFeed.innerHTML = '<div class="error-message">No videos found. Checking for new content...</div>';
@@ -1458,6 +1468,27 @@
 
         // Initialize fallbacks
         window.addEventListener('load', loadFallbacks);
+        async function loadMoreVideos() {
+    if (!lastVisibleDoc) return;
+
+    const nextQuery = db.collection('videos')
+        .where('isAI', '==', true)
+        .orderBy('timestamp', 'desc')
+        .startAfter(lastVisibleDoc)
+        .limit(20);
+
+    const nextSnapshot = await nextQuery.get();
+
+    nextSnapshot.forEach(doc => {
+        createVideoElement(doc.data(), doc.id);
+    });
+
+    // نحدث آخر فيديو جديد
+    if (!nextSnapshot.empty) {
+        lastVisibleDoc = nextSnapshot.docs[nextSnapshot.docs.length - 1];
+    }
+}
+        
     </script>
 </body>
 </html>
