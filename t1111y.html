@@ -668,6 +668,7 @@
 
         // App state
         let currentUser = null;
+        let firstVideoId = null;
         let lastVisibleDoc = null;
         let videoObserver = null;
         let lastVideoFetchTime = null;
@@ -1104,8 +1105,9 @@
                             'disablekb': 1,
                             'fs': 0,
                             'loop': 1,
-                            'modestbranding': 0,
+                            'modestbranding': 1,
                             'playsinline': 1,
+                            'showinfo': 0,
                             'rel': 0,
                             'enablejsapi': 1,
                             'origin': window.location.origin
@@ -1243,12 +1245,16 @@
                 }
                 
                 videoFeed.innerHTML = '';
-                
+                firstVideoId = querySnapshot.docs[0]?.id;
                 querySnapshot.forEach(doc => {
                     const videoData = doc.data();
                     createVideoElement(videoData, doc.id);
                 });
                 
+                setTimeout(() => {
+    const firstPlayer = youtubePlayers[firstVideoId];
+    if (firstPlayer) firstPlayer.playVideo();
+}, 1000);
                 // Initialize video players
                 initVideoPlayers();
                 
@@ -1458,7 +1464,7 @@
                     const playerDiv = container.querySelector('.video-player');
                     if (playerDiv) {
                         playerDiv.innerHTML = `
-                            <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&disablekb=1&fs=0&loop=1&modestbranding=0&playsinline=1&rel=0"
+                            <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&disablekb=1&fs=0&loop=1&modestbranding=0&playsinline=1&showinfo=0&rel=0"
                                 frameborder="0"
                                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                                 allowfullscreen></iframe>
