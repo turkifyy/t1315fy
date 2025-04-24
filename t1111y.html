@@ -1319,9 +1319,11 @@
             
             // Add event listeners for interactions
             const likeButton = videoContainer.querySelector('.like-button');
+            likeButton.style.zIndex = "20000";
             const commentButton = videoContainer.querySelector('.comment-button');
+            commentButton.style.zIndex = "20001";
             const shareButton = videoContainer.querySelector('.share-button');
-            
+            shareButton.style.zIndex = "20002";
             likeButton.addEventListener('click', async function() {
                 const icon = this.querySelector('i');
                 const countElement = this.querySelector('.action-count');
