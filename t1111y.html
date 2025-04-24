@@ -681,6 +681,7 @@
         let videoObserver = null;
         let lastVideoFetchTime = null;
         let isLoadingVideos = false;
+        let isLoadingMore = false;
         let newVideosAvailable = false;
         let unsubscribeVideos = null;
         let unsubscribeComments = null;
@@ -854,13 +855,6 @@
                 if (e.target === loginModal) {
                     hideLoginModal();
                 }
-            });
-
-            // New videos notification click
-            newVideosNotification.addEventListener('click', function() {
-                this.classList.remove('visible');
-                newVideosAvailable = false;
-                loadVideosFromFirestore();
             });
 
             // Comment modal close button
