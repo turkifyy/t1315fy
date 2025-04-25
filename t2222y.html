@@ -1280,7 +1280,7 @@
                     .where('isAI', '==', true)
                     .orderBy('timestamp', 'desc')
                     .startAfter(lastVisibleDoc)
-                    .limit(10);
+                    .limit(20);
 
                 const nextSnapshot = await nextQuery.get();
 
