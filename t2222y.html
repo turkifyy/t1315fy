@@ -488,21 +488,26 @@
         }
 
         /* Tap effect */
-        .tap-effect {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background-color: rgba(255, 255, 255, 0.3);
+         .tap-effect {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
             border-radius: 50%;
             transform: scale(0);
-            animation: tap 0.5s ease-out;
             pointer-events: none;
-            z-index: 45000;
+            z-index: 99999; /* Highest possible z-index */
+            animation: tapEffect 0.8s ease-out;
+            mix-blend-mode: screen;
         }
 
-        @keyframes tap {
-            to {
-                transform: scale(2);
+        @keyframes tapEffect {
+            0% {
+                transform: scale(0.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
                 opacity: 0;
             }
         }
