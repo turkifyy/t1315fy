@@ -567,9 +567,44 @@
                 font-size: 14px;
             }
         }
+	    .banner-ad-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 99999;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    padding: 5px 0;
+    animation: fadeInDown 0.5s ease-out;
+}
+
+@media (max-width: 576px) {
+    .banner-ad-container {
+        padding: 3px 0;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
     </style>
 </head>
 <body>
+       <!-- Toast notifications container -->
+    <div class="toast-container" id="toastContainer"></div>
+	
+   <div class="banner-ad-container">
+	<div id="ad-banner">
     <script type="text/javascript">
 	atOptions = {
 		'key' : 'f9692cbfd85fbcbc3c6a482c17b185ff',
@@ -580,9 +615,22 @@
 	};
 </script>
 <script type="text/javascript" src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"></script>
-	
-    <!-- Toast notifications container -->
-    <div class="toast-container" id="toastContainer"></div>
+	    </div>
+            </div>
+	<!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const adContainer = document.querySelector('.banner-ad-container');
+    const adElement = document.getElementById('ad-banner');
+
+    adContainer.style.height = adElement.offsetHeight + 'px';
+
+    window.addEventListener('resize', function() {
+        adContainer.style.height = adElement.offsetHeight + 'px';
+    });
+});
+	</script>
 
     <!-- Top Navigation -->
     <nav class="top-nav">
