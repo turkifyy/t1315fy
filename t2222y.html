@@ -555,8 +555,7 @@
     <div class="toast-container" id="toastContainer"></div>
 	
 
-
-     <style>
+	<style>
     /* أنماط شريط الإعلانات */
     .banner-ad-container {
       position: fixed;
@@ -622,6 +621,7 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      padding-top: 60px; /* تعويض لشريط الإعلانات الثابت */
     }
 
     #webview-container {
@@ -630,7 +630,7 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: var(--background-light);
-      z-index: 100000;
+      z-index: 1000000;
       flex-direction: column;
       animation: fadeIn 0.3s ease-in-out;
     }
@@ -706,7 +706,7 @@
       animation: spin 1s linear infinite;
       transform: translate(-50%, -50%);
       display: none;
-      z-index: 100001;
+      z-index: 1000001;
     }
 
     @keyframes spin {
@@ -766,7 +766,7 @@
       border-radius: 8px;
       font-size: 14px;
       display: none;
-      z-index: 100003;
+      z-index: 1000003;
       animation: fadeInOut 1.5s ease-in-out;
     }
 
@@ -809,13 +809,13 @@
       background: var(--primary-color);
       width: 0%;
       transition: width 0.3s ease;
-      z-index: 100005;
+      z-index: 1000005;
     }
   </style>
-	
+
 <!-- شريط الإعلانات -->
 <div class="banner-ad-container">
-  <div id="ad-banner" class="ad-transition" style="top: 5;"></div>
+  <div id="ad-banner" class="ad-transition"></div>
 </div>
 
 <!-- متصفح داخلي -->
@@ -834,7 +834,7 @@
 
   <div id="webview-frame-container">
     <div id="loader"></div>
-    <iframe id="webview-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
+    <iframe id="webview-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
   </div>
 
   <div id="webview-actions">
@@ -855,68 +855,86 @@
   // ============== إدارة الإعلانات ==============
   function loadNewAd() {
     const adContainer = document.getElementById('ad-banner');
-
-    const newScript1 = document.createElement('script');
-    newScript1.type = 'text/javascript';
-    newScript1.innerHTML = `
-      atOptions = {
-        'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
-        'format': 'iframe',
-        'height': 50,
-        'width': 320,
-        'params': {}
-      };
-    `;
-
-    const newScript2 = document.createElement('script');
-    newScript2.src = '//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js';
-    newScript2.type = 'text/javascript';
-
     adContainer.innerHTML = '';
 
-    adContainer.appendChild(newScript1);
-    adContainer.appendChild(newScript2);
-
-    // اعتراض نقرات الإعلان بعد تحميله
-    setTimeout(() => {
-      const adIframe = adContainer.querySelector('iframe');
-      if (adIframe) {
-        // السماح بكل شيء في إعلان iframe للحفاظ على الإحصائيات
-        adIframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation';
+    // إنشاء iframe للإعلان بدلاً من السماح بتحميل البرنامج النصي مباشرة
+    const adIframe = document.createElement('iframe');
+    adIframe.style.width = '320px';
+    adIframe.style.height = '50px';
+    adIframe.style.border = 'none';
+    adIframe.style.overflow = 'hidden';
+    adIframe.scrolling = 'no';
+    adIframe.frameBorder = '0';
+    
+    // السماح بكل الصلاحيات للإعلان للحفاظ على الإحصائيات
+    adIframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation';
+    
+    // إنشاء محتوى الإعلان داخل iframe
+    const adContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <script>
+          atOptions = {
+            'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
+            'format': 'iframe',
+            'height': 50,
+            'width': 320,
+            'params': {}
+          };
+        </script>
+        <script src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"></script>
+      </head>
+      <body style="margin:0;padding:0;">
+        <!-- سيتم حقن الإعلان هنا من قبل الشبكة -->
+      </body>
+      </html>
+    `;
+    
+    adContainer.appendChild(adIframe);
+    
+    // كتابة محتوى iframe بعد التحميل
+    adIframe.onload = function() {
+      try {
+        const iframeDoc = adIframe.contentDocument || adIframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(adContent);
+        iframeDoc.close();
         
-        // معالجة النقرات في الإعلان
-        adIframe.addEventListener('load', () => {
+        // اعتراض جميع النقرات في الإعلان
+        setTimeout(() => {
           try {
-            // هذه الطريقة تعمل فقط إذا كان الإعلان من نفس الأصل
-            const adDoc = adIframe.contentDocument || adIframe.contentWindow.document;
-            const links = adDoc.querySelectorAll('a');
-            
+            const links = iframeDoc.querySelectorAll('a');
             links.forEach(link => {
-              link.setAttribute('target', '_blank');
-              link.addEventListener('click', (e) => {
-                // السماح بالإحصائيات أولاً ثم فتح في المتصفح الداخلي
-                setTimeout(() => {
-                  const href = link.getAttribute('href');
-                  if (href && href.startsWith('http')) {
-                    e.preventDefault();
+              link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('http')) {
+                  // أولاً: فتح الرابط في نافذة خفية لتسجيل النقرة
+                  const hiddenFrame = document.createElement('iframe');
+                  hiddenFrame.style.display = 'none';
+                  hiddenFrame.src = href;
+                  document.body.appendChild(hiddenFrame);
+                  
+                  // ثانياً: فتح الرابط في المتصفح الداخلي بعد تأخير بسيط
+                  setTimeout(() => {
+                    document.body.removeChild(hiddenFrame);
                     openWebView(href);
-                  }
-                }, 200); // تأخير بسيط لضمان تسجيل النقر
+                  }, 300);
+                }
               });
             });
-          } catch (err) {
-            // في حالة CORS، نستخدم طريقة بديلة
-            adIframe.contentWindow.addEventListener('beforeunload', () => {
-              const href = adIframe.contentWindow.location.href;
-              if (href && !href.includes('about:blank')) {
-                openWebView(href);
-                return false;
-              }
-            });
+          } catch (e) {
+            console.log('تعذر اعتراض روابط الإعلان:', e);
           }
-        });
+        }, 2000);
+      } catch (e) {
+        console.log('تعذر تحميل الإعلان في iframe:', e);
       }
-    }, 1000);
+    };
+    
+    // بدء تحميل iframe
+    adIframe.src = 'about:blank';
 
     console.log('تم تحديث الإعلان بنجاح في:', new Date());
   }
@@ -1100,9 +1118,6 @@
       if (historyStack[currentHistoryIndex] !== url) {
         addToHistory(url);
       }
-      
-      // حقن معالج الروابط
-      setTimeout(() => injectLinkInterceptor(), 500);
     } catch (err) {
       title.textContent = new URL(frame.src).hostname.replace('www.', '');
     }
@@ -1114,45 +1129,6 @@
     isLoading = false;
     title.textContent = "خطأ في التحميل";
   });
-
-  // اعتراض الروابط الخارجية في الصفحة الرئيسية
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('a[href^="http"]').forEach(link => {
-      if (!link.href.includes(window.location.hostname)) {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          openWebView(link.href);
-        });
-      }
-    });
-  });
-
-  // اعتراض الروابط داخل iframe
-  function injectLinkInterceptor() {
-    try {
-      const doc = frame.contentDocument || frame.contentWindow.document;
-      const links = doc.querySelectorAll('a[href^="http"]');
-      
-      links.forEach(link => {
-        link.setAttribute('target', '_blank');
-        link.addEventListener('click', e => {
-          const href = link.getAttribute('href');
-          if (href && href.startsWith('http')) {
-            e.preventDefault();
-            // فتح الرابط في نافذة جديدة أولاً لتسجيل الإحصائيات
-            const newWindow = window.open(href, '_blank');
-            // ثم فتح في المتصفح الداخلي بعد تأخير بسيط
-            setTimeout(() => {
-              newWindow.close();
-              openWebView(href);
-            }, 300);
-          }
-        });
-      });
-    } catch (err) {
-      // CORS قد يمنع الوصول إلى محتوى iframe
-    }
-  }
 
   // شريط التقدم
   function startProgressBar() {
@@ -1197,7 +1173,6 @@
     setInterval(loadNewAd, 45000);
   });
 </script>
-	
 
 	
 
