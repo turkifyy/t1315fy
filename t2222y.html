@@ -579,7 +579,9 @@
         transform: translateY(0);
     }
 }
-        
+    .ad-transition {
+            transition: opacity 0.5s ease;
+        }
     </style>
 </head>
 <body>
@@ -603,17 +605,60 @@
 	<!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
+        const adTemplates = [
+            {
+                key: 'f9692cbfd85fbcbc3c6a482c17b185ff',
+                format: 'iframe',
+                height: 50,
+                width: 320
+            },
+            {
+                key: 'f9692cbfd85fbcbc3c6a482c17b185ff',
+                format: 'iframe',
+                height: 50,
+                width: 320
+            },
+            {
+                key: 'f9692cbfd85fbcbc3c6a482c17b185ff',
+                format: 'iframe',
+                height: 50,
+                width: 320
+            }
+        ];
+
+        function loadAd(adConfig) {
+            const adContainer = document.getElementById('ad-banner');
+            adContainer.style.opacity = '0';
+            
+            setTimeout(() => {
+                adContainer.innerHTML = `
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key': '${adConfig.key}',
+                            'format': '${adConfig.format}',
+                            'height': ${adConfig.height},
+                            'width': ${adConfig.width},
+                            'params': {}
+                        };
+                    <\/script>
+                    <script type="text/javascript" 
+                            src="//www.highperformanceformat.com/${adConfig.key}/invoke.js"><\/script>
+                `;
+                adContainer.style.opacity = '1';
+            }, 500);
+        }
+
+        let currentAdIndex = 0;
+        function rotateAds() {
+            loadAd(adTemplates[currentAdIndex]);
+            currentAdIndex = (currentAdIndex + 1) % adTemplates.length;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-    const adContainer = document.querySelector('.banner-ad-container');
-    const adElement = document.getElementById('ad-banner');
-
-    adContainer.style.height = adElement.offsetHeight + 'px';
-
-    window.addEventListener('resize', function() {
-        adContainer.style.height = adElement.offsetHeight + 'px';
-    });
-});
-	</script>
+            rotateAds();
+            setInterval(rotateAds, 40000);
+        });
+    </script>
 
     <!-- Top Navigation -->
     <nav class="top-nav">
