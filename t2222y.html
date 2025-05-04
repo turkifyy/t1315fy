@@ -1586,5 +1586,37 @@
         // Initialize fallbacks
         window.addEventListener('load', loadFallbacks);
     </script>
+
+	<!-- متصفح داخلي (يظهر عند النقر على الروابط) -->
+<div id="webview-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:100000;">
+    <button onclick="closeWebView()" style="position:absolute; top:15px; right:15px; z-index:100001; background:red; color:white; border:none; border-radius:50%; width:30px; height:30px; font-size:16px;">✕</button>
+    <iframe id="webview-frame" style="width:100%; height:100%; border:none;"></iframe>
+</div>
+
+<script>
+// دالة فتح المتصفح الداخلي
+function openWebView(url) {
+    document.getElementById('webview-container').style.display = 'block';
+    document.getElementById('webview-frame').src = url;
+}
+
+// دالة إغلاق المتصفح الداخلي
+function closeWebView() {
+    document.getElementById('webview-container').style.display = 'none';
+    document.getElementById('webview-frame').src = '';
+}
+
+// تطبيق على جميع الروابط الخارجية
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('a[href^="http"]').forEach(link => {
+        if (!link.href.includes(window.location.hostname)) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                openWebView(this.href);
+            });
+        }
+    });
+});
+</script>	
 </body>
 </html>
