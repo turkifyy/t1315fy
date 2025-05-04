@@ -849,272 +849,291 @@
 </div>
 
 
-  <script>
-  // ============== إدارة الإعلانات ==============
-  function loadNewAd() {
-    const adContainer = document.getElementById('ad-banner');
-    if (!adContainer) return;
-    
-    adContainer.innerHTML = '';
-    
-    // إنشاء iframe للإعلان
-    const adIframe = document.createElement('iframe');
-    adIframe.id = 'ad-iframe';
-    adIframe.style.width = '320px';
-    adIframe.style.height = '50px';
-    adIframe.style.border = 'none';
-    adIframe.style.overflow = 'hidden';
-    adIframe.style.display = 'block';
-    adIframe.style.margin = '0 auto';
-    adIframe.scrolling = 'no';
-    adIframe.frameBorder = '0';
-    adIframe.sandbox = 'allow-scripts allow-popups allow-forms';
-    
-    // محتوى الإعلان
-    const adContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <base target="_blank">
-        <script data-ad>
-          atOptions = {
-            'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
-            'format': 'iframe',
-            'height': 50,
-            'width': 320,
-            'params': {}
-          };
-        <\/script>
-        <script data-ad src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"><\/script>
-        <script data-ad>
-          // نظام اعتراض النقرات
-          function handleAdClick(e) {
-            let target = e.target;
-            while (target && target.tagName !== 'A' && target !== document.body) {
-              target = target.parentNode;
-            }
-            if (target && target.tagName === 'A' && target.href) {
-              e.preventDefault();
-              window.parent.postMessage({
-                type: 'AD_CLICK',
-                url: target.href,
-                timestamp: Date.now()
-              }, '*');
-              return false;
-            }
-          }
-          document.addEventListener('click', handleAdClick, true);
-        <\/script>
-      </head>
-      <body style="margin:0;padding:0;background:transparent;"></body>
-      </html>
-    `;
-    
-    adContainer.appendChild(adIframe);
-    
-    // معالجة رسائل النقر من الإعلان
-    window.addEventListener('message', function(event) {
-      if (event.data && event.data.type === 'AD_CLICK') {
-        handleAdClick(event.data.url);
+  
+<script>
+  // ============== نظام الإعلانات الثابت الآمن ==============
+  (function() {
+    // إنشاء عنصر الإعلان إذا لم يكن موجوداً
+    function createAdContainer() {
+      let adContainer = document.getElementById('ad-banner');
+      if (!adContainer) {
+        adContainer = document.createElement('div');
+        adContainer.id = 'ad-banner';
+        document.body.prepend(adContainer);
       }
-    });
+      applyAdContainerStyles(adContainer);
+      return adContainer;
+    }
 
-    // تحميل محتوى iframe
-    adIframe.onload = function() {
+    // تطبيق الأنماط الثابتة للإعلان
+    function applyAdContainerStyles(container) {
+      container.style.cssText = `
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 60px !important;
+        z-index: 10000 !important;
+        background-color: rgba(40, 40, 40, 0.95) !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 5px 0 !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+      `;
+      document.body.style.paddingTop = '60px';
+    }
+
+    // تحميل الإعلان مع التعامل مع الأخطاء
+    function loadAdContent(adIframe, retryCount = 0) {
       try {
+        if (!adIframe.contentWindow || !adIframe.contentDocument) {
+          if (retryCount < 3) {
+            setTimeout(() => loadAdContent(adIframe, retryCount + 1), 200);
+            return;
+          }
+          throw new Error('Iframe not ready');
+        }
+
+        const adContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <base target="_blank">
+            <script data-ad>
+              atOptions = {
+                'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
+                'format': 'iframe',
+                'height': 50,
+                'width': 320,
+                'params': {}
+              };
+            <\/script>
+            <script data-ad src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"><\/script>
+            <script data-ad>
+              document.addEventListener('click', function(e) {
+                var target = e.target;
+                while (target && target.tagName !== 'A' && target !== document.body) {
+                  target = target.parentNode;
+                }
+                if (target && target.tagName === 'A' && target.href) {
+                  e.preventDefault();
+                  window.top.postMessage({
+                    type: 'AD_CLICK',
+                    url: target.href,
+                    timestamp: ${Date.now()}
+                  }, '*');
+                }
+              }, true);
+            <\/script>
+          </head>
+          <body style="margin:0;padding:0;background:transparent;"></body>
+          </html>
+        `;
+
         const iframeDoc = adIframe.contentDocument;
         iframeDoc.open();
         iframeDoc.write(adContent);
         iframeDoc.close();
+      } catch (error) {
+        console.error('Error loading ad:', error);
+        if (retryCount < 3) {
+          setTimeout(() => loadAdContent(adIframe, retryCount + 1), 1000);
+        }
+      }
+    }
+
+    // إنشاء iframe الإعلان
+    function createAdIframe() {
+      const iframe = document.createElement('iframe');
+      iframe.id = 'ad-iframe-' + Date.now();
+      iframe.style.cssText = `
+        width: 320px !important;
+        height: 50px !important;
+        border: none !important;
+        overflow: hidden !important;
+        display: block !important;
+        margin: 0 auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      `;
+      iframe.setAttribute('scrolling', 'no');
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('sandbox', 'allow-scripts allow-popups allow-forms');
+      return iframe;
+    }
+
+    // معالجة نقرات الإعلان
+    function handleAdClick(url) {
+      if (!url) return;
+
+      // تسجيل النقرة
+      try {
+        const trackingPixel = new Image();
+        trackingPixel.src = `https://api.example.com/track?url=${encodeURIComponent(url)}&t=${Date.now()}`;
       } catch (e) {
-        console.error('Error loading ad content:', e);
+        console.error('Tracking error:', e);
       }
-    };
-    
-    adIframe.src = 'about:blank';
-  }
 
-  // معالجة نقرات الإعلان
-  function handleAdClick(url) {
-    if (!url) return;
-    
-    // 1. تسجيل النقرة لشبكة الإعلانات (بدون انتظار رد)
-    try {
-      const trackingUrl = new URL(url);
-      trackingUrl.searchParams.append('click_tracker', Date.now());
-      fetch(trackingUrl.toString(), {mode: 'no-cors'});
-    } catch (e) {
-      console.log('Error tracking click:', e);
+      // فتح في المتصفح الداخلي
+      setTimeout(() => {
+        openWebView(url);
+      }, 150);
     }
-    
-    // 2. فتح الرابط في المتصفح الداخلي
-    setTimeout(() => {
-      openWebView(url);
-    }, 150); // تأخير مناسب لتسجيل النقرة
-  }
 
-  // ============== إدارة المتصفح الداخلي ==============
-  const webviewContainer = document.getElementById('webview-container');
-  const webviewFrame = document.getElementById('webview-frame');
-  const webviewTitle = document.getElementById('webview-title');
-  const webviewLoader = document.getElementById('loader');
-  const backBtn = document.getElementById('back-btn');
-  const forwardBtn = document.getElementById('forward-btn');
-  
-  let currentURL = '';
-  let historyStack = [];
-  let currentHistoryIndex = -1;
-  let isLoading = false;
-
-  // فتح رابط في المتصفح الداخلي
-  function openWebView(url) {
-    if (!url) return;
-    
-    // إضافة البروتوكول إذا لم يكن موجوداً
-    if (!/^https?:\/\//i.test(url)) {
-      url = 'https://' + url;
-    }
-    
-    try {
-      const urlObj = new URL(url);
-      // السماح بكل من HTTP و HTTPS
-      if (!['http:', 'https:'].includes(urlObj.protocol)) {
-        alert("يُسمح فقط بروابط HTTP/HTTPS");
-        return;
-      }
+    // دالة رئيسية لتحميل الإعلان
+    function loadAd() {
+      const adContainer = createAdContainer();
+      const adIframe = createAdIframe();
       
-      // إعداد واجهة المتصفح الداخلي
-      webviewContainer.style.display = 'flex';
-      webviewLoader.style.display = 'block';
-      webviewTitle.textContent = "جارٍ التحميل...";
-      webviewFrame.src = url;
-      currentURL = url;
-      isLoading = true;
-      
-      // إضافة إلى سجل التصفح
-      addToHistory(url);
-    } catch (e) {
-      alert("الرابط غير صالح");
-      console.error("Invalid URL:", e);
+      adContainer.innerHTML = '';
+      adContainer.appendChild(adIframe);
+
+      window.addEventListener('message', function listener(event) {
+        if (event.data?.type === 'AD_CLICK') {
+          handleAdClick(event.data.url);
+        }
+      });
+
+      adIframe.onload = function() {
+        setTimeout(() => loadAdContent(adIframe), 100);
+      };
+
+      adIframe.src = 'about:blank';
+
+      return function cleanup() {
+        window.removeEventListener('message', listener);
+        adContainer.innerHTML = '';
+      };
     }
-  }
 
-  // إدارة سجل التصفح
-  function addToHistory(url) {
-    if (currentHistoryIndex < historyStack.length - 1) {
-      historyStack = historyStack.slice(0, currentHistoryIndex + 1);
-    }
-    historyStack.push(url);
-    currentHistoryIndex = historyStack.length - 1;
-    updateNavButtons();
-  }
+    // ============== نظام المتصفح الداخلي ==============
+    function initWebView() {
+      const elements = {
+        container: document.getElementById('webview-container'),
+        frame: document.getElementById('webview-frame'),
+        title: document.getElementById('webview-title'),
+        loader: document.getElementById('loader'),
+        backBtn: document.getElementById('back-btn'),
+        forwardBtn: document.getElementById('forward-btn'),
+        urlInput: document.getElementById('url-input')
+      };
 
-  // تحديث أزرار التنقل
-  function updateNavButtons() {
-    backBtn.disabled = currentHistoryIndex <= 0;
-    forwardBtn.disabled = currentHistoryIndex >= historyStack.length - 1;
-  }
-
-  // أحداث المتصفح الداخلي
-  webviewFrame.addEventListener('load', function() {
-    webviewLoader.style.display = 'none';
-    isLoading = false;
-    
-    try {
-      const url = webviewFrame.contentWindow.location.href;
-      const domain = new URL(url).hostname.replace('www.', '');
-      webviewTitle.textContent = domain;
-      currentURL = url;
-      
-      if (historyStack[currentHistoryIndex] !== url) {
-        addToHistory(url);
-      }
-    } catch (e) {
-      webviewTitle.textContent = new URL(webviewFrame.src).hostname.replace('www.', '');
-    }
-  });
-
-  webviewFrame.addEventListener('error', function() {
-    webviewLoader.style.display = 'none';
-    isLoading = false;
-    webviewTitle.textContent = "خطأ في التحميل";
-  });
-
-  // ============== الأحداث العامة ==============
-  document.addEventListener('DOMContentLoaded', function() {
-    // تحميل أول إعلان
-    loadNewAd();
-    
-    // تحديث الإعلان كل 45 ثانية
-    setInterval(loadNewAd, 45000);
-    
-    // إغلاق المتصفح الداخلي عند الضغط على ESC
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && webviewContainer.style.display === 'flex') {
-        webviewContainer.style.display = 'none';
-        webviewFrame.src = '';
-      }
-    });
-  });
-
-  // ============== واجهة المستخدم ==============
-  function closeWebView() {
-    webviewContainer.style.display = 'none';
-    webviewFrame.src = '';
-  }
-
-  function goBack() {
-    if (currentHistoryIndex > 0) {
-      currentHistoryIndex--;
-      webviewFrame.src = historyStack[currentHistoryIndex];
-    }
-  }
-
-  function goForward() {
-    if (currentHistoryIndex < historyStack.length - 1) {
-      currentHistoryIndex++;
-      webviewFrame.src = historyStack[currentHistoryIndex];
-    }
-  }
-
-  function reloadWebView() {
-    if (currentURL) {
-      webviewFrame.contentWindow.location.reload();
-    }
-  }
-
-  function copyLink() {
-    if (currentURL) {
-      navigator.clipboard.writeText(currentURL)
-        .then(() => {
-          const alertBox = document.getElementById('copy-alert');
-          if (alertBox) {
-            alertBox.style.display = 'block';
-            setTimeout(() => alertBox.style.display = 'none', 1500);
+      const history = {
+        stack: [],
+        index: -1,
+        add(url) {
+          if (this.index < this.stack.length - 1) {
+            this.stack = this.stack.slice(0, this.index + 1);
           }
-        })
-        .catch(e => console.error('Failed to copy:', e));
-    }
-  }
+          this.stack.push(url);
+          this.index = this.stack.length - 1;
+          this.updateButtons();
+        },
+        updateButtons() {
+          if (elements.backBtn && elements.forwardBtn) {
+            elements.backBtn.disabled = this.index <= 0;
+            elements.forwardBtn.disabled = this.index >= this.stack.length - 1;
+          }
+        }
+      };
 
-  function openInExternalBrowser() {
-    if (currentURL) {
-      window.open(currentURL, '_blank');
-    }
-  }
+      function openWebView(url, fromHistory = false) {
+        if (!url) return;
 
-  function toggleUrlBar() {
-    const urlBar = document.getElementById('url-bar');
-    const urlInput = document.getElementById('url-input');
-    if (urlBar && urlInput) {
-      urlBar.style.display = urlBar.style.display === 'block' ? 'none' : 'block';
-      if (urlBar.style.display === 'block') {
-        urlInput.value = currentURL || '';
-        urlInput.focus();
+        if (!/^https?:\/\//i.test(url)) {
+          url = 'https://' + url;
+        }
+
+        try {
+          const urlObj = new URL(url);
+          if (!['http:', 'https:'].includes(urlObj.protocol)) {
+            alert("يُسمح فقط بروابط HTTP/HTTPS");
+            return;
+          }
+
+          elements.container.style.display = 'flex';
+          elements.loader.style.display = 'block';
+          elements.title.textContent = "جارٍ التحميل...";
+          elements.frame.src = url;
+
+          if (!fromHistory) {
+            history.add(url);
+          }
+        } catch (e) {
+          alert("الرابط غير صالح");
+          console.error("Invalid URL:", e);
+        }
       }
+
+      // ربط الأحداث
+      if (elements.frame) {
+        elements.frame.addEventListener('load', function() {
+          elements.loader.style.display = 'none';
+          try {
+            const url = elements.frame.contentWindow.location.href;
+            const domain = new URL(url).hostname.replace('www.', '');
+            elements.title.textContent = domain;
+            if (history.stack[history.index] !== url) {
+              history.add(url);
+            }
+          } catch (e) {
+            elements.title.textContent = new URL(elements.frame.src).hostname.replace('www.', '');
+          }
+        });
+
+        elements.frame.addEventListener('error', function() {
+          elements.loader.style.display = 'none';
+          elements.title.textContent = "خطأ في التحميل";
+        });
+      }
+
+      return { openWebView, history, elements };
     }
-  }
+
+    // ============== التهيئة الرئيسية ==============
+    function init() {
+      // تهيئة المتصفح الداخلي
+      const { openWebView } = initWebView();
+
+      // تحميل الإعلان الأول
+      let cleanupAd = loadAd();
+
+      // تحديث الإعلان كل 45 ثانية
+      const adInterval = setInterval(() => {
+        cleanupAd();
+        cleanupAd = loadAd();
+      }, 45000);
+
+      // التأكد من ظهور الإعلان باستمرار
+      const visibilityChecker = setInterval(() => {
+        const ad = document.getElementById('ad-banner');
+        if (ad) {
+          ad.style.display = 'flex';
+          ad.style.visibility = 'visible';
+          ad.style.opacity = '1';
+        }
+      }, 3000);
+
+      // التنظيف عند إغلاق الصفحة
+      window.addEventListener('beforeunload', () => {
+        clearInterval(adInterval);
+        clearInterval(visibilityChecker);
+        cleanupAd();
+      });
+    }
+
+    // بدء التشغيل
+    if (document.readyState === 'complete') {
+      init();
+    } else {
+      window.addEventListener('load', init);
+    }
+  })();
 </script>
+  
+
+  
 	
 
     <!-- Top Navigation -->
