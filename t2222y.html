@@ -848,21 +848,26 @@
   <div id="copy-alert">تم نسخ الرابط!</div>
 </div>
 
-<script>
+
+  <script>
   // ============== إدارة الإعلانات ==============
   function loadNewAd() {
     const adContainer = document.getElementById('ad-banner');
+    if (!adContainer) return;
+    
     adContainer.innerHTML = '';
-
+    
+    // إنشاء iframe للإعلان
     const adIframe = document.createElement('iframe');
+    adIframe.id = 'ad-iframe';
     adIframe.style.width = '320px';
     adIframe.style.height = '50px';
     adIframe.style.border = 'none';
     adIframe.style.overflow = 'hidden';
+    adIframe.style.display = 'block';
+    adIframe.style.margin = '0 auto';
     adIframe.scrolling = 'no';
     adIframe.frameBorder = '0';
-    
-    // سياسة sandbox أكثر أماناً للإعلان
     adIframe.sandbox = 'allow-scripts allow-popups allow-forms';
     
     // محتوى الإعلان
@@ -871,7 +876,7 @@
       <html>
       <head>
         <base target="_blank">
-        <script>
+        <script data-ad>
           atOptions = {
             'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
             'format': 'iframe',
@@ -880,155 +885,121 @@
             'params': {}
           };
         <\/script>
-        <script src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"><\/script>
+        <script data-ad src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"><\/script>
+        <script data-ad>
+          // نظام اعتراض النقرات
+          function handleAdClick(e) {
+            let target = e.target;
+            while (target && target.tagName !== 'A' && target !== document.body) {
+              target = target.parentNode;
+            }
+            if (target && target.tagName === 'A' && target.href) {
+              e.preventDefault();
+              window.parent.postMessage({
+                type: 'AD_CLICK',
+                url: target.href,
+                timestamp: Date.now()
+              }, '*');
+              return false;
+            }
+          }
+          document.addEventListener('click', handleAdClick, true);
+        <\/script>
       </head>
-      <body style="margin:0;padding:0;"></body>
+      <body style="margin:0;padding:0;background:transparent;"></body>
       </html>
     `;
     
     adContainer.appendChild(adIframe);
     
-    // معالجة تحميل iframe
+    // معالجة رسائل النقر من الإعلان
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'AD_CLICK') {
+        handleAdClick(event.data.url);
+      }
+    });
+
+    // تحميل محتوى iframe
     adIframe.onload = function() {
       try {
-        const iframeDoc = adIframe.contentDocument || adIframe.contentWindow.document;
+        const iframeDoc = adIframe.contentDocument;
         iframeDoc.open();
         iframeDoc.write(adContent);
         iframeDoc.close();
-        
-        // اعتراض النقرات بعد تحميل الإعلان
-        setTimeout(() => {
-          try {
-            // مراقبة تغييرات DOM داخل iframe
-            const observer = new MutationObserver(() => {
-              const links = iframeDoc.querySelectorAll('a');
-              links.forEach(link => {
-                if (!link.hasAttribute('data-ad-intercepted')) {
-                  link.setAttribute('data-ad-intercepted', 'true');
-                  link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const href = this.href || this.getAttribute('href');
-                    if (href && href.startsWith('http')) {
-                      // تسجيل النقرة أولاً
-                      const clickTracker = new Image();
-                      clickTracker.src = href.includes('?') ? 
-                        href + '&track=click' : 
-                        href + '?track=click';
-                      
-                      // ثم فتح في المتصفح الداخلي
-                      setTimeout(() => {
-                        openWebView(href);
-                      }, 100);
-                    }
-                  });
-                }
-              });
-            });
-            
-            observer.observe(iframeDoc.body, {
-              childList: true,
-              subtree: true
-            });
-          } catch (e) {
-            console.error('Error intercepting ad clicks:', e);
-          }
-        }, 1500);
       } catch (e) {
         console.error('Error loading ad content:', e);
       }
     };
     
     adIframe.src = 'about:blank';
-    console.log('تم تحميل الإعلان بنجاح:', new Date().toLocaleTimeString());
+  }
+
+  // معالجة نقرات الإعلان
+  function handleAdClick(url) {
+    if (!url) return;
+    
+    // 1. تسجيل النقرة لشبكة الإعلانات (بدون انتظار رد)
+    try {
+      const trackingUrl = new URL(url);
+      trackingUrl.searchParams.append('click_tracker', Date.now());
+      fetch(trackingUrl.toString(), {mode: 'no-cors'});
+    } catch (e) {
+      console.log('Error tracking click:', e);
+    }
+    
+    // 2. فتح الرابط في المتصفح الداخلي
+    setTimeout(() => {
+      openWebView(url);
+    }, 150); // تأخير مناسب لتسجيل النقرة
   }
 
   // ============== إدارة المتصفح الداخلي ==============
-  const container = document.getElementById('webview-container');
-  const frameContainer = document.getElementById('webview-frame-container');
-  const frame = document.getElementById('webview-frame');
-  const title = document.getElementById('webview-title');
-  const loader = document.getElementById('loader');
-  const alertBox = document.getElementById('copy-alert');
-  const urlBar = document.getElementById('url-bar');
-  const urlInput = document.getElementById('url-input');
-  const progressBar = document.querySelector('.progress-bar');
+  const webviewContainer = document.getElementById('webview-container');
+  const webviewFrame = document.getElementById('webview-frame');
+  const webviewTitle = document.getElementById('webview-title');
+  const webviewLoader = document.getElementById('loader');
   const backBtn = document.getElementById('back-btn');
   const forwardBtn = document.getElementById('forward-btn');
-
-  let currentURL = "";
+  
+  let currentURL = '';
   let historyStack = [];
   let currentHistoryIndex = -1;
   let isLoading = false;
-  let progressInterval;
 
+  // فتح رابط في المتصفح الداخلي
   function openWebView(url) {
     if (!url) return;
     
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    // إضافة البروتوكول إذا لم يكن موجوداً
+    if (!/^https?:\/\//i.test(url)) {
       url = 'https://' + url;
     }
     
     try {
       const urlObj = new URL(url);
-      if (urlObj.protocol !== 'https:') {
-        alert("يُسمح فقط بروابط HTTPS لأسباب أمنية.");
+      // السماح بكل من HTTP و HTTPS
+      if (!['http:', 'https:'].includes(urlObj.protocol)) {
+        alert("يُسمح فقط بروابط HTTP/HTTPS");
         return;
       }
-    } catch {
+      
+      // إعداد واجهة المتصفح الداخلي
+      webviewContainer.style.display = 'flex';
+      webviewLoader.style.display = 'block';
+      webviewTitle.textContent = "جارٍ التحميل...";
+      webviewFrame.src = url;
+      currentURL = url;
+      isLoading = true;
+      
+      // إضافة إلى سجل التصفح
+      addToHistory(url);
+    } catch (e) {
       alert("الرابط غير صالح");
-      return;
-    }
-
-    container.style.display = 'flex';
-    loader.style.display = 'block';
-    title.textContent = "جارٍ التحميل...";
-    frame.src = url;
-    currentURL = url;
-    isLoading = true;
-    startProgressBar();
-    addToHistory(url);
-  }
-
-  function closeWebView() {
-    container.style.display = 'none';
-    frame.src = '';
-    loader.style.display = 'none';
-    urlBar.style.display = 'none';
-    stopProgressBar();
-    isLoading = false;
-  }
-
-  function reloadWebView() {
-    if (!currentURL) return;
-    loader.style.display = 'block';
-    isLoading = true;
-    startProgressBar();
-    frame.contentWindow.location.reload();
-  }
-
-  function goBack() {
-    if (currentHistoryIndex > 0) {
-      currentHistoryIndex--;
-      navigateToHistoryIndex();
+      console.error("Invalid URL:", e);
     }
   }
 
-  function goForward() {
-    if (currentHistoryIndex < historyStack.length - 1) {
-      currentHistoryIndex++;
-      navigateToHistoryIndex();
-    }
-  }
-
-  function navigateToHistoryIndex() {
-    const url = historyStack[currentHistoryIndex];
-    loader.style.display = 'block';
-    isLoading = true;
-    startProgressBar();
-    frame.src = url;
-    currentURL = url;
-  }
-
+  // إدارة سجل التصفح
   function addToHistory(url) {
     if (currentHistoryIndex < historyStack.length - 1) {
       historyStack = historyStack.slice(0, currentHistoryIndex + 1);
@@ -1038,96 +1009,111 @@
     updateNavButtons();
   }
 
+  // تحديث أزرار التنقل
   function updateNavButtons() {
     backBtn.disabled = currentHistoryIndex <= 0;
     forwardBtn.disabled = currentHistoryIndex >= historyStack.length - 1;
   }
 
-  function copyLink() {
-    if (!currentURL) return;
-    navigator.clipboard.writeText(currentURL).then(() => {
-      alertBox.style.display = 'block';
-      setTimeout(() => alertBox.style.display = 'none', 1500);
-    });
-  }
-
-  function openInExternalBrowser() {
-    if (!currentURL) return;
-    window.open(currentURL, '_blank');
-  }
-
-  function toggleUrlBar() {
-    urlBar.style.display = urlBar.style.display === 'block' ? 'none' : 'block';
-    if (urlBar.style.display === 'block') {
-      urlInput.value = currentURL;
-      urlInput.focus();
-    }
-  }
-
-  urlInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      openWebView(urlInput.value);
-      urlBar.style.display = 'none';
-    }
-  });
-
-  frame.addEventListener('load', () => {
-    loader.style.display = 'none';
-    stopProgressBar();
+  // أحداث المتصفح الداخلي
+  webviewFrame.addEventListener('load', function() {
+    webviewLoader.style.display = 'none';
     isLoading = false;
+    
     try {
-      const url = frame.contentWindow.location.href;
-      const host = new URL(url).hostname.replace('www.', '');
-      title.textContent = host;
+      const url = webviewFrame.contentWindow.location.href;
+      const domain = new URL(url).hostname.replace('www.', '');
+      webviewTitle.textContent = domain;
       currentURL = url;
+      
       if (historyStack[currentHistoryIndex] !== url) {
         addToHistory(url);
       }
-    } catch (err) {
-      title.textContent = new URL(frame.src).hostname.replace('www.', '');
+    } catch (e) {
+      webviewTitle.textContent = new URL(webviewFrame.src).hostname.replace('www.', '');
     }
   });
 
-  frame.addEventListener('error', () => {
-    loader.style.display = 'none';
-    stopProgressBar();
+  webviewFrame.addEventListener('error', function() {
+    webviewLoader.style.display = 'none';
     isLoading = false;
-    title.textContent = "خطأ في التحميل";
+    webviewTitle.textContent = "خطأ في التحميل";
   });
 
-  function startProgressBar() {
-    progressBar.style.width = '0%';
-    progressBar.style.opacity = '1';
-    let progress = 0;
-    progressInterval = setInterval(() => {
-      if (!isLoading) {
-        progressBar.style.width = '100%';
-        setTimeout(() => progressBar.style.opacity = '0', 200);
-        clearInterval(progressInterval);
-        return;
-      }
-      progress = Math.min(progress + Math.random() * 10, 90);
-      progressBar.style.width = `${progress}%`;
-    }, 300);
-  }
-
-  function stopProgressBar() {
-    clearInterval(progressInterval);
-    progressBar.style.width = '100%';
-    setTimeout(() => progressBar.style.opacity = '0', 200);
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && container.style.display === 'flex') {
-      closeWebView();
-    }
-  });
-
-  // بدء التشغيل
+  // ============== الأحداث العامة ==============
   document.addEventListener('DOMContentLoaded', function() {
+    // تحميل أول إعلان
     loadNewAd();
+    
+    // تحديث الإعلان كل 45 ثانية
     setInterval(loadNewAd, 45000);
+    
+    // إغلاق المتصفح الداخلي عند الضغط على ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && webviewContainer.style.display === 'flex') {
+        webviewContainer.style.display = 'none';
+        webviewFrame.src = '';
+      }
+    });
   });
+
+  // ============== واجهة المستخدم ==============
+  function closeWebView() {
+    webviewContainer.style.display = 'none';
+    webviewFrame.src = '';
+  }
+
+  function goBack() {
+    if (currentHistoryIndex > 0) {
+      currentHistoryIndex--;
+      webviewFrame.src = historyStack[currentHistoryIndex];
+    }
+  }
+
+  function goForward() {
+    if (currentHistoryIndex < historyStack.length - 1) {
+      currentHistoryIndex++;
+      webviewFrame.src = historyStack[currentHistoryIndex];
+    }
+  }
+
+  function reloadWebView() {
+    if (currentURL) {
+      webviewFrame.contentWindow.location.reload();
+    }
+  }
+
+  function copyLink() {
+    if (currentURL) {
+      navigator.clipboard.writeText(currentURL)
+        .then(() => {
+          const alertBox = document.getElementById('copy-alert');
+          if (alertBox) {
+            alertBox.style.display = 'block';
+            setTimeout(() => alertBox.style.display = 'none', 1500);
+          }
+        })
+        .catch(e => console.error('Failed to copy:', e));
+    }
+  }
+
+  function openInExternalBrowser() {
+    if (currentURL) {
+      window.open(currentURL, '_blank');
+    }
+  }
+
+  function toggleUrlBar() {
+    const urlBar = document.getElementById('url-bar');
+    const urlInput = document.getElementById('url-input');
+    if (urlBar && urlInput) {
+      urlBar.style.display = urlBar.style.display === 'block' ? 'none' : 'block';
+      if (urlBar.style.display === 'block') {
+        urlInput.value = currentURL || '';
+        urlInput.focus();
+      }
+    }
+  }
 </script>
 	
 
