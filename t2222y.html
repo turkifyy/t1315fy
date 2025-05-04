@@ -555,7 +555,7 @@
     <div class="toast-container" id="toastContainer"></div>
 	
 
-	<style>
+<style>
     /* أنماط شريط الإعلانات */
     .banner-ad-container {
       position: fixed;
@@ -563,10 +563,10 @@
       left: 0;
       width: 100%;
       z-index: 1005;
-      background-color: rgba(40, 40, 40, 0.9);	    
+      background-color: rgba(40, 40, 40, 0.9);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       display: flex;
-      justify-content: center;	    
+      justify-content: center;
       padding: 5px 0;
       animation: fadeInDown 0.5s ease-out;
     }
@@ -630,7 +630,7 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: var(--background-light);
-      z-index: 1000000;
+      z-index: 100000;
       flex-direction: column;
       animation: fadeIn 0.3s ease-in-out;
     }
@@ -706,7 +706,7 @@
       animation: spin 1s linear infinite;
       transform: translate(-50%, -50%);
       display: none;
-      z-index: 1000001;
+      z-index: 100001;
     }
 
     @keyframes spin {
@@ -766,7 +766,7 @@
       border-radius: 8px;
       font-size: 14px;
       display: none;
-      z-index: 1000003;
+      z-index: 100003;
       animation: fadeInOut 1.5s ease-in-out;
     }
 
@@ -809,7 +809,7 @@
       background: var(--primary-color);
       width: 0%;
       transition: width 0.3s ease;
-      z-index: 1000005;
+      z-index: 100005;
     }
   </style>
 
@@ -829,7 +829,7 @@
   </div>
 
   <div id="url-bar">
-    <input type="text" id="url-input" placeholder="أدخل عنوان URL" />
+    <input type="text" id="url-input" placeholder="أدخل عنوان URL">
   </div>
 
   <div id="webview-frame-container">
@@ -848,16 +848,12 @@
   <div id="copy-alert">تم نسخ الرابط!</div>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
   // ============== إدارة الإعلانات ==============
   function loadNewAd() {
     const adContainer = document.getElementById('ad-banner');
     adContainer.innerHTML = '';
 
-    // إنشاء iframe للإعلان بدلاً من السماح بتحميل البرنامج النصي مباشرة
     const adIframe = document.createElement('iframe');
     adIframe.style.width = '320px';
     adIframe.style.height = '50px';
@@ -866,12 +862,15 @@
     adIframe.scrolling = 'no';
     adIframe.frameBorder = '0';
     
-    // السماح بكل الصلاحيات للإعلان للحفاظ على الإحصائيات
-    adIframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation';
+    // سياسة sandbox أكثر أماناً للإعلان
+    adIframe.sandbox = 'allow-scripts allow-popups allow-forms';
     
-    // إنشاء محتوى الإعلان داخل iframe
+    // محتوى الإعلان
     const adContent = `
-      
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <base target="_blank">
         <script>
           atOptions = {
             'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
@@ -880,14 +879,16 @@
             'width': 320,
             'params': {}
           };
-        </script>
-        <script src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"></script>
-      
+        <\/script>
+        <script src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"><\/script>
+      </head>
+      <body style="margin:0;padding:0;"></body>
+      </html>
     `;
     
     adContainer.appendChild(adIframe);
     
-    // كتابة محتوى iframe بعد التحميل
+    // معالجة تحميل iframe
     adIframe.onload = function() {
       try {
         const iframeDoc = adIframe.contentDocument || adIframe.contentWindow.document;
@@ -895,42 +896,50 @@
         iframeDoc.write(adContent);
         iframeDoc.close();
         
-        // اعتراض جميع النقرات في الإعلان
+        // اعتراض النقرات بعد تحميل الإعلان
         setTimeout(() => {
           try {
-            const links = iframeDoc.querySelectorAll('a');
-            links.forEach(link => {
-              link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const href = this.getAttribute('href');
-                if (href && href.startsWith('http')) {
-                  // أولاً: فتح الرابط في نافذة خفية لتسجيل النقرة
-                  const hiddenFrame = document.createElement('iframe');
-                  hiddenFrame.style.display = 'none';
-                  hiddenFrame.src = href;
-                  document.body.appendChild(hiddenFrame);
-                  
-                  // ثانياً: فتح الرابط في المتصفح الداخلي بعد تأخير بسيط
-                  setTimeout(() => {
-                    document.body.removeChild(hiddenFrame);
-                    openWebView(href);
-                  }, 300);
+            // مراقبة تغييرات DOM داخل iframe
+            const observer = new MutationObserver(() => {
+              const links = iframeDoc.querySelectorAll('a');
+              links.forEach(link => {
+                if (!link.hasAttribute('data-ad-intercepted')) {
+                  link.setAttribute('data-ad-intercepted', 'true');
+                  link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.href || this.getAttribute('href');
+                    if (href && href.startsWith('http')) {
+                      // تسجيل النقرة أولاً
+                      const clickTracker = new Image();
+                      clickTracker.src = href.includes('?') ? 
+                        href + '&track=click' : 
+                        href + '?track=click';
+                      
+                      // ثم فتح في المتصفح الداخلي
+                      setTimeout(() => {
+                        openWebView(href);
+                      }, 100);
+                    }
+                  });
                 }
               });
             });
+            
+            observer.observe(iframeDoc.body, {
+              childList: true,
+              subtree: true
+            });
           } catch (e) {
-            console.log('تعذر اعتراض روابط الإعلان:', e);
+            console.error('Error intercepting ad clicks:', e);
           }
-        }, 2000);
+        }, 1500);
       } catch (e) {
-        console.log('تعذر تحميل الإعلان في iframe:', e);
+        console.error('Error loading ad content:', e);
       }
     };
     
-    // بدء تحميل iframe
     adIframe.src = 'about:blank';
-
-    console.log('تم تحديث الإعلان بنجاح في:', new Date());
+    console.log('تم تحميل الإعلان بنجاح:', new Date().toLocaleTimeString());
   }
 
   // ============== إدارة المتصفح الداخلي ==============
@@ -952,16 +961,13 @@
   let isLoading = false;
   let progressInterval;
 
-  // فتح WebView
   function openWebView(url) {
     if (!url) return;
     
-    // إضافة https:// إذا لم يكن موجوداً
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'https://' + url;
     }
     
-    // التحقق من أن الرابط يستخدم HTTPS
     try {
       const urlObj = new URL(url);
       if (urlObj.protocol !== 'https:') {
@@ -979,15 +985,10 @@
     frame.src = url;
     currentURL = url;
     isLoading = true;
-    
-    // بدء شريط التقدم
     startProgressBar();
-    
-    // إضافة إلى سجل التاريخ
     addToHistory(url);
   }
 
-  // إغلاق WebView
   function closeWebView() {
     container.style.display = 'none';
     frame.src = '';
@@ -997,42 +998,28 @@
     isLoading = false;
   }
 
-  // إعادة تحميل الصفحة
   function reloadWebView() {
     if (!currentURL) return;
-    
     loader.style.display = 'block';
     isLoading = true;
     startProgressBar();
-    
-    try {
-      frame.contentWindow.location.reload();
-    } catch {
-      frame.src = currentURL;
-    }
+    frame.contentWindow.location.reload();
   }
 
-  // الرجوع للصفحة السابقة
   function goBack() {
     if (currentHistoryIndex > 0) {
       currentHistoryIndex--;
       navigateToHistoryIndex();
-    } else {
-      alert("لا يوجد صفحات سابقة في السجل");
     }
   }
 
-  // التقدم للصفحة التالية
   function goForward() {
     if (currentHistoryIndex < historyStack.length - 1) {
       currentHistoryIndex++;
       navigateToHistoryIndex();
-    } else {
-      alert("لا يوجد صفحات تالية في السجل");
     }
   }
 
-  // التنقل في سجل التاريخ
   function navigateToHistoryIndex() {
     const url = historyStack[currentHistoryIndex];
     loader.style.display = 'block';
@@ -1042,44 +1029,33 @@
     currentURL = url;
   }
 
-  // إضافة صفحة إلى سجل التاريخ
   function addToHistory(url) {
-    // إذا كنا في منتصف السجل، نزيل كل ما بعد المؤشر الحالي
     if (currentHistoryIndex < historyStack.length - 1) {
       historyStack = historyStack.slice(0, currentHistoryIndex + 1);
     }
-    
     historyStack.push(url);
     currentHistoryIndex = historyStack.length - 1;
     updateNavButtons();
   }
 
-  // تحديث أزرار التنقل
   function updateNavButtons() {
     backBtn.disabled = currentHistoryIndex <= 0;
     forwardBtn.disabled = currentHistoryIndex >= historyStack.length - 1;
   }
 
-  // نسخ الرابط الحالي
   function copyLink() {
     if (!currentURL) return;
-    
     navigator.clipboard.writeText(currentURL).then(() => {
       alertBox.style.display = 'block';
       setTimeout(() => alertBox.style.display = 'none', 1500);
-    }).catch(() => {
-      alert("تعذر نسخ الرابط");
     });
   }
 
-  // فتح في متصفح خارجي
   function openInExternalBrowser() {
     if (!currentURL) return;
-    
     window.open(currentURL, '_blank');
   }
 
-  // تبديل شريط العنوان
   function toggleUrlBar() {
     urlBar.style.display = urlBar.style.display === 'block' ? 'none' : 'block';
     if (urlBar.style.display === 'block') {
@@ -1088,7 +1064,6 @@
     }
   }
 
-  // معالجة إدخال URL
   urlInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       openWebView(urlInput.value);
@@ -1096,19 +1071,15 @@
     }
   });
 
-  // أحداث iframe
   frame.addEventListener('load', () => {
     loader.style.display = 'none';
     stopProgressBar();
     isLoading = false;
-    
     try {
       const url = frame.contentWindow.location.href;
       const host = new URL(url).hostname.replace('www.', '');
       title.textContent = host;
       currentURL = url;
-      
-      // تحديث سجل التاريخ إذا كانت URL مختلفة عن الأخيرة
       if (historyStack[currentHistoryIndex] !== url) {
         addToHistory(url);
       }
@@ -1124,50 +1095,40 @@
     title.textContent = "خطأ في التحميل";
   });
 
-  // شريط التقدم
   function startProgressBar() {
     progressBar.style.width = '0%';
     progressBar.style.opacity = '1';
-    
     let progress = 0;
     progressInterval = setInterval(() => {
       if (!isLoading) {
         progressBar.style.width = '100%';
-        setTimeout(() => {
-          progressBar.style.opacity = '0';
-        }, 200);
+        setTimeout(() => progressBar.style.opacity = '0', 200);
         clearInterval(progressInterval);
         return;
       }
-      
-      progress += Math.random() * 10;
-      if (progress > 90) progress = 90;
+      progress = Math.min(progress + Math.random() * 10, 90);
       progressBar.style.width = `${progress}%`;
     }, 300);
   }
 
   function stopProgressBar() {
-    if (progressInterval) clearInterval(progressInterval);
+    clearInterval(progressInterval);
     progressBar.style.width = '100%';
-    setTimeout(() => {
-      progressBar.style.opacity = '0';
-    }, 200);
+    setTimeout(() => progressBar.style.opacity = '0', 200);
   }
 
-  // إغلاق بالضغط على ESC
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && container.style.display === 'flex') {
       closeWebView();
     }
   });
 
-  // بدء تحميل الإعلان الأول
+  // بدء التشغيل
   document.addEventListener('DOMContentLoaded', function() {
     loadNewAd();
     setInterval(loadNewAd, 45000);
   });
 </script>
-
 	
 
     <!-- Top Navigation -->
