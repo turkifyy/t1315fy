@@ -871,9 +871,7 @@
     
     // إنشاء محتوى الإعلان داخل iframe
     const adContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
+      
         <script>
           atOptions = {
             'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
@@ -884,11 +882,7 @@
           };
         </script>
         <script src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"></script>
-      </head>
-      <body style="margin:0;padding:0;">
-        <!-- سيتم حقن الإعلان هنا من قبل الشبكة -->
-      </body>
-      </html>
+      
     `;
     
     adContainer.appendChild(adIframe);
