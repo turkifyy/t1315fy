@@ -590,43 +590,23 @@
 	
   <div class="banner-ad-container">
 	<div id="ad-banner" class="ad-transition" style="top: 5;">
+
+             <script type="text/javascript">
+	atOptions = {
+		'key' : 'f9692cbfd85fbcbc3c6a482c17b185ff',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js"></script>
+		
 	    </div>
             </div>
 	<!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-	<script>
-    function loadNewAd() {
-        const adContainer = document.getElementById('ad-banner');
 
-        const newScript1 = document.createElement('script');
-        newScript1.type = 'text/javascript';
-        newScript1.innerHTML = `
-            atOptions = {
-                'key': 'f9692cbfd85fbcbc3c6a482c17b185ff',
-                'format': 'iframe',
-                'height': 50,
-                'width': 320,
-                'params': {}
-            };
-        `;
-
-        const newScript2 = document.createElement('script');
-        newScript2.src = '//www.highperformanceformat.com/f9692cbfd85fbcbc3c6a482c17b185ff/invoke.js';
-        newScript2.type = 'text/javascript';
-
-        adContainer.innerHTML = '';
-
-        adContainer.appendChild(newScript1);
-        adContainer.appendChild(newScript2);
-
-        console.log('تم تحديث الإعلان بنجاح في:', new Date());
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        loadNewAd();
-        setInterval(loadNewAd, 45000);
-    });
-</script>
   
 	
 
