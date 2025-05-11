@@ -346,8 +346,7 @@
             right: 0;
             height: 70vh;
             background-color: var(--dark-color);
-	    border-top: 7px;
-            border-top-left-radius: 12px;
+	    border-top-left-radius: 12px;
             border-top-right-radius: 12px;
             z-index: 30000;
             transform: translateY(100%);
@@ -435,6 +434,7 @@
         .comment-input {
             flex: 1;
             background-color: rgba(255, 255, 255, 0.1);
+	    top: 10;
             border: none;
             border-radius: 20px;
             padding: 10px 15px;
@@ -445,14 +445,13 @@
 
         .comment-submit {
             background: none;
+	    top: 10;
             border: none;
             color: var(--primary-color);
             font-size: 16px;
             margin-left: 10px;
             cursor: pointer;
         }
-
-        
 
         /* Error message */
         .error-message {
@@ -587,7 +586,7 @@
     </div>
 
     <!-- Comment Modal -->
-    <div class="comment-modal" id="commentModal" style="top: 5;">
+    <div class="comment-modal" id="commentModal">
         <div class="comment-header">
             <button class="comment-close" id="commentCloseBtn">
                 <i class="fas fa-times"></i>
