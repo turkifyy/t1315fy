@@ -609,6 +609,8 @@
     
     <!-- Main App JavaScript -->
     <script>
+      let autoplayEnabled = false;
+	    
         // Firebase configuration - IMPORTANT: Replace with your actual config
         const firebaseConfig = {
             apiKey: "AIzaSyDxAsJt7qc0jJgi2k4mvXDGWKY34wGm60k",
@@ -1042,131 +1044,131 @@
         }
 
         // Initialize YouTube players with error handling
-        function initVideoPlayers() {
-            const videoContainers = document.querySelectorAll('.video-container');
-            
-            videoContainers.forEach(container => {
-                const videoId = container.dataset.videoId;
-                const playerId = `player-${videoId}`;
-                const playerElement = document.getElementById(playerId);
-                
-                if (!playerElement) return;
-                
-                // Skip if player already exists
-                if (youtubePlayers[videoId]) return;
-                
-                try {
-                    // Initialize YouTube player with proper origin
-                    youtubePlayers[videoId] = new YT.Player(playerId, {
-                        height: '100%',
-                        width: '100%',
-                        videoId: videoId,
-                        playerVars: {
-                            'autoplay': 1,
-                            'controls': 0,
-                            'disablekb': 1,
-                            'fs': 0,
-                            'loop': 1,
-                            'modestbranding': 1,
-                            'playsinline': 1,
-                            'showinfo': 0,
-                            'rel': 0,
-                            'enablejsapi': 1,
-                            'origin': window.location.origin
-                        },
-                        events: {
-                            'onReady': (event) => {
-                                // Player is ready
-                            },
-                            'onStateChange': (event) => {
-                                // Loop video when it ends
-                                if (event.data === YT.PlayerState.ENDED) {
-                                    event.target.playVideo();
-                                }
-                            }
+    function initVideoPlayers() {
+    const videoContainers = document.querySelectorAll('.video-container');
+    
+    videoContainers.forEach(container => {
+        const videoId = container.dataset.videoId;
+        const playerId = `player-${videoId}`;
+        const playerElement = document.getElementById(playerId);
+        
+        if (!playerElement) return;
+        if (youtubePlayers[videoId]) return;
+        
+        try {
+            youtubePlayers[videoId] = new YT.Player(playerId, {
+                height: '100%',
+                width: '100%',
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': autoplayEnabled ? 1 : 0, // التشغيل التلقائي يعتمد على المتغير
+                    'controls': 0,
+                    'disablekb': 1,
+                    'fs': 0,
+                    'loop': 1,
+                    'modestbranding': 1,
+                    'playsinline': 1,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'enablejsapi': 1,
+                    'origin': window.location.origin
+                },
+                events: {
+                    'onReady': (event) => {
+                        if (!autoplayEnabled) {
+                            event.target.pauseVideo(); // تأكد من إيقاف الفيديو إذا كان التشغيل التلقائي معطلاً
                         }
-                    });
-                } catch (error) {
-                    console.error('Error initializing YouTube player:', error);
-                    // Fallback to iframe
-                    playerElement.innerHTML = `
-                        <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&showinfo=0&rel=0"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen></iframe>
-                    `;
+                    },
+                    'onStateChange': (event) => {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            event.target.playVideo();
+                        }
+                    }
                 }
-                
-                // Click to pause/play with proper error handling
-                container.addEventListener('click', function(e) {
-                    // Don't pause if clicking on action buttons
-                    if (e.target.closest('.action-button')) {
-                        return;
+            });
+        } catch (error) {
+            console.error('Error initializing YouTube player:', error);
+            playerElement.innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplayEnabled ? 1 : 0}&mute=0&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&showinfo=0&rel=0"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+            `;
+        }
+        
+        // عند النقر على الفيديو
+        container.addEventListener('click', function(e) {
+            if (e.target.closest('.action-button')) return;
+            
+            const player = youtubePlayers[videoId];
+            if (player && typeof player.getPlayerState === 'function') {
+                try {
+                    // إذا كان التشغيل التلقائي معطلاً، فعّله الآن
+                    if (!autoplayEnabled) {
+                        autoplayEnabled = true;
+                        initVideoPlayers(); // أعد تحميل المشغلات لتفعيل التشغيل التلقائي
                     }
                     
-                    const player = youtubePlayers[videoId];
-                    if (player && typeof player.getPlayerState === 'function') {
-                        try {
-                            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-                                player.pauseVideo();
-                            } else {
-                                player.playVideo();
-                            }
-                        } catch (error) {
-                            console.error('Error controlling YouTube player:', error);
-                        }
+                    if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                        player.pauseVideo();
+                    } else {
+                        player.playVideo();
                     }
-                });
-            });
-        }
+                } catch (error) {
+                    console.error('Error controlling YouTube player:', error);
+                }
+            }
+        });
+    });
+}      
 
         // Initialize Intersection Observer for videos
         function initVideoObserver() {
-            if (videoObserver) {
-                videoObserver.disconnect();
-            }
-            
-            videoObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // If the visible video is near the bottom, load more videos
-                        const videos = Array.from(document.querySelectorAll('.video-container'));
-                        if (entry.target === videos[Math.max(0, videos.length - 3)]) {
-                            loadMoreVideos();
-                        }
-                        
-                        // Play the visible video
-                        const videoId = entry.target.dataset.videoId;
-                        const player = youtubePlayers[videoId];
-                        if (player && typeof player.playVideo === 'function') {
+    if (videoObserver) {
+        videoObserver.disconnect();
+    }
+    
+    videoObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const videos = Array.from(document.querySelectorAll('.video-container'));
+                if (entry.target === videos[Math.max(0, videos.length - 3)]) {
+                    loadMoreVideos();
+                }
+                
+                const videoId = entry.target.dataset.videoId;
+                const player = youtubePlayers[videoId];
+                
+                // تشغيل الفيديو فقط إذا كان التشغيل التلقائي مفعلاً
+                if (autoplayEnabled && player && typeof player.playVideo === 'function') {
+                    try {
+                        player.playVideo();
+                    } catch (error) {
+                        console.error('Error playing video:', error);
+                    }
+                }
+                
+                // إيقاف الفيديوهات الأخرى
+                videos.forEach(video => {
+                    if (video !== entry.target) {
+                        const otherPlayer = youtubePlayers[video.dataset.videoId];
+                        if (otherPlayer && typeof otherPlayer.pauseVideo === 'function') {
                             try {
-                                player.playVideo();
+                                otherPlayer.pauseVideo();
                             } catch (error) {
-                                console.error('Error playing video:', error);
+                                console.error('Error pausing video:', error);
                             }
                         }
-                        
-                        // Pause all other videos
-                        videos.forEach(video => {
-                            if (video !== entry.target) {
-                                const otherPlayer = youtubePlayers[video.dataset.videoId];
-                                if (otherPlayer && typeof otherPlayer.pauseVideo === 'function') {
-                                    try {
-                                        otherPlayer.pauseVideo();
-                                    } catch (error) {
-                                        console.error('Error pausing video:', error);
-                                    }
-                                }
-                            }
-                        });
                     }
                 });
-            }, { threshold: 0.7 });
+            }
+        });
+    }, { threshold: 0.7 });
 
-            document.querySelectorAll('.video-container').forEach(video => {
-                videoObserver.observe(video);
-            });
-        }
+    document.querySelectorAll('.video-container').forEach(video => {
+        videoObserver.observe(video);
+    });
+}
 
         // Sanitize input to prevent XSS
         function sanitizeInput(input) {
