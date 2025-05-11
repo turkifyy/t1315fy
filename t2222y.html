@@ -434,7 +434,6 @@
         .comment-input {
             flex: 1;
             background-color: rgba(255, 255, 255, 0.1);
-	    top: 10;
             border: none;
             border-radius: 20px;
             padding: 10px 15px;
@@ -445,7 +444,6 @@
 
         .comment-submit {
             background: none;
-	    top: 10;
             border: none;
             color: var(--primary-color);
             font-size: 16px;
@@ -594,11 +592,12 @@
             <div class="comment-title">Comments</div>
             <div class="comment-count" id="commentCount">0 comments</div>
         </div>
-        <div class="comments-list" id="commentsList"></div>
-        <div class="comment-form">
+	 <div class="comment-form">
             <input type="text" class="comment-input" id="commentInput" placeholder="Add a comment...">
             <button class="comment-submit" id="commentSubmitBtn">Post</button>
-        </div>
+	 </div>   
+        <div class="comments-list" id="commentsList"></div>
+        
     </div>
 
     <!-- Firebase and other JS libraries -->
