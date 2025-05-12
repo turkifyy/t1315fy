@@ -164,7 +164,7 @@
             position: absolute;
             left: 15px;
 	    top: 390px;
-            z-index: 46000;
+            z-index: 44000;
             max-width: 70%;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
@@ -607,6 +607,7 @@
     color: var(--text-color);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
     position: relative;
+    left: 3px;
 }
 
 .swipe-text::after {
@@ -1660,7 +1661,8 @@
 
         // Initialize fallbacks
         window.addEventListener('load', loadFallbacks);
-
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
     const swipeUpPrompt = document.getElementById('swipeUpPrompt');
     const mainContent = document.getElementById('mainContent');
