@@ -548,30 +548,21 @@
             }
         }
 
-	    /* Base Styles */
-:root {
-    --swipe-bg: rgba(0, 0, 0, 0.0);
-    --text-color: #ffffff;
-    --primary-accent: #0070ff;
-    --animation-duration: 0.5s;
-}
-
-/* Swipe Up Prompt */
+	/* Swipe Up Prompt */
 .swipe-up-prompt {
+    text-align: center;
+    color: white;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--swipe-bg);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999999;
-    cursor: pointer;
-    transition: opacity var(--animation-duration) ease, visibility var(--animation-duration) ease;
-    will-change: opacity, transform;
-    
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 45000;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 .swipe-up-prompt.hide {
@@ -580,110 +571,59 @@
     pointer-events: none;
 }
 
+/* Content Container */
 .content-container {
     text-align: center;
-    transform: translateY(20px);
-    transition: transform var(--animation-duration) ease;
 }
 
-.swipe-up-prompt.hide .content-container {
-    transform: translateY(-20px);
-}
-
+/* Main Image */
 .main-image {
     width: 100%;
     max-width: 250px;
     max-height: 250px;
     height: auto;
     margin: 0 auto;
-    animation: float 3s ease-in-out infinite;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    transform: translateX(20px);
 }
 
+/* Swipe Text */
 .swipe-text {
-    margin-top: 25px;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-color);
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
-    position: relative;
-    left: 3px;
-}
-
-.swipe-text::after {
-    content: "";
-    position: absolute;
-    bottom: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.2rem;
-    animation: bounce 1.5s infinite;
-    opacity: 0.8;
+    margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Main Content */
-.main-content {
+#mainContent {
     display: none;
     padding: 20px;
-    opacity: 0;
-    transition: opacity 0.8s ease;
+    color: white;
+    text-align: center;
 }
 
-.main-content.show {
-    display: block;
-    opacity: 1;
-}
-
-/* Animations */
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0) translateX(-50%); }
-    50% { transform: translateY(-10px) translateX(-50%); }
-}
-
-/* Dark/Light Mode Support */
-@media (prefers-color-scheme: light) {
-    :root {
-        --swipe-bg: rgba(255, 255, 255, 0.0);
-        --text-color: #ffffff;
-    }
-    
-    .swipe-text {
-        text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
-    }
-}
-
-/* Responsive Design */
+/* Responsiveness */
 @media (max-width: 768px) {
     .main-image {
         max-width: 200px;
         max-height: 200px;
     }
-    
     .swipe-text {
-        font-size: 1.3rem;
-    }
-    
-    .swipe-text::after {
-        font-size: 1rem;
-        bottom: -25px;
+        font-size: 22px;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
     .main-image {
         max-width: 150px;
         max-height: 150px;
     }
-    
     .swipe-text {
-        font-size: 1.1rem;
+        font-size: 20px;
     }
 }
+
 	    
     </style>
 </head>
@@ -692,12 +632,51 @@
     <div class="toast-container" id="toastContainer"></div>
 
 	 <!-- Swipe Up Prompt -->
-    <div class="swipe-up-prompt" id="swipeUpPrompt" role="dialog" aria-label="Swipe or tap prompt">
-        <div class="content-container" aria-live="polite">
-            <img alt="" class="main-image" src="https://turkify.netlify.app/Swipe_up.webp" role="presentation" loading="eager">
-            <div class="swipe-text">Swipe up for more</div>
-        </div>
+<div class="swipe-up-prompt" id="swipeUpPrompt">
+    <div class="content-container">
+        <!-- Main Image -->
+        <img alt="Swipe Up Prompt" class="main-image" src="https://turkify.netlify.app/Swipe_up.webp" /> 
+        <!-- Swipe Up Text -->
+        <div class="swipe-text">Swipe up for more</div>
     </div>
+</div>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const swipeUpPrompt = document.getElementById('swipeUpPrompt');
+    const mainContent = document.getElementById('mainContent');
+
+    if (!swipeUpPrompt || !mainContent) {
+        console.error("العناصر المطلوبة غير موجودة في الصفحة.");
+        return;
+    }
+
+    // إخفاء الرسالة إذا تم عرضها مسبقًا
+    if (localStorage.getItem('swipeUpPromptShown') === "true") {
+        swipeUpPrompt.classList.add('hide');
+        mainContent.style.display = 'block';
+    }
+
+    let startY = 0;
+
+    // التعامل مع السحب لأعلى (Swipe)
+    swipeUpPrompt.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+    });
+
+    swipeUpPrompt.addEventListener('touchmove', (e) => {
+        const moveY = e.touches[0].clientY;
+        if (startY - moveY > 50) { // إذا تم السحب لأعلى بمسافة كافية
+            swipeUpPrompt.classList.add('hide');
+            mainContent.style.display = 'block';
+            localStorage.setItem('swipeUpPromptShown', 'true');
+            window.scrollBy({
+                top: window.innerHeight,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+   </script>
 
 	<!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1661,54 +1640,7 @@
 
         // Initialize fallbacks
         window.addEventListener('load', loadFallbacks);
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-    const swipeUpPrompt = document.getElementById('swipeUpPrompt');
-    const mainContent = document.getElementById('mainContent');
-
-    if (!swipeUpPrompt || !mainContent) {
-        console.error("العناصر المطلوبة غير موجودة في الصفحة.");
-        return;
-    }
-
-    // إخفاء الرسالة إذا تم عرضها مسبقًا
-    if (localStorage.getItem('swipeUpPromptShown') === "true") {
-        swipeUpPrompt.classList.add('hide');
-        mainContent.style.display = 'block';
-    }
-
-    let startY = 0;
-
-    // التعامل مع السحب لأعلى (Swipe)
-    swipeUpPrompt.addEventListener('touchstart', (e) => {
-        startY = e.touches[0].clientY;
-    });
-
-    swipeUpPrompt.addEventListener('touchmove', (e) => {
-        const moveY = e.touches[0].clientY;
-        if (startY - moveY > 50) { // إذا تم السحب لأعلى بمسافة كافية
-            hidePrompt();
-        }
-    });
-
-    // إخفاء الرسالة عند النقر على الشاشة
-    swipeUpPrompt.addEventListener('click', () => {
-        hidePrompt();
-    });
-
-    // دالة مساعدة لإخفاء الرسالة
-    function hidePrompt() {
-        swipeUpPrompt.classList.add('hide');
-        mainContent.style.display = 'block';
-        localStorage.setItem('swipeUpPromptShown', 'true');
-        window.scrollBy({
-            top: window.innerHeight,
-            behavior: 'smooth'
-        });
-    }
-});
-    </script>
+    </script> 
 	
 </body>
 </html>
