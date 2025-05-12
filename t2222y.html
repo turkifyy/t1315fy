@@ -571,7 +571,7 @@
     cursor: pointer;
     transition: opacity var(--animation-duration) ease, visibility var(--animation-duration) ease;
     will-change: opacity, transform;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(1px);
 }
 
 .swipe-up-prompt.hide {
@@ -610,7 +610,7 @@
 }
 
 .swipe-text::after {
-    content: "↑ or Tap";
+    content: "";
     position: absolute;
     bottom: -30px;
     left: 50%;
@@ -694,7 +694,7 @@
     <div class="swipe-up-prompt" id="swipeUpPrompt" role="dialog" aria-label="Swipe or tap prompt">
         <div class="content-container" aria-live="polite">
             <img alt="" class="main-image" src="https://turkify.netlify.app/Swipe_up.webp" role="presentation" loading="eager">
-            <div class="swipe-text">Swipe up or tap to continue</div>
+            <div class="swipe-text">Swipe up for more</div>
         </div>
     </div>
 
