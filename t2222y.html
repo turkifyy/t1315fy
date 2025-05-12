@@ -1666,98 +1666,48 @@
         document.addEventListener('DOMContentLoaded', () => {
     const swipeUpPrompt = document.getElementById('swipeUpPrompt');
     const mainContent = document.getElementById('mainContent');
-    const STORAGE_KEY = 'swipePromptDismissed';
-    
-    // التحقق من وجود العناصر
+
     if (!swipeUpPrompt || !mainContent) {
-        console.error('Essential elements missing');
+        console.error("العناصر المطلوبة غير موجودة في الصفحة.");
         return;
     }
-    
-    // التحقق مما إذا تم إخفاء العنصر مسبقًا
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-        hidePrompt();
-        return;
+
+    // إخفاء الرسالة إذا تم عرضها مسبقًا
+    if (localStorage.getItem('swipeUpPromptShown') === "true") {
+        swipeUpPrompt.classList.add('hide');
+        mainContent.style.display = 'block';
     }
-    
+
     let startY = 0;
-    let startX = 0;
-    let isScrolling = false;
-    
-    // 1. دعم السحب لأعلى (Swipe)
+
+    // التعامل مع السحب لأعلى (Swipe)
     swipeUpPrompt.addEventListener('touchstart', (e) => {
         startY = e.touches[0].clientY;
-        startX = e.touches[0].clientX;
-        isScrolling = false;
-    }, { passive: true });
-    
+    });
+
     swipeUpPrompt.addEventListener('touchmove', (e) => {
         const moveY = e.touches[0].clientY;
-        const moveX = e.touches[0].clientX;
-        
-        // تجاهل إذا كان السحب أفقيًا
-        if (Math.abs(moveX - startX) > Math.abs(moveY - startY)) {
-            isScrolling = true;
-            return;
-        }
-        
-        // حساب المسافة للسحب الرأسي
-        const deltaY = startY - moveY;
-        
-        // تغيير الشفافية أثناء السحب
-        if (deltaY > 0) {
-            swipeUpPrompt.style.opacity = 1 - (deltaY / 150);
-        }
-        
-        // إخفاء عند الوصول للحد المطلوب
-        if (deltaY > 50 && !isScrolling) {
-            hidePrompt();
-        }
-    }, { passive: true });
-    
-    // 2. دعم النقر (Click/Tap)
-    swipeUpPrompt.addEventListener('click', (e) => {
-        // منع التنشيط إذا كان المستخدم يحاول التمرير
-        if (isScrolling) return;
-        
-        // تأثير النقر (اختياري)
-        swipeUpPrompt.style.transform = 'scale(0.98)';
-        setTimeout(() => {
-            swipeUpPrompt.style.transform = 'scale(1)';
-            hidePrompt();
-        }, 100);
-    });
-    
-    // 3. دعم لوحة المفاتيح (اضغط على سهم لأعلى)
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowUp') {
+        if (startY - moveY > 50) { // إذا تم السحب لأعلى بمسافة كافية
             hidePrompt();
         }
     });
-    
-    // دالة مشتركة للإخفاء
+
+    // إخفاء الرسالة عند النقر على الشاشة
+    swipeUpPrompt.addEventListener('click', () => {
+        hidePrompt();
+    });
+
+    // دالة مساعدة لإخفاء الرسالة
     function hidePrompt() {
-        // اهتزاز خفيف إذا كان متاحًا
-        if ('vibrate' in navigator) navigator.vibrate(30);
-        
-        // إخفاء مع تأثير
         swipeUpPrompt.classList.add('hide');
-        mainContent.classList.add('show');
-        
-        // حفظ الحالة
-        localStorage.setItem(STORAGE_KEY, 'true');
-        
-        // إزالة العنصر من DOM بعد الانتهاء (اختياري)
-        setTimeout(() => {
-            swipeUpPrompt.style.display = 'none';
-        }, 500);
+        mainContent.style.display = 'block';
+        localStorage.setItem('swipeUpPromptShown', 'true');
+        window.scrollBy({
+            top: window.innerHeight,
+            behavior: 'smooth'
+        });
     }
-    
-    // تأخير ظهور العنصر لضمان تحميل الصفحة
-    setTimeout(() => {
-        swipeUpPrompt.style.opacity = '1';
-    }, 100);
-});	    
+});
     </script>
 	
 </body>
