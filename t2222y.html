@@ -550,8 +550,8 @@
 
 	    /* Base Styles */
 :root {
-    --swipe-bg: rgba(0, 0, 0, 0.7);
-    --text-color: #ffffff;
+    --swipe-bg: rgba(0, 0, 0, 0.5);
+    --text-color: #000000;
     --primary-accent: #0070ff;
     --animation-duration: 0.5s;
 }
@@ -571,7 +571,7 @@
     cursor: pointer;
     transition: opacity var(--animation-duration) ease, visibility var(--animation-duration) ease;
     will-change: opacity, transform;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(2px);
 }
 
 .swipe-up-prompt.hide {
@@ -605,7 +605,7 @@
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-color);
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
     position: relative;
 }
 
@@ -647,8 +647,8 @@
 /* Dark/Light Mode Support */
 @media (prefers-color-scheme: light) {
     :root {
-        --swipe-bg: rgba(255, 255, 255, 0.9);
-        --text-color: #333333;
+        --swipe-bg: rgba(255, 255, 255, 0.5);
+        --text-color: #000000;
     }
     
     .swipe-text {
