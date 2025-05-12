@@ -9,6 +9,7 @@
     <!-- Preload critical resources -->
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="https://turkify.netlify.app/Swipe_up.webp" as="image">
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -546,12 +547,156 @@
                 font-size: 14px;
             }
         }
+
+	    /* Base Styles */
+:root {
+    --swipe-bg: rgba(0, 0, 0, 0.7);
+    --text-color: #ffffff;
+    --primary-accent: #0070ff;
+    --animation-duration: 0.5s;
+}
+
+/* Swipe Up Prompt */
+.swipe-up-prompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--swipe-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    cursor: pointer;
+    transition: opacity var(--animation-duration) ease, visibility var(--animation-duration) ease;
+    will-change: opacity, transform;
+    backdrop-filter: blur(5px);
+}
+
+.swipe-up-prompt.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.content-container {
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform var(--animation-duration) ease;
+}
+
+.swipe-up-prompt.hide .content-container {
+    transform: translateY(-20px);
+}
+
+.main-image {
+    width: 100%;
+    max-width: 250px;
+    max-height: 250px;
+    height: auto;
+    margin: 0 auto;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.swipe-text {
+    margin-top: 25px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.swipe-text::after {
+    content: "↑ or Tap";
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+    animation: bounce 1.5s infinite;
+    opacity: 0.8;
+}
+
+/* Main Content */
+.main-content {
+    display: none;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+.main-content.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0) translateX(-50%); }
+    50% { transform: translateY(-10px) translateX(-50%); }
+}
+
+/* Dark/Light Mode Support */
+@media (prefers-color-scheme: light) {
+    :root {
+        --swipe-bg: rgba(255, 255, 255, 0.9);
+        --text-color: #333333;
+    }
+    
+    .swipe-text {
+        text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-image {
+        max-width: 200px;
+        max-height: 200px;
+    }
+    
+    .swipe-text {
+        font-size: 1.3rem;
+    }
+    
+    .swipe-text::after {
+        font-size: 1rem;
+        bottom: -25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-image {
+        max-width: 150px;
+        max-height: 150px;
+    }
+    
+    .swipe-text {
+        font-size: 1.1rem;
+    }
+}
 	    
     </style>
 </head>
 <body>
        <!-- Toast notifications container -->
     <div class="toast-container" id="toastContainer"></div>
+
+	 <!-- Swipe Up Prompt -->
+    <div class="swipe-up-prompt" id="swipeUpPrompt" role="dialog" aria-label="Swipe or tap prompt">
+        <div class="content-container" aria-live="polite">
+            <img alt="" class="main-image" src="https://turkify.netlify.app/Swipe_up.webp" role="presentation" loading="eager">
+            <div class="swipe-text">Swipe up or tap to continue</div>
+        </div>
+    </div>
 
 	<!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1515,8 +1660,103 @@
 
         // Initialize fallbacks
         window.addEventListener('load', loadFallbacks);
-    </script>
 
+        document.addEventListener('DOMContentLoaded', () => {
+    const swipeUpPrompt = document.getElementById('swipeUpPrompt');
+    const mainContent = document.getElementById('mainContent');
+    const STORAGE_KEY = 'swipePromptDismissed';
+    
+    // التحقق من وجود العناصر
+    if (!swipeUpPrompt || !mainContent) {
+        console.error('Essential elements missing');
+        return;
+    }
+    
+    // التحقق مما إذا تم إخفاء العنصر مسبقًا
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+        hidePrompt();
+        return;
+    }
+    
+    let startY = 0;
+    let startX = 0;
+    let isScrolling = false;
+    
+    // 1. دعم السحب لأعلى (Swipe)
+    swipeUpPrompt.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        startX = e.touches[0].clientX;
+        isScrolling = false;
+    }, { passive: true });
+    
+    swipeUpPrompt.addEventListener('touchmove', (e) => {
+        const moveY = e.touches[0].clientY;
+        const moveX = e.touches[0].clientX;
+        
+        // تجاهل إذا كان السحب أفقيًا
+        if (Math.abs(moveX - startX) > Math.abs(moveY - startY)) {
+            isScrolling = true;
+            return;
+        }
+        
+        // حساب المسافة للسحب الرأسي
+        const deltaY = startY - moveY;
+        
+        // تغيير الشفافية أثناء السحب
+        if (deltaY > 0) {
+            swipeUpPrompt.style.opacity = 1 - (deltaY / 150);
+        }
+        
+        // إخفاء عند الوصول للحد المطلوب
+        if (deltaY > 50 && !isScrolling) {
+            hidePrompt();
+        }
+    }, { passive: true });
+    
+    // 2. دعم النقر (Click/Tap)
+    swipeUpPrompt.addEventListener('click', (e) => {
+        // منع التنشيط إذا كان المستخدم يحاول التمرير
+        if (isScrolling) return;
+        
+        // تأثير النقر (اختياري)
+        swipeUpPrompt.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            swipeUpPrompt.style.transform = 'scale(1)';
+            hidePrompt();
+        }, 100);
+    });
+    
+    // 3. دعم لوحة المفاتيح (اضغط على سهم لأعلى)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowUp') {
+            hidePrompt();
+        }
+    });
+    
+    // دالة مشتركة للإخفاء
+    function hidePrompt() {
+        // اهتزاز خفيف إذا كان متاحًا
+        if ('vibrate' in navigator) navigator.vibrate(30);
+        
+        // إخفاء مع تأثير
+        swipeUpPrompt.classList.add('hide');
+        mainContent.classList.add('show');
+        
+        // حفظ الحالة
+        localStorage.setItem(STORAGE_KEY, 'true');
+        
+        // إزالة العنصر من DOM بعد الانتهاء (اختياري)
+        setTimeout(() => {
+            swipeUpPrompt.style.display = 'none';
+        }, 500);
+    }
+    
+    // تأخير ظهور العنصر لضمان تحميل الصفحة
+    setTimeout(() => {
+        swipeUpPrompt.style.opacity = '1';
+    }, 100);
+});	    
+    </script>
 	
 </body>
 </html>
