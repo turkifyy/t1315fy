@@ -1382,6 +1382,19 @@
         .admin-toggle {
                 display: none;
         }
+    #watchLaterBtn {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#watchLaterBtn:hover {
+    color: var(--primary-color);
+}
+
+#watchLaterBtn.added {
+    color: var(--primary-color);
+    font-weight: bold;
+}
     </style>
 </head>
 <body>
@@ -1568,6 +1581,9 @@
                 <i class="fas fa-thumbs-down"></i>
                 <span id="dislikesCount">0</span>
             </div>
+            <div class="stat interaction-btn" id="watchLaterBtn">
+        <i class="far fa-clock"></i> مشاهدة لاحقا
+    </div>
         </div>
     </div>
 
@@ -2892,56 +2908,89 @@ function renderContentGrid(items, elementId) {
             }
             
             function playEpisode(episode) {
-                // تحديث حالة التطبيق
-                appState.currentContent = {
-                    type: 'episode',
-                    data: episode
-                };
-                
-                // تحديث واجهة المستخدم
-                updateNowPlayingInfo(episode);
-                
-                // إخفاء جميع الصفحات وإظهار المشغل
-                Object.values(elements.pages).forEach(page => {
-                    page.classList.remove('active');
-                });
-                elements.playerSection.style.display = 'block';
-                elements.heroSlider.style.display = 'none';
-                
-                // تشغيل الحلقة
-                playContent(episode.url, episode);
-                
-                // حفظ سجل المشاهدة إذا كان المستخدم مسجل الدخول
-                if (appState.currentUser) {
-                    saveWatchHistory(episode, 'episode');
+    // تحديث حالة التطبيق
+    appState.currentContent = {
+        type: 'episode',
+        data: episode
+    };
+    
+    // تحديث واجهة المستخدم
+    updateNowPlayingInfo(episode);
+    
+    // إخفاء جميع الصفحات وإظهار المشغل
+    Object.values(elements.pages).forEach(page => {
+        page.classList.remove('active');
+    });
+    elements.playerSection.style.display = 'block';
+    elements.heroSlider.style.display = 'none';
+    
+    // تشغيل الحلقة
+    playContent(episode.url, episode);
+    
+    // التحقق من قائمة Watch later للمستخدم المسجل
+    if (appState.currentUser) {
+        db.collection('users').doc(appState.currentUser.uid)
+            .collection('watchLater').doc(episode.id).get()
+            .then(doc => {
+                const btn = document.getElementById('watchLaterBtn');
+                if (doc.exists) {
+                    btn.classList.add('added');
+                } else {
+                    btn.classList.remove('added');
                 }
-            }
-            
+            });
+        
+        // حفظ سجل المشاهدة
+        saveWatchHistory(episode, 'episode');
+    } else {
+        // إعادة تعيين الزر إذا كان المستخدم غير مسجل
+        document.getElementById('watchLaterBtn').classList.remove('added');
+    }
+}
             function playMovie(movie) {
-                // تحديث حالة التطبيق
-                appState.currentContent = {
-                    type: 'movie',
-                    data: movie
-                };
-                
-                // تحديث واجهة المستخدم
-                updateNowPlayingInfo(movie);
-                
-                // إخفاء جميع الصفحات وإظهار المشغل
-                Object.values(elements.pages).forEach(page => {
-                    page.classList.remove('active');
-                });
-                elements.playerSection.style.display = 'block';
-                elements.heroSlider.style.display = 'none';
-                
-                // تشغيل الفيلم
-                playContent(movie.url, movie);
-                
-                // حفظ سجل المشاهدة إذا كان المستخدم مسجل الدخول
-                if (appState.currentUser) {
-                    saveWatchHistory(movie, 'movie');
+    // تحديث حالة التطبيق
+    appState.currentContent = {
+        type: 'movie',
+        data: movie
+    };
+    
+    // تحديث واجهة المستخدم
+    updateNowPlayingInfo(movie);
+    
+    // إخفاء جميع الصفحات وإظهار المشغل
+    Object.values(elements.pages).forEach(page => {
+        page.classList.remove('active');
+    });
+    elements.playerSection.style.display = 'block';
+    elements.heroSlider.style.display = 'none';
+    
+    // تشغيل الفيلم
+    playContent(movie.url, movie);
+    
+    // التحقق من قائمة Watch later للمستخدم المسجل
+    if (appState.currentUser) {
+        db.collection('users').doc(appState.currentUser.uid)
+            .collection('watchLater').doc(movie.id).get()
+            .then(doc => {
+                const btn = document.getElementById('watchLaterBtn');
+                if (doc.exists) {
+                    btn.classList.add('added');
+                    btn.innerHTML = '<i class="fas fa-check"></i> في قائمتي';
+                } else {
+                    btn.classList.remove('added');
+                    btn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
                 }
-            }
+            });
+        
+        // حفظ سجل المشاهدة
+        saveWatchHistory(movie, 'movie');
+    } else {
+        // إعادة تعيين الزر إذا كان المستخدم غير مسجل
+        const btn = document.getElementById('watchLaterBtn');
+        btn.classList.remove('added');
+        btn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
+    }
+}
             
             function playContent(url, content) {
                 // إعداد رابط الفيديو
@@ -3227,6 +3276,49 @@ function renderContentGrid(items, elementId) {
                 db.collection(collectionName).doc(content.id).update(updateData)
                     .catch(error => {
                         console.error('Error saving interaction:', error);
+
+                          // إضافة مستمع حدث للزر الجديد
+document.getElementById('watchLaterBtn').addEventListener('click', function() {
+    if (!appState.currentUser) {
+        showLoginModal();
+        return;
+    }
+    
+    if (!appState.currentContent) return;
+    
+    toggleWatchLater(appState.currentContent.data);
+});
+
+// دالة إضافة/إزالة من القائمة
+function toggleWatchLater(content) {
+    const userRef = db.collection('users').doc(appState.currentUser.uid);
+    const watchLaterRef = userRef.collection('watchLater').doc(content.id);
+    
+    watchLaterRef.get().then(doc => {
+        if (doc.exists) {
+            // إذا موجود في القائمة - إزالته
+            watchLaterRef.delete()
+                .then(() => {
+                    document.getElementById('watchLaterBtn').classList.remove('added');
+                    showSuccess('تمت الإزالة من قائمة المشاهدة لاحقاً');
+                });
+        } else {
+            // إذا غير موجود - إضافته
+            watchLaterRef.set({
+                contentId: content.id,
+                title: content.title,
+                thumb: content.thumb,
+                type: content.number ? 'episode' : 'movie',
+                addedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                document.getElementById('watchLaterBtn').classList.add('added');
+                showSuccess('تمت الإضافة إلى قائمة المشاهدة لاحقاً');
+            });
+        }
+    });
+}
+        
                     });
             }
             
