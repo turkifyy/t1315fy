@@ -424,6 +424,21 @@
             margin-top: 40px;
         }
 
+          /* أنماط زر المفضلة */
+#favouriteBtn {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#favouriteBtn.added {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+#favouriteBtn i {
+    margin-left: 5px;
+}
+        
         /* مشغل الفيديو */
         .player-section {
             width: 100%;
@@ -1712,6 +1727,9 @@
             <div class="stat interaction-btn" id="watchLaterBtn">
         <i class="far fa-clock"></i> مشاهدة لاحقا
     </div>
+            <div class="stat interaction-btn" id="favouriteBtn">
+    <i class="far fa-heart"></i> <span>Add to Favourite</span>
+</div>
         </div>
     </div>
 
@@ -3180,6 +3198,9 @@ function renderCarousel(items, elementId, type, showBadges = false) {
         // إعادة تعيين الزر إذا كان المستخدم غير مسجل
         document.getElementById('watchLaterBtn').classList.remove('added');
     }
+        // تحديث حالة زر المفضلة
+checkFavouriteStatus(episode); 
+setupInteractionButtons(episode);    
 }
             function playMovie(movie) {
     // تحديث حالة التطبيق
@@ -3221,9 +3242,12 @@ function renderCarousel(items, elementId, type, showBadges = false) {
     } else {
         // إعادة تعيين الزر إذا كان المستخدم غير مسجل
         const btn = document.getElementById('watchLaterBtn');
-        btn.classList.remove('added');
+  movie btn.classList.remove('added');
         btn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
     }
+    // تحديث حالة زر المفضلة
+checkFavouriteStatus(episode); 
+setupInteractionButtons(episode);
 }
             
             function playContent(url, content) {
@@ -3281,8 +3305,59 @@ function renderCarousel(items, elementId, type, showBadges = false) {
                     updateNowPlayingInfo(content);
                     saveContentInteraction(content, 'dislike');
                 };
+                document.getElementById('favouriteBtn').onclick = () => toggleFavourite(content);
             }
-            
+             // دالة إضافة/إزالة من المفضلة
+async function toggleFavourite(content) {
+    if (!appState.currentUser) {
+        showLoginModal();
+        return;
+    }
+
+    const userRef = db.collection('users').doc(appState.currentUser.uid);
+    const favRef = userRef.collection('favourites').doc(content.id);
+
+    const doc = await favRef.get();
+    const btn = document.getElementById('favouriteBtn');
+
+    if (doc.exists) {
+        await favRef.delete();
+        btn.classList.remove('added');
+        btn.innerHTML = '<i class="far fa-heart"></i> Add to Favourite';
+        showSuccess('تمت الإزالة من المفضلة');
+    } else {
+        await favRef.set({
+            contentId: content.id,
+            title: content.title,
+            thumb: content.thumb,
+            type: content.number ? 'episode' : 'movie',
+            addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        btn.classList.add('added');
+        btn.innerHTML = '<i class="fas fa-heart"></i> In Favourites';
+        showSuccess('تمت الإضافة إلى المفضلة');
+    }
+}
+
+// دالة التحقق من حالة المفضلة
+async function checkFavouriteStatus(content) {
+    if (!appState.currentUser) return;
+
+    const doc = await db.collection('users')
+        .doc(appState.currentUser.uid)
+        .collection('favourites')
+        .doc(content.id)
+        .get();
+
+    const btn = document.getElementById('favouriteBtn');
+    if (doc.exists) {
+        btn.classList.add('added');
+        btn.innerHTML = '<i class="fas fa-heart"></i> In Favourites';
+    } else {
+        btn.classList.remove('added');
+        btn.innerHTML = '<i class="far fa-heart"></i> Add to Favourite';
+    }
+}
             function trackProgress(content) {
                 // في تطبيق حقيقي، ستحتاج إلى استخدام واجهة برمجة تطبيقات مشغل الفيديو
                 // لتتبع التقدم الفعلي للمشاهدة
