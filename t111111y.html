@@ -1363,6 +1363,22 @@
 .profile-tab-content.active {
     display: block;
 }
+        #profileNavItem {
+    transition: all 0.3s ease;
+}
+
+#profileNavImage {
+    border: 2px solid var(--primary-color);
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+#profileLink {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+}
     </style>
 </head>
 <body>
@@ -2359,37 +2375,44 @@
             }
             
             function updateUserProfile(user) {
-                elements.profileName.textContent = user.displayName || 'مستخدم';
-                elements.profileEmail.textContent = user.email || '';
-                
-                // تحديث صورة المستخدم إذا كانت متوفرة
-                if (user.photoURL) {
-                    const avatar = document.querySelector('.profile-avatar');
-                    avatar.innerHTML = '';
-                    const img = document.createElement('img');
-                    img.src = user.photoURL;
-                    img.alt = user.displayName || 'صورة المستخدم';
-                    avatar.appendChild(img);
-                }
-                
-                // تحديث رابط الملف الشخصي في شريط التنقل
-                const profileLink = document.querySelector('.nav-link[data-page="profile"]');
-                if (profileLink) {
-                    profileLink.innerHTML = `<i class="fas fa-user"></i> ${user.displayName || 'الملف الشخصي'}`;
-                }
-            }
+    // إظهار زر الملف الشخصي في الشريط العلوي
+    document.getElementById('profileNavItem').style.display = 'block';
+    
+    // تحديث الصورة المصغرة
+    if (user.photoURL) {
+        document.getElementById('profileNavImage').src = user.photoURL;
+    } else {
+        document.getElementById('profileNavImage').src = 'https://via.placeholder.com/30';
+    }
+    
+    // تحديث بيانات صفحة الملف الشخصي
+    elements.profileName.textContent = user.displayName || 'مستخدم';
+    elements.profileEmail.textContent = user.email || '';
+    
+    // تحديث صورة الملف الشخصي الرئيسية
+    const avatar = document.querySelector('.profile-avatar');
+    avatar.innerHTML = user.photoURL 
+        ? `<img src="${user.photoURL}" alt="صورة المستخدم">`
+        : '<i class="fas fa-user"></i>';
+    
+    // إخفاء زر تسجيل الدخول وإظهار زر الخروج
+    elements.signInButton.style.display = 'none';
+    elements.signOutButton.style.display = 'block';
+}
             
             function resetUserProfile() {
-                elements.profileName.textContent = 'زائر';
-                elements.profileEmail.textContent = 'يجب تسجيل الدخول لعرض المعلومات';
-                document.querySelector('.profile-avatar').innerHTML = '<i class="fas fa-user"></i>';
-                
-                // إعادة تعيين رابط الملف الشخصي في شريط التنقل
-                const profileLink = document.querySelector('.nav-link[data-page="profile"]');
-                if (profileLink) {
-                    profileLink.innerHTML = '<i class="fas fa-user"></i> الملف الشخصي';
-                }
-            }
+    // إخفاء زر الملف الشخصي في الشريط العلوي
+    document.getElementById('profileNavItem').style.display = 'none';
+    
+    // إعادة تعيين صفحة الملف الشخصي
+    elements.profileName.textContent = 'زائر';
+    elements.profileEmail.textContent = 'يجب تسجيل الدخول لعرض المعلومات';
+    document.querySelector('.profile-avatar').innerHTML = '<i class="fas fa-user"></i>';
+    
+    // إعادة تعيين أزرار التسجيل
+    elements.signInButton.style.display = 'block';
+    elements.signOutButton.style.display = 'none';
+}
             
             function loadUserData(userId) {
                 showLoading();
