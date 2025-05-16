@@ -1395,6 +1395,58 @@
     color: var(--primary-color);
     font-weight: bold;
 }
+       /* أنماط الكاروسيل الجديدة */
+.content-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px 0;
+    scrollbar-width: none; /* لإخفاء شريط التمرير في Firefox */
+}
+
+.content-carousel::-webkit-scrollbar {
+    display: none; /* لإخفاء شريط التمرير في Chrome/Safari */
+}
+
+.content-carousel .content-card {
+    flex: 0 0 auto;
+    width: 220px;
+    transition: transform 0.3s ease;
+}
+
+.content-carousel .content-card:hover {
+    transform: scale(1.05);
+}
+
+/* أنماط البادجات */
+.top10-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #E50914 0%, #B00710 100%);
+    color: white;
+    font-weight: bold;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    z-index: 2;
+}
+
+.trending-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #E50914;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+} 
     </style>
 </head>
 <body>
@@ -1439,7 +1491,7 @@
         <section class="section">
             <div class="container">
                 <h3 class="section-title">
-                    <span>أحدث المسلسلات</span>
+                    <span>Letest Series</span>
                 </h3>
                 <div class="content-grid" id="seriesGrid">
                     <!-- سيتم تحميل المسلسلات ديناميكيًا -->
@@ -1451,13 +1503,89 @@
         <section class="section">
             <div class="container">
                 <h3 class="section-title">
-                    <span>أحدث الأفلام</span>
+                    <span>Letest Movies</span>
                 </h3>
                 <div class="content-grid" id="moviesGrid">
                     <!-- سيتم تحميل الأفلام ديناميكيًا -->
                 </div>
             </div>
         </section>
+       <!-- Trending Series -->
+<section class="section">
+    <div class="container">
+        <h3 class="section-title">
+            <i class="fas fa-fire" style="color: #E50914; margin-left: 10px;"></i>
+            <span>Trending Series</span>
+        </h3>
+        <div class="content-carousel" id="trendingSeriesCarousel"></div>
+    </div>
+</section>
+
+<!-- Trending Movies -->
+<section class="section">
+    <div class="container">
+        <h3 class="section-title">
+            <i class="fas fa-bolt" style="color: #E50914; margin-left: 10px;"></i>
+            <span>Trending Movies</span>
+        </h3>
+        <div class="content-carousel" id="trendingMoviesCarousel"></div>
+    </div>
+</section>
+       <!-- Featured Series -->
+<section class="section">
+    <div class="container">
+        <h3 class="section-title">
+            <i class="fas fa-star" style="color: #FFD700; margin-left: 10px;"></i>
+            <span>Featured Series</span>
+        </h3>
+        <div class="content-carousel" id="featuredSeriesCarousel"></div>
+    </div>
+</section>
+
+<!-- Featured Movies -->
+<section class="section">
+    <div class="container">
+        <h3 class="section-title">
+            <i class="fas fa-crown" style="color: #FFD700; margin-left: 10px;"></i>
+            <span>Featured Movies</span>
+        </h3>
+        <div class="content-carousel" id="featuredMoviesCarousel"></div>
+    </div>
+</section>
+
+<!-- Box Office -->
+<section class="section">
+    <div class="container">
+        <h3 class="section-title">
+            <i class="fas fa-trophy" style="color: #E50914; margin-left: 10px;"></i>
+            <span>Box Office</span>
+        </h3>
+        <div class="content-carousel" id="boxOfficeCarousel"></div>
+    </div>
+</section>
+
+       <!-- Latest Episodes -->
+<section class="section">
+    <div class="container">
+        <h3 class="section-title">
+            <i class="fas fa-clock" style="color: #E50914; margin-left: 10px;"></i>
+            <span>Latest Episodes</span>
+        </h3>
+        <div class="content-carousel" id="latestEpisodesCarousel"></div>
+    </div>
+</section>
+
+<!-- Top 10 TV Shows -->
+<section class="section">
+    <div class="container">
+        <h3 class="section-title">
+            <i class="fas fa-medal" style="color: #FFD700; margin-left: 10px;"></i>
+            <span id="top10Title">Top 10 TV Shows</span>
+        </h3>
+        <div class="content-carousel" id="top10Carousel"></div>
+    </div>
+</section> 
+        
     </div>
 
     <!-- صفحة المسلسلات -->
@@ -2222,6 +2350,8 @@
                 
                 // تحميل إعدادات الإعلانات
                 loadAdSettings();
+
+                loadHomePageSections();
             }
             
             function setupEventListeners() {
@@ -2578,6 +2708,110 @@ function renderContentGrid(items, elementId) {
                         showError('حدث خطأ في تحميل البيانات: ' + error.message);
                     });
             }
+               
+async function loadHomePageSections() {
+    // Trending Series
+    loadSectionContent('trendingSeries', 'series', 'trendingSeriesCarousel', true);
+    
+    // Trending Movies
+    loadSectionContent('trendingMovies', 'movies', 'trendingMoviesCarousel', true);
+    
+    // Featured Series
+    loadSectionContent('featuredSeries', 'series', 'featuredSeriesCarousel', false, true);
+    
+    // Featured Movies
+    loadSectionContent('featuredMovies', 'movies', 'featuredMoviesCarousel', false, true);
+    
+    // Box Office
+    loadSectionContent('boxOffice', 'movies', 'boxOfficeCarousel', false, false, 'boxOffice');
+    
+    // Latest Episodes
+    loadLatestEpisodes();
+    
+    // Top 10 TV Shows
+    loadTop10Shows();
+}
+
+// دالة عامة لتحميل المحتوى
+async function loadSectionContent(collection, type, elementId, isTrending = false, isFeatured = false, sortField = 'views') {
+    let query = db.collection(collection).orderBy(sortField, 'desc').limit(10);
+    
+    const snapshot = await query.get();
+    const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    const carousel = document.getElementById(elementId);
+    carousel.innerHTML = '';
+    
+    items.forEach((item, index) => {
+        const card = createContentCard(item, type);
+        
+        // إضافة البادجات حسب النوع
+        if (isTrending) {
+            card.querySelector('.content-thumbnail').innerHTML += `
+                <div class="trending-badge">Trending</div>
+            `;
+        }
+        
+        if (isFeatured) {
+            card.querySelector('.content-thumbnail').innerHTML += `
+                <div class="trending-badge" style="background-color: #FFD700; color: #000;">Featured</div>
+            `;
+        }
+        
+        if (elementId === 'top10Carousel' && index < 10) {
+            card.querySelector('.content-thumbnail').innerHTML += `
+                <div class="top10-badge">${index + 1}</div>
+            `;
+        }
+        
+        carousel.appendChild(card);
+    });
+}
+
+// دالة خاصة للحلقات الجديدة
+async function loadLatestEpisodes() {
+    const snapshot = await db.collection('episodes')
+        .orderBy('releaseDate', 'desc')
+        .limit(10)
+        .get();
+    
+    const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderCarousel(items, 'latestEpisodesCarousel', 'episode');
+}
+
+// دالة خاصة لأعلى 10 مسلسلات
+async function loadTop10Shows() {
+    // جلب بلد المستخدم (يمكن استبداله بقيمة ثابتة إذا لزم الأمر)
+    const country = await getUserCountry() || 'Global';
+    document.getElementById('top10Title').textContent = `Top 10 TV Shows in ${country}`;
+    
+    const snapshot = await db.collection('series')
+        .where('countries', 'array-contains', country)
+        .orderBy('rating', 'desc')
+        .limit(10)
+        .get();
+    
+    const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderCarousel(items, 'top10Carousel', 'series', true);
+}
+
+// دالة مساعدة لعرض الكاروسيل
+function renderCarousel(items, elementId, type, showBadges = false) {
+    const carousel = document.getElementById(elementId);
+    carousel.innerHTML = '';
+    
+    items.forEach((item, index) => {
+        const card = createContentCard(item, type);
+        
+        if (showBadges && index < 10) {
+            card.querySelector('.content-thumbnail').innerHTML += `
+                <div class="top10-badge">${index + 1}</div>
+            `;
+        }
+        
+        carousel.appendChild(card);
+    });
+}
             
             function loadAdSettings() {
                 db.collection('settings').doc('ads').get()
