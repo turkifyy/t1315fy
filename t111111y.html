@@ -2529,7 +2529,15 @@
         }
     });
 }
-            
+          function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    showLoading();
+    auth.signInWithPopup(provider)
+        .catch(error => {
+            hideLoading();
+            showError('حدث خطأ أثناء تسجيل الدخول: ' + error.message);
+        });
+        }
             function signOut() {
                 showLoading();
                 auth.signOut()
@@ -2727,6 +2735,15 @@ function renderContentGrid(items, elementId) {
                         showError('حدث خطأ في تحميل البيانات: ' + error.message);
                     });
             }
+            async function getUserCountry() {
+    try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        return data.country || 'Global';
+    } catch {
+        return 'Global';
+    }
+}
                
 async function loadHomePageSections() {
     // Trending Series
@@ -2816,20 +2833,69 @@ async function loadTop10Shows() {
 
 // دالة مساعدة لعرض الكاروسيل
 function renderCarousel(items, elementId, type, showBadges = false) {
+    // 1. التحقق من صحة المدخلات
+    if (!items || !Array.isArray(items)) {
+        console.error('عناصر الكاروسيل غير صالحة أو غير موجودة');
+        return;
+    }
+
+    if (!elementId || typeof elementId !== 'string') {
+        console.error('معرف العنصر غير صالح');
+        return;
+    }
+
+    // 2. الحصول على عنصر الكاروسيل مع التحقق من وجوده
     const carousel = document.getElementById(elementId);
-    carousel.innerHTML = '';
-    
-    items.forEach((item, index) => {
-        const card = createContentCard(item, type);
-        
-        if (showBadges && index < 10) {
-            card.querySelector('.content-thumbnail').innerHTML += `
-                <div class="top10-badge">${index + 1}</div>
-            `;
+    if (!carousel) {
+        console.error(`لا يمكن العثور على العنصر بالمعرف: ${elementId}`);
+        return;
+    }
+
+    // 3. تفريغ الكاروسيل بطريقة آمنة
+    while (carousel.firstChild) {
+        carousel.removeChild(carousel.firstChild);
+    }
+
+    // 4. معالجة كل عنصر في المصفوفة
+    try {
+        items.slice(0, 20).forEach((item, index) => { // تحديد حد أقصى للعناصر
+            if (!item || !item.id) {
+                console.warn('عنصر غير صالح في مصفوفة الكاروسيل', item);
+                return;
+            }
+
+            // 5. إنشاء بطاقة المحتوى مع التحقق من وجودها
+            const card = createContentCard(item, type);
+            if (!card) {
+                console.warn('فشل في إنشاء بطاقة المحتوى', item);
+                return;
+            }
+
+            // 6. إضافة شارة TOP 10 إذا لزم الأمر
+            if (showBadges && index < 10) {
+                const thumbnail = card.querySelector('.content-thumbnail');
+                if (thumbnail) {
+                    const badge = document.createElement('div');
+                    badge.className = 'top10-badge';
+                    badge.textContent = index + 1;
+                    
+                    // بدلاً من innerHTML += نستخدم appendChild لأمان أفضل
+                    thumbnail.appendChild(badge);
+                }
+            }
+
+            // 7. إضافة البطاقة إلى الكاروسيل
+            carousel.appendChild(card);
+        });
+
+        // 8. تهيئة تأثير الكاروسيل إذا لزم الأمر
+        if (items.length > 1 && typeof initCarouselEffects === 'function') {
+            initCarouselEffects(carousel);
         }
-        
-        carousel.appendChild(card);
-    });
+    } catch (error) {
+        console.error('حدث خطأ أثناء عرض الكاروسيل:', error);
+        carousel.innerHTML = '<p class="error-message">حدث خطأ في عرض المحتوى</p>';
+    }
 }
             
             function loadAdSettings() {
@@ -3161,96 +3227,164 @@ function renderCarousel(items, elementId, type, showBadges = false) {
             }
             
             function playEpisode(episode) {
-    // تحديث حالة التطبيق
+    // 1. التحقق من وجود بيانات الحلقة
+    if (!episode || !episode.id || !episode.url) {
+        showError('بيانات الحلقة غير كاملة أو غير صالحة');
+        return;
+    }
+
+    // 2. تحديث حالة التطبيق
     appState.currentContent = {
         type: 'episode',
         data: episode
     };
     
-    // تحديث واجهة المستخدم
+    // 3. تحديث واجهة المستخدم
     updateNowPlayingInfo(episode);
     
-    // إخفاء جميع الصفحات وإظهار المشغل
+    // 4. إدارة عرض العناصر
     Object.values(elements.pages).forEach(page => {
         page.classList.remove('active');
     });
     elements.playerSection.style.display = 'block';
     elements.heroSlider.style.display = 'none';
     
-    // تشغيل الحلقة
+    // 5. تشغيل الحلقة
     playContent(episode.url, episode);
     
-    // التحقق من قائمة Watch later للمستخدم المسجل
+    // 6. إدارة زر "مشاهدة لاحقاً"
+    const watchLaterBtn = document.getElementById('watchLaterBtn');
     if (appState.currentUser) {
         db.collection('users').doc(appState.currentUser.uid)
             .collection('watchLater').doc(episode.id).get()
             .then(doc => {
-                const btn = document.getElementById('watchLaterBtn');
                 if (doc.exists) {
-                    btn.classList.add('added');
+                    watchLaterBtn.classList.add('added');
+                    watchLaterBtn.innerHTML = '<i class="fas fa-check"></i> في قائمتي';
                 } else {
-                    btn.classList.remove('added');
+                    watchLaterBtn.classList.remove('added');
+                    watchLaterBtn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
                 }
+            })
+            .catch(error => {
+                console.error('خطأ في تحميل حالة المشاهدة لاحقاً:', error);
+                watchLaterBtn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
             });
         
-        // حفظ سجل المشاهدة
+        // 7. حفظ سجل المشاهدة
         saveWatchHistory(episode, 'episode');
     } else {
-        // إعادة تعيين الزر إذا كان المستخدم غير مسجل
-        document.getElementById('watchLaterBtn').classList.remove('added');
+        watchLaterBtn.classList.remove('added');
+        watchLaterBtn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
     }
-        // تحديث حالة زر المفضلة
-checkFavouriteStatus(episode); 
-setupInteractionButtons(episode);   
-setupFavouriteButton(episode);
+    
+    // 8. إدارة زر المفضلة
+    const favouriteBtn = document.getElementById('favouriteBtn');
+    if (appState.currentUser) {
+        db.collection('users').doc(appState.currentUser.uid)
+            .collection('favorites').doc(episode.id).get()
+            .then(doc => {
+                if (doc.exists) {
+                    favouriteBtn.classList.add('added');
+                    favouriteBtn.innerHTML = '<i class="fas fa-heart"></i> في المفضلة';
+                } else {
+                    favouriteBtn.classList.remove('added');
+                    favouriteBtn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
+                }
+            })
+            .catch(error => {
+                console.error('خطأ في تحميل حالة المفضلة:', error);
+                favouriteBtn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
+            });
+    } else {
+        favouriteBtn.classList.remove('added');
+        favouriteBtn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
+    }
+    
+    // 9. إعداد أزرار التفاعل
+    setupInteractionButtons(episode);
 }
             function playMovie(movie) {
-    // تحديث حالة التطبيق
+    // 1. التحقق من صحة بيانات الفيلم
+    if (!movie || !movie.id || !movie.url) {
+        showError('بيانات الفيلم غير كاملة أو غير صالحة');
+        return;
+    }
+
+    // 2. تحديث حالة التطبيق
     appState.currentContent = {
         type: 'movie',
         data: movie
     };
     
-    // تحديث واجهة المستخدم
+    // 3. تحديث واجهة المستخدم
     updateNowPlayingInfo(movie);
     
-    // إخفاء جميع الصفحات وإظهار المشغل
+    // 4. إدارة عرض الصفحات
     Object.values(elements.pages).forEach(page => {
         page.classList.remove('active');
     });
     elements.playerSection.style.display = 'block';
     elements.heroSlider.style.display = 'none';
     
-    // تشغيل الفيلم
+    // 5. تشغيل الفيلم مع التحقق من الرابط
+    if (!movie.url) {
+        showError('لا يوجد رابط تشغيل متاح للفيلم');
+        return;
+    }
     playContent(movie.url, movie);
     
-    // التحقق من قائمة Watch later للمستخدم المسجل
+    // 6. إدارة زر "مشاهدة لاحقاً"
+    const watchLaterBtn = document.getElementById('watchLaterBtn');
     if (appState.currentUser) {
         db.collection('users').doc(appState.currentUser.uid)
             .collection('watchLater').doc(movie.id).get()
             .then(doc => {
-                const btn = document.getElementById('watchLaterBtn');
                 if (doc.exists) {
-                    btn.classList.add('added');
-                    btn.innerHTML = '<i class="fas fa-check"></i> في قائمتي';
+                    watchLaterBtn.classList.add('added');
+                    watchLaterBtn.innerHTML = '<i class="fas fa-check"></i> في قائمتي';
                 } else {
-                    btn.classList.remove('added');
-                    btn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
+                    watchLaterBtn.classList.remove('added');
+                    watchLaterBtn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
                 }
+            })
+            .catch(error => {
+                console.error('خطأ في تحميل حالة المشاهدة لاحقاً:', error);
+                watchLaterBtn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
             });
         
-        // حفظ سجل المشاهدة
+        // 7. حفظ سجل المشاهدة
         saveWatchHistory(movie, 'movie');
     } else {
-        // إعادة تعيين الزر إذا كان المستخدم غير مسجل
-        const btn = document.getElementById('watchLaterBtn');
-    btn.classList.remove('added');
-        btn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
+        watchLaterBtn.classList.remove('added');
+        watchLaterBtn.innerHTML = '<i class="far fa-clock"></i> مشاهدة لاحقاً';
     }
-    // تحديث حالة زر المفضلة
-checkFavouriteStatus(movie); 
-setupInteractionButtons(movie);
-setupFavouriteButton(movie);
+    
+    // 8. إدارة زر المفضلة
+    const favouriteBtn = document.getElementById('favouriteBtn');
+    if (appState.currentUser) {
+        db.collection('users').doc(appState.currentUser.uid)
+            .collection('favorites').doc(movie.id).get()
+            .then(doc => {
+                if (doc.exists) {
+                    favouriteBtn.classList.add('added');
+                    favouriteBtn.innerHTML = '<i class="fas fa-heart"></i> في المفضلة';
+                } else {
+                    favouriteBtn.classList.remove('added');
+                    favouriteBtn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
+                }
+            })
+            .catch(error => {
+                console.error('خطأ في تحميل حالة المفضلة:', error);
+                favouriteBtn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
+            });
+    } else {
+        favouriteBtn.classList.remove('added');
+        favouriteBtn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
+    }
+    
+    // 9. إعداد أزرار التفاعل
+    setupInteractionButtons(movie);
 }
             
             function playContent(url, content) {
@@ -3360,6 +3494,11 @@ async function checkFavouriteStatus(content) {
         btn.classList.remove('added');
         btn.innerHTML = '<i class="far fa-heart"></i> Add to Favourite';
     }
+}
+            function setupFavouriteButton(content) {
+    const btn = document.getElementById('favouriteBtn');
+    btn.onclick = () => toggleFavourite(content);
+    checkFavouriteStatus(content);
 }
             function trackProgress(content) {
                 // في تطبيق حقيقي، ستحتاج إلى استخدام واجهة برمجة تطبيقات مشغل الفيديو
