@@ -20,6 +20,7 @@
             --secondary-color: #6D6D6D;
             --ad-color: #FFA500;
             --navbar-height: 70px;
+            --navbar-padding: 15px;
             --transition-speed: 0.3s;
             --button-size: 1.5rem;
         }
@@ -32,13 +33,13 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--dark-color);
-            color: var(--light-color);
-            line-height: 1.6;
-            padding-top: var(--navbar-height);
-            transition: all var(--transition-speed);
-        }
+    font-family: 'Arial', sans-serif;
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    line-height: 1.6;
+    padding-top: calc(var(--navbar-height) + 15px); /* زيادة 15px فوق المسافة الأصلية */
+    transition: all var(--transition-speed);
+}
 
         /* شريط التنقل العلوي */
         .navbar {
