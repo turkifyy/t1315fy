@@ -2537,14 +2537,24 @@
     });
 }
           function signInWithGoogle() {
+    // تأكد من أن firebase تم تحميله أولاً
+    if (!firebase.auth) {
+        showError('لم يتم تحميل مكتبة المصادقة بشكل صحيح');
+        return;
+    }
+    
     const provider = new firebase.auth.GoogleAuthProvider();
     showLoading();
-    auth.signInWithPopup(provider)
+    firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+            hideLoading();
+            // تسجيل الدخول ناجح
+        })
         .catch(error => {
             hideLoading();
             showError('حدث خطأ أثناء تسجيل الدخول: ' + error.message);
         });
-        }
+          }
             function signOut() {
                 showLoading();
                 auth.signOut()
