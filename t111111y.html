@@ -1463,6 +1463,20 @@
     font-size: 12px;
     font-weight: bold;
 } 
+        @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+#welcomeToast {
+    animation: none; /* إعادة التعيين */
+    transition: all 0.3s ease;
+}
     </style>
 </head>
 <body>
@@ -2372,12 +2386,12 @@
 });
                 
                 // تحميل البيانات الأولية
-                loadInitialData();
+                await loadInitialData();
                 
                 // تحميل إعدادات الإعلانات
-                loadAdSettings();
-
-                loadHomePageSections();
+                await loadAdSettings();
+                   // تحميل أقسام الصفحة الرئيسية
+                await loadHomePageSections();
             }
             
             function setupEventListeners() {
@@ -2387,11 +2401,11 @@
             e.preventDefault();
             const page = this.dataset.page;
             
-            if (page === 'profile' && !appState.currentUser) {
-                showLoginModal();
-                // إضافة هذا السطر لمنع التنقل عند عدم وجود مستخدم
-                return false; 
-            }
+            if (page === 'profile') {
+    if (!appState.currentUser) {
+        showLoginModal();
+        return false;
+    }
             
             showPage(page);
         });
@@ -2544,26 +2558,108 @@ function showLoginModal() {
         modal.remove();
     });
 }
-          function signInWithGoogle() {
-    if (!firebase.auth) {
-        console.error('Firebase Auth غير معرّف');
+          async function signInWithGoogle() {
+    try {
+        // 1. التحقق من توفر Firebase Auth
+        if (!firebase.auth) {
+            throw new Error('Firebase Auth غير معرّف');
+        }
+
+        // 2. إظهار مؤشر التحميل
+        showLoading();
+        
+        // 3. إنشاء موفر Google وتسجيل الدخول
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await firebase.auth().signInWithPopup(provider);
+        
+        // 4. إخفاء مؤشر التحميل
+        hideLoading();
+        
+        // 5. إغلاق نافذة تسجيل الدخول إن وجدت
+        const modal = document.getElementById('loginModal');
+        if (modal) modal.remove();
+        
+        // 6. عرض رسالة الترحيب
+        showWelcomeToast(result.user);
+        
+        // 7. تحديث حالة المستخدم في الواجهة
+        updateUserProfile(result.user);
+        
+        // 8. تحميل بيانات المستخدم
+        await loadUserData(result.user.uid);
+        
+        // 9. التحقق من صلاحيات الأدمن
+        await checkAdminStatus(result.user.uid);
+
+    } catch (error) {
+        // معالجة الأخطاء بشكل شامل
+        handleAuthError(error);
+    }
+}
+
+// دالة عرض رسالة الترحيب
+function showWelcomeToast(user) {
+    const welcomeToast = document.getElementById('welcomeToast');
+    const userNameSpan = document.getElementById('userName');
+    
+    if (!welcomeToast || !userNameSpan) {
+        console.warn('عناصر رسالة الترحيب غير موجودة في DOM');
         return;
     }
-
-    const provider = new firebase.auth.GoogleAuthProvider();
-    showLoading();
     
-    firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-            hideLoading();
-            // إغلاق المودال بعد التسجيل الناجح
-            const modal = document.getElementById('loginModal');
-            if (modal) modal.remove();
-        })
-        .catch(error => {
-            hideLoading();
-            showError('حدث خطأ أثناء تسجيل الدخول: ' + error.message);
-        });
+    // تعيين اسم المستخدم
+    userNameSpan.textContent = user.displayName || 'مستخدم';
+    
+    // إظهار الرسالة مع تأثير
+    welcomeToast.style.display = 'block';
+    welcomeToast.style.animation = 'fadeIn 0.5s ease-in-out';
+    
+    // إخفاء الرسالة بعد 5 ثواني مع تأثير
+    setTimeout(() => {
+        welcomeToast.style.animation = 'fadeOut 0.5s ease-in-out';
+        setTimeout(() => {
+            welcomeToast.style.display = 'none';
+        }, 500);
+    }, 5000);
+}
+
+// دالة معالجة أخطاء المصادقة
+function handleAuthError(error) {
+    hideLoading();
+    
+    // تحسين رسائل الخطأ حسب نوع الخطأ
+    let errorMessage = 'حدث خطأ أثناء تسجيل الدخول';
+    
+    switch(error.code) {
+        case 'auth/popup-closed-by-user':
+            errorMessage = 'تم إغلاق نافذة التسجيل قبل الإكمال';
+            break;
+        case 'auth/account-exists-with-different-credential':
+            errorMessage = 'هذا البريد مسجل بالفعل بطريقة أخرى';
+            break;
+        case 'auth/auth-domain-config-required':
+            errorMessage = 'مشكلة في إعدادات الدومين';
+            break;
+        default:
+            errorMessage += `: ${error.message}`;
+    }
+    
+    showError(errorMessage);
+    
+    // تسجيل الخطأ للتحليل
+    console.error('تفاصيل الخطأ:', error);
+}
+
+// دالة التحقق من صلاحيات الأدمن
+async function checkAdminStatus(userId) {
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists && userDoc.data().isAdmin) {
+            elements.adminToggle.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('فشل في التحقق من صلاحيات الأدمن:', error);
+    }
 }
             function signOut() {
                 showLoading();
@@ -3171,7 +3267,7 @@ function renderCarousel(items, elementId, type, showBadges = false) {
             
                 function createContentCard(item, type) {
     // 1. التحقق من صحة المدخلات
-    if (!item || !item.id || typeof type !== 'string') {
+    if (!item || !item.id) {
         console.error('بيانات البطاقة غير صالحة');
         return document.createElement('div'); // إرجاع عنصر فارغ بدلاً من undefined
     }
@@ -3455,10 +3551,16 @@ function renderCarousel(items, elementId, type, showBadges = false) {
     // 1. التحقق من صحة المدخلات
     if (!url || typeof url !== 'string') {
         console.error('رابط الفيديو غير صالح');
-        showError('عذراً، لا يمكن تشغيل هذا المحتوى');
+        showError('رابط الفيديو غير صالح');
         return;
     }
 
+            // التحقق من أن الرابط يبدأ بـ http أو https
+    if (!url.match(/^https?:\/\//i)) {
+        showError('رابط الفيديو يجب أن يبدأ بـ http:// أو https://');
+        return;
+    }
+                
     if (!content || !content.id) {
         console.error('بيانات المحتوى غير صالحة');
         return;
@@ -3587,7 +3689,7 @@ async function toggleFavourite(content) {
     }
 
     const userRef = db.collection('users').doc(appState.currentUser.uid);
-    const favRef = userRef.collection('favourites').doc(content.id);
+    const favRef = userRef.collection('favorites').doc(content.id);
 
     const doc = await favRef.get();
     const btn = document.getElementById('favouriteBtn');
@@ -3617,7 +3719,7 @@ async function checkFavouriteStatus(content) {
 
     const doc = await db.collection('users')
         .doc(appState.currentUser.uid)
-        .collection('favourites')
+        .collection('favorites')
         .doc(content.id)
         .get();
 
