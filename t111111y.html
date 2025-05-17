@@ -3138,93 +3138,127 @@ function renderCarousel(items, elementId, type, showBadges = false) {
                 });
             }
             
-            function createContentCard(item, type) {
-                const card = document.createElement('div');
-                card.className = 'content-card';
-                card.dataset.id = item.id;
-                card.dataset.type = type;
-                
-                const thumbnail = document.createElement('div');
-                thumbnail.className = type === 'episode' ? 'episode-thumbnail' : 'content-thumbnail';
-                thumbnail.style.backgroundImage = `url('${item.thumb}')`;
-                
-                const info = document.createElement('div');
-                info.className = 'content-info';
-                
-                const title = document.createElement('div');
-                title.className = 'content-title';
-                title.textContent = item.title;
-                
-                const meta = document.createElement('div');
-                meta.className = 'content-meta';
-                
-                if (type === 'episode') {
-                    const episodeNum = document.createElement('div');
-                    episodeNum.className = 'episode-number';
-                    episodeNum.textContent = item.number;
-                    thumbnail.appendChild(episodeNum);
-                    
-                    meta.innerHTML = `
-                        <span>${item.duration || 24} دقيقة</span>
-                        <span>•</span>
-                        <span>${item.imdb || '7.5'} <i class="fas fa-star" style="color: #FFD700;"></i></span>
-                    `;
-                } else if (type === 'series') {
-                    meta.innerHTML = `
-                        <span>${item.rating || '7.5'} <i class="fas fa-star" style="color: #FFD700;"></i></span>
-                        <span>•</span>
-                        <span>${item.season || 1} موسم</span>
-                    `;
-                } else if (type === 'movie') {
-                    meta.innerHTML = `
-                        <span>${item.duration || 90} دقيقة</span>
-                        <span>•</span>
-                        <span>${item.imdb || '7.5'} <i class="fas fa-star" style="color: #FFD700;"></i></span>
-                    `;
-                }
-                
-                const freeBadge = document.createElement('div');
-                freeBadge.className = 'free-badge';
-                freeBadge.textContent = 'Free';
-                thumbnail.appendChild(freeBadge);
-                
-                const stats = document.createElement('div');
-                stats.className = 'content-stats';
-                stats.innerHTML = `
-                    <span><i class="fas fa-eye"></i> ${item.views || 0}</span>
-                    <span><i class="fas fa-thumbs-up"></i> ${item.likes || 0}</span>
-                `;
-                
-                // شريط التقدم
-                const progressContainer = document.createElement('div');
-                progressContainer.className = 'progress-container';
-                
-                const progressBar = document.createElement('div');
-                progressBar.className = 'progress-bar';
-                progressBar.style.width = appState.watchProgress[item.id] ? `${appState.watchProgress[item.id].progress}%` : '0%';
-                
-                progressContainer.appendChild(progressBar);
-                
-                info.appendChild(title);
-                info.appendChild(meta);
-                info.appendChild(stats);
-                info.appendChild(progressContainer);
-                
-                card.appendChild(thumbnail);
-                card.appendChild(info);
-                
-                card.addEventListener('click', function() {
-                    if (type === 'episode') {
-                        playEpisode(item);
-                    } else if (type === 'series') {
-                        showSeriesDetails(item);
-                    } else if (type === 'movie') {
-                        playMovie(item);
-                    }
-                });
-                
-                return card;
+            
+                function createContentCard(item, type) {
+    // 1. التحقق من صحة المدخلات
+    if (!item || !item.id || typeof type !== 'string') {
+        console.error('بيانات البطاقة غير صالحة');
+        return document.createElement('div'); // إرجاع عنصر فارغ بدلاً من undefined
+    }
+
+    // 2. إنشاء العناصر الأساسية
+    const card = document.createElement('div');
+    card.className = 'content-card';
+    card.dataset.id = item.id;
+    card.dataset.type = type;
+    
+    // 3. إنشاء صورة المصغرة مع التحقق من وجودها
+    const thumbnail = document.createElement('div');
+    thumbnail.className = type === 'episode' ? 'episode-thumbnail' : 'content-thumbnail';
+    thumbnail.style.backgroundImage = `url('${item.thumb || 'assets/default-thumbnail.jpg'}')`;
+    thumbnail.setAttribute('alt', item.title || 'صورة المحتوى');
+    
+    // 4. إنشاء منطقة المعلومات
+    const info = document.createElement('div');
+    info.className = 'content-info';
+    
+    // 5. إنشاء عنوان المحتوى
+    const title = document.createElement('div');
+    title.className = 'content-title';
+    title.textContent = item.title || 'بدون عنوان';
+    
+    // 6. إنشاء معلومات الميتا
+    const meta = document.createElement('div');
+    meta.className = 'content-meta';
+    
+    // 7. معالجة أنواع المحتوى المختلفة
+    switch(type) {
+        case 'episode':
+            if (item.number) {
+                const episodeNum = document.createElement('div');
+                episodeNum.className = 'episode-number';
+                episodeNum.textContent = item.number;
+                thumbnail.appendChild(episodeNum);
             }
+            
+            meta.innerHTML = `
+                <span>${item.duration || 24} دقيقة</span>
+                <span>•</span>
+                <span>${item.imdb || '7.5'} <i class="fas fa-star" style="color: #FFD700;"></i></span>
+            `;
+            break;
+            
+        case 'series':
+            meta.innerHTML = `
+                <span>${item.rating || '7.5'} <i class="fas fa-star" style="color: #FFD700;"></i></span>
+                <span>•</span>
+                <span>${item.season || 1} موسم</span>
+            `;
+            break;
+            
+        case 'movie':
+            meta.innerHTML = `
+                <span>${item.duration || 90} دقيقة</span>
+                <span>•</span>
+                <span>${item.imdb || '7.5'} <i class="fas fa-star" style="color: #FFD700;"></i></span>
+            `;
+            break;
+            
+        default:
+            console.warn('نوع المحتوى غير معروف:', type);
+    }
+    
+    // 8. إضافة شارة Free
+    const freeBadge = document.createElement('div');
+    freeBadge.className = 'free-badge';
+    freeBadge.textContent = 'Free';
+    thumbnail.appendChild(freeBadge);
+    
+    // 9. إضافة الإحصائيات
+    const stats = document.createElement('div');
+    stats.className = 'content-stats';
+    stats.innerHTML = `
+        <span><i class="fas fa-eye"></i> ${item.views || 0}</span>
+        <span><i class="fas fa-thumbs-up"></i> ${item.likes || 0}</span>
+    `;
+    
+    // 10. شريط التقدم
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'progress-container';
+    
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    const progressPercent = appState.watchProgress[item.id]?.progress || 0;
+    progressBar.style.width = `${Math.min(Math.max(progressPercent, 0), 100)}%`; // التأكد من أن النسبة بين 0 و100
+    progressContainer.appendChild(progressBar);
+    
+    // 11. تجميع العناصر
+    info.append(title, meta, stats, progressContainer);
+    card.append(thumbnail, info);
+    
+    // 12. إضافة حدث النقر
+    card.addEventListener('click', (e) => {
+        if (e.target.closest('.interaction-btn')) return; // منع التنفيذ عند النقر على أزرار التفاعل
+        
+        try {
+            switch(type) {
+                case 'episode':
+                    if (typeof playEpisode === 'function') playEpisode(item);
+                    break;
+                case 'series':
+                    if (typeof showSeriesDetails === 'function') showSeriesDetails(item);
+                    break;
+                case 'movie':
+                    if (typeof playMovie === 'function') playMovie(item);
+                    break;
+            }
+        } catch (error) {
+            console.error('خطأ في تنفيذ حدث النقر:', error);
+        }
+    });
+    
+    return card;
+}
             
             function playEpisode(episode) {
     // 1. التحقق من وجود بيانات الحلقة
@@ -3388,32 +3422,103 @@ function renderCarousel(items, elementId, type, showBadges = false) {
 }
             
             function playContent(url, content) {
-                // إعداد رابط الفيديو
-                let videoUrl = url;
-                const startTime = appState.watchProgress[content.id] ? Math.floor(appState.watchProgress[content.id].time) : 0;
-                
-                if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-                    const videoId = extractYouTubeId(videoUrl);
-                    if (videoId) {
-                        videoUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&start=${startTime}`;
-                    }
-                } else if (videoUrl.includes('vimeo.com')) {
-                    const videoId = videoUrl.split('/').pop();
-                    videoUrl = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
-                }
-                
-                elements.videoPlayer.src = videoUrl;
-                
-                // إظهار إعلان ما قبل التشغيل إذا لزم الأمر
-                if (APP_CONFIG.ADS_ENABLED && AD_SETTINGS.preRoll.enabled) {
-                    showAd('pre-roll', AD_SETTINGS.preRoll.duration);
-                } else {
-                    elements.nowPlayingInfo.style.display = 'block';
-                }
-                
-                // بدء تتبع التقدم
-                trackProgress(content);
+    // 1. التحقق من صحة المدخلات
+    if (!url || typeof url !== 'string') {
+        console.error('رابط الفيديو غير صالح');
+        showError('عذراً، لا يمكن تشغيل هذا المحتوى');
+        return;
+    }
+
+    if (!content || !content.id) {
+        console.error('بيانات المحتوى غير صالحة');
+        return;
+    }
+
+    // 2. التحقق من وجود مشغل الفيديو
+    if (!elements.videoPlayer) {
+        console.error('عنصر مشغل الفيديو غير موجود');
+        return;
+    }
+
+    // 3. إعداد وقت البدء
+    const startTime = appState.watchProgress[content.id] 
+        ? Math.max(0, Math.floor(appState.watchProgress[content.id].time)) 
+        : 0;
+
+    try {
+        // 4. معالجة روابط اليوتيوب
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            const videoId = extractYouTubeId(url);
+            if (!videoId) {
+                throw new Error('لا يمكن استخراج معرف فيديو اليوتيوب');
             }
+            
+            // 5. بناء رابط تضمين آمن لليوتيوب
+            const embedUrl = new URL(`https://www.youtube.com/embed/${videoId}`);
+            embedUrl.searchParams.set('autoplay', '1');
+            embedUrl.searchParams.set('start', startTime);
+            embedUrl.searchParams.set('rel', '0'); // عدم عرض مقاطع مقترحة
+            embedUrl.searchParams.set('modestbranding', '1'); // تقليل العلامات التجارية
+            
+            elements.videoPlayer.src = embedUrl.toString();
+        }
+        // 6. معالجة روابط Vimeo
+        else if (url.includes('vimeo.com')) {
+            const videoId = url.split('/').pop();
+            if (!videoId) {
+                throw new Error('لا يمكن استخراج معرف فيديو Vimeo');
+            }
+            
+            const embedUrl = new URL(`https://player.vimeo.com/video/${videoId}`);
+            embedUrl.searchParams.set('autoplay', '1');
+            embedUrl.searchParams.set('byline', '0');
+            embedUrl.searchParams.set('title', '0');
+            
+            elements.videoPlayer.src = embedUrl.toString();
+        }
+        // 7. روابط مباشرة أخرى
+        else {
+            // التحقق من أن الرابط يبدأ بـ https
+            if (!url.startsWith('https://')) {
+                throw new Error('روابط التشغيل يجب أن تكون آمنة (HTTPS)');
+            }
+            elements.videoPlayer.src = url;
+        }
+
+        // 8. إعداد معالجة الأخطاء لمشغل الفيديو
+        elements.videoPlayer.onerror = () => {
+            console.error('حدث خطأ في تحميل الفيديو');
+            showError('حدث خطأ أثناء تحميل الفيديو، يرجى المحاولة لاحقاً');
+        };
+
+        // 9. إدارة الإعلانات
+        if (APP_CONFIG.ADS_ENABLED && AD_SETTINGS.preRoll.enabled) {
+            showAd('pre-roll', AD_SETTINGS.preRoll.duration);
+        } else {
+            elements.nowPlayingInfo.style.display = 'block';
+            trackProgress(content);
+        }
+
+        // 10. تسجيل حدث التشغيل
+        logPlayEvent(content);
+
+    } catch (error) {
+        console.error('حدث خطأ في تشغيل المحتوى:', error);
+        showError('عذراً، لا يمكن تشغيل هذا المحتوى');
+        elements.videoPlayer.src = '';
+    }
+}
+
+// دالة مساعدة لتسجيل أحداث التشغيل
+function logPlayEvent(content) {
+    if (typeof analytics !== 'undefined') {
+        analytics.track('play', {
+            content_id: content.id,
+            content_type: content.type,
+            title: content.title
+        });
+    }
+}
             
             function updateNowPlayingInfo(content) {
                 elements.nowPlayingTitle.textContent = content.title;
@@ -3674,36 +3779,75 @@ async function checkFavouriteStatus(content) {
                 hideLoading();
             }
             
-            function saveWatchHistory(content, type) {
-                if (!appState.currentUser) return;
-                
-                db.collection('users').doc(appState.currentUser.uid).collection('watchHistory').add({
-                    contentId: content.id,
-                    title: content.title,
-                    thumb: content.thumb,
-                    type: type,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        progress: appState.watchProgress[content.id]?.progress || 0,
-                        duration: content.duration || (type === 'movie' ? 90 : 24)
-                    })
-                    .then(() => {
-                        // تحديث عدد المشاهدات للمحتوى
-                        if (type === 'episode') {
-                            return db.collection('episodes').doc(content.id).update({
-                                views: firebase.firestore.FieldValue.increment(1),
-                                lastWatched: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        } else if (type === 'movie') {
-                            return db.collection('movies').doc(content.id).update({
-                                views: firebase.firestore.FieldValue.increment(1),
-                                lastWatched: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error saving watch history:', error);
-                    });
-            }
+            async function saveWatchHistory(content, type) {
+    // 1. التحقق من صحة المدخلات
+    if (!appState.currentUser || !appState.currentUser.uid) {
+        console.warn('لا يوجد مستخدم مسجل لحفظ سجل المشاهدة');
+        return;
+    }
+
+    if (!content || !content.id || typeof type !== 'string') {
+        console.error('بيانات المحتوى غير صالحة للحفظ');
+        return;
+    }
+
+    // 2. التحقق من أنواع المحتوى المسموح بها
+    const allowedTypes = ['episode', 'movie'];
+    if (!allowedTypes.includes(type)) {
+        console.error('نوع المحتوى غير مدعوم:', type);
+        return;
+    }
+
+    // 3. إعداد بيانات سجل المشاهدة
+    const watchData = {
+        contentId: content.id,
+        title: content.title || 'بدون عنوان',
+        thumb: content.thumb || 'default-thumbnail.jpg',
+        type: type,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        progress: Math.min(Math.max(appState.watchProgress[content.id]?.progress || 0, 0), 100), // التأكد من أن النسبة بين 0-100
+        duration: content.duration || (type === 'movie' ? 90 : 24),
+        userId: appState.currentUser.uid // إضافة ID المستخدم للربط
+    };
+
+    try {
+        // 4. حفظ سجل المشاهدة مع دمج البيانات
+        const userRef = db.collection('users').doc(appState.currentUser.uid);
+        await userRef.collection('watchHistory').doc(content.id).set(watchData, { merge: true });
+
+        // 5. تحديث إحصائيات المشاهدة
+        const updateData = {
+            views: firebase.firestore.FieldValue.increment(1),
+            lastWatched: firebase.firestore.FieldValue.serverTimestamp(),
+            lastWatchedBy: appState.currentUser.uid
+        };
+
+        const collectionName = type === 'episode' ? 'episodes' : 'movies';
+        await db.collection(collectionName).doc(content.id).update(updateData);
+
+        // 6. تحديث حالة التطبيق
+        if (!appState.watchHistory) {
+            appState.watchHistory = {};
+        }
+        appState.watchHistory[content.id] = watchData;
+
+    } catch (error) {
+        console.error('فشل في حفظ سجل المشاهدة:', error);
+        
+        // 7. إعادة المحاولة مرة واحدة في حالة الخطأ
+        try {
+            await db.collection('errorLogs').add({
+                error: 'Failed to save watch history',
+                contentId: content.id,
+                userId: appState.currentUser.uid,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                errorDetails: error.message
+            });
+        } catch (logError) {
+            console.error('فشل في تسجيل الخطأ:', logError);
+        }
+    }
+}
             
             function saveContentInteraction(content, interactionType) {
                 if (!appState.currentUser) return;
@@ -3779,24 +3923,100 @@ function toggleWatchLater(content) {
                 return (match && match[2].length === 11) ? match[2] : null;
             }
             
-            function toggleAdminPanel() {
-    if (!appState.currentUser) {
+            async function toggleAdminPanel() {
+    // 1. التحقق من وجود مستخدم مسجل
+    if (!appState.currentUser || !appState.currentUser.uid) {
         showLoginModal();
         return;
     }
 
-    // التحقق من صلاحية المستخدم في Firestore
-    db.collection('users').doc(appState.currentUser.uid).get()
-        .then(doc => {
-            if (doc.exists && doc.data().isAdmin) {
-                elements.adminPanel.style.display = elements.adminPanel.style.display === 'block' ? 'none' : 'block';
-                if (elements.adminPanel.style.display === 'block') {
-                    loadAdminData();
-                }
-            } else {
-                showError('ليس لديك صلاحية الدخول إلى لوحة التحكم');
+    try {
+        // 2. إظهار مؤشر التحميل
+        showLoading();
+
+        // 3. التحقق من صلاحيات الأدمن
+        const userDoc = await db.collection('users')
+            .doc(appState.currentUser.uid)
+            .get();
+
+        // 4. التحقق من وجود المستخدم وبياناته
+        if (!userDoc.exists) {
+            throw new Error('بيانات المستخدم غير موجودة');
+        }
+
+        const userData = userDoc.data();
+
+        // 5. التحقق من الصلاحيات
+        if (userData.isAdmin) {
+            // 6. تبديل حالة لوحة التحكم
+            const isVisible = elements.adminPanel.style.display === 'block';
+            elements.adminPanel.style.display = isVisible ? 'none' : 'block';
+            
+            // 7. تحميل البيانات إذا كانت اللوحة ظاهرة
+            if (!isVisible) {
+                await loadAdminData();
+                
+                // تسجيل دخول الأدمن
+                logAdminAccess();
             }
+        } else {
+            showError('ليست لديك صلاحيات الدخول إلى لوحة التحكم');
+            
+            // تسجيل محاولة الدخول غير المصرح بها
+            logUnauthorizedAccessAttempt();
+        }
+    } catch (error) {
+        console.error('حدث خطأ في الوصول إلى لوحة التحكم:', error);
+        showError('حدث خطأ أثناء محاولة الوصول إلى لوحة التحكم');
+        
+        // 8. تسجيل الخطأ في نظام التتبع
+        await logErrorToServer(error);
+    } finally {
+        // 9. إخفاء مؤشر التحميل في جميع الحالات
+        hideLoading();
+    }
+}
+
+// الدوال المساعدة الجديدة:
+
+async function logAdminAccess() {
+    try {
+        await db.collection('adminLogs').add({
+            userId: appState.currentUser.uid,
+            action: 'admin_panel_access',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            userAgent: navigator.userAgent,
+            ip: await fetchUserIP() // دالة افتراضية تحتاج لتنفيذها
         });
+    } catch (logError) {
+        console.error('فشل في تسجيل دخول الأدمن:', logError);
+    }
+}
+
+async function logUnauthorizedAccessAttempt() {
+    try {
+        await db.collection('securityLogs').add({
+            userId: appState.currentUser.uid,
+            action: 'unauthorized_admin_access_attempt',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            userAgent: navigator.userAgent
+        });
+    } catch (logError) {
+        console.error('فشل في تسجيل محاولة الدخول غير المصرح بها:', logError);
+    }
+}
+
+async function logErrorToServer(error) {
+    try {
+        await db.collection('errorLogs').add({
+            error: error.message,
+            stack: error.stack,
+            userId: appState.currentUser?.uid,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (logError) {
+        console.error('فشل في تسجيل الخطأ:', logError);
+    }
 }
             
             function loadAdminData() {
