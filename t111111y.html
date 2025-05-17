@@ -2569,7 +2569,10 @@
             
             function updateUserProfile(user) {
     // إظهار زر الملف الشخصي في الشريط العلوي
-    document.getElementById('profileNavItem').style.display = 'block';
+     if (!user) {
+        document.getElementById('profileNavItem').style.display = 'none';
+        return;
+     }
     
     // تحديث الصورة المصغرة
     if (user.photoURL) {
@@ -3674,8 +3677,10 @@ async function checkFavouriteStatus(content) {
             }
             
             function showAd(adType, duration) {
-                if (!APP_CONFIG.ADS_ENABLED) return;
-                
+                if (!APP_CONFIG.ADS_ENABLED) {
+        console.log('الإعلانات معطلة في الإعدادات');
+        return;
+        }
                 appState.isShowingAd = true;
                 elements.adOverlay.style.display = 'flex';
                 elements.adSkip.style.display = 'flex';
@@ -3940,57 +3945,42 @@ function toggleWatchLater(content) {
                 return (match && match[2].length === 11) ? match[2] : null;
             }
             
-            async function toggleAdminPanel() {
-    // 1. التحقق من وجود مستخدم مسجل
-    if (!appState.currentUser || !appState.currentUser.uid) {
+            
+                async function toggleAdminPanel() {
+    // 1. التحقق من وجود مستخدم مسجل أولاً
+    if (!appState.currentUser) {
         showLoginModal();
         return;
     }
 
     try {
-        // 2. إظهار مؤشر التحميل
-        showLoading();
-
-        // 3. التحقق من صلاحيات الأدمن
-        const userDoc = await db.collection('users')
-            .doc(appState.currentUser.uid)
-            .get();
-
-        // 4. التحقق من وجود المستخدم وبياناته
+        // 2. جلب بيانات المستخدم من Firestore
+        const userDoc = await db.collection('users').doc(appState.currentUser.uid).get();
+        
+        // 3. التحقق من وجود المستند وبياناته
         if (!userDoc.exists) {
             throw new Error('بيانات المستخدم غير موجودة');
         }
 
         const userData = userDoc.data();
 
-        // 5. التحقق من الصلاحيات
-        if (userData.isAdmin) {
-            // 6. تبديل حالة لوحة التحكم
-            const isVisible = elements.adminPanel.style.display === 'block';
-            elements.adminPanel.style.display = isVisible ? 'none' : 'block';
-            
-            // 7. تحميل البيانات إذا كانت اللوحة ظاهرة
-            if (!isVisible) {
-                await loadAdminData();
-                
-                // تسجيل دخول الأدمن
-                logAdminAccess();
-            }
-        } else {
-            showError('ليست لديك صلاحيات الدخول إلى لوحة التحكم');
-            
-            // تسجيل محاولة الدخول غير المصرح بها
-            logUnauthorizedAccessAttempt();
+        // 4. التحقق من صلاحية الأدمن
+        if (!userData.isAdmin) {
+            throw new Error('ليست لديك صلاحيات الأدمن');
         }
+
+        // 5. تبديل حالة لوحة الإدارة
+        const isVisible = elements.adminPanel.style.display === 'block';
+        elements.adminPanel.style.display = isVisible ? 'none' : 'block';
+
+        // 6. تحميل بيانات الأدمن إذا كانت اللوحة ظاهرة
+        if (!isVisible) {
+            await loadAdminData();
+        }
+
     } catch (error) {
-        console.error('حدث خطأ في الوصول إلى لوحة التحكم:', error);
-        showError('حدث خطأ أثناء محاولة الوصول إلى لوحة التحكم');
-        
-        // 8. تسجيل الخطأ في نظام التتبع
-        await logErrorToServer(error);
-    } finally {
-        // 9. إخفاء مؤشر التحميل في جميع الحالات
-        hideLoading();
+        console.error('خطأ في لوحة الإدارة:', error);
+        showError(error.message);
     }
 }
 
