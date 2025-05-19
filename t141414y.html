@@ -1397,19 +1397,7 @@
         .admin-toggle {
                 display: none;
         }
-    #watchLaterBtn {
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-#watchLaterBtn:hover {
-    color: var(--primary-color);
-}
-
-#watchLaterBtn.added {
-    color: var(--primary-color);
-    font-weight: bold;
-}
+    
        /* أنماط الكاروسيل الجديدة */
 .content-carousel {
     display: flex;
@@ -1665,30 +1653,9 @@
             </div>
             <h2 class="profile-name" id="profileName">زائر</h2>
             <p class="profile-email" id="profileEmail">يجب تسجيل الدخول لعرض المعلومات</p>
-            
-            <div class="profile-tabs">
-    <button class="profile-tab active" data-tab="history">سجل المشاهدة</button>
-    <button class="profile-tab" data-tab="watchlater">مشاهدة لاحقًا</button>
-    <button class="profile-tab" data-tab="continue">استكمال المشاهدة</button>
-    <button class="profile-tab" data-tab="favorites">المفضلة</button>
-</div>
-
 <div class="profile-tab-content active" id="historyTab">
     <div class="content-grid" id="watchHistoryGrid"></div>
 </div>
-
-<div class="profile-tab-content" id="watchlaterTab">
-    <div class="content-grid" id="watchLaterGrid"></div>
-</div>
-
-<div class="profile-tab-content" id="continueTab">
-    <div class="content-grid" id="continueWatchingGrid"></div>
-</div>
-
-<div class="profile-tab-content" id="favoritesTab">
-    <div class="content-grid" id="favoritesGrid"></div>
-</div>
-            
             <div class="watch-history">
                 <h3 class="section-title">
                     <span>سجل المشاهدة</span>
@@ -1699,9 +1666,6 @@
             </div>
         </div>
     </div>
-
-
-
     <section class="player-section" id="playerSection">
         <!-- إعلان ما قبل التشغيل -->
         <div class="ad-overlay" id="adOverlay">
@@ -1746,12 +1710,6 @@
                 <i class="fas fa-thumbs-down"></i>
                 <span id="dislikesCount">0</span>
             </div>
-            <div class="stat interaction-btn" id="watchLaterBtn">
-        <i class="far fa-clock"></i> مشاهدة لاحقا
-    </div>
-            <div class="stat interaction-btn" id="favouriteBtn">
-    <i class="far fa-heart"></i> <span>Add to Favourite</span>
-</div>
         </div>
     </div>
 
@@ -1874,10 +1832,6 @@
                     <input type="number" id="episodeDuration" class="admin-input" placeholder="مدة الحلقة..." min="1">
                 </div>
                 <div class="admin-group">
-                    <label class="admin-label">تقييم IMDB:</label>
-                    <input type="number" id="episodeImdb" class="admin-input" placeholder="تقييم IMDB..." min="0" max="10" step="0.1">
-                </div>
-                <div class="admin-group">
                     <label class="admin-label">رقم الموسم:</label>
                     <input type="number" id="episodeSeason" class="admin-input" placeholder="رقم الموسم..." min="1">
                 </div>
@@ -1923,10 +1877,6 @@
                     <div class="admin-group">
                         <label class="admin-label">مدة الفيلم (دقائق):</label>
                         <input type="number" id="movieDuration" class="admin-input" placeholder="مدة الفيلم..." min="1">
-                    </div>
-                    <div class="admin-group">
-                        <label class="admin-label">تقييم IMDB:</label>
-                        <input type="number" id="movieImdb" class="admin-input" placeholder="تقييم IMDB..." min="0" max="10" step="0.1">
                     </div>
                     <div class="admin-group">
                         <label class="admin-label">مميز:</label>
@@ -2147,55 +2097,10 @@
                 خريطة تفاعلية للزوار حسب البلدان
             </div>
         </div>
-        
-        <!-- تبويب الإعدادات -->
-        <div class="admin-tab-content" id="settingsTab">
-            <h3 class="admin-title">إعدادات النظام</h3>
-            <div class="admin-controls">
-                <div class="admin-group">
-                    <label class="admin-label">عنوان الموقع:</label>
-                    <input type="text" id="siteTitle" class="admin-input" placeholder="عنوان الموقع..." value="منصة السنافر">
-                </div>
-                <div class="admin-group">
-                    <label class="admin-label">شعار الموقع:</label>
-                    <input type="text" id="siteLogo" class="admin-input" placeholder="رابط الشعار..." value="https://via.placeholder.com/150x50?text=SMURFS+LOGO">
-                </div>
-                <div class="admin-group">
-                    <label class="admin-label">شعار القناة:</label>
-                    <input type="text" id="channelLogo" class="admin-input" placeholder="رابط شعار القناة..." value="https://via.placeholder.com/100x50?text=قناة+السنافر">
-                </div>
-                <div class="admin-group">
-                    <label class="admin-label">لون الموقع الأساسي:</label>
-                    <input type="color" id="primaryColor" class="admin-input" value="#E50914">
-                </div>
-                <div class="admin-group">
-                    <label class="admin-label">وضع الموقع:</label>
-                    <select id="siteMode" class="admin-select">
-                        <option value="light">فاتح</option>
-                        <option value="dark" selected>داكن</option>
-                    </select>
-                </div>
-                <div class="admin-group">
-                    <label class="admin-label">كلمة مرور الأدمن:</label>
-                    <input type="password" id="adminPassword" class="admin-input" placeholder="كلمة مرور الأدمن..." value="password">
-                </div>
-            </div>
-            <div class="btn-group">
-                <button id="saveSettings" class="admin-btn"><i class="fas fa-save"></i> حفظ الإعدادات</button>
-            </div>
-        </div>
-    </div>
-    
     <!-- زر تبديل الإدارة -->
     <div class="admin-toggle" id="adminToggle">
         <i class="fas fa-cog"></i>
     </div>
-
-    <!-- رسائل التحميل والأخطاء -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
-    
     <div class="error-message" id="errorMessage"></div>
     
     <div class="success-message" id="successMessage"></div>
@@ -2929,55 +2834,6 @@
                 } catch (error) {
                     hideLoading();
                     showError('حدث خطأ في تحميل بيانات المستخدم: ' + error.message);
-                }
-            }
-
-            // دالة لتحميل قائمة "مشاهدة لاحقًا"
-            async function loadWatchLater() {
-                if (!appState.currentUser) return;
-                
-                try {
-                    const snapshot = await db.collection('users').doc(appState.currentUser.uid)
-                        .collection('watchLater')
-                        .get();
-                    
-                    const items = snapshot.docs.map(doc => doc.data());
-                    renderContentGrid(items, 'watchLaterGrid');
-                } catch (error) {
-                    console.error('خطأ في تحميل قائمة المشاهدة لاحقاً:', error);
-                }
-            }
-
-            // دالة لتحميل قائمة "استكمال المشاهدة"
-            async function loadContinueWatching() {
-                if (!appState.currentUser) return;
-                
-                try {
-                    const snapshot = await db.collection('users').doc(appState.currentUser.uid)
-                        .collection('watchHistory')
-                        .where('progress', '<', 100)
-                        .get();
-                    
-                    const items = snapshot.docs.map(doc => doc.data());
-                    renderContentGrid(items, 'continueWatchingGrid');
-                } catch (error) {
-                    console.error('خطأ في تحميل قائمة استكمال المشاهدة:', error);
-                }
-            }
-
-            // دالة لتحميل قائمة "المفضلة"
-            async function loadFavorites() {
-                if (!appState.currentUser) return;
-                
-                try {
-                    const snapshot = await db.collection('users').doc(appState.currentUser.uid)
-                        .collection('favorites')
-                        .get();
-                    
-                    const items = snapshot.docs.map(doc => doc.data());
-                    renderContentGrid(items, 'favoritesGrid');
-                } catch (error) {
-                    console.error('خطأ في تحميل قائمة المفضلة:', error);
                 }
             }
 
@@ -3828,36 +3684,6 @@
                         ? Math.max(0, Math.floor(appState.watchProgress[content.id].time)) 
                         : 0;
 
-                    // 4. معالجة روابط اليوتيوب
-                    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                        const videoId = extractYouTubeId(url);
-                        if (!videoId) {
-                            throw new Error('لا يمكن استخراج معرف فيديو اليوتيوب');
-                        }
-                        
-                        // 5. بناء رابط تضمين آمن لليوتيوب
-                        const embedUrl = new URL(`https://www.youtube.com/embed/${videoId}`);
-                        embedUrl.searchParams.set('autoplay', '1');
-                        embedUrl.searchParams.set('start', startTime);
-                        embedUrl.searchParams.set('rel', '0');
-                        embedUrl.searchParams.set('modestbranding', '1');
-                        
-                        elements.videoPlayer.src = embedUrl.toString();
-                    }
-                    // 6. معالجة روابط Vimeo
-                    else if (url.includes('vimeo.com')) {
-                        const videoId = url.split('/').pop();
-                        if (!videoId) {
-                            throw new Error('لا يمكن استخراج معرف فيديو Vimeo');
-                        }
-                        
-                        const embedUrl = new URL(`https://player.vimeo.com/video/${videoId}`);
-                        embedUrl.searchParams.set('autoplay', '1');
-                        embedUrl.searchParams.set('byline', '0');
-                        embedUrl.searchParams.set('title', '0');
-                        
-                        elements.videoPlayer.src = embedUrl.toString();
-                    }
                     // 7. روابط مباشرة أخرى
                     else {
                         if (!url.startsWith('https://')) {
@@ -3943,80 +3769,13 @@
                             updateNowPlayingInfo(content);
                             saveContentInteraction(content, 'dislike');
                         };
-                    }
-                    
-                    const favouriteBtn = document.getElementById('favouriteBtn');
-                    if (favouriteBtn) {
-                        favouriteBtn.onclick = () => toggleFavourite(content);
-                    }
-                } catch (error) {
-                    console.error('خطأ في إعداد أزرار التفاعل:', error);
-                }
-            }
+                    }   
+    
+                }     
+    
+           }
             
-            // دالة إضافة/إزالة من المفضلة
-            async function toggleFavourite(content) {
-                try {
-                    if (!appState.currentUser) {
-                        showLoginModal();
-                        return;
-                    }
-
-                    const userRef = db.collection('users').doc(appState.currentUser.uid);
-                    const favRef = userRef.collection('favorites').doc(content.id);
-
-                    const doc = await favRef.get();
-                    const btn = document.getElementById('favouriteBtn');
-                    if (!btn) return;
-
-                    if (doc.exists) {
-                        await favRef.delete();
-                        btn.classList.remove('added');
-                        btn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
-                        showSuccess('تمت الإزالة من المفضلة');
-                    } else {
-                        await favRef.set({
-                            contentId: content.id,
-                            title: content.title,
-                            thumb: content.thumb,
-                            type: content.number ? 'episode' : 'movie',
-                            addedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        btn.classList.add('added');
-                        btn.innerHTML = '<i class="fas fa-heart"></i> في المفضلة';
-                        showSuccess('تمت الإضافة إلى المفضلة');
-                    }
-                } catch (error) {
-                    console.error('خطأ في تبديل حالة المفضلة:', error);
-                    showError('حدث خطأ أثناء تحديث المفضلة');
-                }
-            }
-
-            // دالة التحقق من حالة المفضلة
-            async function checkFavouriteStatus(content) {
-                try {
-                    if (!appState.currentUser) return;
-
-                    const doc = await db.collection('users')
-                        .doc(appState.currentUser.uid)
-                        .collection('favorites')
-                        .doc(content.id)
-                        .get();
-
-                    const btn = document.getElementById('favouriteBtn');
-                    if (!btn) return;
-
-                    if (doc.exists) {
-                        btn.classList.add('added');
-                        btn.innerHTML = '<i class="fas fa-heart"></i> في المفضلة';
-                    } else {
-                        btn.classList.remove('added');
-                        btn.innerHTML = '<i class="far fa-heart"></i> إضافة للمفضلة';
-                    }
-                } catch (error) {
-                    console.error('خطأ في التحقق من حالة المفضلة:', error);
-                }
-            }
+            
             
             function trackProgress(content) {
                 try {
@@ -4337,50 +4096,6 @@
                         });
                 } catch (error) {
                     console.error('خطأ في حفظ تفاعل المحتوى:', error);
-                }
-            }
-            
-            // دالة إضافة/إزالة من القائمة
-            async function toggleWatchLater(content) {
-                try {
-                    const userRef = db.collection('users').doc(appState.currentUser.uid);
-                    const watchLaterRef = userRef.collection('watchLater').doc(content.id);
-                    
-                    const doc = await watchLaterRef.get();
-                    const watchLaterBtn = document.getElementById('watchLaterBtn');
-                    if (!watchLaterBtn) return;
-                    
-                    if (doc.exists) {
-                        // إذا موجود في القائمة - إزالته
-                        await watchLaterRef.delete();
-                        watchLaterBtn.classList.remove('added');
-                        showSuccess('تمت الإزالة من قائمة المشاهدة لاحقاً');
-                    } else {
-                        // إذا غير موجود - إضافته
-                        await watchLaterRef.set({
-                            contentId: content.id,
-                            title: content.title,
-                            thumb: content.thumb,
-                            type: content.number ? 'episode' : 'movie',
-                            addedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        watchLaterBtn.classList.add('added');
-                        showSuccess('تمت الإضافة إلى قائمة المشاهدة لاحقاً');
-                    }
-                } catch (error) {
-                    console.error('خطأ في تبديل حالة المشاهدة لاحقاً:', error);
-                    showError('حدث خطأ أثناء تحديث قائمة المشاهدة لاحقاً');
-                }
-            }
-            
-            function extractYouTubeId(url) {
-                try {
-                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-                    const match = url.match(regExp);
-                    return (match && match[2].length === 11) ? match[2] : null;
-                } catch (error) {
-                    console.error('خطأ في استخراج معرف يوتيوب:', error);
-                    return null;
                 }
             }
             
