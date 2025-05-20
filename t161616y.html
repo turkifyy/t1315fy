@@ -1185,6 +1185,28 @@
                 }
             },
             created() {
+                // تأخير تحميل إعدادات الإعلانات حتى يتم التحقق من صلاحيات المشرف
+auth.onAuthStateChanged(user => {
+  this.user = user;
+  if (user) {
+    this.checkAdminStatus().then(() => {
+      if (this.isAdmin) {
+        this.loadAdSettings(); // يتم تحميلها فقط إذا كان مشرفاً
+      }
+    });
+  }
+});
+
+// تعديل دالة التحقق من الصلاحيات
+async checkAdminStatus() {
+  try {
+    const doc = await db.collection('admins').doc(this.user.uid).get();
+    this.isAdmin = doc.exists;
+  } catch (error) {
+    console.error("Failed to check admin status:", error);
+    this.isAdmin = false;
+  }
+}
                 // متابعة حالة المصادقة
                 auth.onAuthStateChanged(user => {
                     this.user = user;
