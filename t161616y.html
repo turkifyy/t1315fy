@@ -1016,13 +1016,13 @@
     <script>
         // تكوين Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyDEXAMPLEEXAMPLEEXAMPLEEXAMPLE",
-            authDomain: "vod-platform-example.firebaseapp.com",
-            projectId: "vod-platform-example",
-            storageBucket: "vod-platform-example.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:EXAMPLEEXAMPLEEXAMPLE",
-            measurementId: "G-EXAMPLE"
+            apiKey: "AIzaSyDL7PaPWXH7gWbsFoCRZA8cKMov-xcY4bQ",
+            authDomain: "turkify-movies.firebaseapp.com",
+            projectId: "turkify-movies",
+            storageBucket: "turkify-movies.firebasestorage.app",
+            messagingSenderId: "535487522663",
+            appId: "1:535487522663:web:b11bc354d78f9ab388b1c2",
+            measurementId: "G-R9XMGSTVRK"
         };
 
         // تهيئة Firebase
@@ -2011,5 +2011,83 @@
             }
         }).mount('#app');
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      user: null,
+      searchQuery: '',
+      currentPage: 'home',
+      featuredContent: {},
+      homeSections: [],
+      allSeries: [],
+      allMovies: [],
+      watchHistory: [],
+      watchlist: [],
+      showProfileDropdown: false,
+      isAdmin: false,
+      currentSeries: {},
+      currentSeriesSeasons: [],
+      currentVideoUrl: '',
+      currentVideoTitle: '',
+      currentVideoDuration: '',
+      isLiked: false,
+      isDisliked: false,
+      likeCount: 0,
+      dislikeCount: 0,
+      adminTab: 'series',
+      adminSeries: [],
+      adminEpisodes: [],
+      adminMovies: [],
+      adSettings: {
+        publisherId: '',
+        adType: 'banner',
+        preRoll: false,
+        midRoll: false,
+        postRoll: false
+      },
+      stats: {
+        totalViews: 0,
+        activeUsers: 0,
+        avgWatchTime: 0,
+        topContent: [],
+        visitorsByCountry: []
+      },
+      searchResults: []
+    },
+    methods: {
+      showHome() { this.currentPage = 'home'; },
+      showSeries() { this.currentPage = 'series'; },
+      showMovies() { this.currentPage = 'movies'; },
+      showProfile() { this.currentPage = 'profile'; },
+      showAdminPanel() { this.currentPage = 'admin'; },
+      searchContent() { this.currentPage = 'search'; },
+      showSeriesDetails(series) { this.currentPage = 'series-details'; this.currentSeries = series; },
+      playContent(content) { this.currentPage = 'player'; this.currentVideoUrl = content.videoUrl || ''; this.currentVideoTitle = content.title; this.currentVideoDuration = content.duration || ''; },
+      playEpisode(ep) { this.playContent(ep); },
+      playFirstEpisode() {
+        let firstSeason = this.currentSeriesSeasons[0];
+        if (firstSeason && firstSeason.episodes && firstSeason.episodes.length > 0) {
+          this.playEpisode(firstSeason.episodes[0]);
+        }
+      },
+      toggleProfileMenu() { this.showProfileDropdown = !this.showProfileDropdown; },
+      signInWithGoogle() { /* Firebase Sign In Here */ },
+      signOut() { this.user = null; this.currentPage = 'home'; },
+      addToWatchlist(item) { this.watchlist.push(item); },
+      removeFromWatchlist(id) { this.watchlist = this.watchlist.filter(i => i.id !== id); },
+      formatDate(date) { return new Date(date).toLocaleDateString(); },
+      toggleLike() { this.isLiked = !this.isLiked; },
+      toggleDislike() { this.isDisliked = !this.isDisliked; },
+      closePlayer() { this.currentPage = 'home'; },
+      setAdminTab(tab) { this.adminTab = tab; },
+      toggleMobileSidebar() { this.showMobileSidebar = !this.showMobileSidebar; }
+    },
+    mounted() {
+      // تحميل بيانات تجريبية أو من Firebase
+    }
+  });
+</script>
 </body>
 </html>
