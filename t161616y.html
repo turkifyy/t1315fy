@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة VOD - بث الفيديو حسب الطلب</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <style>
+        .hero-slide {
+            height: 70vh;
+            background-size: cover;
+            background-position: center;
+        }
+        .episode-thumb {
+            transition: all 0.3s ease;
+        }
+        .episode-thumb:hover {
+            transform: scale(1.05);
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .hide-sidebar {
+            transform: translateX(100%);
+        }
+        .show-sidebar {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- تطبيق VOD -->
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- شريط التنقل العلوي -->
+        <nav class="bg-black bg-opacity-90 py-3 px-4 fixed w-full z-50">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-6 space-x-reverse">
+                    <a href="#" class="text-red-600 font-bold text-2xl" @click="showHome">VOD</a>
+                    <div class="hidden md:flex space-x-6 space-x-reverse">
+                        <a href="#" class="hover:text-red-500" @click="showHome">الرئيسية</a>
+                        <a href="#" class="hover:text-red-500" @click="showSeries">المسلسلات</a>
+                        <a href="#" class="hover:text-red-500" @click="showMovies">الأفلام</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <div class="relative">
+                        <input type="text" placeholder="بحث..." class="bg-gray-800 rounded-full py-1 px-4 text-sm w-40 md:w-64 focus:outline-none focus:ring-2 focus:ring-red-500" v-model="searchQuery" @keyup.enter="searchContent">
+                        <button class="absolute left-3 top-1/2 transform -translate-y-1/2" @click="searchContent">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <button v-if="!user" @click="signInWithGoogle" class="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded-full text-sm">تسجيل الدخول</button>
+                    <div v-else class="relative">
+                        <button @click="toggleProfileMenu" class="flex items-center space-x-2 space-x-reverse focus:outline-none">
+                            <img :src="user.photoURL" class="w-8 h-8 rounded-full border-2 border-red-600">
+                            <span class="hidden md:inline">{{ user.displayName }}</span>
+                        </button>
+                        <div v-if="showProfileDropdown" class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50">
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-700" @click="showProfile">الملف الشخصي</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-700" @click="showAdminPanel" v-if="isAdmin">لوحة التحكم</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-700" @click="signOut">تسجيل الخروج</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="flex-grow pt-16">
+            <!-- الصفحة الرئيسية -->
+            <div v-if="currentPage === 'home'" class="pb-10">
+                <!-- Hero Slider -->
+                <div class="relative">
+                    <div class="hero-slide" :style="{ 'background-image': 'linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url(' + featuredContent.backdrop + ')' }">
+                        <div class="container mx-auto px-4 h-full flex items-center">
+                            <div class="max-w-2xl">
+                                <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ featuredContent.title }}</h1>
+                                <p class="text-gray-300 mb-6">{{ featuredContent.description }}</p>
+                                <div class="flex space-x-4 space-x-reverse">
+                                    <button @click="playContent(featuredContent)" class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                        </svg>
+                                        تشغيل
+                                    </button>
+                                    <button @click="addToWatchlist(featuredContent)" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                        </svg>
+                                        قائمة المشاهدة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أقسام المحتوى -->
+                <div class="container mx-auto px-4 mt-8">
+                    <section class="mb-10" v-for="section in homeSections" :key="section.title">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl md:text-2xl font-bold">{{ section.title }}</h2>
+                            <a href="#" class="text-red-500 hover:underline" @click="showMore(section.type)">عرض الكل</a>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            <div v-for="item in section.items" :key="item.id" class="relative group">
+                                <div class="aspect-w-2 aspect-h-3 bg-gray-800 rounded-lg overflow-hidden">
+                                    <img :src="item.poster" :alt="item.title" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <button @click="playContent(item)" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <button @click="addToWatchlist(item)" class="absolute top-2 right-2 bg-gray-800 bg-opacity-80 hover:bg-gray-700 text-white p-1 rounded-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h3 class="mt-2 text-sm font-semibold truncate">{{ item.title }}</h3>
+                                <div class="flex items-center text-gray-400 text-xs">
+                                    <span>{{ item.year }}</span>
+                                    <span class="mx-1">•</span>
+                                    <span>{{ item.type === 'movie' ? 'فيلم' : 'مسلسل' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- صفحة المسلسلات -->
+            <div v-if="currentPage === 'series'" class="container mx-auto px-4 py-10">
+                <h1 class="text-2xl md:text-3xl font-bold mb-6">المسلسلات</h1>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <div v-for="series in allSeries" :key="series.id" class="relative group">
+                        <div class="aspect-w-2 aspect-h-3 bg-gray-800 rounded-lg overflow-hidden">
+                            <img :src="series.poster" :alt="series.title" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <button @click="showSeriesDetails(series)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                    عرض التفاصيل
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="mt-2 text-sm font-semibold truncate">{{ series.title }}</h3>
+                        <div class="flex items-center text-gray-400 text-xs">
+                            <span>{{ series.year }}</span>
+                            <span class="mx-1">•</span>
+                            <span>{{ series.seasons }} مواسم</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحة الأفلام -->
+            <div v-if="currentPage === 'movies'" class="container mx-auto px-4 py-10">
+                <h1 class="text-2xl md:text-3xl font-bold mb-6">الأفلام</h1>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <div v-for="movie in allMovies" :key="movie.id" class="relative group">
+                        <div class="aspect-w-2 aspect-h-3 bg-gray-800 rounded-lg overflow-hidden">
+                            <img :src="movie.poster" :alt="movie.title" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <button @click="playContent(movie)" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="mt-2 text-sm font-semibold truncate">{{ movie.title }}</h3>
+                        <div class="flex items-center text-gray-400 text-xs">
+                            <span>{{ movie.year }}</span>
+                            <span class="mx-1">•</span>
+                            <span>{{ movie.duration }} دقيقة</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحة تفاصيل المسلسل -->
+            <div v-if="currentPage === 'series-details'" class="pb-10">
+                <div class="relative">
+                    <div class="h-64 md:h-96 w-full bg-cover bg-center" :style="{ 'background-image': 'linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 100%), url(' + currentSeries.backdrop + ')' }"></div>
+                    <div class="container mx-auto px-4 relative -mt-16 md:-mt-24">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/4 mb-6 md:mb-0 md:pr-6">
+                                <img :src="currentSeries.poster" :alt="currentSeries.title" class="w-full rounded-lg shadow-lg">
+                            </div>
+                            <div class="md:w-3/4">
+                                <h1 class="text-3xl md:text-4xl font-bold mb-2">{{ currentSeries.title }}</h1>
+                                <div class="flex items-center space-x-4 space-x-reverse mb-4">
+                                    <span class="text-yellow-400 font-bold">{{ currentSeries.rating }}/10</span>
+                                    <span>{{ currentSeries.year }}</span>
+                                    <span>{{ currentSeries.seasons }} مواسم</span>
+                                    <span>{{ currentSeries.episodes }} حلقات</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span v-for="genre in currentSeries.genres" :key="genre" class="bg-gray-700 text-white px-3 py-1 rounded-full text-sm">{{ genre }}</span>
+                                </div>
+                                <p class="text-gray-300 mb-6">{{ currentSeries.description }}</p>
+                                <div class="flex space-x-4 space-x-reverse mb-8">
+                                    <button @click="playFirstEpisode" class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                        </svg>
+                                        تشغيل الحلقة الأولى
+                                    </button>
+                                    <button @click="addToWatchlist(currentSeries)" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                        </svg>
+                                        قائمة المشاهدة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- قائمة الحلقات -->
+                        <div class="mt-10">
+                            <h2 class="text-xl md:text-2xl font-bold mb-6">الحلقات</h2>
+                            <div class="bg-gray-800 rounded-lg overflow-hidden">
+                                <div v-for="season in currentSeriesSeasons" :key="season.number" class="mb-6">
+                                    <div class="bg-gray-700 px-4 py-3 flex justify-between items-center cursor-pointer" @click="toggleSeason(season.number)">
+                                        <h3 class="font-semibold">الموسم {{ season.number }}</h3>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform" :class="{ 'rotate-180': season.expanded }" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div v-if="season.expanded" class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div v-for="episode in getEpisodesForSeason(season.number)" :key="episode.id" class="bg-gray-900 rounded-lg overflow-hidden flex">
+                                            <div class="w-1/3 relative">
+                                                <img :src="episode.thumbnail" :alt="episode.title" class="w-full h-full object-cover">
+                                                <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                                    <button @click="playEpisode(episode)" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="w-2/3 p-3">
+                                                <h4 class="font-semibold">{{ episode.episodeNumber }}. {{ episode.title }}</h4>
+                                                <p class="text-gray-400 text-sm mt-1">{{ episode.duration }} دقيقة</p>
+                                                <p class="text-gray-400 text-sm mt-2 line-clamp-2">{{ episode.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- مسلسلات مشابهة -->
+                        <div class="mt-10">
+                            <h2 class="text-xl md:text-2xl font-bold mb-6">مسلسلات مشابهة</h2>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                <div v-for="series in similarSeries" :key="series.id" class="relative group">
+                                    <div class="aspect-w-2 aspect-h-3 bg-gray-800 rounded-lg overflow-hidden">
+                                        <img :src="series.poster" :alt="series.title" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                            <button @click="showSeriesDetails(series)" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                                عرض التفاصيل
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <h3 class="mt-2 text-sm font-semibold truncate">{{ series.title }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- مشغل الفيديو -->
+            <div v-if="currentPage === 'player'" class="fixed inset-0 bg-black z-50">
+                <div class="absolute top-4 right-4 z-50">
+                    <button @click="closePlayer" class="bg-gray-800 bg-opacity-70 hover:bg-gray-700 text-white p-2 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="w-full h-full flex items-center justify-center">
+                    <div class="w-full max-w-6xl px-4">
+                        <div class="video-container">
+                            <iframe :src="currentVideoUrl" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                        <div class="mt-4 px-4">
+                            <h2 class="text-xl font-bold">{{ currentVideoTitle }}</h2>
+                            <div class="flex justify-between items-center mt-2">
+                                <div class="flex items-center space-x-4 space-x-reverse">
+                                    <button @click="toggleLike" class="flex items-center space-x-1 space-x-reverse">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{'text-red-500 fill-current': isLiked, 'text-gray-400': !isLiked}" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                        </svg>
+                                        <span>{{ likeCount }}</span>
+                                    </button>
+                                    <button @click="toggleDislike" class="flex items-center space-x-1 space-x-reverse">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{'text-red-500 fill-current': isDisliked, 'text-gray-400': !isDisliked}" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.017a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                                        </svg>
+                                        <span>{{ dislikeCount }}</span>
+                                    </button>
+                                </div>
+                                <div class="text-gray-400">{{ currentVideoDuration }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحة الملف الشخصي -->
+            <div v-if="currentPage === 'profile'" class="container mx-auto px-4 py-10">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/4 mb-8 md:mb-0 md:pr-8">
+                        <div class="bg-gray-800 rounded-lg p-6 text-center">
+                            <img :src="user.photoURL" :alt="user.displayName" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-red-600">
+                            <h2 class="text-xl font-bold">{{ user.displayName }}</h2>
+                            <p class="text-gray-400">{{ user.email }}</p>
+                            <div class="mt-4">
+                                <button @click="signOut" class="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded-full text-sm">تسجيل الخروج</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-3/4">
+                        <div class="bg-gray-800 rounded-lg p-6">
+                            <h2 class="text-xl font-bold mb-6">سجل المشاهدة</h2>
+                            <div v-if="watchHistory.length > 0">
+                                <div v-for="item in watchHistory" :key="item.id" class="flex mb-4 pb-4 border-b border-gray-700 last:border-0">
+                                    <div class="w-1/4">
+                                        <img :src="item.poster" :alt="item.title" class="w-full rounded">
+                                    </div>
+                                    <div class="w-3/4 pr-4">
+                                        <h3 class="font-semibold">{{ item.title }}</h3>
+                                        <p class="text-gray-400 text-sm mb-2">{{ item.type === 'movie' ? 'فيلم' : 'مسلسل' }} • {{ item.year }}</p>
+                                        <p class="text-gray-400 text-sm">آخر مشاهدة: {{ formatDate(item.watchedAt) }}</p>
+                                        <button @click="playContent(item)" class="mt-2 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm">استئناف المشاهدة</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="text-center py-8 text-gray-400">
+                                <p>لا يوجد سجل مشاهدة حتى الآن</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-800 rounded-lg p-6 mt-6">
+                            <h2 class="text-xl font-bold mb-6">قائمة المشاهدة</h2>
+                            <div v-if="watchlist.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                <div v-for="item in watchlist" :key="item.id" class="relative group">
+                                    <div class="aspect-w-2 aspect-h-3 bg-gray-700 rounded-lg overflow-hidden">
+                                        <img :src="item.poster" :alt="item.title" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                            <button @click="playContent(item)" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                            <button @click="removeFromWatchlist(item.id)" class="absolute top-2 right-2 bg-gray-800 bg-opacity-80 hover:bg-gray-700 text-white p-1 rounded-full">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <h3 class="mt-2 text-sm font-semibold truncate">{{ item.title }}</h3>
+                                </div>
+                            </div>
+                            <div v-else class="text-center py-8 text-gray-400">
+                                <p>لم تقم بإضافة أي محتوى إلى قائمة المشاهدة بعد</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- لوحة التحكم الإدارية -->
+            <div v-if="currentPage === 'admin'" class="flex min-h-screen">
+                <!-- Sidebar -->
+                <div class="w-64 bg-gray-800 fixed h-full z-40" :class="{ 'hidden md:block': !showMobileSidebar, 'block': showMobileSidebar }">
+                    <div class="p-4 border-b border-gray-700">
+                        <h2 class="text-xl font-bold text-red-500">لوحة التحكم</h2>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-6">
+                            <h3 class="text-gray-400 uppercase text-xs font-semibold mb-2">المحتوى</h3>
+                            <ul>
+                                <li class="mb-1">
+                                    <a href="#" @click="setAdminTab('series')" class="block px-3 py-2 rounded" :class="{'bg-gray-700 text-white': adminTab === 'series', 'text-gray-300 hover:bg-gray-700': adminTab !== 'series'}">المسلسلات</a>
+                                </li>
+                                <li class="mb-1">
+                                    <a href="#" @click="setAdminTab('episodes')" class="block px-3 py-2 rounded" :class="{'bg-gray-700 text-white': adminTab === 'episodes', 'text-gray-300 hover:bg-gray-700': adminTab !== 'episodes'}">الحلقات</a>
+                                </li>
+                                <li class="mb-1">
+                                    <a href="#" @click="setAdminTab('movies')" class="block px-3 py-2 rounded" :class="{'bg-gray-700 text-white': adminTab === 'movies', 'text-gray-300 hover:bg-gray-700': adminTab !== 'movies'}">الأفلام</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="text-gray-400 uppercase text-xs font-semibold mb-2">الإعلانات</h3>
+                            <ul>
+                                <li class="mb-1">
+                                    <a href="#" @click="setAdminTab('ads')" class="block px-3 py-2 rounded" :class="{'bg-gray-700 text-white': adminTab === 'ads', 'text-gray-300 hover:bg-gray-700': adminTab !== 'ads'}">إدارة الإعلانات</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-400 uppercase text-xs font-semibold mb-2">الإحصائيات</h3>
+                            <ul>
+                                <li class="mb-1">
+                                    <a href="#" @click="setAdminTab('stats')" class="block px-3 py-2 rounded" :class="{'bg-gray-700 text-white': adminTab === 'stats', 'text-gray-300 hover:bg-gray-700': adminTab !== 'stats'}">إحصائيات المشاهدة</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="flex-1 md:ml-64">
+                    <!-- Top Bar -->
+                    <div class="bg-gray-900 p-4 border-b border-gray-800 flex justify-between items-center fixed w-full md:w-[calc(100%-16rem)] z-30">
+                        <button @click="toggleMobileSidebar" class="md:hidden text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <div class="flex items-center space-x-4 space-x-reverse">
+                            <button @click="showHome" class="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm">العودة للمنصة</button>
+                            <button @click="signOut" class="bg-gray-700 hover:bg-gray-600 text-white py-1 px-3 rounded text-sm">تسجيل الخروج</button>
+                        </div>
+                    </div>
+
+                    <!-- Admin Content -->
+                    <div class="pt-16 pb-10 px-4">
+                        <!-- إدارة المسلسلات -->
+                        <div v-if="adminTab === 'series'">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold">إدارة المسلسلات</h2>
+                                <button @click="openAddSeriesModal" class="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded text-sm">إضافة مسلسل جديد</button>
+                            </div>
+                            
+                            <div class="bg-gray-800 rounded-lg overflow-hidden">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-700">
+                                        <tr>
+                                            <th class="px-4 py-3 text-right">الصورة</th>
+                                            <th class="px-4 py-3 text-right">العنوان</th>
+                                            <th class="px-4 py-3 text-right">السنة</th>
+                                            <th class="px-4 py-3 text-right">التقييم</th>
+                                            <th class="px-4 py-3 text-right">الحالة</th>
+                                            <th class="px-4 py-3 text-right">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-700">
+                                        <tr v-for="series in adminSeries" :key="series.id">
+                                            <td class="px-4 py-3">
+                                                <img :src="series.poster" :alt="series.title" class="w-16 h-20 object-cover rounded">
+                                            </td>
+                                            <td class="px-4 py-3">{{ series.title }}</td>
+                                            <td class="px-4 py-3">{{ series.year }}</td>
+                                            <td class="px-4 py-3">{{ series.rating }}/10</td>
+                                            <td class="px-4 py-3">
+                                                <span class="px-2 py-1 rounded-full text-xs" :class="{'bg-green-500 text-white': series.status === 'مكتمل', 'bg-yellow-500 text-white': series.status === 'مستمر', 'bg-red-500 text-white': series.status === 'متوقف'}">{{ series.status }}</span>
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <button @click="editSeries(series)" class="text-blue-400 hover:text-blue-300 mr-2">تعديل</button>
+                                                <button @click="confirmDeleteSeries(series.id)" class="text-red-400 hover:text-red-300">حذف</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- إدارة الحلقات -->
+                        <div v-if="adminTab === 'episodes'">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold">إدارة الحلقات</h2>
+                                <button @click="openAddEpisodeModal" class="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded text-sm">إضافة حلقة جديدة</button>
+                            </div>
+                            
+                            <div class="bg-gray-800 rounded-lg overflow-hidden">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-700">
+                                        <tr>
+                                            <th class="px-4 py-3 text-right">المسلسل</th>
+                                            <th class="px-4 py-3 text-right">الموسم</th>
+                                            <th class="px-4 py-3 text-right">الحلقة</th>
+                                            <th class="px-4 py-3 text-right">العنوان</th>
+                                            <th class="px-4 py-3 text-right">المدة</th>
+                                            <th class="px-4 py-3 text-right">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-700">
+                                        <tr v-for="episode in adminEpisodes" :key="episode.id">
+                                            <td class="px-4 py-3">{{ getSeriesTitle(episode.seriesId) }}</td>
+                                            <td class="px-4 py-3">{{ episode.season }}</td>
+                                            <td class="px-4 py-3">{{ episode.episodeNumber }}</td>
+                                            <td class="px-4 py-3">{{ episode.title }}</td>
+                                            <td class="px-4 py-3">{{ episode.duration }} دقيقة</td>
+                                            <td class="px-4 py-3">
+                                                <button @click="editEpisode(episode)" class="text-blue-400 hover:text-blue-300 mr-2">تعديل</button>
+                                                <button @click="confirmDeleteEpisode(episode.id)" class="text-red-400 hover:text-red-300">حذف</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- إدارة الأفلام -->
+                        <div v-if="adminTab === 'movies'">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold">إدارة الأفلام</h2>
+                                <button @click="openAddMovieModal" class="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded text-sm">إضافة فيلم جديد</button>
+                            </div>
+                            
+                            <div class="bg-gray-800 rounded-lg overflow-hidden">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-700">
+                                        <tr>
+                                            <th class="px-4 py-3 text-right">الصورة</th>
+                                            <th class="px-4 py-3 text-right">العنوان</th>
+                                            <th class="px-4 py-3 text-right">السنة</th>
+                                            <th class="px-4 py-3 text-right">المدة</th>
+                                            <th class="px-4 py-3 text-right">التقييم</th>
+                                            <th class="px-4 py-3 text-right">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-700">
+                                        <tr v-for="movie in adminMovies" :key="movie.id">
+                                            <td class="px-4 py-3">
+                                                <img :src="movie.poster" :alt="movie.title" class="w-16 h-20 object-cover rounded">
+                                            </td>
+                                            <td class="px-4 py-3">{{ movie.title }}</td>
+                                            <td class="px-4 py-3">{{ movie.year }}</td>
+                                            <td class="px-4 py-3">{{ movie.duration }} دقيقة</td>
+                                            <td class="px-4 py-3">{{ movie.rating }}/10</td>
+                                            <td class="px-4 py-3">
+                                                <button @click="editMovie(movie)" class="text-blue-400 hover:text-blue-300 mr-2">تعديل</button>
+                                                <button @click="confirmDeleteMovie(movie.id)" class="text-red-400 hover:text-red-300">حذف</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- إدارة الإعلانات -->
+                        <div v-if="adminTab === 'ads'">
+                            <h2 class="text-xl font-bold mb-6">إدارة الإعلانات</h2>
+                            
+                            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                                <h3 class="text-lg font-semibold mb-4">إعدادات Adsterra</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-gray-400 mb-2">معرف الناشر</label>
+                                        <input type="text" v-model="adSettings.publisherId" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-400 mb-2">نوع الإعلان</label>
+                                        <select v-model="adSettings.adType" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                            <option value="banner">بانر</option>
+                                            <option value="popunder">بوب أندر</option>
+                                            <option value="directlink">رابط مباشر</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <button @click="saveAdSettings" class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded">حفظ الإعدادات</button>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-6">
+                                <h3 class="text-lg font-semibold mb-4">تحكم في عرض الإعلانات</h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-gray-400">إعلانات ما قبل التشغيل</label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" v-model="adSettings.preRoll" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-gray-400">إعلانات أثناء التشغيل</label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" v-model="adSettings.midRoll" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-gray-400">إعلانات بعد التشغيل</label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" v-model="adSettings.postRoll" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الإحصائيات -->
+                        <div v-if="adminTab === 'stats'">
+                            <h2 class="text-xl font-bold mb-6">إحصائيات المشاهدة</h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                                <div class="bg-gray-800 rounded-lg p-6">
+                                    <h3 class="text-lg font-semibold mb-2">إجمالي المشاهدات</h3>
+                                    <p class="text-3xl font-bold">{{ stats.totalViews }}</p>
+                                </div>
+                                <div class="bg-gray-800 rounded-lg p-6">
+                                    <h3 class="text-lg font-semibold mb-2">المستخدمون النشطون</h3>
+                                    <p class="text-3xl font-bold">{{ stats.activeUsers }}</p>
+                                </div>
+                                <div class="bg-gray-800 rounded-lg p-6">
+                                    <h3 class="text-lg font-semibold mb-2">متوسط وقت المشاهدة</h3>
+                                    <p class="text-3xl font-bold">{{ stats.avgWatchTime }} دقيقة</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                                <h3 class="text-lg font-semibold mb-4">أكثر المحتويات مشاهدة</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full">
+                                        <thead class="bg-gray-700">
+                                            <tr>
+                                                <th class="px-4 py-3 text-right">#</th>
+                                                <th class="px-4 py-3 text-right">العنوان</th>
+                                                <th class="px-4 py-3 text-right">النوع</th>
+                                                <th class="px-4 py-3 text-right">المشاهدات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-700">
+                                            <tr v-for="(item, index) in stats.topContent" :key="item.id">
+                                                <td class="px-4 py-3">{{ index + 1 }}</td>
+                                                <td class="px-4 py-3">{{ item.title }}</td>
+                                                <td class="px-4 py-3">{{ item.type === 'movie' ? 'فيلم' : 'مسلسل' }}</td>
+                                                <td class="px-4 py-3">{{ item.views }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-6">
+                                <h3 class="text-lg font-semibold mb-4">توزيع الزوار حسب الدولة</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full">
+                                        <thead class="bg-gray-700">
+                                            <tr>
+                                                <th class="px-4 py-3 text-right">#</th>
+                                                <th class="px-4 py-3 text-right">الدولة</th>
+                                                <th class="px-4 py-3 text-right">عدد الزوار</th>
+                                                <th class="px-4 py-3 text-right">النسبة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-700">
+                                            <tr v-for="(country, index) in stats.visitorsByCountry" :key="country.code">
+                                                <td class="px-4 py-3">{{ index + 1 }}</td>
+                                                <td class="px-4 py-3">{{ country.name }}</td>
+                                                <td class="px-4 py-3">{{ country.visitors }}</td>
+                                                <td class="px-4 py-3">{{ country.percentage }}%</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحة البحث -->
+            <div v-if="currentPage === 'search'" class="container mx-auto px-4 py-10">
+                <h1 class="text-2xl md:text-3xl font-bold mb-6">نتائج البحث عن "{{ searchQuery }}"</h1>
+                
+                <div v-if="searchResults.length > 0">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                        <div v-for="item in searchResults" :key="item.id" class="relative group">
+                            <div class="aspect-w-2 aspect-h-3 bg-gray-800 rounded-lg overflow-hidden">
+                                <img :src="item.poster" :alt="item.title" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <button @click="item.type === 'series' ? showSeriesDetails(item) : playContent(item)" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <h3 class="mt-2 text-sm font-semibold truncate">{{ item.title }}</h3>
+                            <div class="flex items-center text-gray-400 text-xs">
+                                <span>{{ item.year }}</span>
+                                <span class="mx-1">•</span>
+                                <span>{{ item.type === 'movie' ? 'فيلم' : 'مسلسل' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="text-center py-16 text-gray-400">
+                    <p>لا توجد نتائج مطابقة لبحثك</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- تذييل الصفحة -->
+        <footer class="bg-black bg-opacity-90 py-8">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold text-red-600 mb-4">VOD</h3>
+                        <p class="text-gray-400">منصة بث الفيديو حسب الطلب الأولى في العالم العربي. استمتع بأفضل المسلسلات والأفلام في أي وقت ومن أي مكان.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">روابط سريعة</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-red-500" @click="showHome">الرئيسية</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-red-500" @click="showSeries">المسلسلات</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-red-500" @click="showMovies">الأفلام</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">حول المنصة</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-red-500">عن المنصة</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-red-500">اتصل بنا</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-red-500">الشروط والأحكام</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-red-500">سياسة الخصوصية</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">تابعنا</h4>
+                        <div class="flex space-x-4 space-x-reverse">
+                            <a href="#" class="text-gray-400 hover:text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500">
+                    <p>© 2023 منصة VOD. جميع الحقوق محفوظة.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <!-- Modal إضافة/تعديل مسلسل -->
+    <div v-if="showSeriesModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">{{ isEditingSeries ? 'تعديل مسلسل' : 'إضافة مسلسل جديد' }}</h3>
+                    <button @click="closeSeriesModal" class="text-gray-400 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-400 mb-2">العنوان</label>
+                        <input type="text" v-model="seriesForm.title" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">السنة</label>
+                            <input type="number" v-model="seriesForm.year" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">التقييم</label>
+                            <input type="number" step="0.1" v-model="seriesForm.rating" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">عدد المواسم</label>
+                            <input type="number" v-model="seriesForm.seasons" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">عدد الحلقات</label>
+                            <input type="number" v-model="seriesForm.episodes" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">الحالة</label>
+                        <select v-model="seriesForm.status" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                            <option value="مستمر">مستمر</option>
+                            <option value="مكتمل">مكتمل</option>
+                            <option value="متوقف">متوقف</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">الأصناف</label>
+                        <div class="flex flex-wrap gap-2">
+                            <span v-for="genre in availableGenres" :key="genre" @click="toggleGenre(genre)" class="px-3 py-1 rounded-full text-sm cursor-pointer" :class="{'bg-red-600 text-white': seriesForm.genres.includes(genre), 'bg-gray-700 text-gray-300': !seriesForm.genres.includes(genre)}">{{ genre }}</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">رابط الصورة (بوستر)</label>
+                        <input type="text" v-model="seriesForm.poster" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">رابط الخلفية</label>
+                        <input type="text" v-model="seriesForm.backdrop" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">القصة</label>
+                        <textarea v-model="seriesForm.description" rows="4" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 space-x-reverse pt-4">
+                        <button @click="closeSeriesModal" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded">إلغاء</button>
+                        <button @click="saveSeries" class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded">{{ isEditingSeries ? 'حفظ التعديلات' : 'إضافة مسلسل' }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal إضافة/تعديل حلقة -->
+    <div v-if="showEpisodeModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">{{ isEditingEpisode ? 'تعديل حلقة' : 'إضافة حلقة جديدة' }}</h3>
+                    <button @click="closeEpisodeModal" class="text-gray-400 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-400 mb-2">المسلسل</label>
+                        <select v-model="episodeForm.seriesId" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                            <option v-for="series in adminSeries" :key="series.id" :value="series.id">{{ series.title }}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">الموسم</label>
+                            <input type="number" v-model="episodeForm.season" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">رقم الحلقة</label>
+                            <input type="number" v-model="episodeForm.episodeNumber" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">عنوان الحلقة</label>
+                        <input type="text" v-model="episodeForm.title" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">رابط الفيديو</label>
+                        <input type="text" v-model="episodeForm.videoUrl" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">المدة (دقيقة)</label>
+                            <input type="number" v-model="episodeForm.duration" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">رابط الصورة المصغرة</label>
+                            <input type="text" v-model="episodeForm.thumbnail" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">وصف الحلقة</label>
+                        <textarea v-model="episodeForm.description" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 space-x-reverse pt-4">
+                        <button @click="closeEpisodeModal" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded">إلغاء</button>
+                        <button @click="saveEpisode" class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded">{{ isEditingEpisode ? 'حفظ التعديلات' : 'إضافة حلقة' }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal إضافة/تعديل فيلم -->
+    <div v-if="showMovieModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">{{ isEditingMovie ? 'تعديل فيلم' : 'إضافة فيلم جديد' }}</h3>
+                    <button @click="closeMovieModal" class="text-gray-400 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-400 mb-2">العنوان</label>
+                        <input type="text" v-model="movieForm.title" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">السنة</label>
+                            <input type="number" v-model="movieForm.year" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">المدة (دقيقة)</label>
+                            <input type="number" v-model="movieForm.duration" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">التقييم</label>
+                            <input type="number" step="0.1" v-model="movieForm.rating" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">رابط الفيديو</label>
+                            <input type="text" v-model="movieForm.videoUrl" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">الأصناف</label>
+                        <div class="flex flex-wrap gap-2">
+                            <span v-for="genre in availableGenres" :key="genre" @click="toggleMovieGenre(genre)" class="px-3 py-1 rounded-full text-sm cursor-pointer" :class="{'bg-red-600 text-white': movieForm.genres.includes(genre), 'bg-gray-700 text-gray-300': !movieForm.genres.includes(genre)}">{{ genre }}</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">رابط الصورة (بوستر)</label>
+                        <input type="text" v-model="movieForm.poster" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">رابط الخلفية</label>
+                        <input type="text" v-model="movieForm.backdrop" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 mb-2">القصة</label>
+                        <textarea v-model="movieForm.description" rows="4" class="w-full bg-gray-700 border border-gray-600 rounded py-2 px-3 focus:outline-none focus:ring-1 focus:ring-red-500"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 space-x-reverse pt-4">
+                        <button @click="closeMovieModal" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded">إلغاء</button>
+                        <button @click="saveMovie" class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded">{{ isEditingMovie ? 'حفظ التعديلات' : 'إضافة فيلم' }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal تأكيد الحذف -->
+    <div v-if="showConfirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg max-w-md w-full">
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-4">تأكيد الحذف</h3>
+                <p class="text-gray-300 mb-6">هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذه العملية.</p>
+                <div class="flex justify-end space-x-3 space-x-reverse">
+                    <button @click="closeConfirmModal" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded">إلغاء</button>
+                    <button @click="confirmDelete" class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded">حذف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        // تكوين Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEXAMPLEEXAMPLEEXAMPLEEXAMPLE",
+            authDomain: "vod-platform-example.firebaseapp.com",
+            projectId: "vod-platform-example",
+            storageBucket: "vod-platform-example.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:EXAMPLEEXAMPLEEXAMPLE",
+            measurementId: "G-EXAMPLE"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
+
+        // تطبيق Vue
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    currentPage: 'home',
+                    user: null,
+                    isAdmin: false,
+                    showProfileDropdown: false,
+                    
+                    // بيانات الصفحة الرئيسية
+                    featuredContent: {
+                        title: 'مسلسل جديد',
+                        description: 'وصف المسلسل الجديد الذي سيتم عرضه هنا كمسلسل مميز على المنصة.',
+                        backdrop: 'https://via.placeholder.com/1920x1080',
+                        poster: 'https://via.placeholder.com/300x450',
+                        year: 2023,
+                        rating: 8.5,
+                        type: 'series',
+                        id: '1'
+                    },
+                    homeSections: [
+                        {
+                            title: 'أحدث المسلسلات',
+                            type: 'series',
+                            items: []
+                        },
+                        {
+                            title: 'أحدث الأفلام',
+                            type: 'movies',
+                            items: []
+                        },
+                        {
+                            title: 'الأكثر مشاهدة',
+                            type: 'trending',
+                            items: []
+                        }
+                    ],
+                    
+                    // بيانات المسلسلات والأفلام
+                    allSeries: [],
+                    allMovies: [],
+                    currentSeries: null,
+                    currentSeriesSeasons: [],
+                    similarSeries: [],
+                    
+                    // بيانات المشغل
+                    currentVideoUrl: '',
+                    currentVideoTitle: '',
+                    currentVideoDuration: '',
+                    isLiked: false,
+                    isDisliked: false,
+                    likeCount: 0,
+                    dislikeCount: 0,
+                    
+                    // بيانات الملف الشخصي
+                    watchHistory: [],
+                    watchlist: [],
+                    
+                    // بيانات البحث
+                    searchQuery: '',
+                    searchResults: [],
+                    
+                    // لوحة التحكم الإدارية
+                    adminTab: 'series',
+                    showMobileSidebar: false,
+                    adminSeries: [],
+                    adminEpisodes: [],
+                    adminMovies: [],
+                    stats: {
+                        totalViews: 12543,
+                        activeUsers: 842,
+                        avgWatchTime: 45,
+                        topContent: [
+                            { id: '1', title: 'المسلسل الأول', type: 'series', views: 3250 },
+                            { id: '2', title: 'الفيلم الأول', type: 'movie', views: 2840 },
+                            { id: '3', title: 'المسلسل الثاني', type: 'series', views: 2150 }
+                        ],
+                        visitorsByCountry: [
+                            { code: 'SA', name: 'السعودية', visitors: 4520, percentage: 36 },
+                            { code: 'EG', name: 'مصر', visitors: 3850, percentage: 31 },
+                            { code: 'AE', name: 'الإمارات', visitors: 2150, percentage: 17 },
+                            { code: 'KW', name: 'الكويت', visitors: 980, percentage: 8 },
+                            { code: 'QA', name: 'قطر', visitors: 720, percentage: 6 },
+                            { code: 'Other', name: 'أخرى', visitors: 320, percentage: 2 }
+                        ]
+                    },
+                    adSettings: {
+                        publisherId: '',
+                        adType: 'banner',
+                        preRoll: true,
+                        midRoll: true,
+                        postRoll: false
+                    },
+                    
+                    // نماذج الإدارة
+                    showSeriesModal: false,
+                    isEditingSeries: false,
+                    seriesForm: {
+                        id: '',
+                        title: '',
+                        year: 2023,
+                        rating: 7.5,
+                        seasons: 1,
+                        episodes: 10,
+                        status: 'مستمر',
+                        genres: [],
+                        poster: 'https://via.placeholder.com/300x450',
+                        backdrop: 'https://via.placeholder.com/1920x1080',
+                        description: ''
+                    },
+                    
+                    showEpisodeModal: false,
+                    isEditingEpisode: false,
+                    episodeForm: {
+                        id: '',
+                        seriesId: '',
+                        season: 1,
+                        episodeNumber: 1,
+                        title: '',
+                        videoUrl: '',
+                        duration: 45,
+                        thumbnail: 'https://via.placeholder.com/300x170',
+                        description: ''
+                    },
+                    
+                    showMovieModal: false,
+                    isEditingMovie: false,
+                    movieForm: {
+                        id: '',
+                        title: '',
+                        year: 2023,
+                        duration: 120,
+                        rating: 7.5,
+                        genres: [],
+                        poster: 'https://via.placeholder.com/300x450',
+                        backdrop: 'https://via.placeholder.com/1920x1080',
+                        videoUrl: '',
+                        description: ''
+                    },
+                    
+                    showConfirmModal: false,
+                    itemToDelete: null,
+                    deleteType: '',
+                    
+                    availableGenres: [
+                        'أكشن', 'مغامرة', 'كوميدي', 'دراما', 'خيال علمي', 
+                        'رعب', 'غموض', 'رومانسي', 'تاريخي', 'جريمة', 
+                        'وثائقي', 'أنيميشن', 'عائلي', 'حرب', 'غرب أمريكي'
+                    ]
+                }
+            },
+            created() {
+                // متابعة حالة المصادقة
+                auth.onAuthStateChanged(user => {
+                    this.user = user;
+                    if (user) {
+                        this.checkAdminStatus();
+                        this.loadUserData();
+                        analytics.setUserId(user.uid);
+                        analytics.logEvent('login');
+                    } else {
+                        this.isAdmin = false;
+                    }
+                });
+                
+                // تحميل البيانات الأولية
+                this.loadHomeData();
+                this.loadAllSeries();
+                this.loadAllMovies();
+                this.loadAdminData();
+            },
+            methods: {
+                // طرق التنقل
+                showHome() {
+                    this.currentPage = 'home';
+                    analytics.logEvent('view_home');
+                },
+                showSeries() {
+                    this.currentPage = 'series';
+                    analytics.logEvent('view_series');
+                },
+                showMovies() {
+                    this.currentPage = 'movies';
+                    analytics.logEvent('view_movies');
+                },
+                showProfile() {
+                    this.currentPage = 'profile';
+                    this.showProfileDropdown = false;
+                    analytics.logEvent('view_profile');
+                },
+                showAdminPanel() {
+                    this.currentPage = 'admin';
+                    this.showProfileDropdown = false;
+                    analytics.logEvent('view_admin');
+                },
+                showMore(type) {
+                    if (type === 'series') {
+                        this.showSeries();
+                    } else if (type === 'movies') {
+                        this.showMovies();
+                    }
+                },
+                showSeriesDetails(series) {
+                    this.currentPage = 'series-details';
+                    this.currentSeries = series;
+                    this.loadSeriesDetails(series.id);
+                    analytics.logEvent('view_series_details', { series_id: series.id });
+                },
+                toggleProfileMenu() {
+                    this.showProfileDropdown = !this.showProfileDropdown;
+                },
+                
+                // طرق تشغيل المحتوى
+                playContent(content) {
+                    if (content.type === 'movie') {
+                        this.playMovie(content);
+                    } else if (content.type === 'series') {
+                        this.showSeriesDetails(content);
+                    }
+                },
+                playMovie(movie) {
+                    this.currentVideoUrl = movie.videoUrl;
+                    this.currentVideoTitle = movie.title;
+                    this.currentVideoDuration = movie.duration + ' دقيقة';
+                    this.currentPage = 'player';
+                    
+                    // تسجيل المشاهدة
+                    if (this.user) {
+                        this.recordWatchHistory(movie);
+                    }
+                    
+                    analytics.logEvent('play_movie', { movie_id: movie.id });
+                },
+                playEpisode(episode) {
+                    this.currentVideoUrl = episode.videoUrl;
+                    this.currentVideoTitle = `${this.currentSeries.title} - الحلقة ${episode.episodeNumber}`;
+                    this.currentVideoDuration = episode.duration + ' دقيقة';
+                    this.currentPage = 'player';
+                    
+                    // تسجيل المشاهدة
+                    if (this.user) {
+                        this.recordWatchHistory({
+                            id: `${this.currentSeries.id}_${episode.id}`,
+                            title: `${this.currentSeries.title} - الحلقة ${episode.episodeNumber}`,
+                            type: 'episode',
+                            poster: this.currentSeries.poster,
+                            year: this.currentSeries.year
+                        });
+                    }
+                    
+                    analytics.logEvent('play_episode', { 
+                        series_id: this.currentSeries.id,
+                        episode_id: episode.id 
+                    });
+                },
+                playFirstEpisode() {
+                    const firstEpisode = this.getEpisodesForSeason(1)[0];
+                    if (firstEpisode) {
+                        this.playEpisode(firstEpisode);
+                    }
+                },
+                closePlayer() {
+                    this.currentPage = 'home';
+                },
+                toggleLike() {
+                    this.isLiked = !this.isLiked;
+                    if (this.isLiked) {
+                        this.likeCount++;
+                        if (this.isDisliked) {
+                            this.isDisliked = false;
+                            this.dislikeCount--;
+                        }
+                    } else {
+                        this.likeCount--;
+                    }
+                },
+                toggleDislike() {
+                    this.isDisliked = !this.isDisliked;
+                    if (this.isDisliked) {
+                        this.dislikeCount++;
+                        if (this.isLiked) {
+                            this.isLiked = false;
+                            this.likeCount--;
+                        }
+                    } else {
+                        this.dislikeCount--;
+                    }
+                },
+                
+                // طرق البحث
+                searchContent() {
+                    if (this.searchQuery.trim() === '') return;
+                    
+                    this.searchResults = [
+                        ...this.allSeries.filter(series => 
+                            series.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+                        ),
+                        ...this.allMovies.filter(movie => 
+                            movie.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+                        )
+                    ];
+                    
+                    this.currentPage = 'search';
+                    analytics.logEvent('search', { query: this.searchQuery });
+                },
+                
+                // طرق المصادقة
+                signInWithGoogle() {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    auth.signInWithPopup(provider)
+                        .then(result => {
+                            this.user = result.user;
+                            this.checkAdminStatus();
+                            this.loadUserData();
+                            analytics.logEvent('google_login_success');
+                        })
+                        .catch(error => {
+                            console.error('Error signing in with Google:', error);
+                            analytics.logEvent('google_login_error', { error: error.message });
+                        });
+                },
+                signOut() {
+                    auth.signOut()
+                        .then(() => {
+                            this.user = null;
+                            this.isAdmin = false;
+                            this.currentPage = 'home';
+                            analytics.logEvent('logout');
+                        })
+                        .catch(error => {
+                            console.error('Error signing out:', error);
+                        });
+                },
+                checkAdminStatus() {
+                    if (!this.user) return;
+                    
+                    db.collection('admins').doc(this.user.uid).get()
+                        .then(doc => {
+                            this.isAdmin = doc.exists;
+                        })
+                        .catch(error => {
+                            console.error('Error checking admin status:', error);
+                        });
+                },
+                
+                // طرق بيانات المستخدم
+                loadUserData() {
+                    if (!this.user) return;
+                    
+                    // تحميل سجل المشاهدة
+                    db.collection('users').doc(this.user.uid).collection('watchHistory')
+                        .orderBy('watchedAt', 'desc')
+                        .limit(10)
+                        .get()
+                        .then(querySnapshot => {
+                            this.watchHistory = querySnapshot.docs.map(doc => doc.data());
+                        })
+                        .catch(error => {
+                            console.error('Error loading watch history:', error);
+                        });
+                    
+                    // تحميل قائمة المشاهدة
+                    db.collection('users').doc(this.user.uid).collection('watchlist')
+                        .get()
+                        .then(querySnapshot => {
+                            this.watchlist = querySnapshot.docs.map(doc => doc.data());
+                        })
+                        .catch(error => {
+                            console.error('Error loading watchlist:', error);
+                        });
+                },
+                recordWatchHistory(content) {
+                    if (!this.user) return;
+                    
+                    const historyItem = {
+                        id: content.id,
+                        title: content.title,
+                        type: content.type,
+                        poster: content.poster,
+                        year: content.year,
+                        watchedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    db.collection('users').doc(this.user.uid).collection('watchHistory')
+                        .doc(content.id)
+                        .set(historyItem)
+                        .catch(error => {
+                            console.error('Error recording watch history:', error);
+                        });
+                    
+                    // تحديث عدد المشاهدات في المحتوى
+                    const collectionName = content.type === 'movie' ? 'movies' : 'series';
+                    db.collection(collectionName).doc(content.id)
+                        .update({
+                            views: firebase.firestore.FieldValue.increment(1)
+                        })
+                        .catch(error => {
+                            console.error('Error updating views:', error);
+                        });
+                },
+                addToWatchlist(content) {
+                    if (!this.user) return;
+                    
+                    const watchlistItem = {
+                        id: content.id,
+                        title: content.title,
+                        type: content.type,
+                        poster: content.poster,
+                        year: content.year,
+                        addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    db.collection('users').doc(this.user.uid).collection('watchlist')
+                        .doc(content.id)
+                        .set(watchlistItem)
+                        .then(() => {
+                            this.watchlist.push(watchlistItem);
+                            analytics.logEvent('add_to_watchlist', { content_id: content.id });
+                        })
+                        .catch(error => {
+                            console.error('Error adding to watchlist:', error);
+                        });
+                },
+                removeFromWatchlist(contentId) {
+                    if (!this.user) return;
+                    
+                    db.collection('users').doc(this.user.uid).collection('watchlist')
+                        .doc(contentId)
+                        .delete()
+                        .then(() => {
+                            this.watchlist = this.watchlist.filter(item => item.id !== contentId);
+                            analytics.logEvent('remove_from_watchlist', { content_id: contentId });
+                        })
+                        .catch(error => {
+                            console.error('Error removing from watchlist:', error);
+                        });
+                },
+                formatDate(timestamp) {
+                    if (!timestamp) return '';
+                    const date = timestamp.toDate();
+                    return date.toLocaleDateString('ar-EG');
+                },
+                
+                // طرق تحميل البيانات
+                loadHomeData() {
+                    // تحميل المحتوى المميز
+                    db.collection('series').orderBy('rating', 'desc').limit(1).get()
+                        .then(querySnapshot => {
+                            if (!querySnapshot.empty) {
+                                const doc = querySnapshot.docs[0];
+                                this.featuredContent = {
+                                    id: doc.id,
+                                    ...doc.data(),
+                                    type: 'series'
+                                };
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading featured content:', error);
+                        });
+                    
+                    // تحميل أحدث المسلسلات
+                    db.collection('series').orderBy('year', 'desc').limit(5).get()
+                        .then(querySnapshot => {
+                            this.homeSections[0].items = querySnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data(),
+                                type: 'series'
+                            }));
+                        })
+                        .catch(error => {
+                            console.error('Error loading latest series:', error);
+                        });
+                    
+                    // تحميل أحدث الأفلام
+                    db.collection('movies').orderBy('year', 'desc').limit(5).get()
+                        .then(querySnapshot => {
+                            this.homeSections[1].items = querySnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data(),
+                                type: 'movie'
+                            }));
+                        })
+                        .catch(error => {
+                            console.error('Error loading latest movies:', error);
+                        });
+                    
+                    // تحميل المحتوى الأكثر مشاهدة
+                    db.collection('series').orderBy('views', 'desc').limit(3).get()
+                        .then(seriesSnapshot => {
+                            const trendingSeries = seriesSnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data(),
+                                type: 'series'
+                            }));
+                            
+                            db.collection('movies').orderBy('views', 'desc').limit(2).get()
+                                .then(moviesSnapshot => {
+                                    const trendingMovies = moviesSnapshot.docs.map(doc => ({
+                                        id: doc.id,
+                                        ...doc.data(),
+                                        type: 'movie'
+                                    }));
+                                    
+                                    this.homeSections[2].items = [...trendingSeries, ...trendingMovies];
+                                })
+                                .catch(error => {
+                                    console.error('Error loading trending movies:', error);
+                                });
+                        })
+                        .catch(error => {
+                            console.error('Error loading trending series:', error);
+                        });
+                },
+                loadAllSeries() {
+                    db.collection('series').get()
+                        .then(querySnapshot => {
+                            this.allSeries = querySnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data(),
+                                type: 'series'
+                            }));
+                        })
+                        .catch(error => {
+                            console.error('Error loading all series:', error);
+                        });
+                },
+                loadAllMovies() {
+                    db.collection('movies').get()
+                        .then(querySnapshot => {
+                            this.allMovies = querySnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data(),
+                                type: 'movie'
+                            }));
+                        })
+                        .catch(error => {
+                            console.error('Error loading all movies:', error);
+                        });
+                },
+                loadSeriesDetails(seriesId) {
+                    // تحميل مواسم المسلسل
+                    db.collection('series').doc(seriesId).get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                const seasons = [];
+                                for (let i = 1; i <= doc.data().seasons; i++) {
+                                    seasons.push({
+                                        number: i,
+                                        expanded: i === 1
+                                    });
+                                }
+                                this.currentSeriesSeasons = seasons;
+                                
+                                // تحميل مسلسلات مشابهة (نفس النوع)
+                                const genres = doc.data().genres;
+                                if (genres && genres.length > 0) {
+                                    db.collection('series')
+                                        .where('genres', 'array-contains', genres[0])
+                                        .limit(5)
+                                        .get()
+                                        .then(querySnapshot => {
+                                            this.similarSeries = querySnapshot.docs
+                                                .filter(d => d.id !== seriesId)
+                                                .map(doc => ({
+                                                    id: doc.id,
+                                                    ...doc.data(),
+                                                    type: 'series'
+                                                }));
+                                        })
+                                        .catch(error => {
+                                            console.error('Error loading similar series:', error);
+                                        });
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading series details:', error);
+                        });
+                },
+                getEpisodesForSeason(seasonNumber) {
+                    if (!this.currentSeries) return [];
+                    
+                    // في تطبيق حقيقي، ستتم جلب الحلقات من قاعدة البيانات
+                    // هنا نستخدم بيانات وهمية للتوضيح
+                    const episodes = [];
+                    const episodesPerSeason = Math.floor(this.currentSeries.episodes / this.currentSeries.seasons);
+                    
+                    for (let i = 1; i <= episodesPerSeason; i++) {
+                        episodes.push({
+                            id: `s${seasonNumber}e${i}`,
+                            seriesId: this.currentSeries.id,
+                            season: seasonNumber,
+                            episodeNumber: i,
+                            title: `الحلقة ${i}`,
+                            videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                            duration: 45,
+                            thumbnail: 'https://via.placeholder.com/300x170',
+                            description: 'وصف الحلقة هنا...'
+                        });
+                    }
+                    
+                    return episodes;
+                },
+                toggleSeason(seasonNumber) {
+                    this.currentSeriesSeasons = this.currentSeriesSeasons.map(season => {
+                        if (season.number === seasonNumber) {
+                            return {
+                                ...season,
+                                expanded: !season.expanded
+                            };
+                        }
+                        return season;
+                    });
+                },
+                
+                // طرق لوحة التحكم الإدارية
+                loadAdminData() {
+                    // تحميل المسلسلات للإدارة
+                    db.collection('series').get()
+                        .then(querySnapshot => {
+                            this.adminSeries = querySnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }));
+                        })
+                        .catch(error => {
+                            console.error('Error loading admin series:', error);
+                        });
+                    
+                    // تحميل الحلقات للإدارة
+                    db.collection('episodes').get()
+                        .then(querySnapshot => {
+                            this.adminEpisodes = querySnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }));
+                        })
+                        .catch(error => {
+                            console.error('Error loading admin episodes:', error);
+                        });
+                    
+                    // تحميل الأفلام للإدارة
+                    db.collection('movies').get()
+                        .then(querySnapshot => {
+                            this.adminMovies = querySnapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }));
+                        })
+                        .catch(error => {
+                            console.error('Error loading admin movies:', error);
+                        });
+                    
+                    // تحميل إعدادات الإعلانات
+                    db.collection('settings').doc('ads').get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                this.adSettings = doc.data();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading ad settings:', error);
+                        });
+                },
+                setAdminTab(tab) {
+                    this.adminTab = tab;
+                    this.showMobileSidebar = false;
+                },
+                toggleMobileSidebar() {
+                    this.showMobileSidebar = !this.showMobileSidebar;
+                },
+                getSeriesTitle(seriesId) {
+                    const series = this.adminSeries.find(s => s.id === seriesId);
+                    return series ? series.title : 'غير معروف';
+                },
+                
+                // طرق إدارة المسلسلات
+                openAddSeriesModal() {
+                    this.seriesForm = {
+                        id: '',
+                        title: '',
+                        year: new Date().getFullYear(),
+                        rating: 7.5,
+                        seasons: 1,
+                        episodes: 10,
+                        status: 'مستمر',
+                        genres: [],
+                        poster: 'https://via.placeholder.com/300x450',
+                        backdrop: 'https://via.placeholder.com/1920x1080',
+                        description: ''
+                    };
+                    this.isEditingSeries = false;
+                    this.showSeriesModal = true;
+                },
+                editSeries(series) {
+                    this.seriesForm = {
+                        id: series.id,
+                        title: series.title,
+                        year: series.year,
+                        rating: series.rating,
+                        seasons: series.seasons,
+                        episodes: series.episodes,
+                        status: series.status,
+                        genres: [...series.genres],
+                        poster: series.poster,
+                        backdrop: series.backdrop,
+                        description: series.description
+                    };
+                    this.isEditingSeries = true;
+                    this.showSeriesModal = true;
+                },
+                closeSeriesModal() {
+                    this.showSeriesModal = false;
+                },
+                toggleGenre(genre) {
+                    if (this.seriesForm.genres.includes(genre)) {
+                        this.seriesForm.genres = this.seriesForm.genres.filter(g => g !== genre);
+                    } else {
+                        this.seriesForm.genres.push(genre);
+                    }
+                },
+                saveSeries() {
+                    if (this.isEditingSeries) {
+                        // تحديث المسلسل
+                        db.collection('series').doc(this.seriesForm.id)
+                            .update(this.seriesForm)
+                            .then(() => {
+                                this.loadAdminData();
+                                this.loadAllSeries();
+                                this.loadHomeData();
+                                this.showSeriesModal = false;
+                                analytics.logEvent('update_series', { series_id: this.seriesForm.id });
+                            })
+                            .catch(error => {
+                                console.error('Error updating series:', error);
+                            });
+                    } else {
+                        // إضافة مسلسل جديد
+                        db.collection('series')
+                            .add(this.seriesForm)
+                            .then(docRef => {
+                                this.seriesForm.id = docRef.id;
+                                this.loadAdminData();
+                                this.loadAllSeries();
+                                this.loadHomeData();
+                                this.showSeriesModal = false;
+                                analytics.logEvent('add_series', { series_id: docRef.id });
+                            })
+                            .catch(error => {
+                                console.error('Error adding series:', error);
+                            });
+                    }
+                },
+                confirmDeleteSeries(seriesId) {
+                    this.itemToDelete = seriesId;
+                    this.deleteType = 'series';
+                    this.showConfirmModal = true;
+                },
+                
+                // طرق إدارة الحلقات
+                openAddEpisodeModal() {
+                    this.episodeForm = {
+                        id: '',
+                        seriesId: this.adminSeries.length > 0 ? this.adminSeries[0].id : '',
+                        season: 1,
+                        episodeNumber: 1,
+                        title: '',
+                        videoUrl: '',
+                        duration: 45,
+                        thumbnail: 'https://via.placeholder.com/300x170',
+                        description: ''
+                    };
+                    this.isEditingEpisode = false;
+                    this.showEpisodeModal = true;
+                },
+                editEpisode(episode) {
+                    this.episodeForm = {
+                        id: episode.id,
+                        seriesId: episode.seriesId,
+                        season: episode.season,
+                        episodeNumber: episode.episodeNumber,
+                        title: episode.title,
+                        videoUrl: episode.videoUrl,
+                        duration: episode.duration,
+                        thumbnail: episode.thumbnail,
+                        description: episode.description
+                    };
+                    this.isEditingEpisode = true;
+                    this.showEpisodeModal = true;
+                },
+                closeEpisodeModal() {
+                    this.showEpisodeModal = false;
+                },
+                saveEpisode() {
+                    if (this.isEditingEpisode) {
+                        // تحديث الحلقة
+                        db.collection('episodes').doc(this.episodeForm.id)
+                            .update(this.episodeForm)
+                            .then(() => {
+                                this.loadAdminData();
+                                this.showEpisodeModal = false;
+                                analytics.logEvent('update_episode', { episode_id: this.episodeForm.id });
+                            })
+                            .catch(error => {
+                                console.error('Error updating episode:', error);
+                            });
+                    } else {
+                        // إضافة حلقة جديدة
+                        db.collection('episodes')
+                            .add(this.episodeForm)
+                            .then(docRef => {
+                                this.episodeForm.id = docRef.id;
+                                this.loadAdminData();
+                                this.showEpisodeModal = false;
+                                analytics.logEvent('add_episode', { episode_id: docRef.id });
+                            })
+                            .catch(error => {
+                                console.error('Error adding episode:', error);
+                            });
+                    }
+                },
+                confirmDeleteEpisode(episodeId) {
+                    this.itemToDelete = episodeId;
+                    this.deleteType = 'episode';
+                    this.showConfirmModal = true;
+                },
+                
+                // طرق إدارة الأفلام
+                openAddMovieModal() {
+                    this.movieForm = {
+                        id: '',
+                        title: '',
+                        year: new Date().getFullYear(),
+                        duration: 120,
+                        rating: 7.5,
+                        genres: [],
+                        poster: 'https://via.placeholder.com/300x450',
+                        backdrop: 'https://via.placeholder.com/1920x1080',
+                        videoUrl: '',
+                        description: ''
+                    };
+                    this.isEditingMovie = false;
+                    this.showMovieModal = true;
+                },
+                editMovie(movie) {
+                    this.movieForm = {
+                        id: movie.id,
+                        title: movie.title,
+                        year: movie.year,
+                        duration: movie.duration,
+                        rating: movie.rating,
+                        genres: [...movie.genres],
+                        poster: movie.poster,
+                        backdrop: movie.backdrop,
+                        videoUrl: movie.videoUrl,
+                        description: movie.description
+                    };
+                    this.isEditingMovie = true;
+                    this.showMovieModal = true;
+                },
+                closeMovieModal() {
+                    this.showMovieModal = false;
+                },
+                toggleMovieGenre(genre) {
+                    if (this.movieForm.genres.includes(genre)) {
+                        this.movieForm.genres = this.movieForm.genres.filter(g => g !== genre);
+                    } else {
+                        this.movieForm.genres.push(genre);
+                    }
+                },
+                saveMovie() {
+                    if (this.isEditingMovie) {
+                        // تحديث الفيلم
+                        db.collection('movies').doc(this.movieForm.id)
+                            .update(this.movieForm)
+                            .then(() => {
+                                this.loadAdminData();
+                                this.loadAllMovies();
+                                this.loadHomeData();
+                                this.showMovieModal = false;
+                                analytics.logEvent('update_movie', { movie_id: this.movieForm.id });
+                            })
+                            .catch(error => {
+                                console.error('Error updating movie:', error);
+                            });
+                    } else {
+                        // إضافة فيلم جديد
+                        db.collection('movies')
+                            .add(this.movieForm)
+                            .then(docRef => {
+                                this.movieForm.id = docRef.id;
+                                this.loadAdminData();
+                                this.loadAllMovies();
+                                this.loadHomeData();
+                                this.showMovieModal = false;
+                                analytics.logEvent('add_movie', { movie_id: docRef.id });
+                            })
+                            .catch(error => {
+                                console.error('Error adding movie:', error);
+                            });
+                    }
+                },
+                confirmDeleteMovie(movieId) {
+                    this.itemToDelete = movieId;
+                    this.deleteType = 'movie';
+                    this.showConfirmModal = true;
+                },
+                
+                // طرق تأكيد الحذف
+                closeConfirmModal() {
+                    this.showConfirmModal = false;
+                    this.itemToDelete = null;
+                    this.deleteType = '';
+                },
+                confirmDelete() {
+                    if (this.deleteType === 'series') {
+                        this.deleteSeries(this.itemToDelete);
+                    } else if (this.deleteType === 'episode') {
+                        this.deleteEpisode(this.itemToDelete);
+                    } else if (this.deleteType === 'movie') {
+                        this.deleteMovie(this.itemToDelete);
+                    }
+                    
+                    this.closeConfirmModal();
+                },
+                deleteSeries(seriesId) {
+                    db.collection('series').doc(seriesId)
+                        .delete()
+                        .then(() => {
+                            this.loadAdminData();
+                            this.loadAllSeries();
+                            this.loadHomeData();
+                            analytics.logEvent('delete_series', { series_id: seriesId });
+                        })
+                        .catch(error => {
+                            console.error('Error deleting series:', error);
+                        });
+                },
+                deleteEpisode(episodeId) {
+                    db.collection('episodes').doc(episodeId)
+                        .delete()
+                        .then(() => {
+                            this.loadAdminData();
+                            analytics.logEvent('delete_episode', { episode_id: episodeId });
+                        })
+                        .catch(error => {
+                            console.error('Error deleting episode:', error);
+                        });
+                },
+                deleteMovie(movieId) {
+                    db.collection('movies').doc(movieId)
+                        .delete()
+                        .then(() => {
+                            this.loadAdminData();
+                            this.loadAllMovies();
+                            this.loadHomeData();
+                            analytics.logEvent('delete_movie', { movie_id: movieId });
+                        })
+                        .catch(error => {
+                            console.error('Error deleting movie:', error);
+                        });
+                },
+                
+                // طرق إدارة الإعلانات
+                saveAdSettings() {
+                    db.collection('settings').doc('ads')
+                        .set(this.adSettings)
+                        .then(() => {
+                            analytics.logEvent('save_ad_settings');
+                        })
+                        .catch(error => {
+                            console.error('Error saving ad settings:', error);
+                        });
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
