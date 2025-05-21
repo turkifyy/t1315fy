@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StreamFlix</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .navbar {
+      background-color: #141414;
+    }
+
+    .navbar-brand, .nav-link, .btn {
+      color: white !important;
+    }
+
+    .hero-slider {
+      height: 500px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .hero-slider .overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+      padding: 40px;
+    }
+
+    .card {
+      border: none;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .video-player {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-player iframe {
+      max-width: 90%;
+      max-height: 90%;
+    }
+
+    .admin-section {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #1f1f1f;
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .admin-section a {
+      margin: 10px 0;
+    }
+
+    .content-section {
+      padding: 40px;
+    }
+
+    .search-bar {
+      width: 300px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-slider {
+        height: 300px;
+      }
+
+      .search-bar {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">StreamFlix</a>
+      <form class="d-flex" id="searchForm">
+        <input class="form-control me-2 search-bar" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
+      <button class="btn btn-light me-2" id="loginBtn">Login</button>
+      <button class="btn btn-light" id="adminBtn" style="display: none;">Admin</button>
+    </div>
+  </nav>
+
+  <!-- Admin Sidebar -->
+  <div class="admin-section" id="adminSidebar">
+    <h4>Admin Panel</h4>
+    <a href="#" onclick="showAdminSection('series')">Manage Series</a>
+    <a href="#" onclick="showAdminSection('episodes')">Manage Episodes</a>
+    <a href="#" onclick="showAdminSection('movies')">Manage Movies</a>
+    <a href="#" onclick="showAdminSection('ads')">Ad Settings</a>
+    <a href="#" onclick="showAdminSection('stats')">Statistics</a>
+    <button class="btn btn-danger mt-auto" onclick="toggleAdminSidebar()">Close</button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="container" id="mainContent">
+    <!-- Homepage -->
+    <div id="homePage">
+      <!-- Hero Slider -->
+      <div id="heroCarousel" class="carousel slide hero-slider" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <!-- Slides will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Content Sections -->
+      <div class="row mt-5">
+        <div class="col-md-4">
+          <h3>Latest Series</h3>
+          <div id="latestSeries" class="row g-3">
+            <!-- Series cards will be populated dynamically -->
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h3>Most Watched</h3>
+          <div id="mostWatched" class="row g-3">
+            <!-- Content cards will be populated dynamically -->
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h3>Recommendations</h3>
+          <div id="recommendations" class="row g-3">
+            <!-- Content cards will be populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Series Details Page -->
+    <div id="seriesPage" style="display: none;">
+      <div class="row">
+        <div class="col-md-8">
+          <div id="seriesInfo"></div>
+          <div id="episodesList" class="row mt-4 g-3"></div>
+        </div>
+        <div class="col-md-4">
+          <h4>Similar Series</h4>
+          <div id="similarSeries" class="row g-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div class="video-player" id="videoPlayer">
+      <div class="position-relative" style="width: 80%; height: 80%">
+        <div id="adContainer"></div>
+        <iframe id="videoFrame" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+        <button class="btn btn-light mt-3" onclick="closeVideoPlayer()">Close</button>
+        <div class="d-flex gap-3 mt-3">
+          <button class="btn btn-success" onclick="toggleLike()">Like</button>
+          <button class="btn btn-danger" onclick="toggleDislike()">Dislike</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Sections -->
+    <div id="adminSeries" class="admin-panel" style="display: none;">
+      <h3>Series Management</h3>
+      <form id="seriesForm">
+        <input type="text" class="form-control mb-2" id="seriesTitle" placeholder="Title" required>
+        <input type="text" class="form-control mb-2" id="seriesImage" placeholder="Image URL" required>
+        <input type="text" class="form-control mb-2" id="seriesBg" placeholder="Background URL" required>
+        <input type="number" class="form-control mb-2" id="seriesRating" placeholder="Rating" required>
+        <textarea class="form-control mb-2" id="seriesStory" placeholder="Story" required></textarea>
+        <input type="number" class="form-control mb-2" id="seriesYear" placeholder="Year" required>
+        <input type="text" class="form-control mb-2" id="seriesGenre" placeholder="Genre" required>
+        <input type="text" class="form-control mb-2" id="seriesStatus" placeholder="Status" required>
+        <input type="text" class="form-control mb-2" id="seriesLink" placeholder="Watch Link" required>
+        <button type="submit" class="btn btn-primary">Add Series</button>
+      </form>
+      <div id="adminSeriesList" class="mt-4"></div>
+    </div>
+
+    <div id="adminEpisodes" class="admin-panel" style="display: none;">
+      <h3>Episode Management</h3>
+      <form id="episodeForm">
+        <select class="form-select mb-2" id="episodeSeriesSelector">
+          <!-- Populated dynamically -->
+        </select>
+        <input type="number" class="form-control mb-2" id="episodeNumber" placeholder="Episode Number" required>
+        <input type="text" class="form-control mb-2" id="episodeTitle" placeholder="Title" required>
+        <input type="text" class="form-control mb-2" id="episodeLink" placeholder="Watch Link" required>
+        <input type="text" class="form-control mb-2" id="episodeThumbnail" placeholder="Thumbnail URL" required>
+        <input type="number" class="form-control mb-2" id="episodeDuration" placeholder="Duration (min)" required>
+        <button type="submit" class="btn btn-primary">Add Episode</button>
+      </form>
+      <div id="adminEpisodesList" class="mt-4"></div>
+    </div>
+
+    <div id="adminMovies" class="admin-panel" style="display: none;">
+      <h3>Movie Management</h3>
+      <form id="movieForm">
+        <input type="text" class="form-control mb-2" id="movieTitle" placeholder="Title" required>
+        <input type="text" class="form-control mb-2" id="movieLink" placeholder="Watch Link" required>
+        <input type="text" class="form-control mb-2" id="movieImage" placeholder="Image URL" required>
+        <input type="text" class="form-control mb-2" id="movieBg" placeholder="Background URL" required>
+        <textarea class="form-control mb-2" id="movieStory" placeholder="Story" required></textarea>
+        <input type="number" class="form-control mb-2" id="movieDuration" placeholder="Duration (min)" required>
+        <input type="number" class="form-control mb-2" id="movieRating" placeholder="Rating" required>
+        <button type="submit" class="btn btn-primary">Add Movie</button>
+      </form>
+      <div id="adminMoviesList" class="mt-4"></div>
+    </div>
+
+    <div id="adminAds" class="admin-panel" style="display: none;">
+      <h3>Ad Management</h3>
+      <form id="adForm">
+        <select class="form-select mb-2" id="adType">
+          <option value="pre">Pre-roll</option>
+          <option value="mid">Mid-roll</option>
+          <option value="post">Post-roll</option>
+        </select>
+        <input type="text" class="form-control mb-2" id="adCode" placeholder="Ad Code (iframe/script)" required>
+        <button type="submit" class="btn btn-primary">Save Ad</button>
+      </form>
+      <div id="adminAdsList" class="mt-4"></div>
+    </div>
+
+    <div id="adminStats" class="admin-panel" style="display: none;">
+      <h3>Statistics</h3>
+      <div id="statsContent">
+        <h5>Platform Stats</h5>
+        <p>Total Users: <span id="totalUsers"></span></p>
+        <p>Total Content: <span id="totalContent"></span></p>
+        <h5>Watch History</h5>
+        <ul id="watchHistoryStats"></ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const analytics = firebase.analytics();
+
+    let currentUser = null;
+    let isAdmin = false;
+
+    // Authentication
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
+        .then(result => {
+          currentUser = result.user;
+          checkAdminStatus();
+          document.getElementById('loginBtn').style.display = 'none';
+          document.getElementById('adminBtn').style.display = 'inline-block';
+          analytics.logEvent('login', { method: 'google' });
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    });
+
+    // Admin Panel Toggle
+    document.getElementById('adminBtn').addEventListener('click', () => {
+      toggleAdminSidebar();
+    });
+
+    function checkAdminStatus() {
+      db.collection("users").doc(currentUser.uid).get()
+        .then(doc => {
+          if (doc.exists) {
+            isAdmin = doc.data().isAdmin || false;
+            if (isAdmin) {
+              document.getElementById('adminSidebar').style.display = 'flex';
+            }
+          }
+        });
+    }
+
+    function toggleAdminSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      sidebar.style.display = sidebar.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function showAdminSection(section) {
+      document.querySelectorAll('.admin-panel').forEach(el => el.style.display = 'none');
+      document.getElementById('admin' + section.charAt(0).toUpperCase() + section.slice(1)).style.display = 'block';
+    }
+
+    // Watch History Management
+    function addToWatchHistory(contentType, contentId) {
+      if (!currentUser) return;
+      
+      db.collection("users").doc(currentUser.uid).collection("watchHistory").add({
+        contentId: contentId,
+        contentType: contentType,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      analytics.logEvent('content_watched', { type: contentType, id: contentId });
+    }
+
+    // Video Player Functions
+    function openVideoPlayer(link) {
+      document.getElementById('videoFrame').src = link;
+      document.getElementById('videoPlayer').style.display = 'flex';
+      document.getElementById('adContainer').innerHTML = '<iframe src="https://adsterra.com/ad/pre-roll" width="80%" height="450" frameborder="0"></iframe>';
+    }
+
+    function closeVideoPlayer() {
+      document.getElementById('videoPlayer').style.display = 'none';
+      document.getElementById('videoFrame').src = '';
+      document.getElementById('adContainer').innerHTML = '';
+    }
+
+    // Like/Dislike
+    function toggleLike() {
+      if (!currentUser) return;
+      analytics.logEvent('like_toggled');
+      // Add like logic to Firestore
+    }
+
+    function toggleDislike() {
+      if (!currentUser) return;
+      analytics.logEvent('dislike_toggled');
+      // Add dislike logic to Firestore
+    }
+
+    // Admin Functions
+    document.getElementById('seriesForm').addEventListener('submit', e => {
+      e.preventDefault();
+      db.collection("series").add({
+        title: document.getElementById('seriesTitle').value,
+        image: document.getElementById('seriesImage').value,
+        background: document.getElementById('seriesBg').value,
+        rating: document.getElementById('seriesRating').value,
+        story: document.getElementById('seriesStory').value,
+        year: document.getElementById('seriesYear').value,
+        genre: document.getElementById('seriesGenre').value,
+        status: document.getElementById('seriesStatus').value,
+        watchLink: document.getElementById('seriesLink').value,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    document.getElementById('episodeForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const seriesId = document.getElementById('episodeSeriesSelector').value;
+      db.collection("series").doc(seriesId).update({
+        episodes: firebase.firestore.FieldValue.arrayUnion({
+          number: document.getElementById('episodeNumber').value,
+          title: document.getElementById('episodeTitle').value,
+          link: document.getElementById('episodeLink').value,
+          thumbnail: document.getElementById('episodeThumbnail').value,
+          duration: document.getElementById('episodeDuration').value
+        })
+      });
+    });
+
+    document.getElementById('movieForm').addEventListener('submit', e => {
+      e.preventDefault();
+      db.collection("movies").add({
+        title: document.getElementById('movieTitle').value,
+        link: document.getElementById('movieLink').value,
+        image: document.getElementById('movieImage').value,
+        background: document.getElementById('movieBg').value,
+        story: document.getElementById('movieStory').value,
+        duration: document.getElementById('movieDuration').value,
+        rating: document.getElementById('movieRating').value,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    document.getElementById('adForm').addEventListener('submit', e => {
+      e.preventDefault();
+      db.collection("ads").doc(document.getElementById('adType').value).set({
+        code: document.getElementById('adCode').value
+      });
+    });
+
+    // Load Admin Data
+    function loadAdminData() {
+      // Load series
+      db.collection("series").onSnapshot(snapshot => {
+        const seriesList = document.getElementById('adminSeriesList');
+        seriesList.innerHTML = '';
+        snapshot.forEach(doc => {
+          const div = document.createElement('div');
+          div.className = 'mb-3';
+          div.innerHTML = `
+            <h5>${doc.data().title}</h5>
+            <button class="btn btn-warning btn-sm" onclick="editContent('series', '${doc.id}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteContent('series', '${doc.id}')">Delete</button>
+          `;
+          seriesList.appendChild(div);
+        });
+      });
+
+      // Load episodes
+      db.collection("series").onSnapshot(snapshot => {
+        const selector = document.getElementById('episodeSeriesSelector');
+        selector.innerHTML = '';
+        snapshot.forEach(doc => {
+          const option = document.createElement('option');
+          option.value = doc.id;
+          option.textContent = doc.data().title;
+          selector.appendChild(option);
+        });
+      });
+
+      // Load movies
+      db.collection("movies").onSnapshot(snapshot => {
+        const movieList = document.getElementById('adminMoviesList');
+        movieList.innerHTML = '';
+        snapshot.forEach(doc => {
+          const div = document.createElement('div');
+          div.className = 'mb-3';
+          div.innerHTML = `
+            <h5>${doc.data().title}</h5>
+            <button class="btn btn-warning btn-sm" onclick="editContent('movies', '${doc.id}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteContent('movies', '${doc.id}')">Delete</button>
+          `;
+          movieList.appendChild(div);
+        });
+      });
+
+      // Load ads
+      db.collection("ads").onSnapshot(snapshot => {
+        const adList = document.getElementById('adminAdsList');
+        adList.innerHTML = '';
+        snapshot.forEach(doc => {
+          const div = document.createElement('div');
+          div.className = 'mb-3';
+          div.innerHTML = `
+            <h5>${doc.id.charAt(0).toUpperCase() + doc.id.slice(1)}-roll Ad</h5>
+            <textarea class="form-control mb-2" readonly>${doc.data().code}</textarea>
+            <button class="btn btn-info btn-sm" onclick="editAd('${doc.id}')">Edit</button>
+          `;
+          adList.appendChild(div);
+        });
+      });
+
+      // Load stats
+      db.collection("users").onSnapshot(snapshot => {
+        document.getElementById('totalUsers').textContent = snapshot.size;
+      });
+
+      db.collectionGroup("watchHistory").onSnapshot(snapshot => {
+        document.getElementById('totalContent').textContent = snapshot.size;
+        document.getElementById('watchHistoryStats').innerHTML = snapshot.docs
+          .map(doc => `<li>${doc.data().contentType} - ${doc.data().contentId}</li>`)
+          .join('');
+      });
+    }
+
+    function editContent(collection, id) {
+      // Implementation for editing content
+    }
+
+    function deleteContent(collection, id) {
+      db.collection(collection).doc(id).delete();
+    }
+
+    function editAd(adType) {
+      // Implementation for editing ads
+    }
+
+    // Homepage Content
+    function loadHomepage() {
+      // Load hero slider
+      db.collection("series").limit(5).onSnapshot(snapshot => {
+        const carousel = document.getElementById('heroCarousel');
+        carousel.innerHTML = '';
+        snapshot.forEach((doc, index) => {
+          const slide = document.createElement('div');
+          slide.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+          slide.style.backgroundImage = `url('${doc.data().background}')`;
+          slide.innerHTML = `
+            <div class="overlay">
+              <h1>${doc.data().title}</h1>
+              <p>${doc.data().story.substring(0, 150)}...</p>
+              <button class="btn btn-light" onclick="openSeriesDetails('${doc.id}')">Watch Now</button>
+            </div>
+          `;
+          carousel.appendChild(slide);
+        });
+      });
+
+      // Load latest series
+      db.collection("series").orderBy("createdAt", "desc").limit(6).onSnapshot(snapshot => {
+        const container = document.getElementById('latestSeries');
+        container.innerHTML = '';
+        snapshot.forEach(doc => {
+          const card = document.createElement('div');
+          card.className = 'col-6 col-md-4 col-lg-3';
+          card.innerHTML = `
+            <div class="card" onclick="openSeriesDetails('${doc.id}')">
+              <img src="${doc.data().image}" class="card-img-top" alt="${doc.data().title}">
+              <div class="card-body">
+                <h5 class="card-title">${doc.data().title}</h5>
+                <p class="card-text">${doc.data().story.substring(0, 100)}...</p>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      });
+
+      // Load most watched
+      db.collectionGroup("watchHistory").onSnapshot(snapshot => {
+        const container = document.getElementById('mostWatched');
+        container.innerHTML = '';
+        const contentCount = {};
+        snapshot.forEach(doc => {
+          contentCount[doc.data().contentId] = (contentCount[doc.data().contentId] || 0) + 1;
+        });
+        
+        // Sort and display most watched
+        Object.entries(contentCount).sort((a, b) => b[1] - a[1]).slice(0,6).forEach(([id, count]) => {
+          const card = document.createElement('div');
+          card.className = 'col-6 col-md-4 col-lg-3';
+          card.innerHTML = `
+            <div class="card" onclick="loadContent('${id}')">
+              <img src="" class="card-img-top" alt="Most Watched">
+              <div class="card-body">
+                <h5 class="card-title">Most Watched</h5>
+                <p class="card-text">Viewed ${count} times</p>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      });
+
+      // Load recommendations
+      db.collection("series").limit(6).onSnapshot(snapshot => {
+        const container = document.getElementById('recommendations');
+        container.innerHTML = '';
+        snapshot.forEach(doc => {
+          const card = document.createElement('div');
+          card.className = 'col-6 col-md-4 col-lg-3';
+          card.innerHTML = `
+            <div class="card" onclick="openSeriesDetails('${doc.id}')">
+              <img src="${doc.data().image}" class="card-img-top" alt="${doc.data().title}">
+              <div class="card-body">
+                <h5 class="card-title">${doc.data().title}</h5>
+                <p class="card-text">${doc.data().story.substring(0, 100)}...</p>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      });
+    }
+
+    function openSeriesDetails(seriesId) {
+      db.collection("series").doc(seriesId).get().then(doc => {
+        const seriesData = doc.data();
+        document.getElementById('seriesInfo').innerHTML = `
+          <img src="${seriesData.background}" class="w-100 mb-3" style="height: 400px; object-fit: cover;">
+          <h2>${seriesData.title}</h2>
+          <p><strong>Rating:</strong> ${seriesData.rating}</p>
+          <p>${seriesData.story}</p>
+        `;
+
+        const episodes = seriesData.episodes || [];
+        document.getElementById('episodesList').innerHTML = '';
+        episodes.forEach(episode => {
+          const episodeCard = document.createElement('div');
+          episodeCard.className = 'col-6 col-md-4';
+          episodeCard.innerHTML = `
+            <div class="card">
+              <img src="${episode.thumbnail}" class="card-img-top" alt="Episode ${episode.number}">
+              <div class="card-body">
+                <h5 class="card-title">Episode ${episode.number}: ${episode.title}</h5>
+                <p class="card-text">Duration: ${episode.duration} minutes</p>
+                <button class="btn btn-primary" onclick="openVideoPlayer('${episode.link}')">Play</button>
+              </div>
+            </div>
+          `;
+          document.getElementById('episodesList').appendChild(episodeCard);
+        });
+
+        // Load similar series
+        document.getElementById('similarSeries').innerHTML = '';
+        db.collection("series").limit(4).onSnapshot(snapshot => {
+          snapshot.forEach(doc => {
+            if (doc.id !== seriesId) {
+              const card = document.createElement('div');
+              card.className = 'col-6 col-md-4';
+              card.innerHTML = `
+                <div class="card">
+                  <img src="${doc.data().image}" class="card-img-top" alt="${doc.data().title}">
+                  <div class="card-body">
+                    <h5 class="card-title">${doc.data().title}</h5>
+                    <p class="card-text">${doc.data().story.substring(0, 100)}...</p>
+                  </div>
+                </div>
+              `;
+              document.getElementById('similarSeries').appendChild(card);
+            }
+          });
+        });
+
+        document.getElementById('homePage').style.display = 'none';
+        document.getElementById('seriesPage').style.display = 'block';
+      });
+    }
+
+    // Initialize App
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        checkAdminStatus();
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('adminBtn').style.display = 'inline-block';
+      } else {
+        document.getElementById('loginBtn').style.display = 'inline-block';
+        document.getElementById('adminBtn').style.display = 'none';
+      }
+    });
+
+    // Load Initial Content
+    window.onload = () => {
+      loadHomepage();
+      loadAdminData();
+    };
+  </script>
+</body>
+</html>
