@@ -1,0 +1,2674 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة VOD</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Adsterra -->
+    <script src="https://www.adsterra.com/adsterra.js"></script>
+    <style>
+        /* CSS Reset */
+        :root {
+            --primary-color: #e50914;
+            --dark-color: #141414;
+            --light-color: #f4f4f4;
+            --text-color: #ffffff;
+            --text-secondary: #b3b3b3;
+            --bg-color: #000000;
+            --card-bg: #181818;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-radius: 4px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            direction: rtl;
+        }
+        
+        a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Utility Classes */
+        .container {
+            width: 100%;
+            padding: 0 15px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .container {
+                max-width: 970px;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1170px;
+            }
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .flex-column {
+            flex-direction: column;
+        }
+        
+        .flex-row {
+            flex-direction: row;
+        }
+        
+        .justify-center {
+            justify-content: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .align-center {
+            align-items: center;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-left {
+            text-align: left;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #f40612;
+        }
+        
+        .btn-secondary {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(109, 109, 110, 0.4);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+        
+        .btn-lg {
+            padding: 10px 20px;
+            font-size: 1.25rem;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+            height: 70px;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar.scrolled {
+            background: var(--dark-color);
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+        }
+        
+        .nav-link {
+            color: var(--text-color);
+            margin: 0 10px;
+            font-weight: 500;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .profile-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            min-width: 160px;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--text-color);
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 5px 0;
+        }
+        
+        /* Hero Slider */
+        .hero {
+            height: 70vh;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 20px;
+        }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 50px;
+            max-width: 60%;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .hero-buttons .btn {
+            margin-left: 10px;
+            margin-bottom: 10px;
+        }
+        
+        /* Content Sections */
+        .section {
+            padding: 20px 0;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-right: 30px;
+        }
+        
+        .content-row {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 30px;
+            scrollbar-width: none;
+            gap: 15px;
+        }
+        
+        .content-row::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .content-item {
+            flex: 0 0 auto;
+            width: 220px;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .content-item:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .content-item img {
+            width: 100%;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+        
+        .content-item-info {
+            padding: 10px 0;
+        }
+        
+        .content-item-title {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Video Player */
+        .video-player {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 10000;
+            display: none;
+        }
+        
+        .video-player iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .close-player {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 30px;
+            color: var(--text-color);
+            cursor: pointer;
+            z-index: 10001;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Profile Page */
+        .profile-page {
+            padding: 100px 30px 50px;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-left: 20px;
+        }
+        
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .card-img-top {
+            width: 100%;
+            height: auto;
+        }
+        
+        .card-body {
+            padding: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .card-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color);
+        }
+        
+        .bg-secondary {
+            background-color: #6c757d;
+        }
+        
+        .bg-success {
+            background-color: var(--success-color);
+        }
+        
+        .bg-info {
+            background-color: var(--info-color);
+        }
+        
+        .bg-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .bg-danger {
+            background-color: var(--danger-color);
+        }
+        
+        /* Forms */
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.1);
+            background-clip: padding-box;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-control:focus {
+            outline: 0;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25);
+        }
+        
+        .form-select {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.1);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: left 0.75rem center;
+            background-size: 16px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        .form-select:focus {
+            outline: 0;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        /* Tables */
+        .table {
+            width: 100%;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            vertical-align: top;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Admin Dashboard */
+        .admin-dashboard {
+            padding: 80px 20px 20px;
+            min-height: 100vh;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .sidebar {
+            background: #343a40;
+            min-height: 100vh;
+            padding: 20px 0;
+            color: #fff;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 10px 20px;
+            border-bottom: 1px solid #4b545c;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu li a {
+            color: #fff;
+        }
+        
+        .sidebar-menu li.active {
+            background: #007bff;
+        }
+        
+        .admin-content {
+            padding: 20px;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            display: none;
+            overflow-y: auto;
+        }
+        
+        .modal.show {
+            display: block;
+        }
+        
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            margin: 30px auto;
+            max-width: 800px;
+        }
+        
+        .modal-content {
+            position: relative;
+            background-color: var(--dark-color);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5);
+            outline: 0;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-title {
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .modal-body {
+            position: relative;
+            padding: 15px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content {
+                max-width: 100%;
+                padding: 0 20px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+            }
+            
+            .content-item {
+                width: 150px;
+            }
+            
+            .navbar {
+                padding: 0 15px;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-left: 0;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Dark mode */
+        .dark-mode {
+            --bg-color: #121212;
+            --text-color: #f5f5f5;
+            --text-secondary: #a0a0a0;
+            --card-bg: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main App Container -->
+    <div id="app">
+        <!-- Authentication Screen -->
+        <div id="auth-screen" class="flex justify-center align-center" style="height: 100vh;">
+            <div class="text-center">
+                <h1 class="mb-4">مرحباً بك في منصة VOD</h1>
+                <button id="google-signin" class="btn btn-primary btn-lg">
+                    <i class="fab fa-google me-2"></i> تسجيل الدخول بواسطة Google
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content (Hidden by default) -->
+        <div id="main-content" class="hidden">
+            <!-- Navigation -->
+            <nav class="navbar">
+                <div class="container">
+                    <a class="navbar-brand" href="#">
+                        <img src="https://via.placeholder.com/150x50?text=VOD+Platform" alt="Logo">
+                    </a>
+                    <button class="navbar-toggler hidden" type="button" id="navbar-toggler">
+                        <span class="fas fa-bars"></span>
+                    </button>
+                    <div class="navbar-collapse" id="navbar-nav">
+                        <ul class="flex">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-page="home">الرئيسية</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-page="series">المسلسلات</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-page="movies">الأفلام</a>
+                            </li>
+                        </ul>
+                        <div class="flex align-center">
+                            <div class="search-container me-3 flex">
+                                <input type="text" class="form-control" placeholder="بحث..." id="search-input">
+                                <button class="btn btn-outline" type="button" id="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="dropdown">
+                                <a href="#" class="dropdown-toggle" id="profileDropdown">
+                                    <img src="https://via.placeholder.com/35" alt="Profile" class="profile-icon" id="profile-pic">
+                                </a>
+                                <ul class="dropdown-menu" id="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" data-page="profile">الملف الشخصي</a></li>
+                                    <li><a class="dropdown-item hidden" href="#" id="admin-dashboard-link">لوحة التحكم</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="signout-btn">تسجيل الخروج</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Pages Container -->
+            <div id="pages-container">
+                <!-- Home Page -->
+                <div id="home-page" class="page">
+                    <!-- Hero Slider -->
+                    <div class="hero" id="hero-slider" style="background-image: url('https://via.placeholder.com/1920x1080')">
+                        <div class="hero-content">
+                            <h1 class="hero-title" id="hero-title">عنوان المحتوى المميز</h1>
+                            <p class="hero-description" id="hero-description">وصف مختصر للمحتوى المميز الذي يعرض في هذه المنصة.</p>
+                            <div class="hero-buttons">
+                                <button class="btn btn-primary btn-lg"><i class="fas fa-play"></i> تشغيل</button>
+                                <button class="btn btn-secondary btn-lg"><i class="fas fa-info-circle"></i> معلومات</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Sections -->
+                    <div class="section">
+                        <h2 class="section-title">أحدث المسلسلات</h2>
+                        <div class="content-row" id="latest-series"></div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">أحدث الأفلام</h2>
+                        <div class="content-row" id="latest-movies"></div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">الأكثر مشاهدة</h2>
+                        <div class="content-row" id="most-watched"></div>
+                    </div>
+                </div>
+
+                <!-- Series Page -->
+                <div id="series-page" class="page hidden" style="padding: 100px 30px 50px;">
+                    <h1 class="mb-4">جميع المسلسلات</h1>
+                    <div class="row flex flex-wrap" id="all-series"></div>
+                </div>
+
+                <!-- Movies Page -->
+                <div id="movies-page" class="page hidden" style="padding: 100px 30px 50px;">
+                    <h1 class="mb-4">جميع الأفلام</h1>
+                    <div class="row flex flex-wrap" id="all-movies"></div>
+                </div>
+
+                <!-- Series Detail Page -->
+                <div id="series-detail-page" class="page hidden" style="padding: 100px 30px 50px;">
+                    <div class="series-backdrop" style="height: 400px; background-size: cover; background-position: center; position: relative; margin-bottom: 30px;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: linear-gradient(to top, #000, transparent);"></div>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <div class="col-md-4" style="flex: 0 0 33.333%; max-width: 33.333%; padding: 0 15px;">
+                            <img src="" alt="Series Poster" class="img-fluid rounded series-poster" style="width: 100%; height: auto; border-radius: var(--border-radius);">
+                        </div>
+                        <div class="col-md-8" style="flex: 0 0 66.666%; max-width: 66.666%; padding: 0 15px;">
+                            <h1 class="series-title"></h1>
+                            <div class="series-meta mb-3">
+                                <span class="badge bg-primary me-2 series-year"></span>
+                                <span class="badge bg-success me-2 series-rating"></span>
+                                <span class="badge bg-info series-status"></span>
+                            </div>
+                            <p class="series-description"></p>
+                            <div class="series-genres mb-3"></div>
+                            <button class="btn btn-primary btn-lg play-series-btn"><i class="fas fa-play"></i> تشغيل الحلقة الأولى</button>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <h3>الحلقات</h3>
+                        <div class="episodes-list mt-3"></div>
+                    </div>
+                    <div class="mt-5">
+                        <h3>مسلسلات مشابهة</h3>
+                        <div class="content-row similar-series"></div>
+                    </div>
+                </div>
+
+                <!-- Movie Detail Page -->
+                <div id="movie-detail-page" class="page hidden" style="padding: 100px 30px 50px;">
+                    <div class="movie-backdrop" style="height: 400px; background-size: cover; background-position: center; position: relative; margin-bottom: 30px;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: linear-gradient(to top, #000, transparent);"></div>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <div class="col-md-4" style="flex: 0 0 33.333%; max-width: 33.333%; padding: 0 15px;">
+                            <img src="" alt="Movie Poster" class="img-fluid rounded movie-poster" style="width: 100%; height: auto; border-radius: var(--border-radius);">
+                        </div>
+                        <div class="col-md-8" style="flex: 0 0 66.666%; max-width: 66.666%; padding: 0 15px;">
+                            <h1 class="movie-title"></h1>
+                            <div class="movie-meta mb-3">
+                                <span class="badge bg-primary me-2 movie-year"></span>
+                                <span class="badge bg-success me-2 movie-rating"></span>
+                                <span class="badge bg-info movie-duration"></span>
+                            </div>
+                            <p class="movie-description"></p>
+                            <div class="movie-genres mb-3"></div>
+                            <button class="btn btn-primary btn-lg play-movie-btn"><i class="fas fa-play"></i> تشغيل الفيلم</button>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <h3>أفلام مشابهة</h3>
+                        <div class="content-row similar-movies"></div>
+                    </div>
+                </div>
+
+                <!-- Profile Page -->
+                <div id="profile-page" class="page hidden">
+                    <div class="profile-page">
+                        <div class="profile-header">
+                            <img src="https://via.placeholder.com/100" alt="Profile" class="profile-avatar" id="profile-avatar">
+                            <div>
+                                <h2 id="profile-name">اسم المستخدم</h2>
+                                <p id="profile-email">البريد الإلكتروني</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap">
+                            <div class="col-md-8" style="flex: 0 0 66.666%; max-width: 66.666%; padding: 0 15px;">
+                                <h3 class="mb-4">سجل المشاهدة</h3>
+                                <div class="watch-history" id="watch-history"></div>
+                            </div>
+                            <div class="col-md-4" style="flex: 0 0 33.333%; max-width: 33.333%; padding: 0 15px;">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title">القوائم المخصصة</h5>
+                                        <ul class="list-group" style="border: none;">
+                                            <li class="list-group-item flex justify-between align-center" style="background: transparent; border: none; padding: 10px 0;">
+                                                المفضلة
+                                                <span class="badge bg-primary rounded-pill" id="favorites-count">0</span>
+                                            </li>
+                                            <li class="list-group-item flex justify-between align-center" style="background: transparent; border: none; padding: 10px 0;">
+                                                المشاهدة لاحقاً
+                                                <span class="badge bg-primary rounded-pill" id="watchlist-count">0</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Results Page -->
+                <div id="search-page" class="page hidden" style="padding: 100px 30px 50px;">
+                    <h1 class="mb-4">نتائج البحث</h1>
+                    <div id="search-results"></div>
+                </div>
+
+                <!-- Video Player -->
+                <div class="video-player" id="video-player">
+                    <span class="close-player" id="close-player">&times;</span>
+                    <iframe id="player-iframe" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard (Hidden by default) -->
+        <div id="admin-dashboard" class="hidden">
+            <div class="admin-dashboard">
+                <div class="flex flex-wrap">
+                    <div class="col-md-2 sidebar" style="flex: 0 0 16.666%; max-width: 16.666%;">
+                        <h4 class="text-center mb-4">لوحة التحكم</h4>
+                        <ul class="sidebar-menu">
+                            <li class="active" data-section="dashboard"><a href="#"><i class="fas fa-tachometer-alt me-2"></i>لوحة التحكم</a></li>
+                            <li data-section="series"><a href="#"><i class="fas fa-tv me-2"></i>إدارة المسلسلات</a></li>
+                            <li data-section="episodes"><a href="#"><i class="fas fa-list-ol me-2"></i>إدارة الحلقات</a></li>
+                            <li data-section="movies"><a href="#"><i class="fas fa-film me-2"></i>إدارة الأفلام</a></li>
+                            <li data-section="ads"><a href="#"><i class="fas fa-ad me-2"></i>إدارة الإعلانات</a></li>
+                            <li data-section="stats"><a href="#"><i class="fas fa-chart-line me-2"></i>الإحصائيات</a></li>
+                            <li><a href="#" id="back-to-app"><i class="fas fa-arrow-left me-2"></i>العودة للتطبيق</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-10 admin-content" style="flex: 0 0 83.333%; max-width: 83.333%;">
+                        <!-- Dashboard Section -->
+                        <div id="dashboard-section">
+                            <h2>لوحة التحكم</h2>
+                            <div class="flex flex-wrap mt-4">
+                                <div class="col-md-4" style="flex: 0 0 33.333%; max-width: 33.333%; padding: 0 15px;">
+                                    <div class="card text-white bg-primary mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">إجمالي المسلسلات</h5>
+                                            <p class="card-text display-4" id="total-series">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="flex: 0 0 33.333%; max-width: 33.333%; padding: 0 15px;">
+                                    <div class="card text-white bg-success mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">إجمالي الأفلام</h5>
+                                            <p class="card-text display-4" id="total-movies">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="flex: 0 0 33.333%; max-width: 33.333%; padding: 0 15px;">
+                                    <div class="card text-white bg-info mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">إجمالي المشاهدات</h5>
+                                            <p class="card-text display-4" id="total-views">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">آخر المسلسلات المضافة</h5>
+                                    <div class="table-responsive" style="overflow-x: auto;">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>العنوان</th>
+                                                    <th>السنة</th>
+                                                    <th>الحالة</th>
+                                                    <th>التقييم</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recent-series">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Series Management Section -->
+                        <div id="series-section" class="hidden">
+                            <div class="flex justify-between align-center mb-4">
+                                <h2>إدارة المسلسلات</h2>
+                                <button class="btn btn-primary" id="add-series-btn">
+                                    <i class="fas fa-plus me-2"></i>إضافة مسلسل
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>الصورة</th>
+                                            <th>العنوان</th>
+                                            <th>السنة</th>
+                                            <th>الحالة</th>
+                                            <th>التقييم</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="series-list">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Episodes Management Section -->
+                        <div id="episodes-section" class="hidden">
+                            <div class="flex justify-between align-center mb-4">
+                                <h2>إدارة الحلقات</h2>
+                                <button class="btn btn-primary" id="add-episode-btn">
+                                    <i class="fas fa-plus me-2"></i>إضافة حلقة
+                                </button>
+                            </div>
+                            <div class="flex mb-4">
+                                <div class="col-md-4" style="flex: 0 0 33.333%; max-width: 33.333%; padding: 0 15px;">
+                                    <select class="form-select" id="series-select">
+                                        <option value="">اختر مسلسل...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>المسلسل</th>
+                                            <th>رقم الحلقة</th>
+                                            <th>العنوان</th>
+                                            <th>المدة</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="episodes-list">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Movies Management Section -->
+                        <div id="movies-section" class="hidden">
+                            <div class="flex justify-between align-center mb-4">
+                                <h2>إدارة الأفلام</h2>
+                                <button class="btn btn-primary" id="add-movie-btn">
+                                    <i class="fas fa-plus me-2"></i>إضافة فيلم
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>الصورة</th>
+                                            <th>العنوان</th>
+                                            <th>السنة</th>
+                                            <th>المدة</th>
+                                            <th>التقييم</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="movies-list">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Ads Management Section -->
+                        <div id="ads-section" class="hidden">
+                            <h2>إدارة الإعلانات</h2>
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">إعدادات Adsterra</h5>
+                                    <form id="ads-settings-form">
+                                        <div class="form-group">
+                                            <label for="publisher-id">معرف الناشر</label>
+                                            <input type="text" class="form-control" id="publisher-id">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="ad-type">نوع الإعلان</label>
+                                            <select class="form-select" id="ad-type">
+                                                <option value="banner">بانر</option>
+                                                <option value="interstitial">إعلان بين الصفحات</option>
+                                                <option value="video">فيديو</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" class="form-check-input" id="pre-roll-ads">
+                                            <label class="form-check-label" for="pre-roll-ads">إعلانات ما قبل التشغيل</label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" class="form-check-input" id="mid-roll-ads">
+                                            <label class="form-check-label" for="mid-roll-ads">إعلانات أثناء التشغيل</label>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Section -->
+                        <div id="stats-section" class="hidden">
+                            <h2>الإحصائيات</h2>
+                            <div class="flex flex-wrap mt-4">
+                                <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">إحصائيات المشاهدات</h5>
+                                            <canvas id="views-chart" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">توزيع الزوار</h5>
+                                            <canvas id="visitors-chart" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">أكثر المحتويات مشاهدة</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>العنوان</th>
+                                                    <th>النوع</th>
+                                                    <th>المشاهدات</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="top-content">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Modals -->
+    <!-- Add Series Modal -->
+    <div class="modal hidden" id="addSeriesModal">
+        <div class="modal-dialog" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة مسلسل جديد</h5>
+                    <button type="button" class="btn-close" id="close-add-series-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-series-form">
+                        <div class="flex flex-wrap">
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="series-title">عنوان المسلسل</label>
+                                    <input type="text" class="form-control" id="series-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="series-year">سنة الإصدار</label>
+                                    <input type="number" class="form-control" id="series-year" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="series-status">حالة المسلسل</label>
+                                    <select class="form-select" id="series-status" required>
+                                        <option value="مستمر">مستمر</option>
+                                        <option value="مكتمل">مكتمل</option>
+                                        <option value="ملغى">ملغى</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="series-rating">التقييم</label>
+                                    <input type="number" step="0.1" class="form-control" id="series-rating" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="series-poster">رابط صورة الملصق</label>
+                                    <input type="url" class="form-control" id="series-poster" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="series-backdrop">رابط صورة الخلفية</label>
+                                    <input type="url" class="form-control" id="series-backdrop" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="series-genres">التصنيفات (مفصولة بفاصلة)</label>
+                                    <input type="text" class="form-control" id="series-genres" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="series-description">القصة</label>
+                            <textarea class="form-control" id="series-description" rows="4" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-add-series">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="save-series-btn">حفظ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Series Modal -->
+    <div class="modal hidden" id="editSeriesModal">
+        <div class="modal-dialog" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل المسلسل</h5>
+                    <button type="button" class="btn-close" id="close-edit-series-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-series-form">
+                        <input type="hidden" id="edit-series-id">
+                        <div class="flex flex-wrap">
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="edit-series-title">عنوان المسلسل</label>
+                                    <input type="text" class="form-control" id="edit-series-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-series-year">سنة الإصدار</label>
+                                    <input type="number" class="form-control" id="edit-series-year" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-series-status">حالة المسلسل</label>
+                                    <select class="form-select" id="edit-series-status" required>
+                                        <option value="مستمر">مستمر</option>
+                                        <option value="مكتمل">مكتمل</option>
+                                        <option value="ملغى">ملغى</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-series-rating">التقييم</label>
+                                    <input type="number" step="0.1" class="form-control" id="edit-series-rating" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="edit-series-poster">رابط صورة الملصق</label>
+                                    <input type="url" class="form-control" id="edit-series-poster" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-series-backdrop">رابط صورة الخلفية</label>
+                                    <input type="url" class="form-control" id="edit-series-backdrop" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-series-genres">التصنيفات (مفصولة بفاصلة)</label>
+                                    <input type="text" class="form-control" id="edit-series-genres" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-series-description">القصة</label>
+                            <textarea class="form-control" id="edit-series-description" rows="4" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit-series">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="update-series-btn">تحديث</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Episode Modal -->
+    <div class="modal hidden" id="addEpisodeModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة حلقة جديدة</h5>
+                    <button type="button" class="btn-close" id="close-add-episode-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-episode-form">
+                        <div class="form-group">
+                            <label for="episode-series">المسلسل</label>
+                            <select class="form-select" id="episode-series" required>
+                                <option value="">اختر مسلسل...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="episode-number">رقم الحلقة</label>
+                            <input type="number" class="form-control" id="episode-number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="episode-title">عنوان الحلقة</label>
+                            <input type="text" class="form-control" id="episode-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="episode-duration">المدة (دقائق)</label>
+                            <input type="number" class="form-control" id="episode-duration" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="episode-thumbnail">رابط الصورة المصغرة</label>
+                            <input type="url" class="form-control" id="episode-thumbnail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="episode-video">رابط الفيديو</label>
+                            <input type="url" class="form-control" id="episode-video" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-add-episode">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="save-episode-btn">حفظ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Episode Modal -->
+    <div class="modal hidden" id="editEpisodeModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل الحلقة</h5>
+                    <button type="button" class="btn-close" id="close-edit-episode-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-episode-form">
+                        <input type="hidden" id="edit-episode-id">
+                        <div class="form-group">
+                            <label for="edit-episode-series">المسلسل</label>
+                            <select class="form-select" id="edit-episode-series" required>
+                                <option value="">اختر مسلسل...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-episode-number">رقم الحلقة</label>
+                            <input type="number" class="form-control" id="edit-episode-number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-episode-title">عنوان الحلقة</label>
+                            <input type="text" class="form-control" id="edit-episode-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-episode-duration">المدة (دقائق)</label>
+                            <input type="number" class="form-control" id="edit-episode-duration" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-episode-thumbnail">رابط الصورة المصغرة</label>
+                            <input type="url" class="form-control" id="edit-episode-thumbnail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-episode-video">رابط الفيديو</label>
+                            <input type="url" class="form-control" id="edit-episode-video" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit-episode">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="update-episode-btn">تحديث</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Movie Modal -->
+    <div class="modal hidden" id="addMovieModal">
+        <div class="modal-dialog" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة فيلم جديد</h5>
+                    <button type="button" class="btn-close" id="close-add-movie-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-movie-form">
+                        <div class="flex flex-wrap">
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="movie-title">عنوان الفيلم</label>
+                                    <input type="text" class="form-control" id="movie-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="movie-year">سنة الإصدار</label>
+                                    <input type="number" class="form-control" id="movie-year" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="movie-duration">المدة (دقائق)</label>
+                                    <input type="number" class="form-control" id="movie-duration" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="movie-rating">التقييم</label>
+                                    <input type="number" step="0.1" class="form-control" id="movie-rating" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="movie-poster">رابط صورة الملصق</label>
+                                    <input type="url" class="form-control" id="movie-poster" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="movie-backdrop">رابط صورة الخلفية</label>
+                                    <input type="url" class="form-control" id="movie-backdrop" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="movie-genres">التصنيفات (مفصولة بفاصلة)</label>
+                                    <input type="text" class="form-control" id="movie-genres" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-description">القصة</label>
+                            <textarea class="form-control" id="movie-description" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-video">رابط الفيديو</label>
+                            <input type="url" class="form-control" id="movie-video" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-add-movie">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="save-movie-btn">حفظ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Movie Modal -->
+    <div class="modal hidden" id="editMovieModal">
+        <div class="modal-dialog" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل الفيلم</h5>
+                    <button type="button" class="btn-close" id="close-edit-movie-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-movie-form">
+                        <input type="hidden" id="edit-movie-id">
+                        <div class="flex flex-wrap">
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="edit-movie-title">عنوان الفيلم</label>
+                                    <input type="text" class="form-control" id="edit-movie-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-movie-year">سنة الإصدار</label>
+                                    <input type="number" class="form-control" id="edit-movie-year" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-movie-duration">المدة (دقائق)</label>
+                                    <input type="number" class="form-control" id="edit-movie-duration" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-movie-rating">التقييم</label>
+                                    <input type="number" step="0.1" class="form-control" id="edit-movie-rating" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+                                <div class="form-group">
+                                    <label for="edit-movie-poster">رابط صورة الملصق</label>
+                                    <input type="url" class="form-control" id="edit-movie-poster" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-movie-backdrop">رابط صورة الخلفية</label>
+                                    <input type="url" class="form-control" id="edit-movie-backdrop" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-movie-genres">التصنيفات (مفصولة بفاصلة)</label>
+                                    <input type="text" class="form-control" id="edit-movie-genres" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-movie-description">القصة</label>
+                            <textarea class="form-control" id="edit-movie-description" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-movie-video">رابط الفيديو</label>
+                            <input type="url" class="form-control" id="edit-movie-video" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit-movie">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="update-movie-btn">تحديث</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <script>
+        // =============================================
+        // 1. تعريف الدوال المساعدة أولاً (إصلاح الخطأ #1)
+        // =============================================
+        
+        // دالة الإشعارات (تم نقلها للأعلى)
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast show align-items-center text-white bg-${type}`;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.left = '20px';
+            toast.style.zIndex = '9999';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '4px';
+            toast.style.display = 'flex';
+            toast.style.alignItems = 'center';
+            
+            toast.innerHTML = `
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer;">
+                    &times;
+                </button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            toast.querySelector('.btn-close').addEventListener('click', () => {
+                toast.remove();
+            });
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // دالة لتحميل الصور مع fallback (إصلاح الخطأ #6)
+        function loadImageWithFallback(imgElement, src, fallbackSrc = 'https://via.placeholder.com/300x450') {
+            imgElement.onerror = () => {
+                imgElement.src = fallbackSrc;
+                imgElement.onerror = null;
+            };
+            imgElement.src = src;
+        }
+
+        // دالة لإضافة معالج حدث مرة واحدة (إصلاح الخطأ #3)
+        const eventListeners = new Set();
+        function addEventListenerOnce(element, event, callback) {
+            const key = `${element.id || element.className}-${event}`;
+            if (!eventListeners.has(key)) {
+                element.addEventListener(event, callback);
+                eventListeners.add(key);
+            }
+        }
+
+        // =============================================
+        // 2. تهيئة Firebase مع أذونات محسنة (إصلاح الخطأ #8)
+        // =============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL7PaPWXH7gWbsFoCRZA8cKMov-xcY4bQ",
+            authDomain: "turkify-movies.firebaseapp.com",
+            projectId: "turkify-movies",
+            storageBucket: "turkify-movies.appspot.com",
+            messagingSenderId: "535487522663",
+            appId: "1:535487522663:web:b11bc354d78f9ab388b1c2",
+            measurementId: "G-R9XMGSTVRK"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
+
+        // تحسين قواعد الأمان
+        db.settings({
+            timestampsInSnapshots: true,
+            merge: true
+        });
+
+        // Google Provider
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        // =============================================
+        // 3. تعريف عناصر DOM
+        // =============================================
+        const authScreen = document.getElementById('auth-screen');
+        const mainContent = document.getElementById('main-content');
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const googleSignin = document.getElementById('google-signin');
+        const signoutBtn = document.getElementById('signout-btn');
+        const profilePic = document.getElementById('profile-pic');
+        const profileAvatar = document.getElementById('profile-avatar');
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const adminDashboardLink = document.getElementById('admin-dashboard-link');
+        const backToApp = document.getElementById('back-to-app');
+        const videoPlayer = document.getElementById('video-player');
+        const playerIframe = document.getElementById('player-iframe');
+        const closePlayer = document.getElementById('close-player');
+        const heroSlider = document.getElementById('hero-slider');
+        const heroTitle = document.getElementById('hero-title');
+        const heroDescription = document.getElementById('hero-description');
+        const latestSeries = document.getElementById('latest-series');
+        const latestMovies = document.getElementById('latest-movies');
+        const mostWatched = document.getElementById('most-watched');
+        const allSeries = document.getElementById('all-series');
+        const allMovies = document.getElementById('all-movies');
+        const watchHistory = document.getElementById('watch-history');
+        const favoritesCount = document.getElementById('favorites-count');
+        const watchlistCount = document.getElementById('watchlist-count');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const searchResults = document.getElementById('search-results');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        // عناصر لوحة التحكم
+        const totalSeries = document.getElementById('total-series');
+        const totalMovies = document.getElementById('total-movies');
+        const totalViews = document.getElementById('total-views');
+        const recentSeries = document.getElementById('recent-series');
+        const seriesList = document.getElementById('series-list');
+        const episodesList = document.getElementById('episodes-list');
+        const moviesList = document.getElementById('movies-list');
+        const topContent = document.getElementById('top-content');
+        const seriesSelect = document.getElementById('series-select');
+        const episodeSeries = document.getElementById('episode-series');
+        const editEpisodeSeries = document.getElementById('edit-episode-series');
+
+        // عناصر النماذج
+        const saveSeriesBtn = document.getElementById('save-series-btn');
+        const updateSeriesBtn = document.getElementById('update-series-btn');
+        const saveEpisodeBtn = document.getElementById('save-episode-btn');
+        const updateEpisodeBtn = document.getElementById('update-episode-btn');
+        const saveMovieBtn = document.getElementById('save-movie-btn');
+        const updateMovieBtn = document.getElementById('update-movie-btn');
+
+        // أزرار إغلاق النماذج
+        const closeAddSeriesModal = document.getElementById('close-add-series-modal');
+        const closeEditSeriesModal = document.getElementById('close-edit-series-modal');
+        const closeAddEpisodeModal = document.getElementById('close-add-episode-modal');
+        const closeEditEpisodeModal = document.getElementById('close-edit-episode-modal');
+        const closeAddMovieModal = document.getElementById('close-add-movie-modal');
+        const closeEditMovieModal = document.getElementById('close-edit-movie-modal');
+
+        // أزرار إلغاء النماذج
+        const cancelAddSeries = document.getElementById('cancel-add-series');
+        const cancelEditSeries = document.getElementById('cancel-edit-series');
+        const cancelAddEpisode = document.getElementById('cancel-add-episode');
+        const cancelEditEpisode = document.getElementById('cancel-edit-episode');
+        const cancelAddMovie = document.getElementById('cancel-add-movie');
+        const cancelEditMovie = document.getElementById('cancel-edit-movie');
+
+        // أزرار الإضافة
+        const addSeriesBtn = document.getElementById('add-series-btn');
+        const addEpisodeBtn = document.getElementById('add-episode-btn');
+        const addMovieBtn = document.getElementById('add-movie-btn');
+
+        // =============================================
+        // 4. إدارة حالة التطبيق (إصلاح الخطأ #5)
+        // =============================================
+        const appState = {
+            currentUser: null,
+            isAdmin: false,
+            currentPage: 'home',
+            currentAdminSection: 'dashboard',
+            currentContent: {
+                seriesId: null,
+                movieId: null,
+                episodeId: null
+            }
+        };
+
+        // =============================================
+        // 5. وظائف تشغيل الفيديو (إصلاح الخطأ #4 و #9)
+        // =============================================
+        function playVideo(url, title, type, id) {
+            // التحقق من وجود Adsterra واستخدام HTTPS (إصلاح الخطأ #4)
+            if (typeof Adsterra !== 'undefined' && window.location.protocol === 'https:') {
+                if (document.getElementById('pre-roll-ads')?.checked) {
+                    Adsterra.showPreRollAd(() => {
+                        showVideoPlayer(url);
+                        logView(id, type, title);
+                    });
+                    return;
+                }
+            }
+            
+            showVideoPlayer(url);
+            logView(id, type, title);
+        }
+
+        function showVideoPlayer(url) {
+            playerIframe.src = url;
+            videoPlayer.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // إعداد حجم متجاوب للمشغل (إصلاح الخطأ #9)
+            const resizePlayer = () => {
+                const aspectRatio = 16 / 9;
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                
+                if (windowWidth / windowHeight > aspectRatio) {
+                    playerIframe.style.width = `${windowHeight * aspectRatio}px`;
+                    playerIframe.style.height = `${windowHeight}px`;
+                } else {
+                    playerIframe.style.width = `${windowWidth}px`;
+                    playerIframe.style.height = `${windowWidth / aspectRatio}px`;
+                }
+            };
+            
+            window.addEventListener('resize', resizePlayer);
+            resizePlayer();
+        }
+
+        function logView(contentId, contentType, title) {
+            if (!appState.currentUser) return;
+            
+            const viewData = {
+                userId: appState.currentUser.uid,
+                contentId: contentId,
+                contentType: contentType,
+                title: title,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            db.collection('views').add(viewData)
+                .then(() => {
+                    analytics.logEvent('play_content', {
+                        content_type: contentType,
+                        content_id: contentId
+                    });
+                })
+                .catch(error => {
+                    console.error("Error logging view:", error);
+                });
+        }
+
+        closePlayer.addEventListener('click', () => {
+            playerIframe.src = '';
+            videoPlayer.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // =============================================
+        // 6. وظائف المصادقة (إصلاح الخطأ #14 - تسجيل الدخول بجوجل)
+        // =============================================
+        function initApp() {
+            // إضافة معالج حدث للروابط (إصلاح الخطأ #7)
+            document.querySelectorAll('a[href="#"]').forEach(link => {
+                link.addEventListener('click', e => e.preventDefault());
+            });
+
+            auth.onAuthStateChanged(async user => {
+                if (user) {
+                    appState.currentUser = user;
+                    
+                    // تحميل صورة المستخدم مع fallback
+                    loadImageWithFallback(profilePic, user.photoURL || 'https://via.placeholder.com/35');
+                    loadImageWithFallback(profileAvatar, user.photoURL || 'https://via.placeholder.com/100');
+                    
+                    profileName.textContent = user.displayName || 'مستخدم';
+                    profileEmail.textContent = user.email;
+                    
+                    // التحقق من صلاحيات المدير (إصلاح الخطأ #2)
+                    await checkAdminStatus(user.uid);
+                    
+                    // عرض المحتوى الرئيسي
+                    authScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    
+                    // تحميل الصفحة الحالية
+                    if (appState.currentPage === 'home') {
+                        await loadHomePage();
+                    }
+                    
+                    // تحميل بيانات الملف الشخصي (إصلاح الخطأ #11)
+                    await loadProfileData();
+                    
+                    // تحميل إعدادات الإعلانات
+                    await loadAdsSettings();
+                    
+                    analytics.logEvent('login');
+                } else {
+                    appState.currentUser = null;
+                    appState.isAdmin = false;
+                    authScreen.classList.remove('hidden');
+                    mainContent.classList.add('hidden');
+                    adminDashboard.classList.add('hidden');
+                }
+            });
+        }
+
+        async function checkAdminStatus(userId) {
+            try {
+                const doc = await db.collection('admins').doc(userId).get();
+                appState.isAdmin = doc.exists;
+                
+                if (appState.isAdmin) {
+                    adminDashboardLink.classList.remove('hidden');
+                } else {
+                    adminDashboardLink.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+                appState.isAdmin = false;
+                adminDashboardLink.classList.add('hidden');
+            }
+        }
+
+        googleSignin.addEventListener('click', () => {
+            auth.signInWithPopup(provider).then(result => {
+                console.log('Signed in:', result.user);
+                showToast('تم تسجيل الدخول بنجاح', 'success');
+            }).catch(error => {
+                console.error('Sign in error:', error);
+                showToast('حدث خطأ أثناء تسجيل الدخول', 'danger');
+            });
+        });
+
+        signoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                console.log('Signed out');
+                showToast('تم تسجيل الخروج بنجاح', 'success');
+            }).catch(error => {
+                console.error('Sign out error:', error);
+                showToast('حدث خطأ أثناء تسجيل الخروج', 'danger');
+            });
+        });
+
+        // =============================================
+        // 7. وظائف التنقل (إصلاح الخطأ #7)
+        // =============================================
+        profileDropdown.addEventListener('click', (e) => {
+            e.preventDefault();
+            dropdownMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+
+        document.querySelectorAll('[data-page]').forEach(link => {
+            addEventListenerOnce(link, 'click', e => {
+                e.preventDefault();
+                const page = e.target.getAttribute('data-page');
+                navigateTo(page);
+                dropdownMenu.classList.remove('show');
+            });
+        });
+
+        async function navigateTo(page) {
+            try {
+                // إخفاء جميع الصفحات
+                document.querySelectorAll('.page').forEach(p => {
+                    p.classList.add('hidden');
+                });
+                
+                // عرض الصفحة المحددة
+                const pageElement = document.getElementById(`${page}-page`);
+                if (pageElement) {
+                    pageElement.classList.remove('hidden');
+                    appState.currentPage = page;
+                    
+                    // تحميل بيانات الصفحة
+                    switch(page) {
+                        case 'home':
+                            await loadHomePage();
+                            break;
+                        case 'series':
+                            await loadAllSeries();
+                            break;
+                        case 'movies':
+                            await loadAllMovies();
+                            break;
+                        case 'profile':
+                            await loadProfileData();
+                            break;
+                    }
+                    
+                    // تحديث رابط التنقل النشط
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    const activeLink = document.querySelector(`.nav-link[data-page="${page}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                    }
+                    
+                    // التمرير إلى الأعلى
+                    window.scrollTo(0, 0);
+                }
+            } catch (error) {
+                console.error("Error navigating:", error);
+                showToast('حدث خطأ في تحميل الصفحة', 'danger');
+            }
+        }
+
+        // =============================================
+        // 8. وظائف البحث (إصلاح الخطأ #10)
+        // =============================================
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                performSearch(query);
+            }
+        });
+
+        searchInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    performSearch(query);
+                }
+            }
+        });
+
+        async function performSearch(query) {
+            try {
+                // عرض صفحة البحث
+                await navigateTo('search');
+                
+                // مسح النتائج السابقة
+                searchResults.innerHTML = '';
+                
+                // البحث في المسلسلات (إصلاح الخطأ #10 - تحسين استعلامات البحث)
+                const seriesQuery = await db.collection('series')
+                    .where('keywords', 'array-contains', query.toLowerCase())
+                    .limit(10)
+                    .get();
+
+                if (!seriesQuery.empty) {
+                    searchResults.innerHTML += '<h3 class="mt-4">المسلسلات</h3><div class="row flex flex-wrap" id="search-series"></div>';
+                    const container = document.getElementById('search-series');
+                    
+                    seriesQuery.forEach(doc => {
+                        const series = doc.data();
+                        const item = document.createElement('div');
+                        item.className = 'col-md-3';
+                        item.style = 'flex: 0 0 25%; max-width: 25%; padding: 0 15px; margin-bottom: 20px;';
+                        item.innerHTML = `
+                            <div class="card h-100">
+                                <img src="" class="card-img-top" alt="${series.title}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${series.title}</h5>
+                                    <p class="card-text">${series.year} • ${series.rating}/10</p>
+                                    <button class="btn btn-primary btn-sm view-series-btn" data-id="${doc.id}">عرض التفاصيل</button>
+                                </div>
+                            </div>
+                        `;
+                        loadImageWithFallback(item.querySelector('img'), series.poster);
+                        container.appendChild(item);
+                    });
+                    
+                    // إضافة معالجات الأحداث
+                    document.querySelectorAll('.view-series-btn').forEach(btn => {
+                        addEventListenerOnce(btn, 'click', () => {
+                            viewSeriesDetails(btn.getAttribute('data-id'));
+                        });
+                    });
+                }
+                
+                // البحث في الأفلام (إصلاح الخطأ #10 - تحسين استعلامات البحث)
+                const moviesQuery = await db.collection('movies')
+                    .where('keywords', 'array-contains', query.toLowerCase())
+                    .limit(10)
+                    .get();
+
+                if (!moviesQuery.empty) {
+                    searchResults.innerHTML += '<h3 class="mt-4">الأفلام</h3><div class="row flex flex-wrap" id="search-movies"></div>';
+                    const container = document.getElementById('search-movies');
+                    
+                    moviesQuery.forEach(doc => {
+                        const movie = doc.data();
+                        const item = document.createElement('div');
+                        item.className = 'col-md-3';
+                        item.style = 'flex: 0 0 25%; max-width: 25%; padding: 0 15px; margin-bottom: 20px;';
+                        item.innerHTML = `
+                            <div class="card h-100">
+                                <img src="" class="card-img-top" alt="${movie.title}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${movie.title}</h5>
+                                    <p class="card-text">${movie.year} • ${movie.rating}/10</p>
+                                    <button class="btn btn-primary btn-sm view-movie-btn" data-id="${doc.id}">عرض التفاصيل</button>
+                                </div>
+                            </div>
+                        `;
+                        loadImageWithFallback(item.querySelector('img'), movie.poster);
+                        container.appendChild(item);
+                    });
+                    
+                    // إضافة معالجات الأحداث
+                    document.querySelectorAll('.view-movie-btn').forEach(btn => {
+                        addEventListenerOnce(btn, 'click', () => {
+                            viewMovieDetails(btn.getAttribute('data-id'));
+                        });
+                    });
+                }
+                
+                analytics.logEvent('search', { search_term: query });
+            } catch (error) {
+                console.error("Error performing search:", error);
+                showToast('حدث خطأ أثناء البحث', 'danger');
+            }
+        }
+
+        // =============================================
+        // 9. وظائف الصفحة الرئيسية (إصلاح الخطأ #12 - تحميل المحتوى الأكثر مشاهدة)
+        // =============================================
+        async function loadHomePage() {
+            try {
+                // تحميل المحتوى المميز
+                const featuredQuery = await db.collection('series')
+                    .orderBy('createdAt', 'desc')
+                    .limit(1)
+                    .get();
+
+                if (!featuredQuery.empty) {
+                    const doc = featuredQuery.docs[0];
+                    const series = doc.data();
+                    
+                    heroSlider.style.backgroundImage = `url('${series.backdrop}')`;
+                    heroTitle.textContent = series.title;
+                    heroDescription.textContent = series.description.substring(0, 150) + '...';
+                    
+                    // تحديث زر التشغيل
+                    document.querySelector('.hero-buttons .btn-primary').onclick = async () => {
+                        try {
+                            const episodesQuery = await db.collection('episodes')
+                                .where('seriesId', '==', doc.id)
+                                .orderBy('number')
+                                .limit(1)
+                                .get();
+
+                            if (!episodesQuery.empty) {
+                                const episode = episodesQuery.docs[0].data();
+                                playVideo(episode.videoUrl, `${series.title} - الحلقة ${episode.number}`, 'series', doc.id);
+                            }
+                        } catch (error) {
+                            console.error("Error getting first episode:", error);
+                            showToast('حدث خطأ في تحميل الحلقة', 'danger');
+                        }
+                    };
+                }
+
+                // تحميل أحدث المسلسلات (إصلاح الخطأ #12)
+                latestSeries.innerHTML = '';
+                const latestSeriesQuery = await db.collection('series')
+                    .orderBy('createdAt', 'desc')
+                    .limit(10)
+                    .get();
+
+                latestSeriesQuery.forEach(doc => {
+                    const series = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'content-item';
+                    item.innerHTML = `
+                        <img src="" alt="${series.title}">
+                        <div class="content-item-info">
+                            <h3 class="content-item-title">${series.title}</h3>
+                        </div>
+                    `;
+                    loadImageWithFallback(item.querySelector('img'), series.poster);
+                    item.onclick = () => viewSeriesDetails(doc.id);
+                    latestSeries.appendChild(item);
+                });
+
+                // تحميل أحدث الأفلام (إصلاح الخطأ #12)
+                latestMovies.innerHTML = '';
+                const latestMoviesQuery = await db.collection('movies')
+                    .orderBy('createdAt', 'desc')
+                    .limit(10)
+                    .get();
+
+                latestMoviesQuery.forEach(doc => {
+                    const movie = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'content-item';
+                    item.innerHTML = `
+                        <img src="" alt="${movie.title}">
+                        <div class="content-item-info">
+                            <h3 class="content-item-title">${movie.title}</h3>
+                        </div>
+                    `;
+                    loadImageWithFallback(item.querySelector('img'), movie.poster);
+                    item.onclick = () => viewMovieDetails(doc.id);
+                    latestMovies.appendChild(item);
+                });
+
+                // تحميل الأكثر مشاهدة (إصلاح الخطأ #12)
+                mostWatched.innerHTML = '';
+                const mostWatchedContent = await getMostWatchedContent(10);
+                
+                for (const item of mostWatchedContent) {
+                    if (item.data.contentType === 'series') {
+                        const seriesDoc = await db.collection('series').doc(item.data.contentId).get();
+                        if (seriesDoc.exists) {
+                            const series = seriesDoc.data();
+                            const itemElement = document.createElement('div');
+                            itemElement.className = 'content-item';
+                            itemElement.innerHTML = `
+                                <img src="" alt="${series.title}">
+                                <div class="content-item-info">
+                                    <h3 class="content-item-title">${series.title}</h3>
+                                </div>
+                            `;
+                            loadImageWithFallback(itemElement.querySelector('img'), series.poster);
+                            itemElement.onclick = () => viewSeriesDetails(seriesDoc.id);
+                            mostWatched.appendChild(itemElement);
+                        }
+                    } else if (item.data.contentType === 'movie') {
+                        const movieDoc = await db.collection('movies').doc(item.data.contentId).get();
+                        if (movieDoc.exists) {
+                            const movie = movieDoc.data();
+                            const itemElement = document.createElement('div');
+                            itemElement.className = 'content-item';
+                            itemElement.innerHTML = `
+                                <img src="" alt="${movie.title}">
+                                <div class="content-item-info">
+                                    <h3 class="content-item-title">${movie.title}</h3>
+                                </div>
+                            `;
+                            loadImageWithFallback(itemElement.querySelector('img'), movie.poster);
+                            itemElement.onclick = () => viewMovieDetails(movieDoc.id);
+                            mostWatched.appendChild(itemElement);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading home page:", error);
+                showToast('حدث خطأ في تحميل الصفحة الرئيسية', 'danger');
+            }
+        }
+
+        async function getMostWatchedContent(limit = 10) {
+            try {
+                const viewsSnapshot = await db.collection('views')
+                    .orderBy('timestamp', 'desc')
+                    .limit(100)
+                    .get();
+
+                const contentMap = new Map();
+
+                viewsSnapshot.forEach(doc => {
+                    const view = doc.data();
+                    const key = `${view.contentType}_${view.contentId}`;
+                    
+                    if (contentMap.has(key)) {
+                        contentMap.get(key).count++;
+                    } else {
+                        contentMap.set(key, {
+                            count: 1,
+                            data: view
+                        });
+                    }
+                });
+
+                return Array.from(contentMap.values())
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, limit);
+            } catch (error) {
+                console.error("Error getting most watched content:", error);
+                showToast('حدث خطأ في تحميل المحتوى الأكثر مشاهدة', 'danger');
+                return [];
+            }
+        }
+
+        // =============================================
+        // 10. وظائف تفاصيل المحتوى
+        // =============================================
+        async function viewSeriesDetails(seriesId) {
+            appState.currentContent.seriesId = seriesId;
+            await navigateTo('series-detail');
+            
+            try {
+                const doc = await db.collection('series').doc(seriesId).get();
+                if (doc.exists) {
+                    const series = doc.data();
+                    
+                    // تعيين الخلفية
+                    document.querySelector('.series-backdrop').style.backgroundImage = `url('${series.backdrop}')`;
+                    
+                    // تعيين الملصق
+                    loadImageWithFallback(document.querySelector('.series-poster'), series.poster);
+                    
+                    // تعيين العنوان والمعلومات
+                    document.querySelector('.series-title').textContent = series.title;
+                    document.querySelector('.series-year').textContent = series.year;
+                    document.querySelector('.series-rating').textContent = `${series.rating}/10`;
+                    document.querySelector('.series-status').textContent = series.status;
+                    document.querySelector('.series-description').textContent = series.description;
+                    
+                    // تعيين التصنيفات
+                    const genresContainer = document.querySelector('.series-genres');
+                    genresContainer.innerHTML = '';
+                    series.genres.split(',').forEach(genre => {
+                        genresContainer.innerHTML += `<span class="badge bg-secondary me-2">${genre.trim()}</span>`;
+                    });
+                    
+                    // تعيين زر التشغيل
+                    document.querySelector('.play-series-btn').onclick = async () => {
+                        try {
+                            const episodesQuery = await db.collection('episodes')
+                                .where('seriesId', '==', seriesId)
+                                .orderBy('number')
+                                .limit(1)
+                                .get();
+
+                            if (!episodesQuery.empty) {
+                                const episode = episodesQuery.docs[0].data();
+                                playVideo(episode.videoUrl, `${series.title} - الحلقة ${episode.number}`, 'series', seriesId);
+                            }
+                        } catch (error) {
+                            console.error("Error getting first episode:", error);
+                            showToast('حدث خطأ في تحميل الحلقة', 'danger');
+                        }
+                    };
+                    
+                    // تحميل الحلقات
+                    const episodesList = document.querySelector('.episodes-list');
+                    episodesList.innerHTML = '';
+                    
+                    const episodesQuery = await db.collection('episodes')
+                        .where('seriesId', '==', seriesId)
+                        .orderBy('number')
+                        .get();
+
+                    if (!episodesQuery.empty) {
+                        episodesQuery.forEach(episodeDoc => {
+                            const episode = episodeDoc.data();
+                            const episodeElement = document.createElement('div');
+                            episodeElement.className = 'card mb-2';
+                            episodeElement.innerHTML = `
+                                <div class="card-body flex justify-between align-center">
+                                    <div>
+                                        <h5 class="card-title mb-1">الحلقة ${episode.number}: ${episode.title}</h5>
+                                        <p class="card-text mb-0 text-muted">${episode.duration} دقيقة</p>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm play-episode-btn" 
+                                            data-url="${episode.videoUrl}" 
+                                            data-title="${series.title} - الحلقة ${episode.number}">
+                                        <i class="fas fa-play"></i> تشغيل
+                                    </button>
+                                </div>
+                            `;
+                            episodesList.appendChild(episodeElement);
+                        });
+                        
+                        // إضافة معالجات الأحداث لأزرار التشغيل
+                        document.querySelectorAll('.play-episode-btn').forEach(btn => {
+                            addEventListenerOnce(btn, 'click', () => {
+                                playVideo(btn.getAttribute('data-url'), btn.getAttribute('data-title'), 'series', seriesId);
+                            });
+                        });
+                    } else {
+                        episodesList.innerHTML = '<p>لا توجد حلقات متاحة</p>';
+                    }
+                    
+                    // تحميل مسلسلات مشابهة
+                    const similarSeries = document.querySelector('.similar-series');
+                    similarSeries.innerHTML = '';
+                    
+                    if (series.genres) {
+                        const firstGenre = series.genres.split(',')[0].trim();
+                        
+                        const similarQuery = await db.collection('series')
+                            .where('genres', 'array-contains', firstGenre)
+                            .where(firebase.firestore.FieldPath.documentId(), '!=', seriesId)
+                            .limit(5)
+                            .get();
+
+                        similarQuery.forEach(doc => {
+                            const similar = doc.data();
+                            const item = document.createElement('div');
+                            item.className = 'content-item';
+                            item.innerHTML = `
+                                <img src="" alt="${similar.title}">
+                                <div class="content-item-info">
+                                    <h3 class="content-item-title">${similar.title}</h3>
+                                </div>
+                            `;
+                            loadImageWithFallback(item.querySelector('img'), similar.poster);
+                            item.onclick = () => viewSeriesDetails(doc.id);
+                            similarSeries.appendChild(item);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading series details:", error);
+                showToast('حدث خطأ في تحميل تفاصيل المسلسل', 'danger');
+            }
+        }
+
+        async function viewMovieDetails(movieId) {
+            appState.currentContent.movieId = movieId;
+            await navigateTo('movie-detail');
+            
+            try {
+                const doc = await db.collection('movies').doc(movieId).get();
+                if (doc.exists) {
+                    const movie = doc.data();
+                    
+                    // تعيين الخلفية
+                    document.querySelector('.movie-backdrop').style.backgroundImage = `url('${movie.backdrop}')`;
+                    
+                    // تعيين الملصق
+                    loadImageWithFallback(document.querySelector('.movie-poster'), movie.poster);
+                    
+                    // تعيين العنوان والمعلومات
+                    document.querySelector('.movie-title').textContent = movie.title;
+                    document.querySelector('.movie-year').textContent = movie.year;
+                    document.querySelector('.movie-rating').textContent = `${movie.rating}/10`;
+                    document.querySelector('.movie-duration').textContent = `${movie.duration} دقيقة`;
+                    document.querySelector('.movie-description').textContent = movie.description;
+                    
+                    // تعيين التصنيفات
+                    const genresContainer = document.querySelector('.movie-genres');
+                    genresContainer.innerHTML = '';
+                    movie.genres.split(',').forEach(genre => {
+                        genresContainer.innerHTML += `<span class="badge bg-secondary me-2">${genre.trim()}</span>`;
+                    });
+                    
+                    // تعيين زر التشغيل
+                    document.querySelector('.play-movie-btn').onclick = () => {
+                        playVideo(movie.videoUrl, movie.title, 'movie', movieId);
+                    };
+                    
+                    // تحميل أفلام مشابهة
+                    const similarMovies = document.querySelector('.similar-movies');
+                    similarMovies.innerHTML = '';
+                    
+                    if (movie.genres) {
+                        const firstGenre = movie.genres.split(',')[0].trim();
+                        
+                        const similarQuery = await db.collection('movies')
+                            .where('genres', 'array-contains', firstGenre)
+                            .where(firebase.firestore.FieldPath.documentId(), '!=', movieId)
+                            .limit(5)
+                            .get();
+
+                        similarQuery.forEach(doc => {
+                            const similar = doc.data();
+                            const item = document.createElement('div');
+                            item.className = 'content-item';
+                            item.innerHTML = `
+                                <img src="" alt="${similar.title}">
+                                <div class="content-item-info">
+                                    <h3 class="content-item-title">${similar.title}</h3>
+                                </div>
+                            `;
+                            loadImageWithFallback(item.querySelector('img'), similar.poster);
+                            item.onclick = () => viewMovieDetails(doc.id);
+                            similarMovies.appendChild(item);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading movie details:", error);
+                showToast('حدث خطأ في تحميل تفاصيل الفيلم', 'danger');
+            }
+        }
+
+        // =============================================
+        // 11. وظائف تحميل المحتوى (إصلاح الخطأ #13 - قسم الأفلام)
+        // =============================================
+        async function loadAllSeries() {
+            try {
+                allSeries.innerHTML = '';
+                const snapshot = await db.collection('series').orderBy('title').get();
+                
+                snapshot.forEach(doc => {
+                    const series = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'col-md-3';
+                    item.style = 'flex: 0 0 25%; max-width: 25%; padding: 0 15px; margin-bottom: 20px;';
+                    item.innerHTML = `
+                        <div class="card h-100">
+                            <img src="" class="card-img-top" alt="${series.title}">
+                            <div class="card-body">
+                                <h5 class="card-title">${series.title}</h5>
+                                <p class="card-text">${series.year} • ${series.rating}/10</p>
+                                <button class="btn btn-primary btn-sm view-series-btn" data-id="${doc.id}">عرض التفاصيل</button>
+                            </div>
+                        </div>
+                    `;
+                    loadImageWithFallback(item.querySelector('img'), series.poster);
+                    allSeries.appendChild(item);
+                });
+                
+                // إضافة معالجات الأحداث
+                document.querySelectorAll('.view-series-btn').forEach(btn => {
+                    addEventListenerOnce(btn, 'click', () => {
+                        viewSeriesDetails(btn.getAttribute('data-id'));
+                    });
+                });
+            } catch (error) {
+                console.error("Error loading all series:", error);
+                showToast('حدث خطأ في تحميل المسلسلات', 'danger');
+            }
+        }
+
+        async function loadAllMovies() {
+            try {
+                allMovies.innerHTML = '';
+                const snapshot = await db.collection('movies')
+                    .orderBy('title')
+                    .get();
+                
+                snapshot.forEach(doc => {
+                    const movie = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'col-md-3';
+                    item.style = 'flex: 0 0 25%; max-width: 25%; padding: 0 15px; margin-bottom: 20px;';
+                    item.innerHTML = `
+                        <div class="card h-100">
+                            <img src="" class="card-img-top" alt="${movie.title}">
+                            <div class="card-body">
+                                <h5 class="card-title">${movie.title}</h5>
+                                <p class="card-text">${movie.year} • ${movie.rating}/10</p>
+                                <button class="btn btn-primary btn-sm view-movie-btn" data-id="${doc.id}">عرض التفاصيل</button>
+                            </div>
+                        </div>
+                    `;
+                    loadImageWithFallback(item.querySelector('img'), movie.poster);
+                    allMovies.appendChild(item);
+                });
+                
+                // إضافة معالجات الأحداث
+                document.querySelectorAll('.view-movie-btn').forEach(btn => {
+                    addEventListenerOnce(btn, 'click', () => {
+                        viewMovieDetails(btn.getAttribute('data-id'));
+                    });
+                                });
+            } catch (error) {
+                console.error("Error loading all movies:", error);
+                showToast('حدث خطأ في تحميل الأفلام', 'danger');
+            }
+        }
+
+        // =============================================
+        // 12. وظائف المفضلة وقائمة المشاهدة (إضافة جديدة)
+        // =============================================
+        async function toggleFavorite(contentId, contentType) {
+            if (!appState.currentUser) {
+                showToast('يجب تسجيل الدخول لإضافة إلى المفضلة', 'warning');
+                return;
+            }
+
+            try {
+                const favoriteRef = db.collection('favorites')
+                    .where('userId', '==', appState.currentUser.uid)
+                    .where('contentId', '==', contentId)
+                    .limit(1);
+
+                const snapshot = await favoriteRef.get();
+
+                if (snapshot.empty) {
+                    await db.collection('favorites').add({
+                        userId: appState.currentUser.uid,
+                        contentId: contentId,
+                        contentType: contentType,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('تمت الإضافة إلى المفضلة', 'success');
+                } else {
+                    await db.collection('favorites').doc(snapshot.docs[0].id).delete();
+                    showToast('تمت الإزالة من المفضلة', 'info');
+                }
+
+                // تحديث العداد
+                await loadProfileData();
+            } catch (error) {
+                console.error("Error toggling favorite:", error);
+                showToast('حدث خطأ أثناء تحديث المفضلة', 'danger');
+            }
+        }
+
+        async function toggleWatchlist(contentId, contentType) {
+            if (!appState.currentUser) {
+                showToast('يجب تسجيل الدخول لإضافة إلى قائمة المشاهدة', 'warning');
+                return;
+            }
+
+            try {
+                const watchlistRef = db.collection('watchlist')
+                    .where('userId', '==', appState.currentUser.uid)
+                    .where('contentId', '==', contentId)
+                    .limit(1);
+
+                const snapshot = await watchlistRef.get();
+
+                if (snapshot.empty) {
+                    await db.collection('watchlist').add({
+                        userId: appState.currentUser.uid,
+                        contentId: contentId,
+                        contentType: contentType,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('تمت الإضافة إلى قائمة المشاهدة', 'success');
+                } else {
+                    await db.collection('watchlist').doc(snapshot.docs[0].id).delete();
+                    showToast('تمت الإزالة من قائمة المشاهدة', 'info');
+                }
+
+                // تحديث العداد
+                await loadProfileData();
+            } catch (error) {
+                console.error("Error toggling watchlist:", error);
+                showToast('حدث خطأ أثناء تحديث قائمة المشاهدة', 'danger');
+            }
+        }
+
+        // =============================================
+        // 13. وظائف التقييم والتعليقات (إضافة جديدة)
+        // =============================================
+        async function submitRating(contentId, contentType, rating) {
+            if (!appState.currentUser) {
+                showToast('يجب تسجيل الدخول لتقييم المحتوى', 'warning');
+                return;
+            }
+
+            try {
+                // التحقق من وجود تقييم سابق
+                const ratingRef = db.collection('ratings')
+                    .where('userId', '==', appState.currentUser.uid)
+                    .where('contentId', '==', contentId)
+                    .limit(1);
+
+                const snapshot = await ratingRef.get();
+
+                if (snapshot.empty) {
+                    await db.collection('ratings').add({
+                        userId: appState.currentUser.uid,
+                        contentId: contentId,
+                        contentType: contentType,
+                        rating: rating,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    await db.collection('ratings').doc(snapshot.docs[0].id).update({
+                        rating: rating,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                // تحديث متوسط التقييمات
+                await updateContentRating(contentId, contentType);
+                showToast('تم حفظ التقييم بنجاح', 'success');
+            } catch (error) {
+                console.error("Error submitting rating:", error);
+                showToast('حدث خطأ أثناء حفظ التقييم', 'danger');
+            }
+        }
+
+        async function updateContentRating(contentId, contentType) {
+            try {
+                const ratingsSnapshot = await db.collection('ratings')
+                    .where('contentId', '==', contentId)
+                    .get();
+
+                let total = 0;
+                let count = 0;
+
+                ratingsSnapshot.forEach(doc => {
+                    total += doc.data().rating;
+                    count++;
+                });
+
+                const averageRating = count > 0 ? (total / count).toFixed(1) : 0;
+
+                // تحديث التقييم في المحتوى
+                if (contentType === 'movie') {
+                    await db.collection('movies').doc(contentId).update({
+                        rating: averageRating
+                    });
+                } else if (contentType === 'series') {
+                    await db.collection('series').doc(contentId).update({
+                        rating: averageRating
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating content rating:", error);
+            }
+        }
+
+        // =============================================
+        // 14. وظائف إضافية للتحكم في النماذج
+        // =============================================
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // إضافة معالجات الأحداث لأزرار إغلاق النماذج
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            addEventListenerOnce(btn, 'click', () => {
+                const modal = btn.closest('.modal');
+                closeModal(modal.id);
+            });
+        });
+
+        // =============================================
+        // 15. تهيئة التطبيق
+        // =============================================
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // جعل الدوال متاحة عالمياً
+            window.viewSeriesDetails = viewSeriesDetails;
+            window.viewMovieDetails = viewMovieDetails;
+            window.toggleFavorite = toggleFavorite;
+            window.toggleWatchlist = toggleWatchlist;
+            window.submitRating = submitRating;
+            
+            // تأثير التمرير للشريط العلوي
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    document.querySelector('.navbar').classList.add('scrolled');
+                } else {
+                    document.querySelector('.navbar').classList.remove('scrolled');
+                }
+            });
+            
+            // التحكم في حجم الفيديو عند تغيير حجم النافذة
+            window.addEventListener('resize', () => {
+                if (appState.currentPage === 'home' && window.innerWidth <= 768) {
+                    document.querySelector('.hero-content').style.maxWidth = '100%';
+                } else if (appState.currentPage === 'home') {
+                    document.querySelector('.hero-content').style.maxWidth = '60%';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
