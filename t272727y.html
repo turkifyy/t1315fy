@@ -1359,6 +1359,17 @@
         .notification-close:hover {
             opacity: 1;
         }
+
+        [dir="rtl"] .notification {
+            right: auto;
+            left: 20px;
+            direction: rtl;
+        }
+
+[dir="rtl"] .notification-close {
+            margin-left: 0;
+            margin-right: 12px;
+         }
         
         /* User Profile Modal */
         .profile-modal {
@@ -2364,6 +2375,7 @@
             
             // Initialize emoji picker
             setupEmojiPicker();
+            setupFCM();
         }
         
         // Register service worker for PWA capabilities
@@ -2754,11 +2766,149 @@ function signInWithGoogle() {
         }
         
         // Show onboarding screen
-        function showOnboarding(userId) {
-            authScreen.style.display = 'none';
-            onboardingScreen.classList.add('active');
-            loadPeopleYouMayKnow(userId);
-        }
+        // عرض شاشة Onboarding مع الإصلاحات
+function showOnboarding(userId) {
+    try {
+        authScreen.style.display = 'none';
+        onboardingScreen.classList.add('active');
+        
+        // تحميل الأشخاص المقترحين مع معالجة الأخطاء
+        loadPeopleYouMayKnow(userId);
+    } catch (error) {
+        console.error('Error in showOnboarding:', error);
+        // في حالة الخطأ، نتجاوز Onboarding ونذهب مباشرة للتطبيق الرئيسي
+        proceedToMainApp(userId);
+    }
+}
+
+// تحميل الأشخاص المقترحين
+function loadPeopleYouMayKnow(userId) {
+    showLoading();
+    
+    db.collection('users')
+        .where('uid', '!=', userId)
+        .limit(8)
+        .get()
+        .then(snapshot => {
+            peopleYouMayKnow = [];
+            const promises = [];
+            
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                // نتأكد أن المستخدم ليس صديقًا بالفعل
+                promises.push(
+                    db.collection('users').doc(userId).get()
+                        .then(userDoc => {
+                            if (userDoc.exists) {
+                                const userData = userDoc.data();
+                                if (!userData.friends || !userData.friends.includes(user.uid)) {
+                                    peopleYouMayKnow.push({
+                                        id: user.uid,
+                                        ...user
+                                    });
+                                }
+                            }
+                        })
+                );
+            });
+            
+            return Promise.all(promises);
+        })
+        .then(() => {
+            renderPeopleYouMayKnow();
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Error loading people:', error);
+            hideLoading();
+            // عرض رسالة خطأ في الواجهة
+            document.getElementById('peopleList').innerHTML = `
+                <div class="center-align" style="padding: 20px; color: red;">
+                    ${language === 'en' ? 'Failed to load suggestions' : 'فشل تحميل الاقتراحات'}
+                </div>`;
+        });
+}
+
+// عرض الأشخاص المقترحين
+function renderPeopleYouMayKnow() {
+    const peopleList = document.getElementById('peopleList');
+    if (!peopleList) return;
+
+    peopleList.innerHTML = '';
+    
+    if (peopleYouMayKnow.length === 0) {
+        peopleList.innerHTML = `
+            <div class="center-align" style="padding: 20px;">
+                ${language === 'en' ? 'No suggestions available' : 'لا توجد اقتراحات متاحة'}
+            </div>`;
+        return;
+    }
+
+    peopleYouMayKnow.forEach(person => {
+        const personCard = document.createElement('div');
+        personCard.className = 'person-card';
+        personCard.innerHTML = `
+            <img class="lazy" 
+                 data-src="${person.photoURL || 'https://via.placeholder.com/80'}" 
+                 alt="${person.displayName}"
+                 onerror="this.src='https://via.placeholder.com/80'">
+            <h4>${person.displayName || 'Unknown'}</h4>
+            <p>${language === 'en' ? 'Suggested for you' : 'مقترح لك'}</p>
+            <button class="add-friend-btn" data-user-id="${person.id}">
+                ${strings[language].addFriend}
+            </button>
+        `;
+        
+        personCard.querySelector('.add-friend-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            sendFriendRequest(person.id, person.displayName);
+        });
+        
+        peopleList.appendChild(personCard);
+    });
+
+    // تحديث تحميل الصور الكسولة
+    if (lazyLoadInstance) {
+        lazyLoadInstance.update();
+    }
+}
+
+// إرسال طلب صداقة مع الإصلاحات
+function sendFriendRequest(userId, userName) {
+    showLoading();
+    
+    const request = {
+        id: generateId(),
+        senderId: currentUser.uid,
+        senderName: currentUser.displayName,
+        senderPhoto: currentUser.photoURL,
+        receiverId: userId,
+        status: 'pending',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // نضيف الطلب إلى المستلم
+    db.collection('users').doc(userId).update({
+        friendRequests: firebase.firestore.FieldValue.arrayUnion(request)
+    })
+    .then(() => {
+        // نحدّث واجهة المستخدم
+        const buttons = document.querySelectorAll(`.add-friend-btn[data-user-id="${userId}"]`);
+        buttons.forEach(button => {
+            button.textContent = strings[language].friendRequestSent;
+            button.classList.add('pending');
+            button.disabled = true;
+        });
+        
+        showNotification(`${userName} ${strings[language].friendRequestSent}`, 'success');
+        hideLoading();
+    })
+    .catch(error => {
+        console.error('Error sending friend request:', error);
+        showNotification(language === 'en' ? 'Failed to send request' : 'فشل إرسال الطلب', 'error');
+        hideLoading();
+    });
+}
         
         // Load user data with additional information
         function loadUserData(userId) {
@@ -2954,44 +3104,67 @@ function signInWithGoogle() {
         }
         
         // Search friends with debounced input
-        function searchFriends() {
-            const searchTerm = friendSearch.value.toLowerCase().trim();
-            
-            if (searchTerm === '') {
-                renderFriendsList();
-                return;
-            }
-            
-            const filteredFriends = friends.filter(friend => 
-                friend.displayName.toLowerCase().includes(searchTerm)
-            );
-            
-            friendsList.innerHTML = '';
-            
-            if (filteredFriends.length === 0) {
-                friendsList.innerHTML = `<div class="center-align" style="padding: 20px;">${strings[language].noResults}</div>`;
-                return;
-            }
-            
-            filteredFriends.forEach(friend => {
-                const friendItem = document.createElement('div');
-                friendItem.className = `friend-item ${currentChat && currentChat.id === friend.id ? 'active' : ''}`;
-                friendItem.dataset.friendId = friend.id;
-                friendItem.innerHTML = `
-                    <img src="${friend.photoURL || 'https://via.placeholder.com/56'}" alt="${friend.displayName}">
-                    <div class="friend-info">
-                        <div class="friend-name">${friend.displayName}</div>
-                        <div class="friend-status ${friend.isOnline ? 'online' : 'offline'}">
-                            <span class="friend-status-dot"></span>
-                            <span>${friend.isOnline ? strings[language].online : strings[language].offline}</span>
-                        </div>
-                    </div>
-                `;
-                
-                friendItem.addEventListener('click', () => openChat(friend));
-                friendsList.appendChild(friendItem);
-            });
+         // البحث عن الأصدقاء مع إصلاح المشاكل
+function searchFriends() {
+    const searchTerm = friendSearch.value.toLowerCase().trim();
+    const friendsListContainer = document.getElementById('friendsList');
+    
+    if (!friendsListContainer) {
+        console.error('Friends list container not found');
+        return;
+    }
+
+    if (searchTerm === '') {
+        renderFriendsList();
+        return;
+    }
+
+    try {
+        const filteredFriends = friends.filter(friend => {
+            if (!friend || !friend.displayName) return false;
+            return friend.displayName.toLowerCase().includes(searchTerm);
+        });
+
+        friendsListContainer.innerHTML = '';
+        
+        if (filteredFriends.length === 0) {
+            friendsListContainer.innerHTML = `
+                <div class="center-align" style="padding: 20px;">
+                    ${strings[language].noResults}
+                </div>`;
+            return;
         }
+
+        filteredFriends.forEach(friend => {
+            const friendItem = document.createElement('div');
+            friendItem.className = `friend-item ${currentChat && currentChat.id === friend.id ? 'active' : ''}`;
+            friendItem.dataset.friendId = friend.id;
+            friendItem.innerHTML = `
+                <img src="${friend.photoURL || 'https://via.placeholder.com/56'}" 
+                     alt="${friend.displayName}" 
+                     onerror="this.src='https://via.placeholder.com/56'">
+                <div class="friend-info">
+                    <div class="friend-name">${friend.displayName}</div>
+                    <div class="friend-status ${friend.isOnline ? 'online' : 'offline'}">
+                        <span class="friend-status-dot"></span>
+                        <span>${friend.isOnline ? strings[language].online : strings[language].offline}</span>
+                    </div>
+                </div>
+            `;
+            
+            friendItem.addEventListener('click', () => openChat(friend));
+            friendsListContainer.appendChild(friendItem);
+        });
+    } catch (error) {
+        console.error('Error in searchFriends:', error);
+        friendsListContainer.innerHTML = `
+            <div class="center-align" style="padding: 20px; color: red;">
+                ${language === 'en' ? 'Search error' : 'خطأ في البحث'}
+            </div>`;
+    }
+}
+            
+            
         
         // Clear search input
         function clearSearchInput() {
@@ -4720,36 +4893,96 @@ function signInWithGoogle() {
         }
         
         // Show notification with different types
-        function showNotification(message, type = 'info') {
-            notification.className = `notification ${type}`;
-            notificationMessage.textContent = message;
-            
-            // Set icon based on type
-            switch (type) {
-                case 'success':
-                    notificationIcon.textContent = 'check_circle';
-                    notificationTitle.textContent = language === 'en' ? 'Success' : 'نجاح';
-                    break;
-                case 'error':
-                    notificationIcon.textContent = 'error';
-                    notificationTitle.textContent = language === 'en' ? 'Error' : 'خطأ';
-                    break;
-                case 'warning':
-                    notificationIcon.textContent = 'warning';
-                    notificationTitle.textContent = language === 'en' ? 'Warning' : 'تحذير';
-                    break;
-                default:
-                    notificationIcon.textContent = 'info';
-                    notificationTitle.textContent = language === 'en' ? 'Notification' : 'إشعار';
-            }
-            
-            notification.classList.add('show');
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 5000);
+        // نظام الإشعارات مع الإصلاحات
+function showNotification(message, type = 'info') {
+    try {
+        // إعداد العناصر الأساسية
+        notification.className = `notification ${type}`;
+        notificationMessage.textContent = message;
+        
+        // تعيين الأيقونة والعنوان حسب النوع
+        switch (type) {
+            case 'success':
+                notificationIcon.textContent = 'check_circle';
+                notificationTitle.textContent = language === 'en' ? 'Success' : 'نجاح';
+                break;
+            case 'error':
+                notificationIcon.textContent = 'error';
+                notificationTitle.textContent = language === 'en' ? 'Error' : 'خطأ';
+                break;
+            case 'warning':
+                notificationIcon.textContent = 'warning';
+                notificationTitle.textContent = language === 'en' ? 'Warning' : 'تحذير';
+                break;
+            case 'person_add':
+                notificationIcon.textContent = 'person_add';
+                notificationTitle.textContent = language === 'en' ? 'Friend Request' : 'طلب صداقة';
+                break;
+            case 'message':
+                notificationIcon.textContent = 'message';
+                notificationTitle.textContent = language === 'en' ? 'New Message' : 'رسالة جديدة';
+                break;
+            case 'call':
+                notificationIcon.textContent = 'call';
+                notificationTitle.textContent = language === 'en' ? 'Call' : 'مكالمة';
+                break;
+            default:
+                notificationIcon.textContent = 'info';
+                notificationTitle.textContent = language === 'en' ? 'Notification' : 'إشعار';
         }
+        
+        // عرض الإشعار
+        notification.classList.add('show');
+        
+        // إخفاء تلقائي بعد 5 ثوان
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 5000);
+    } catch (error) {
+        console.error('Error showing notification:', error);
+        // نسخة بديلة بسيطة في حالة فشل النظام الرئيسي
+        alert(`Notification: ${message}`);
+    }
+}
+
+// إرسال إشعارات Firebase Cloud Messaging (FCM)
+function setupFCM() {
+    try {
+        const messaging = firebase.messaging();
+        
+        // طلب الإذن للإشعارات
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+                return messaging.getToken();
+            }
+            throw new Error('Permission not granted');
+        })
+        .then(token => {
+            console.log('FCM token:', token);
+            // حفظ التوكن في Firestore للمستخدم الحالي
+            if (currentUser) {
+                return db.collection('users').doc(currentUser.uid).update({
+                    fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+                });
+            }
+        })
+        .catch(error => {
+            console.error('FCM setup error:', error);
+        });
+        
+        // معالجة الإشعارات الواردة
+        messaging.onMessage(payload => {
+            console.log('Message received:', payload);
+            showNotification(
+                payload.notification.body, 
+                payload.data?.type || 'info'
+            );
+        });
+    } catch (error) {
+        console.error('FCM initialization error:', error);
+    }
+}
         
         // Hide notification
         function hideNotification() {
