@@ -2389,16 +2389,51 @@
         }
         
         // Handle auth state changes
-        function handleAuthStateChange(user) {
-            if (user) {
-                currentUser = user;
-                setupUser(user);
-            } else {
+function handleAuthStateChange(user) {
+    if (user) {
+        currentUser = user;
+        // Update UI immediately
+        authScreen.style.display = 'none';
+        appContainer.style.display = 'flex';
+        
+        // Check if user needs onboarding
+        db.collection('users').doc(user.uid).get()
+            .then(doc => {
+                hideLoading(); // Ensure loading spinner is hidden
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    
+                    // Update UI with user data
+                    userName.textContent = userData.displayName || user.displayName;
+                    userAvatar.src = userData.photoURL || user.photoURL || 'https://via.placeholder.com/40';
+                    
+                    // Check if user has completed onboarding
+                    if (userData.onboardingCompleted) {
+                        proceedToMainApp(user.uid);
+                    } else {
+                        // Show onboarding
+                        showOnboarding(user.uid);
+                    }
+                } else {
+                    // User document doesn't exist (shouldn't happen with current flow)
+                    console.error('User document not found');
+                    proceedToMainUser(user.uid);
+                }
+            })
+            .catch(error => {
                 hideLoading();
+                console.error('Error getting user data:', error);
+                showNotification(error.message, 'error');
                 authScreen.style.display = 'flex';
                 appContainer.style.display = 'none';
-            }
-        }
+            });
+    } else {
+        hideLoading();
+        authScreen.style.display = 'flex';
+        appContainer.style.display = 'none';
+    }
+}
         
         // Handle auth errors
         function handleAuthError(error) {
