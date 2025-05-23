@@ -2611,54 +2611,71 @@ function handleAuthStateChange(user) {
         }
         
         // Sign in with Google with enhanced error handling
-        function signInWithGoogle() {
-            showLoading();
+        // Sign in with Google with enhanced error handling
+function signInWithGoogle() {
+    showLoading();
+    
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('profile');
+    provider.addScope('email');
+    
+    auth.signInWithPopup(provider)
+        .then(result => {
+            console.log('Sign-in successful', result.user);
             
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.addScope('profile');
-            provider.addScope('email');
-            
-            auth.signInWithPopup(provider)
-                .then(result => {
-                    // Check if user is new
-                    if (result.additionalUserInfo.isNewUser) {
-                        // Add user to Firestore with additional fields
-                        return db.collection('users').doc(result.user.uid).set({
-                            uid: result.user.uid,
-                            displayName: result.user.displayName,
-                            email: result.user.email,
-                            photoURL: result.user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(result.user.displayName)}&background=0084ff&color=fff`,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            language: language,
-                            isOnline: true,
-                            lastSeen: null,
-                            friends: [],
-                            friendRequests: [],
-                            status: language === 'en' ? 'Hey there! I am using Messenger Pro' : 'مرحبًا! أنا أستخدم ماسنجر برو',
-                            onboardingCompleted: false
-                        });
-                    } else {
-                        // Update existing user's online status
-                        return db.collection('users').doc(result.user.uid).update({
-                            isOnline: true,
-                            lastSeen: null,
-                            language: language
-                        });
-                    }
-                })
-                .catch(error => {
-                    hideLoading();
-                    
-                    // Handle specific errors
-                    if (error.code === 'auth/popup-closed-by-user') {
-                        showNotification(language === 'en' ? 'Sign in was canceled' : 'تم إلغاء تسجيل الدخول', 'warning');
-                    } else if (error.code === 'auth/network-request-failed') {
-                        showNotification(language === 'en' ? 'Network error. Please check your connection.' : 'خطأ في الشبكة. يرجى التحقق من اتصالك.', 'error');
-                    } else {
-                        showNotification(error.message, 'error');
-                    }
+            // Check if user is new
+            if (result.additionalUserInfo.isNewUser) {
+                console.log('New user detected, creating document');
+                return db.collection('users').doc(result.user.uid).set({
+                    uid: result.user.uid,
+                    displayName: result.user.displayName,
+                    email: result.user.email,
+                    photoURL: result.user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(result.user.displayName)}&background=0084ff&color=fff`,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    language: language,
+                    isOnline: true,
+                    lastSeen: null,
+                    friends: [],
+                    friendRequests: [],
+                    status: language === 'en' ? 'Hey there! I am using Messenger Pro' : 'مرحبًا! أنا أستخدم ماسنجر برو',
+                    onboardingCompleted: false
+                }, { merge: true }); // Added merge option to prevent overwrites
+            } else {
+                console.log('Existing user, updating status');
+                return db.collection('users').doc(result.user.uid).update({
+                    isOnline: true,
+                    lastSeen: null,
+                    language: language
+                }).catch(error => {
+                    console.error('Update failed, trying set with merge', error);
+                    return db.collection('users').doc(result.user.uid).set({
+                        isOnline: true,
+                        lastSeen: null,
+                        language: language
+                    }, { merge: true });
                 });
-        }
+            }
+        })
+        .then(() => {
+            console.log('Firestore operation completed');
+            // No need to hide loading here, handleAuthStateChange will handle it
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Full error details:', error);
+            
+            // Handle specific errors
+            if (error.code === 'auth/popup-closed-by-user') {
+                showNotification(language === 'en' ? 'Sign in was canceled' : 'تم إلغاء تسجيل الدخول', 'warning');
+            } else if (error.code === 'auth/network-request-failed') {
+                showNotification(language === 'en' ? 'Network error. Please check your connection.' : 'خطأ في الشبكة. يرجى التحقق من اتصالك.', 'error');
+            } else if (error.code === 'permission-denied') {
+                showNotification(language === 'en' ? 'Database permission denied. Please try again later.' : 'تم رفض إذن قاعدة البيانات. يرجى المحاولة لاحقًا.', 'error');
+            } else {
+                showNotification(error.message, 'error');
+            }
+        });
+}
         
         // Set up user after sign in with presence management
         function setupUser(user) {
