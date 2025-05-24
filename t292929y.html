@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Chat - Video & Text</title>
+    
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <style>
+        /* Main Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff5722;
+            text-align: center;
+        }
+        
+        /* Chat Selection Screen */
+        .selection-screen {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .selection-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .chat-option {
+            display: inline-block;
+            width: 200px;
+            margin: 0 15px;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-option:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-5px);
+        }
+        
+        .chat-option i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            display: block;
+            color: #ff5722;
+        }
+        
+        .chat-option h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .start-btn {
+            margin-top: 40px;
+            padding: 12px 30px;
+            font-size: 18px;
+            background-color: #ff5722;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .start-btn:hover {
+            background-color: #e64a19;
+        }
+        
+        /* Chat Screen */
+        .chat-screen {
+            display: none;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+        }
+        
+        .remote-video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .local-video {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 25%;
+            max-width: 200px;
+            border: 2px solid #fff;
+            border-radius: 4px;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        
+        .received {
+            background-color: #e0e0e0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .sent {
+            background-color: #ff5722;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            outline: none;
+            font-size: 16px;
+        }
+        
+        .send-btn {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .chat-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .control-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .control-btn i {
+            margin-right: 5px;
+        }
+        
+        .skip-btn {
+            background-color: #ff5722;
+            color: white;
+        }
+        
+        .report-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .switch-btn {
+            background-color: #2196f3;
+            color: white;
+        }
+        
+        .status-bar {
+            padding: 10px;
+            background-color: #e0e0e0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .timer {
+            color: #ff5722;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .loading-spinner {
+            margin: 30px auto;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-option {
+                width: 150px;
+                margin: 0 10px;
+            }
+            
+            .local-video {
+                width: 30%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .chat-option {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .selection-screen {
+                padding: 20px;
+            }
+            
+            .local-video {
+                width: 40%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">Random Chat</div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Selection Screen -->
+        <div id="selection-screen" class="selection-screen">
+            <h2 class="selection-title">Choose your chat mode</h2>
+            <div class="options-container">
+                <div id="video-option" class="chat-option">
+                    <i class="material-icons">videocam</i>
+                    <h3>Video Chat</h3>
+                    <p>Face-to-face conversation</p>
+                </div>
+                <div id="text-option" class="chat-option">
+                    <i class="material-icons">chat</i>
+                    <h3>Text Chat</h3>
+                    <p>Text-only conversation</p>
+                </div>
+            </div>
+            <button id="start-btn" class="start-btn waves-effect waves-light">START</button>
+        </div>
+        
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <h3>Finding someone for you...</h3>
+            <div class="progress loading-spinner">
+                <div class="indeterminate"></div>
+            </div>
+            <p id="status-message">Connecting to server...</p>
+            <button id="cancel-search-btn" class="btn waves-effect waves-light red">CANCEL</button>
+        </div>
+        
+        <!-- Video Chat Screen -->
+        <div id="video-chat-screen" class="chat-screen">
+            <div class="status-bar">
+                <span id="video-status">Connected</span> | 
+                <span class="timer">Time: <span id="video-timer">00:00</span></span>
+            </div>
+            <div class="video-container">
+                <video id="remote-video" class="remote-video" autoplay playsinline></video>
+                <video id="local-video" class="local-video" autoplay playsinline muted></video>
+            </div>
+            <div class="chat-controls">
+                <button id="video-skip-btn" class="control-btn skip-btn waves-effect">
+                    <i class="material-icons">skip_next</i> Skip
+                </button>
+                <button id="video-report-btn" class="control-btn report-btn waves-effect">
+                    <i class="material-icons">report</i> Report
+                </button>
+                <button id="video-switch-btn" class="control-btn switch-btn waves-effect">
+                    <i class="material-icons">swap_horiz</i> Text Mode
+                </button>
+            </div>
+        </div>
+        
+        <!-- Text Chat Screen -->
+        <div id="text-chat-screen" class="chat-screen">
+            <div class="status-bar">
+                <span id="text-status">Connected</span> | 
+                <span class="timer">Time: <span id="text-timer">00:00</span></span>
+            </div>
+            <div class="chat-container">
+                <div id="text-messages" class="chat-messages">
+                    <!-- Messages will appear here -->
+                </div>
+                <div class="chat-input-container">
+                    <input id="text-input" type="text" class="chat-input" placeholder="Type your message...">
+                    <button id="text-send-btn" class="send-btn waves-effect waves-light">
+                        <i class="material-icons">send</i>
+                    </button>
+                </div>
+            </div>
+            <div class="chat-controls">
+                <button id="text-skip-btn" class="control-btn skip-btn waves-effect">
+                    <i class="material-icons">skip_next</i> Skip
+                </button>
+                <button id="text-report-btn" class="control-btn report-btn waves-effect">
+                    <i class="material-icons">report</i> Report
+                </button>
+                <button id="text-switch-btn" class="control-btn switch-btn waves-effect">
+                    <i class="material-icons">swap_horiz</i> Video Mode
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="report-modal" class="modal">
+        <div class="modal-content">
+            <h4>Report User</h4>
+            <p>Please select the reason for reporting this user:</p>
+            <form action="#">
+                <p>
+                    <label>
+                        <input name="report-reason" type="radio" value="spam" checked />
+                        <span>Spam or advertising</span>
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <input name="report-reason" type="radio" value="abuse" />
+                        <span>Abusive behavior</span>
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <input name="report-reason" type="radio" value="nudity" />
+                        <span>Nudity or sexual content</span>
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <input name="report-reason" type="radio" value="other" />
+                        <span>Other</span>
+                    </label>
+                </p>
+                <div class="input-field">
+                    <textarea id="report-notes" class="materialize-textarea" placeholder="Additional notes (optional)"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+            <a id="submit-report-btn" class="waves-effect waves-red btn red">Submit Report</a>
+        </div>
+    </div>
+    
+    <div id="disconnected-modal" class="modal">
+        <div class="modal-content">
+            <h4>Disconnected</h4>
+            <p>Your chat partner has disconnected. Would you like to find someone new?</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+            <a id="find-new-btn" class="waves-effect waves-light btn">Find New Partner</a>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUpOtYEp0vvpvVglJWTt_PzwabklOOPKI",
+            authDomain: "turkify-messenger.firebaseapp.com",
+            projectId: "turkify-messenger",
+            storageBucket: "turkify-messenger.firebasestorage.app",
+            messagingSenderId: "881925084444",
+            appId: "1:881925084444:web:21afeeb4b1127dbfab16d9",
+            measurementId: "G-8V22W8PS30"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const analytics = firebase.analytics();
+        
+        // Global variables
+        let currentUser = null;
+        let chatMode = null; // 'video' or 'text'
+        let chatRoomId = null;
+        let chatPartnerId = null;
+        let localStream = null;
+        let peerConnection = null;
+        let chatStartTime = null;
+        let timerInterval = null;
+        let isSearching = false;
+        
+        // Configuration for ICE servers (using free STUN servers)
+        const iceServers = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+        };
+        
+        // Offensive words filter
+        const offensiveWords = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'nigger', 'whore', 'slut'];
+        
+        // DOM Elements
+        const selectionScreen = document.getElementById('selection-screen');
+        const loadingScreen = document.getElementById('loading-screen');
+        const videoChatScreen = document.getElementById('video-chat-screen');
+        const textChatScreen = document.getElementById('text-chat-screen');
+        const startBtn = document.getElementById('start-btn');
+        const videoOption = document.getElementById('video-option');
+        const textOption = document.getElementById('text-option');
+        const cancelSearchBtn = document.getElementById('cancel-search-btn');
+        const statusMessage = document.getElementById('status-message');
+        const remoteVideo = document.getElementById('remote-video');
+        const localVideo = document.getElementById('local-video');
+        const videoStatus = document.getElementById('video-status');
+        const videoTimer = document.getElementById('video-timer');
+        const videoSkipBtn = document.getElementById('video-skip-btn');
+        const videoReportBtn = document.getElementById('video-report-btn');
+        const videoSwitchBtn = document.getElementById('video-switch-btn');
+        const textStatus = document.getElementById('text-status');
+        const textTimer = document.getElementById('text-timer');
+        const textMessages = document.getElementById('text-messages');
+        const textInput = document.getElementById('text-input');
+        const textSendBtn = document.getElementById('text-send-btn');
+        const textSkipBtn = document.getElementById('text-skip-btn');
+        const textReportBtn = document.getElementById('text-report-btn');
+        const textSwitchBtn = document.getElementById('text-switch-btn');
+        const submitReportBtn = document.getElementById('submit-report-btn');
+        const findNewBtn = document.getElementById('find-new-btn');
+        const reportModal = document.getElementById('report-modal');
+        const disconnectedModal = document.getElementById('disconnected-modal');
+        
+        // Initialize Materialize modals
+        $(document).ready(function(){
+            $('.modal').modal();
+        });
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        // Main initialization function
+        async function initApp() {
+            console.log('Initializing application...');
+            
+            try {
+                // Initialize Firebase authentication
+                await initFirebaseAuth();
+                
+                // Set up event listeners
+                setupEventListeners();
+                
+                // Log analytics event
+                logAnalyticsEvent('app_loaded');
+                
+                console.log('Application initialized successfully');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize the application. Please refresh the page.');
+            }
+        }
+        
+        // Initialize Firebase authentication
+        async function initFirebaseAuth() {
+            console.log('Initializing Firebase auth...');
+            
+            try {
+                // Sign in anonymously
+                await auth.signInAnonymously();
+                
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        currentUser = user;
+                        console.log('User signed in anonymously with ID:', user.uid);
+                    } else {
+                        console.log('User is signed out');
+                    }
+                });
+            } catch (error) {
+                console.error('Authentication error:', error);
+                throw error;
+            }
+        }
+        
+        // Set up all event listeners
+        function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
+            // Selection screen events
+            videoOption.addEventListener('click', () => selectChatMode('video'));
+            textOption.addEventListener('click', () => selectChatMode('text'));
+            startBtn.addEventListener('click', startChat);
+            
+            // Loading screen events
+            cancelSearchBtn.addEventListener('click', cancelSearch);
+            
+            // Video chat events
+            videoSkipBtn.addEventListener('click', skipChat);
+            videoReportBtn.addEventListener('click', () => openReportModal());
+            videoSwitchBtn.addEventListener('click', () => switchChatMode('text'));
+            
+            // Text chat events
+            textSkipBtn.addEventListener('click', skipChat);
+            textReportBtn.addEventListener('click', () => openReportModal());
+            textSwitchBtn.addEventListener('click', () => switchChatMode('video'));
+            textSendBtn.addEventListener('click', sendTextMessage);
+            textInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendTextMessage();
+            });
+            
+            // Modal events
+            submitReportBtn.addEventListener('click', submitReport);
+            findNewBtn.addEventListener('click', findNewPartner);
+            
+            // Handle beforeunload to clean up
+            window.addEventListener('beforeunload', cleanupBeforeUnload);
+        }
+        
+        // Select chat mode (video or text)
+        function selectChatMode(mode) {
+            console.log('Selected chat mode:', mode);
+            chatMode = mode;
+            
+            // Update UI to show selected mode
+            videoOption.style.backgroundColor = mode === 'video' ? '#e0e0e0' : '#fff';
+            textOption.style.backgroundColor = mode === 'text' ? '#e0e0e0' : '#fff';
+        }
+        
+        // Start chat process
+        async function startChat() {
+            if (!chatMode) {
+                M.toast({html: 'Please select a chat mode first'});
+                return;
+            }
+            
+            console.log('Starting', chatMode, 'chat...');
+            logAnalyticsEvent('chat_started', { mode: chatMode });
+            
+            // Show loading screen
+            selectionScreen.style.display = 'none';
+            loadingScreen.style.display = 'block';
+            isSearching = true;
+            statusMessage.textContent = 'Searching for a partner...';
+            
+            try {
+                // For video chat, get user media first
+                if (chatMode === 'video') {
+                    await setupLocalMedia();
+                }
+                
+                // Find a chat partner
+                await findChatPartner();
+            } catch (error) {
+                console.error('Error starting chat:', error);
+                showError('Failed to start chat. Please try again.');
+                cancelSearch();
+            }
+        }
+        
+        // Set up local media (video/audio)
+        async function setupLocalMedia() {
+            console.log('Setting up local media...');
+            statusMessage.textContent = 'Setting up your camera and microphone...';
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                // Display local video stream
+                localVideo.srcObject = localStream;
+                console.log('Local media setup complete');
+            } catch (error) {
+                console.error('Error accessing media devices:', error);
+                
+                if (error.name === 'NotAllowedError') {
+                    showError('Camera/microphone access was denied. Please enable permissions to use video chat.');
+                } else {
+                    showError('Could not access camera/microphone. Please check your devices.');
+                }
+                
+                throw error;
+            }
+        }
+        
+        // Find a chat partner
+        async function findChatPartner() {
+            console.log('Finding chat partner...');
+            statusMessage.textContent = 'Finding a partner...';
+            
+            try {
+                // Create a reference to the chat queue collection
+                const queueRef = db.collection('chatQueue');
+                
+                // Check for existing partners waiting in the queue
+                const snapshot = await queueRef
+                    .where('mode', '==', chatMode)
+                    .where('userId', '!=', currentUser.uid)
+                    .limit(1)
+                    .get();
+                
+                if (!snapshot.empty) {
+                    // Found a partner - create a chat room
+                    const partnerDoc = snapshot.docs[0];
+                    chatPartnerId = partnerDoc.data().userId;
+                    
+                    console.log('Found partner:', chatPartnerId);
+                    statusMessage.textContent = 'Partner found! Connecting...';
+                    
+                    // Remove partner from queue
+                    await partnerDoc.ref.delete();
+                    
+                    // Create a chat room
+                    await createChatRoom(partnerDoc.data().userId);
+                } else {
+                    // No partner found - add self to queue
+                    console.log('No partner found - adding to queue');
+                    statusMessage.textContent = 'Waiting for a partner to join...';
+                    
+                    await queueRef.add({
+                        userId: currentUser.uid,
+                        mode: chatMode,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Listen for a partner to join
+                    await listenForPartner();
+                }
+            } catch (error) {
+                console.error('Error finding partner:', error);
+                throw error;
+            }
+        }
+        
+        // Listen for a partner to join
+        async function listenForPartner() {
+            console.log('Listening for partner...');
+            
+            const queueRef = db.collection('chatQueue');
+            const unsubscribe = queueRef
+                .where('mode', '==', chatMode)
+                .where('userId', '!=', currentUser.uid)
+                .limit(1)
+                .onSnapshot(async (snapshot) => {
+                    if (!snapshot.empty && isSearching) {
+                        // Found a partner
+                        const partnerDoc = snapshot.docs[0];
+                        chatPartnerId = partnerDoc.data().userId;
+                        
+                        console.log('Partner joined:', chatPartnerId);
+                        
+                        // Remove self from queue
+                        const selfQuery = await queueRef
+                            .where('userId', '==', currentUser.uid)
+                            .limit(1)
+                            .get();
+                        
+                        if (!selfQuery.empty) {
+                            await selfQuery.docs[0].ref.delete();
+                        }
+                        
+                        // Stop listening
+                        unsubscribe();
+                        
+                        // Create a chat room
+                        await createChatRoom(partnerDoc.data().userId);
+                    }
+                });
+            
+            // Set timeout for partner search (5 minutes)
+            setTimeout(async () => {
+                if (isSearching) {
+                    console.log('Partner search timed out');
+                    unsubscribe();
+                    
+                    // Remove self from queue
+                    const selfQuery = await queueRef
+                        .where('userId', '==', currentUser.uid)
+                        .limit(1)
+                        .get();
+                    
+                    if (!selfQuery.empty) {
+                        await selfQuery.docs[0].ref.delete();
+                    }
+                    
+                    M.toast({html: 'Could not find a partner. Please try again.'});
+                    cancelSearch();
+                }
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+        
+        // Create a chat room
+        async function createChatRoom(partnerId) {
+            console.log('Creating chat room with partner:', partnerId);
+            statusMessage.textContent = 'Setting up chat room...';
+            
+            // Generate a unique room ID
+            chatRoomId = generateRoomId(currentUser.uid, partnerId);
+            
+            // Create room in Firestore
+            const roomRef = db.collection('chatRooms').doc(chatRoomId);
+            
+            try {
+                await roomRef.set({
+                    user1: currentUser.uid,
+                    user2: partnerId,
+                    mode: chatMode,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    active: true
+                });
+                
+                // Set up real-time listeners based on chat mode
+                if (chatMode === 'video') {
+                    await setupVideoChat(roomRef);
+                } else {
+                    await setupTextChat(roomRef);
+                }
+                
+                // Hide loading screen and show chat screen
+                loadingScreen.style.display = 'none';
+                
+                if (chatMode === 'video') {
+                    videoChatScreen.style.display = 'block';
+                    videoStatus.textContent = 'Connected to partner';
+                } else {
+                    textChatScreen.style.display = 'block';
+                    textStatus.textContent = 'Connected to partner';
+                }
+                
+                // Start chat timer
+                startChatTimer();
+                
+                // Log analytics
+                logAnalyticsEvent('chat_connected', {
+                    mode: chatMode,
+                    partnerId: partnerId,
+                    roomId: chatRoomId
+                });
+                
+                console.log('Chat room setup complete');
+                isSearching = false;
+            } catch (error) {
+                console.error('Error creating chat room:', error);
+                throw error;
+            }
+        }
+        
+        // Set up video chat
+        async function setupVideoChat(roomRef) {
+            console.log('Setting up video chat...');
+            
+            // Create peer connection
+            peerConnection = new RTCPeerConnection(iceServers);
+            
+            // Add local stream to connection
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+            
+            // Listen for ICE candidates
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    console.log('New ICE candidate:', event.candidate);
+                    roomRef.collection('iceCandidates').add({
+                        userId: currentUser.uid,
+                        candidate: event.candidate,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            };
+            
+            // Listen for remote stream
+            peerConnection.ontrack = (event) => {
+                console.log('Received remote stream');
+                remoteVideo.srcObject = event.streams[0];
+            };
+            
+            // Listen for connection state changes
+            peerConnection.onconnectionstatechange = () => {
+                console.log('Connection state:', peerConnection.connectionState);
+                
+                if (peerConnection.connectionState === 'disconnected' || 
+                    peerConnection.connectionState === 'failed') {
+                    handleDisconnection();
+                }
+            };
+            
+            // Create offer if we initiated the chat
+            const roomData = (await roomRef.get()).data();
+            if (roomData.user1 === currentUser.uid) {
+                console.log('Creating offer...');
+                
+                const offerDescription = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offerDescription);
+                
+                await roomRef.update({
+                    offer: {
+                        type: offerDescription.type,
+                        sdp: offerDescription.sdp
+                    },
+                    from: currentUser.uid
+                });
+                
+                console.log('Offer created and set as local description');
+            }
+            
+            // Listen for answers or offers
+            roomRef.onSnapshot(async (snapshot) => {
+                const data = snapshot.data();
+                
+                if (!data) {
+                    console.log('Room deleted');
+                    handleDisconnection();
+                    return;
+                }
+                
+                // If we're user2 and there's an offer, create an answer
+                if (data.user2 === currentUser.uid && data.offer && !peerConnection.currentRemoteDescription) {
+                    console.log('Received offer, creating answer...');
+                    
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                    
+                    const answerDescription = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answerDescription);
+                    
+                    await roomRef.update({
+                        answer: {
+                            type: answerDescription.type,
+                            sdp: answerDescription.sdp
+                        }
+                    });
+                    
+                    console.log('Answer created and set as local description');
+                }
+                
+                // If we're user1 and there's an answer, set it
+                if (data.user1 === currentUser.uid && data.answer && !peerConnection.currentRemoteDescription) {
+                    console.log('Received answer, setting remote description...');
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                }
+            });
+            
+            // Listen for ICE candidates
+            roomRef.collection('iceCandidates')
+                .where('userId', '==', chatPartnerId)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach(async (change) => {
+                        if (change.type === 'added') {
+                            const candidate = change.doc.data().candidate;
+                            console.log('Adding ICE candidate:', candidate);
+                            try {
+                                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                            } catch (error) {
+                                console.error('Error adding ICE candidate:', error);
+                            }
+                        }
+                    });
+                });
+        }
+        
+        // Set up text chat
+        async function setupTextChat(roomRef) {
+            console.log('Setting up text chat...');
+            
+            // Clear previous messages
+            textMessages.innerHTML = '';
+            
+            // Listen for new messages
+            roomRef.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const message = change.doc.data();
+                            displayMessage(message);
+                        }
+                    });
+                });
+            
+            // Listen for room changes (partner disconnection)
+            roomRef.onSnapshot((snapshot) => {
+                const data = snapshot.data();
+                if (!data || !data.active) {
+                    handleDisconnection();
+                }
+            });
+        }
+        
+        // Display a text message
+        function displayMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            
+            if (message.userId === currentUser.uid) {
+                messageElement.classList.add('sent');
+            } else {
+                messageElement.classList.add('received');
+            }
+            
+            // Basic link detection
+            let messageText = message.text;
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            messageText = messageText.replace(urlRegex, (url) => {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            });
+            
+            messageElement.innerHTML = messageText;
+            textMessages.appendChild(messageElement);
+            
+            // Scroll to bottom
+            textMessages.scrollTop = textMessages.scrollHeight;
+        }
+        
+        // Send a text message
+        async function sendTextMessage() {
+            const messageText = textInput.value.trim();
+            
+            if (!messageText) return;
+            
+            // Check for offensive words
+            if (containsOffensiveWords(messageText)) {
+                M.toast({html: 'Your message contains inappropriate content. Please modify it.'});
+                return;
+            }
+            
+            try {
+                await db.collection('chatRooms').doc(chatRoomId).collection('messages').add({
+                    userId: currentUser.uid,
+                    text: messageText,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Clear input
+                textInput.value = '';
+                
+                // Log analytics
+                logAnalyticsEvent('message_sent', {
+                    length: messageText.length,
+                    containsLinks: messageText.includes('http')
+                });
+            } catch (error) {
+                console.error('Error sending message:', error);
+                M.toast({html: 'Failed to send message. Please try again.'});
+            }
+        }
+        
+        // Check for offensive words
+        function containsOffensiveWords(text) {
+            const lowerText = text.toLowerCase();
+            return offensiveWords.some(word => lowerText.includes(word));
+        }
+        
+        // Start chat timer
+        function startChatTimer() {
+            chatStartTime = new Date();
+            
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const elapsed = Math.floor((now - chatStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const seconds = (elapsed % 60).toString().padStart(2, '0');
+                
+                if (chatMode === 'video') {
+                    videoTimer.textContent = `${minutes}:${seconds}`;
+                } else {
+                    textTimer.textContent = `${minutes}:${seconds}`;
+                }
+            }, 1000);
+        }
+        
+        // Skip current chat
+        async function skipChat() {
+            console.log('Skipping chat...');
+            logAnalyticsEvent('chat_skipped', {
+                mode: chatMode,
+                duration: getChatDuration()
+            });
+            
+            await endCurrentChat();
+            await startNewSearch();
+        }
+        
+        // Switch chat mode
+        async function switchChatMode(newMode) {
+            console.log('Switching to', newMode, 'mode...');
+            logAnalyticsEvent('mode_switched', {
+                from: chatMode,
+                to: newMode,
+                duration: getChatDuration()
+            });
+            
+            await endCurrentChat();
+            chatMode = newMode;
+            await startChat();
+        }
+        
+        // End current chat
+        async function endCurrentChat() {
+            console.log('Ending current chat...');
+            
+            // Clear timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Close peer connection if video chat
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            
+            // Stop local media tracks
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            // Update room status in Firestore
+            if (chatRoomId) {
+                try {
+                    await db.collection('chatRooms').doc(chatRoomId).update({
+                        active: false,
+                        endedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error('Error updating room status:', error);
+                }
+            }
+            
+            // Hide chat screens
+            videoChatScreen.style.display = 'none';
+            textChatScreen.style.display = 'none';
+            
+            // Reset variables
+            chatRoomId = null;
+            chatPartnerId = null;
+        }
+        
+        // Start new search
+        async function startNewSearch() {
+            loadingScreen.style.display = 'block';
+            isSearching = true;
+            statusMessage.textContent = 'Searching for a new partner...';
+            
+            try {
+                await findChatPartner();
+            } catch (error) {
+                console.error('Error starting new search:', error);
+                showError('Failed to find a new partner. Please try again.');
+                cancelSearch();
+            }
+        }
+        
+        // Find new partner after disconnection
+        async function findNewPartner() {
+            $('#disconnected-modal').modal('close');
+            await startNewSearch();
+        }
+        
+        // Cancel search and return to selection screen
+        function cancelSearch() {
+            console.log('Cancelling search...');
+            
+            // Reset state
+            isSearching = false;
+            
+            // Stop local media if video chat
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            // Remove from queue if still searching
+            if (currentUser) {
+                db.collection('chatQueue')
+                    .where('userId', '==', currentUser.uid)
+                    .get()
+                    .then((snapshot) => {
+                        snapshot.forEach(doc => doc.ref.delete());
+                    });
+            }
+            
+            // Show selection screen
+            loadingScreen.style.display = 'none';
+            selectionScreen.style.display = 'block';
+        }
+        
+        // Handle disconnection
+        function handleDisconnection() {
+            console.log('Partner disconnected');
+            
+            // Clear timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Close peer connection if video chat
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            
+            // Stop local media tracks
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            // Hide chat screens
+            videoChatScreen.style.display = 'none';
+            textChatScreen.style.display = 'none';
+            
+            // Show disconnection modal
+            $('#disconnected-modal').modal('open');
+            
+            // Log analytics
+            logAnalyticsEvent('chat_disconnected', {
+                mode: chatMode,
+                duration: getChatDuration()
+            });
+            
+            // Reset variables
+            chatRoomId = null;
+            chatPartnerId = null;
+        }
+        
+        // Open report modal
+        function openReportModal() {
+            $('#report-modal').modal('open');
+        }
+        
+        // Submit report
+        async function submitReport() {
+            const reason = document.querySelector('input[name="report-reason"]:checked').value;
+            const notes = document.getElementById('report-notes').value;
+            
+            console.log('Submitting report for partner:', chatPartnerId);
+            
+            try {
+                await db.collection('reports').add({
+                    reporterId: currentUser.uid,
+                    reportedId: chatPartnerId,
+                    roomId: chatRoomId,
+                    reason: reason,
+                    notes: notes,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    mode: chatMode
+                });
+                
+                M.toast({html: 'Thank you for your report. We will review it shortly.'});
+                $('#report-modal').modal('close');
+                
+                // Log analytics
+                logAnalyticsEvent('user_reported', {
+                    reason: reason,
+                    mode: chatMode
+                });
+                
+                // Skip after reporting
+                await skipChat();
+            } catch (error) {
+                console.error('Error submitting report:', error);
+                M.toast({html: 'Failed to submit report. Please try again.'});
+            }
+        }
+        
+        // Clean up before page unload
+        function cleanupBeforeUnload() {
+            console.log('Cleaning up before unload...');
+            
+            // End current chat if active
+            if (chatRoomId) {
+                db.collection('chatRooms').doc(chatRoomId).update({
+                    active: false,
+                    endedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+            
+            // Remove from queue if searching
+            if (isSearching && currentUser) {
+                db.collection('chatQueue')
+                    .where('userId', '==', currentUser.uid)
+                    .get()
+                    .then((snapshot) => {
+                        snapshot.forEach(doc => doc.ref.delete());
+                    });
+            }
+            
+            // Close peer connection if video chat
+            if (peerConnection) {
+                peerConnection.close();
+            }
+            
+            // Stop local media tracks
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+        }
+        
+        // Show error message
+        function showError(message) {
+            M.toast({html: message, classes: 'red'});
+        }
+        
+        // Log analytics event
+        function logAnalyticsEvent(eventName, eventParams = {}) {
+            try {
+                analytics.logEvent(eventName, eventParams);
+                console.log('Logged analytics event:', eventName, eventParams);
+            } catch (error) {
+                console.error('Error logging analytics event:', error);
+            }
+        }
+        
+        // Generate room ID from user IDs
+        function generateRoomId(userId1, userId2) {
+            const sortedIds = [userId1, userId2].sort();
+            return sortedIds.join('_');
+        }
+        
+        // Get chat duration in seconds
+        function getChatDuration() {
+            if (!chatStartTime) return 0;
+            return Math.floor((new Date() - chatStartTime) / 1000);
+        }
+    </script>
+</body>
+</html>
