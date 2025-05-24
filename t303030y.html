@@ -1236,32 +1236,33 @@
         
         // Initialize Firebase authentication with enhanced error handling
         async function initFirebaseAuth() {
-            console.log('Initializing Firebase auth...');
-            
-            try {
-                // Sign in anonymously with timeout
-                const authPromise = auth.signInAnonymously();
-                const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Authentication timeout')), 10000);
-                await Promise.race([authPromise, timeoutPromise]);
+    console.log('Initializing Firebase auth...');
+    
+    try {
+        // Sign in anonymously with timeout
+        const authPromise = auth.signInAnonymously();
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Authentication timeout')), 10000);
+        
+        await Promise.race([authPromise, timeoutPromise]);
+        
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                appState.currentUser = user;
+                console.log('User signed in anonymously with ID:', user.uid);
                 
-                auth.onAuthStateChanged((user) => {
-                    if (user) {
-                        appState.currentUser = user;
-                        console.log('User signed in anonymously with ID:', user.uid);
-                        
-                        // Set user ID in analytics
-                        analytics.setUserId(user.uid);
-                    } else {
-                        console.log('User is signed out');
-                    }
-                });
-            } catch (error) {
-                console.error('Authentication error:', error);
-                showError('Failed to connect to chat service. Please check your internet connection.');
-                throw error;
+                // Set user ID in analytics
+                analytics.setUserId(user.uid);
+            } else {
+                console.log('User is signed out');
             }
-        }
+        });
+    } catch (error) {
+        console.error('Authentication error:', error);
+        showError('Failed to connect to chat service. Please check your internet connection.');
+        throw error;
+    }
+}
         
         // Set up all event listeners with enhanced organization
         function setupEventListeners() {
