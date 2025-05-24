@@ -1242,8 +1242,7 @@
                 // Sign in anonymously with timeout
                 const authPromise = auth.signInAnonymously();
                 const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Authentication timeout')), 10000);
-                
+    setTimeout(() => reject(new Error('Authentication timeout')), 10000);
                 await Promise.race([authPromise, timeoutPromise]);
                 
                 auth.onAuthStateChanged((user) => {
