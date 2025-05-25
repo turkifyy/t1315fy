@@ -6623,6 +6623,53 @@ $(document).ready(() => {
     window.loadPremiumTasks = loadPremiumTasks;
     window.editPremiumTask = editPremiumTask;
 });
+    
+document.addEventListener("DOMContentLoaded", function () {
+    // إظهار قسم المصادقة وإظهار النموذج الصحيح
+    function showAuthSection(tabId) {
+        document.getElementById("authSection").classList.remove("hidden");
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("register").classList.add("hidden");
+        document.getElementById("reset").classList.add("hidden");
+        document.getElementById(tabId).classList.remove("hidden");
+        window.scrollTo({ top: document.getElementById("authSection").offsetTop, behavior: 'smooth' });
+    }
+
+    // زر "Get Started - It's Free"
+    document.getElementById("heroRegisterBtn")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        showAuthSection("register");
+    });
+
+    // زر "Register" في navbar
+    document.getElementById("registerBtn")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        showAuthSection("register");
+    });
+
+    // زر "Login" في navbar
+    document.getElementById("loginBtn")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        showAuthSection("login");
+    });
+
+    // زر التبديل داخل صفحة المصادقة
+    document.getElementById("showRegisterForm")?.addEventListener("click", function () {
+        showAuthSection("register");
+    });
+
+    document.getElementById("showLoginForm")?.addEventListener("click", function () {
+        showAuthSection("login");
+    });
+
+    document.getElementById("showResetForm")?.addEventListener("click", function () {
+        showAuthSection("reset");
+    });
+
+    document.getElementById("backToLoginForm")?.addEventListener("click", function () {
+        showAuthSection("login");
+    });
+});
 </script>
 </body>
 </html>
