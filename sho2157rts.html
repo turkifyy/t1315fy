@@ -1347,8 +1347,14 @@
         // Set current year in footer
         currentYearSpan.textContent = new Date().getFullYear();
         
-        // Whitelisted domains for security
-        const allowedDomains = ['example.com', 'trustedsite.org', 'mydomain.net'];
+        function isValidUrl(url) {
+    try {
+        new URL(url); 
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
         
         // Initialize page based on URL
         function initPage() {
@@ -1558,10 +1564,10 @@
             
             // Validate URL
             if (!isValidUrl(originalUrl)) {
-                originalUrlInput.classList.add('is-invalid');
-                showNotification('error', 'الرجاء إدخال رابط صالح أو ضمن النطاقات المسموحة');
-                return;
-            }
+            originalUrlInput.classList.add('is-invalid');
+            showNotification('error', 'الرجاء إدخال رابط صالح');
+         return;
+        }
             
             // Validate series name
             if (!seriesName || !isValidSeriesName(seriesName)) {
