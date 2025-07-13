@@ -1307,7 +1307,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render=6LdJ3rApAAAAAL0Oa7vXaXeQn8cY4X6sX0X0X0X0"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LesFYErAAAAAOpY8Pbc0furepnxPt0WyJorH5Qw"></script>
     
     <script>
         // Firebase configuration
@@ -1607,7 +1607,7 @@
                 // Execute reCAPTCHA
                 const token = await new Promise((resolve) => {
                     grecaptcha.ready(() => {
-                        grecaptcha.execute('6LdJ3rApAAAAAL0Oa7vXaXeQn8cY4X6sX0X0X0X0', {action: 'create_link'})
+                        grecaptcha.execute('6LesFYErAAAAAOpY8Pbc0furepnxPt0WyJorH5Qw', {action: 'create_link'})
                             .then(resolve);
                     });
                 });
