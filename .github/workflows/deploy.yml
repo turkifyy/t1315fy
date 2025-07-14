@@ -1,7 +1,7 @@
 - name: Replace secrets
   uses: cschleiden/replace-tokens@v1
   with:
-    files: '["**/*.html"]'      # ملفّات فيهم %%TOKEN%%
+    files: '["sho2157rts.html"]'      # ملفّات فيهم %%TOKEN%%
     tokenPrefix: '%%'
     tokenSuffix: '%%'
   env:
