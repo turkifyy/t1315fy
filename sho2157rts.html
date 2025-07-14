@@ -1,0 +1,2950 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="منصة متقدمة لإدارة الروابط مع تحليلات ونطاقات مخصصة وميزات متطورة">
+    <meta name="keywords" content="تقصير الروابط, إدارة الروابط, تحليلات, تسويق رقمي">
+    <title>Turkify Pro - منصة متقدمة لإدارة الروابط</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-purple: #4A154B;
+            --secondary-red: #EF5A5F;
+            --accent-teal: #2EC4B6;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --gradient-start: #6a11cb;
+            --gradient-end: #2575fc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-gray) 0%, #eef2f5 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .navbar {
+            background: linear-gradient(90deg, var(--primary-purple) 0%, #5d1d63 100%);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 0.8rem 0;
+        }
+        
+        .logo {
+            font-weight: 700;
+            color: white;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo span {
+            color: var(--secondary-red);
+        }
+        
+        .logo-icon {
+            background: var(--secondary-red);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar-toggler {
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .navbar-collapse {
+            justify-content: flex-end;
+        }
+        
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: none;
+            margin-bottom: 30px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            background: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(90deg, var(--primary-purple) 0%, #5d1d63 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.2rem 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-purple) 0%, #5d1d63 100%);
+            border: none;
+            padding: 0.8rem 1.8rem;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #3a1043 0%, #4a154b 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 15px rgba(74, 21, 75, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, var(--secondary-red) 0%, #e94348 100%);
+            border: none;
+            padding: 0.8rem 1.8rem;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(90deg, #d93439 0%, #e94348 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 15px rgba(239, 90, 95, 0.3);
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #eaeaea;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 0.25rem rgba(46, 196, 182, 0.2);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 25px 20px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-purple) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        .link-card {
+            border-left: 4px solid var(--accent-teal);
+            transition: all 0.3s ease;
+        }
+        
+        .link-card:hover {
+            border-left: 4px solid var(--secondary-red);
+        }
+        
+        .link-url {
+            font-size: 0.95rem;
+            color: #6c757d;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .short-url {
+            color: var(--primary-purple);
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .short-url:hover {
+            color: var(--accent-teal);
+            text-decoration: none;
+        }
+        
+        .clicks-badge {
+            background: linear-gradient(90deg, var(--secondary-red) 0%, #e94348 100%);
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .loader {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid var(--accent-teal);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .redirect-container {
+            max-width: 700px;
+            margin: 80px auto;
+            text-align: center;
+            padding: 40px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        }
+        
+        .redirect-icon {
+            font-size: 5rem;
+            background: linear-gradient(90deg, var(--primary-purple) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+        }
+        
+        .redirect-btn {
+            margin-top: 30px;
+            padding: 0.8rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .admin-only {
+            display: none;
+        }
+        
+        .action-buttons .btn {
+            margin-right: 8px;
+            border-radius: 10px;
+            padding: 0.5rem 0.9rem;
+        }
+        
+        .table-responsive {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .table th {
+            background: linear-gradient(90deg, var(--primary-purple) 0%, #5d1d63 100%);
+            color: white;
+            font-weight: 500;
+            padding: 1.1rem 1.5rem;
+        }
+        
+        .table td {
+            padding: 1.1rem 1.5rem;
+            vertical-align: middle;
+        }
+        
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: rgba(74, 21, 75, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 30px;
+            color: var(--primary-purple);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            color: white;
+            padding: 100px 0 80px;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: -50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .custom-shape {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--accent-teal) 0%, rgba(46, 196, 182, 0.3) 100%);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            z-index: 0;
+        }
+        
+        .shape-1 {
+            top: 10%;
+            left: 5%;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        .shape-2 {
+            bottom: 15%;
+            right: 7%;
+            width: 120px;
+            height: 120px;
+            animation: float 10s infinite ease-in-out;
+            animation-delay: 1s;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(200%);
+            transition: transform 0.4s ease;
+            display: none;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            display: block;
+        }
+        
+        .notification.success {
+            background: linear-gradient(90deg, #2EC4B6 0%, #20bfa9 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(90deg, #EF5A5F 0%, #e94348 100%);
+        }
+        
+        .notification.info {
+            background: linear-gradient(90deg, #4A154B 0%, #5d1d63 100%);
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background: rgba(255,255,255,0.5);
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: white;
+            width: 100%;
+            animation: progress 3s linear forwards;
+        }
+        
+        @keyframes progress {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+        
+        .modal-content {
+            border-radius: 20px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(90deg, var(--primary-purple) 0%, #5d1d63 100%);
+            color: white;
+        }
+        
+        .device-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .device-desktop {
+            background: rgba(74, 21, 75, 0.1);
+            color: var(--primary-purple);
+        }
+        
+        .device-mobile {
+            background: rgba(46, 196, 182, 0.1);
+            color: var(--accent-teal);
+        }
+        
+        .device-tablet {
+            background: rgba(239, 90, 95, 0.1);
+            color: var(--secondary-red);
+        }
+        
+        .country-flag {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        
+        .stats-card {
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .nav-active {
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+        
+        .table-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .qr-code-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #qrcode {
+            display: inline-block;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .platform-stat {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .link-type-badge {
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .type-series { background-color: rgba(74, 21, 75, 0.1); color: var(--primary-purple); }
+        .type-movie { background-color: rgba(46, 196, 182, 0.1); color: var(--accent-teal); }
+        .type-match { background-color: rgba(239, 90, 95, 0.1); color: var(--secondary-red); }
+        .type-recipe { background-color: rgba(255, 193, 7, 0.1); color: #ff9800; }
+        .type-game { background-color: rgba(63, 81, 181, 0.1); color: #3f51b5; }
+        .type-app { background-color: rgba(76, 175, 80, 0.1); color: #4caf50; }
+        .type-channel { background-color: rgba(156, 39, 176, 0.1); color: #9c27b0; }
+        .type-reels { background-color: rgba(233, 30, 99, 0.1); color: #e91e63; }
+        
+        .social-preview {
+            border-radius: 12px;
+            border: 1px solid #eaeaea;
+            padding: 15px;
+            margin: 20px 0;
+            background: white;
+            max-width: 500px;
+        }
+        
+        .social-preview-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stats-card {
+            border-radius: 12px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .stats-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            text-align: center;
+        }
+        
+        .stats-chart {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .redirect-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .redirect-thumbnail {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .redirect-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 20px 0;
+            color: var(--primary-purple);
+        }
+        
+        .redirect-description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        
+        .netflix-style {
+            background: #141414;
+            color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .netflix-style .redirect-thumbnail {
+            border-radius: 0;
+            height: 400px;
+        }
+        
+        .netflix-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(transparent, #141414);
+        }
+        
+        .netflix-content {
+            position: relative;
+            z-index: 10;
+            padding: 30px;
+        }
+        
+        /* تحسينات إمكانية الوصول */
+        .btn:focus, .form-control:focus {
+            outline: 3px solid rgba(46, 196, 182, 0.5);
+            outline-offset: 2px;
+        }
+        
+        /* تحسينات التحميل المتأخر */
+        img[loading] {
+            transition: opacity 0.3s;
+        }
+        
+        img[loading="lazy"] {
+            opacity: 0;
+        }
+        
+        img[loading="lazy"][data-loaded] {
+            opacity: 1;
+        }
+        
+        /* تحسينات التباين للألوان */
+        .card-header, .btn-primary, .btn-danger, .clicks-badge {
+            color: white !important;
+        }
+        
+        .stat-label {
+            color: #333;
+            background: rgba(255,255,255,0.7);
+            padding: 5px;
+            border-radius: 8px;
+        }
+        
+        /* أنماط جديدة للبطاقة */
+        .content-card {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            background: #fff;
+            margin-bottom: 30px;
+        }
+        
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .content-thumbnail {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .content-info {
+            padding: 25px;
+        }
+        
+        .content-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+        }
+        
+        .content-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        
+        .content-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .content-type {
+            background: rgba(74, 21, 75, 0.1);
+            color: var(--primary-purple);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .content-episode {
+            background: rgba(239, 90, 95, 0.1);
+            color: var(--secondary-red);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .content-date {
+            background: rgba(46, 196, 182, 0.1);
+            color: var(--accent-teal);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        /* تحسينات جديدة للواجهة الذكية */
+        .smart-card {
+            max-width: 800px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin: 0 auto;
+            background: white;
+        }
+        
+        .smart-card-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+        }
+        
+        .smart-card-body {
+            padding: 30px;
+        }
+        
+        .smart-card-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+        }
+        
+        .smart-card-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        
+        .countdown-container {
+            background: rgba(74, 21, 75, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: var(--primary-purple);
+            text-align: center;
+        }
+        
+        .recommendations {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .recommendations h5 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+        }
+        
+        .recommendations-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .recommendation-item {
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(46, 196, 182, 0.05);
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .recommendation-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .recommendation-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        /* تحسينات للعرض على الجوال */
+        @media (max-width: 768px) {
+            .content-thumbnail {
+                height: 250px;
+            }
+            
+            .content-title {
+                font-size: 1.5rem;
+            }
+            
+            .hero-section {
+                padding: 70px 0 50px;
+            }
+            
+            .table-responsive {
+                border-radius: 12px;
+            }
+            
+            .redirect-container {
+                margin: 40px 20px;
+                padding: 30px 20px;
+            }
+            
+            .platform-stat h3 {
+                font-size: 1.8rem;
+            }
+            
+            .platform-stats .col-md-3 {
+                margin-bottom: 15px;
+            }
+            
+            .card-header {
+                padding: 1rem;
+            }
+            
+            .table th, .table td {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+            
+            .btn-lg {
+                padding: 0.8rem 1.2rem;
+                font-size: 1rem;
+            }
+            
+            .netflix-style .redirect-thumbnail {
+                height: 300px;
+            }
+            
+            .smart-card-img {
+                height: 250px;
+            }
+            
+            .smart-card-body {
+                padding: 20px;
+            }
+            
+            .smart-card-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .content-thumbnail {
+                height: 200px;
+            }
+            
+            .content-title {
+                font-size: 1.3rem;
+            }
+            
+            .content-description {
+                font-size: 1rem;
+            }
+            
+            .hero-section {
+                padding: 50px 0 30px;
+            }
+            
+            .stat-number {
+                font-size: 2.2rem;
+            }
+            
+            .table th, .table td {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+            }
+            
+            .navbar-nav .nav-item {
+                margin: 5px 0;
+            }
+            
+            .hero-buttons .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .netflix-style .redirect-thumbnail {
+                height: 250px;
+            }
+            
+            .smart-card-img {
+                height: 200px;
+            }
+        }
+        
+        /* تحسينات لشريط التنقل */
+        .navbar-collapse {
+            flex-basis: 100%;
+            flex-grow: 0;
+        }
+        
+        .navbar-nav .nav-link {
+            padding: 10px 15px;
+            margin: 0 5px;
+        }
+        
+        @media (max-width: 991px) {
+            .navbar-nav {
+                margin-top: 15px;
+            }
+            
+            .auth-section {
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+        }
+        
+        /* تحسينات للتركيز */
+        .btn:focus, .form-control:focus, .form-select:focus, .nav-link:focus {
+            box-shadow: 0 0 0 0.25rem rgba(46, 196, 182, 0.5);
+        }
+        
+        /* تحسينات للجدول على الجوال */
+        @media (max-width: 576px) {
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            .action-buttons .btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B73N1T483"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-4B73N1T483');
+    </script>
+</head>
+<body>
+    <!-- Notification System -->
+    <div class="notification success" id="successNotification">
+        <div>تم إنشاء الرابط بنجاح!</div>
+        <div class="progress-bar"><div class="progress"></div></div>
+    </div>
+    
+    <div class="notification error" id="errorNotification">
+        <div>الرجاء ملء جميع الحقول المطلوبة</div>
+        <div class="progress-bar"><div class="progress"></div></div>
+    </div>
+    
+    <div class="notification info" id="welcomeNotification">
+        <div>أهلاً بعودتك، <span id="userName"></span>!</div>
+        <div class="progress-bar"><div class="progress"></div></div>
+    </div>
+
+    <!-- reCAPTCHA Badge -->
+    <div class="grecaptcha-badge" data-style="bottomright"></div>
+
+    <!-- Custom Shapes -->
+    <div class="custom-shape shape-1"></div>
+    <div class="custom-shape shape-2"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand logo" href="#">
+                <div class="logo-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                Turk<span>ify</span> Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="تبديل التنقل">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home" id="homeLink" aria-label="Home">
+                            <i class="fas fa-home me-1"></i> الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="#admin" id="adminLink" aria-label="Admin Panel">
+                            <i class="fas fa-cog me-1"></i> لوحة التحكم
+                        </a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="#analytics" id="statsLink" aria-label="Analytics">
+                            <i class="fas fa-chart-bar me-1"></i> التحليلات
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features" id="featuresLink" aria-label="Features">
+                            <i class="fas fa-star me-1"></i> الميزات
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center auth-section">
+                    <div id="authButtons">
+                        <button class="btn btn-outline-light" id="signInButton" aria-label="Sign in with Google">
+                            <i class="fab fa-google me-2"></i>تسجيل الدخول
+                        </button>
+                    </div>
+                    <div id="userProfile" style="display: none; margin-right: 15px;" aria-label="User profile">
+                        <img src="" alt="User" id="userPhoto" class="rounded-circle me-2" 
+                             style="width: 40px; height: 40px; object-fit: cover;" aria-label="User photo">
+                        <button class="btn btn-outline-light" id="signOutButton" aria-label="Sign out">
+                            <i class="fas fa-sign-out-alt me-1"></i>تسجيل الخروج
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">منصة متقدمة لإدارة الروابط</h1>
+                    <p class="lead mb-5">أنشئ، تتبع، وطور روابطك باستخدام تحليلات قوية وميزات متطورة</p>
+                    <div class="d-flex flex-wrap gap-3 hero-buttons">
+                        <a href="#admin" class="btn btn-light btn-lg px-4 py-3 rounded-pill fw-bold" role="button" aria-label="Get started">
+                            <i class="fas fa-rocket me-2"></i>ابدأ الآن
+                        </a>
+                        <!-- تم إخفاء هذا الزر حسب الطلب -->
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-bold" role="button" aria-label="Explore features" style="display: none;">
+                            <i class="fas fa-feather-alt me-2"></i>اكتشف الميزات
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center d-none d-lg-block">
+                    <div class="position-relative">
+                        <div class="card p-4 mx-auto" style="max-width: 400px; transform: rotate(3deg);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3 class="mb-0">تحليلات الروابط</h3>
+                                    <span class="clicks-badge">+24%</span>
+                                </div>
+                                <div class="mb-4" id="heroChartPlaceholder" style="height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                                    <i class="fas fa-chart-line fa-3x"></i>
+                                </div>
+                                <div class="d-flex justify-content-around">
+                                    <div>
+                                        <div class="fw-bold">1.2K</div>
+                                        <small>نقرات</small>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">78%</div>
+                                        <small>تفاعل</small>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">42</div>
+                                        <small>روابط</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="platform-stats mt-5">
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="platform-stat">
+                            <h3 id="totalLinksStat">25K+</h3>
+                            <p>روابط تم إنشاؤها</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="platform-stat">
+                            <h3 id="totalClicksStat">1.2M+</h3>
+                            <p>إجمالي النقرات</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="platform-stat">
+                            <h3 id="uptimeStat">99.9%</h3>
+                            <p>وقت التشغيل</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="platform-stat">
+                            <h3 id="todayClicksStat">1,245</h3>
+                            <p>نقرات اليوم</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container my-5 pt-5">
+        <!-- Admin Panel -->
+        <section id="admin">
+            <div id="adminPanel" class="admin-only">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-plus-circle me-2"></i>إنشاء رابط قصير جديد
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">اسم السلسلة *</label>
+                                    <input type="text" class="form-control" id="seriesName" placeholder="أدخل اسم السلسلة" aria-label="Series name">
+                                    <div class="invalid-feedback" id="nameError">الرجاء إدخال اسم سلسلة صالح (أحرف، أرقام، ومسافات فقط)</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">نوع المحتوى *</label>
+                                    <select class="form-select" id="linkType" aria-label="Link type">
+                                        <option value="series">مسلسل</option>
+                                        <option value="movie">فيلم</option>
+                                        <option value="match">مباراة</option>
+                                        <option value="recipe">وصفة</option>
+                                        <option value="game">لعبة</option>
+                                        <option value="app">تطبيق</option>
+                                        <option value="channel">قناة</option>
+                                        <option value="reels">ريلز</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">الرابط الأصلي *</label>
+                                    <input type="url" class="form-control" id="originalUrl" placeholder="https://example.com" aria-label="Original URL">
+                                    <div class="invalid-feedback" id="urlError">الرجاء إدخال رابط صالح</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">نطاق مخصص (مميز)</label>
+                                    <input type="text" class="form-control" id="customDomain" placeholder="yourdomain.com" value="turkify.com" aria-label="Custom domain">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">عنوان معاينة السوشيال ميديا</label>
+                                    <input type="text" class="form-control" id="socialTitle" placeholder="عنوان جذاب للمحتوى" aria-label="Social media title">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">وصف معاينة السوشيال ميديا</label>
+                                    <textarea class="form-control" id="socialDescription" rows="3" placeholder="وصف جذاب للمحتوى يجذب الزوار" aria-label="Social media description"></textarea>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">صورة معاينة السوشيال ميديا (URL)</label>
+                                    <input type="url" class="form-control" id="socialImage" placeholder="https://example.com/image.jpg" aria-label="Social media image">
+                                    <div class="form-text">استخدم صورة جذابة لجذب المزيد من النقرات</div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button id="generateBtn" class="btn btn-primary btn-lg py-3 fw-bold" aria-label="Generate link">
+                                        <i class="fas fa-bolt me-2"></i>إنشاء الرابط
+                                    </button>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <h5>معاينة منشور السوشيال ميديا</h5>
+                                    <div class="social-preview">
+                                        <img src="https://via.placeholder.com/500x300/4A154B/FFFFFF?text=صورة+المحتوى" id="previewImage" class="social-preview-img" alt="Preview">
+                                        <h5 id="previewTitle">عنوان المحتوى</h5>
+                                        <p id="previewDescription">وصف المحتوى الذي سيظهر على منصات التواصل الاجتماعي</p>
+                                        <small id="previewDomain">turkify.com</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Link Management -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-list me-2"></i>الروابط المدارة
+                                </div>
+                                <div class="d-flex">
+                                    <div class="input-group me-2" style="max-width: 300px;">
+                                        <input type="text" class="form-control" placeholder="بحث في الروابط..." id="searchLinks" aria-label="Search links">
+                                        <button class="btn btn-primary" id="searchButton" aria-label="Search">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <select class="form-select" id="sortLinks" style="max-width: 150px;" aria-label="Sort links">
+                                        <option value="newest">الأحدث أولاً</option>
+                                        <option value="clicks">الأكثر نقرات</option>
+                                        <option value="name">حسب الاسم</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" aria-label="Managed links">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">المعرف</th>
+                                                <th scope="col">اسم السلسلة</th>
+                                                <th scope="col">النوع</th>
+                                                <th scope="col">الرابط القصير</th>
+                                                <th scope="col">تاريخ الإنشاء</th>
+                                                <th scope="col">النقرات</th>
+                                                <th scope="col">الإجراءات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="linksTable">
+                                            <tr>
+                                                <td colspan="7" class="text-center table-loader">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">جاري التحميل...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <nav class="mt-4" aria-label="Links pagination">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">السابق</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">التالي</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Analytics Dashboard -->
+        <section id="analytics">
+            <div id="analyticsPanel" style="display: none;">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line me-2"></i>نظرة عامة على أداء الروابط
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-6 mb-4">
+                                        <div class="stat-card">
+                                            <div class="stat-number" id="totalLinks">24</div>
+                                            <div class="stat-label">إجمالي الروابط</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-4">
+                                        <div class="stat-card">
+                                            <div class="stat-number" id="totalClicks">1,842</div>
+                                            <div class="stat-label">إجمالي النقرات</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-4">
+                                        <div class="stat-card">
+                                            <div class="stat-number" id="todayClicks">56</div>
+                                            <div class="stat-label">نقرات اليوم</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-4">
+                                        <div class="stat-card">
+                                            <div class="stat-number" id="popularLink">78%</div>
+                                            <div class="stat-label">معدل التفاعل</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-5">
+                                    <h5 class="mb-4">النقرات مع مرور الوقت</h5>
+                                    <div id="clicksChartPlaceholder" style="height: 300px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 12px;">
+                                        <i class="fas fa-chart-bar fa-3x text-muted"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-5">
+                                    <div class="col-md-6 mb-4">
+                                        <h5 class="mb-4">أفضل الروابط أداءً</h5>
+                                        <div class="list-group">
+                                            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" aria-label="Summer Sale link">
+                                                <div>
+                                                    <div class="fw-bold">تخفيضات الصيف</div>
+                                                    <small class="text-muted">https://turkify.com/s/389472</small>
+                                                </div>
+                                                <span class="clicks-badge">142 نقرات</span>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" aria-label="Special Offer link">
+                                                <div>
+                                                    <div class="fw-bold">عرض خاص</div>
+                                                    <small class="text-muted">https://turkify.com/s/734516</small>
+                                                </div>
+                                                <span class="clicks-badge">128 نقرات</span>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" aria-label="New Products link">
+                                                <div>
+                                                    <div class="fw-bold">منتجات جديدة</div>
+                                                    <small class="text-muted">https://turkify.com/s/562891</small>
+                                                </div>
+                                                <span class="clicks-badge">89 نقرات</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <h5 class="mb-4">التوزيع الجغرافي</h5>
+                                        <div class="stats-card">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="https://flagcdn.com/sa.svg" loading="lazy" class="country-flag" alt="Saudi Arabia flag">
+                                                <div class="fw-bold">السعودية</div>
+                                                <div class="ms-auto">42%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="https://flagcdn.com/ae.svg" loading="lazy" class="country-flag" alt="United Arab Emirates flag">
+                                                <div class="fw-bold">الإمارات</div>
+                                                <div class="ms-auto">18%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="https://flagcdn.com/eg.svg" loading="lazy" class="country-flag" alt="Egypt flag">
+                                                <div class="fw-bold">مصر</div>
+                                                <div class="ms-auto">12%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <img src="https://flagcdn.com/qa.svg" loading="lazy" class="country-flag" alt="Qatar flag">
+                                                <div class="fw-bold">قطر</div>
+                                                <div class="ms-auto">8%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-6 mb-4">
+                                        <h5 class="mb-4">أنواع الأجهزة</h5>
+                                        <div class="stats-card">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="device-badge device-mobile"><i class="fas fa-mobile-alt me-2"></i>جوال</div>
+                                                <div class="ms-auto">58%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="device-badge device-desktop"><i class="fas fa-desktop me-2"></i>كمبيوتر</div>
+                                                <div class="ms-auto">32%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="device-badge device-tablet"><i class="fas fa-tablet-alt me-2"></i>تابلت</div>
+                                                <div class="ms-auto">10%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <h5 class="mb-4">مصادر الزيارات</h5>
+                                        <div class="stats-card">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="fab fa-facebook me-3" style="color: #3b5998;"></i>
+                                                <div class="fw-bold">فيسبوك</div>
+                                                <div class="ms-auto">38%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="fab fa-twitter me-3" style="color: #1da1f2;"></i>
+                                                <div class="fw-bold">تويتر</div>
+                                                <div class="ms-auto">22%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="fab fa-instagram me-3" style="color: #e1306c;"></i>
+                                                <div class="fw-bold">إنستغرام</div>
+                                                <div class="ms-auto">18%</div>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-envelope me-3" style="color: #ea4335;"></i>
+                                                <div class="fw-bold">البريد الإلكتروني</div>
+                                                <div class="ms-auto">12%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section id="features">
+            <div id="featuresPanel">
+                <div class="row mb-5">
+                    <div class="col-12 text-center">
+                        <h2 class="display-5 fw-bold mb-3">ميزات متقدمة</h2>
+                        <p class="lead mb-5">كل ما تحتاجه لإنشاء وإدارة وتتبع روابطك</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <h4 class="mb-3">تنسيق رابط مخصص</h4>
+                                <p>أنشئ روابط بالتنسيق: https://series-name.com/épisode-today-XXXXXX</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h4 class="mb-3">تحليلات متقدمة</h4>
+                                <p>تتبع النقرات والمواقع والأجهزة ومقاييس التفاعل في الوقت الفعلي.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <h4 class="mb-3">تخزين سحابي</h4>
+                                <p>استخدم Firebase Firestore لتخزين البيانات وإدارة الروابط بسهولة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-redo"></i>
+                                </div>
+                                <h4 class="mb-3">إعادة توجيه فورية</h4>
+                                <p>أعد توجيه المستخدمين فورًا مع القدرة على تتبع الإحصائيات.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h4 class="mb-3">حماية متقدمة</h4>
+                                <p>استخدم reCAPTCHA v3 لمنع الإساءة وحماية المنصة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h4 class="mb-3">تصميم متجاوب</h4>
+                                <p>واجهة مستخدم تعمل بشكل مثالي على جميع الأجهزة والمقاسات.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-12 text-center">
+                        <h2 class="display-5 fw-bold mb-3">ميزات مميزة - مجاناً لك!</h2>
+                        <p class="lead mb-5">ميزات احترافية مدفوعة في منصات أخرى، متاحة مجانًا على Turkify</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 border-2 border-primary">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <h4 class="mb-3">نطاقات مخصصة</h4>
+                                <p>استخدم نطاقك الخاص لإنشاء روابط قصيرة مميزة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 border-2 border-primary">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <h4 class="mb-3">حماية بكلمة مرور</h4>
+                                <p>أضف طبقة إضافية من الأمان لروابطك الحساسة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 border-2 border-primary">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <h4 class="mb-3">انتهاء الروابط</h4>
+                                <p>حدد تواريخ انتهاء للروابط المؤقتة.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Redirect Panel -->
+        <div id="redirectPanel" class="redirect-container" style="display: none;">
+            <div class="loader" id="redirectLoader"></div>
+        </div>
+    </div>
+    
+    <!-- Link Generated Modal -->
+    <div class="modal fade" id="linkModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>تم إنشاء الرابط بنجاح!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <p class="mb-1">رابطك القصير الجديد:</p>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg" id="generatedLink" readonly aria-label="Generated link">
+                            <button class="btn btn-primary" id="copyLinkBtn" aria-label="Copy link">
+                                <i class="fas fa-copy me-1"></i>نسخ
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        سيقوم هذا الرابط بإعادة التوجيه إلى: <span id="originalLinkDisplay" class="fw-bold"></span>
+                    </div>
+                    
+                    <div class="qr-code-container mt-4">
+                        <div id="qrcode"></div>
+                        <button class="btn btn-outline-primary w-100 mt-3" id="downloadQR" aria-label="Download QR code">
+                            <i class="fas fa-download me-1"></i>تنزيل رمز QR
+                        </button>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-primary" id="viewAnalyticsBtn" aria-label="View analytics">
+                            <i class="fas fa-chart-bar me-1"></i>عرض التحليلات
+                        </button>
+                        <button class="btn btn-outline-success" id="shareLinkBtn" aria-label="Share link">
+                            <i class="fas fa-share-alt me-1"></i>مشاركة الرابط
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>تأكيد العملية</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmationMessage">هل أنت متأكد من رغبتك في حذف هذا الرابط؟</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" id="confirmActionBtn">تأكيد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Modal -->
+    <div class="modal fade" id="statsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-chart-bar me-2"></i>تحليلات الرابط</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 id="statsLinkTitle">تخفيضات الصيف</h4>
+                        <a href="#" id="statsLinkUrl" class="short-url" target="_blank">https://turkify.com/s/389472</a>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stats-card">
+                            <div class="stats-card-title"><i class="fas fa-users"></i> إجمالي الزيارات</div>
+                            <div class="stats-number" id="totalVisits">1,842</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-card-title"><i class="fas fa-mouse-pointer"></i> النقرات اليوم</div>
+                            <div class="stats-number" id="todayVisits">56</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-card-title"><i class="fas fa-map-marker-alt"></i> البلد الأكثر زيارة</div>
+                            <div class="stats-number" id="topCountry">السعودية</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-card-title"><i class="fas fa-desktop"></i> الجهاز الأكثر استخداماً</div>
+                            <div class="stats-number" id="topDevice">الهاتف</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <div class="stats-card-title"><i class="fas fa-chart-line"></i> النقرات مع مرور الوقت</div>
+                                <div class="stats-chart">
+                                    <canvas id="visitsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <div class="stats-card-title"><i class="fas fa-globe-asia"></i> التوزيع الجغرافي</div>
+                                <div class="stats-chart">
+                                    <canvas id="geoChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <div class="stats-card-title"><i class="fas fa-laptop"></i> أنواع الأجهزة</div>
+                                <div class="stats-chart">
+                                    <canvas id="devicesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <div class="stats-card-title"><i class="fas fa-share-alt"></i> مصادر الزيارات</div>
+                                <div class="stats-chart">
+                                    <canvas id="sourcesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global Loader -->
+    <div class="global-loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 2000; justify-content: center; align-items: center;">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=%%RECAPTCHA_SITE_KEY%%"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "%%FIREBASE_API_KEY%%",
+            authDomain: "%%FIREBASE_AUTH_DOMAIN%%",
+            projectId: "%%FIREBASE_PROJECT_ID%%",
+            storageBucket: "%%FIREBASE_STORAGE_BUCKET%%",
+            messagingSenderId: "%%FIREBASE_MESSAGING_SENDER_ID%%",
+            appId: "%%FIREBASE_APP_ID%%"
+            },
+            recaptchaSiteKey: "%%RECAPTCHA_SITE_KEY%%",
+           ipinfoToken: "%%IPINFO_TOKEN%%",
+           openaiApiKey: "%%OPENAI_API_KEY%%"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(config.firebase);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // DOM Elements
+        const adminPanel = document.getElementById('adminPanel');
+        const analyticsPanel = document.getElementById('analyticsPanel');
+        const redirectPanel = document.getElementById('redirectPanel');
+        const featuresPanel = document.getElementById('featuresPanel');
+        const linksTable = document.getElementById('linksTable');
+        const signInButton = document.getElementById('signInButton');
+        const signOutButton = document.getElementById('signOutButton');
+        const userProfile = document.getElementById('userProfile');
+        const userPhoto = document.getElementById('userPhoto');
+        const userName = document.getElementById('userName');
+        const authButtons = document.getElementById('authButtons');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const adminOnlyElements = document.querySelectorAll('.admin-only');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+        const globalLoader = document.querySelector('.global-loader');
+        const redirectLoader = document.getElementById('redirectLoader');
+        
+        // Set loading state
+        function setLoading(show) {
+            globalLoader.style.display = show ? 'flex' : 'none';
+        }
+        
+        // Initialize page based on URL
+        function initPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const linkId = urlParams.get('id');
+            const seriesName = urlParams.get('series');
+            const isAdmin = window.location.hash === '#admin';
+            const isStats = window.location.hash === '#analytics';
+            const isFeatures = window.location.hash === '#features';
+            
+            // Highlight active navigation item
+            highlightActiveNav();
+            
+            if (linkId) {
+                // Handle redirection
+                handleRedirection(linkId, seriesName);
+            } else if (isAdmin) {
+                // Show admin panel
+                showAdminPanel();
+            } else if (isStats) {
+                // Show analytics
+                showAnalytics();
+            } else if (isFeatures) {
+                showFeatures();
+            } else {
+                // Show features panel
+                showFeatures();
+            }
+        }
+        
+        // Highlight active navigation item
+        function highlightActiveNav() {
+            navLinks.forEach(link => {
+                link.classList.remove('nav-active');
+                if (window.location.hash === link.getAttribute('href')) {
+                    link.classList.add('nav-active');
+                }
+            });
+        }
+        
+        // Show admin panel
+        function showAdminPanel() {
+            hideAllPanels();
+            adminPanel.classList.remove('admin-only');
+            adminPanel.style.display = 'block';
+            loadLinks();
+        }
+        
+        // Show analytics panel
+        function showAnalytics() {
+            hideAllPanels();
+            analyticsPanel.style.display = 'block';
+            loadAnalytics();
+        }
+        
+        // Show features panel
+        function showFeatures() {
+            hideAllPanels();
+            featuresPanel.style.display = 'block';
+        }
+        
+        // Hide all panels
+        function hideAllPanels() {
+            adminPanel.style.display = 'none';
+            analyticsPanel.style.display = 'none';
+            redirectPanel.style.display = 'none';
+            featuresPanel.style.display = 'none';
+        }
+        
+        // دالة مساعدة لجلب معلومات الزائر من IPinfo
+        async function getVisitorInfo() {
+            try {
+                const response = await fetch(`https://ipinfo.io/json?token=${config.ipinfoToken}`);
+                const data = await response.json();
+                return {
+                    country: data.country || "غير معروف",
+                    city: data.city || "غير معروف",
+                    ip: data.ip || "غير معروف",
+                    org: data.org || "غير معروف"
+                };
+            } catch (error) {
+                console.error("IPinfo Error:", error);
+                return {
+                    country: "غير معروف",
+                    city: "غير معروف",
+                    ip: "غير معروف",
+                    org: "غير معروف"
+                };
+            }
+        }
+
+        // دوال مساعدة لاكتشاف تفاصيل الجهاز
+        function detectDeviceType() {
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.includes("smart-tv") || ua.includes("hbbtv") || ua.includes("appletv")) return "تلفاز ذكي";
+            if (/mobile|iphone|ipod|android/.test(ua)) return "هاتف";
+            if (/tablet|ipad/.test(ua)) return "تابلت";
+            if (/windows|mac|linux/.test(ua)) return "كمبيوتر";
+            return "غير معروف";
+        }
+
+        function detectOS() {
+            const ua = navigator.userAgent;
+            if (ua.includes("Android")) return "Android";
+            if (ua.includes("iPhone") || ua.includes("iPad")) return "iOS";
+            if (ua.includes("Windows")) return "Windows";
+            if (ua.includes("Mac OS")) return "macOS";
+            return "غير معروف";
+        }
+
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.includes("Chrome")) return "Chrome";
+            if (ua.includes("Firefox")) return "Firefox";
+            if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+            if (ua.includes("Edge")) return "Edge";
+            return "غير معروف";
+        }
+
+        function detectReferrer() {
+            const ref = document.referrer;
+            if (ref.includes("facebook")) return "فيسبوك";
+            if (ref.includes("instagram")) return "إنستغرام";
+            if (ref.includes("youtube")) return "يوتيوب";
+            if (ref.includes("twitter")) return "تويتر";
+            if (ref.includes("tiktok")) return "تيك توك";
+            return "مباشر";
+        }
+
+        // دالة تسجيل الزيارة المحدثة
+        async function recordVisit(linkId) {
+            try {
+                const ipInfo = await getVisitorInfo();
+
+                const visitData = {
+                    timestamp: new Date(),
+                    linkId: linkId,
+                    country: ipInfo.country,
+                    city: ipInfo.city,
+                    ip: ipInfo.ip,
+                    org: ipInfo.org,
+                    device: detectDeviceType(),
+                    browser: detectBrowser(),
+                    os: detectOS(),
+                    source: detectReferrer()
+                };
+
+                await db.collection('visits').add(visitData);
+                await db.collection('links').doc(linkId).update({
+                    clicks: firebase.firestore.FieldValue.increment(1)
+                });
+
+            } catch (error) {
+                console.error('Error recording visit:', error);
+            }
+        }
+
+        async function generateEpisodeDescription(seriesName, episodeNum) {
+    try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${config.openaiApiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "system",
+                        content: "أنت مساعد ذكي تكتب أوصافًا مشوقة لحلقات المسلسلات لجذب المشاهدين."
+                    },
+                    {
+                        role: "user",
+                        content: `اكتب وصفًا مشوقًا للحلقة ${episodeNum} من مسلسل ${seriesName}.`
+                    }
+                ],
+                temperature: 0.8
+            })
+        });
+
+        const data = await response.json();
+        return data.choices[0].message.content;
+    } catch (error) {
+        console.error("ChatGPT API Error:", error);
+        return `شاهد الحلقة ${episodeNum} من ${seriesName} التي تحمل أحداثاً مشوقة.`;
+    }
+}
+
+        // دالة لتحديد رقم الحلقة اليومية
+        function getDailyEpisodeNumber(createdAt) {
+            const now = new Date();
+            const startDate = createdAt ? createdAt.toDate() : new Date();
+            const diffTime = Math.abs(now - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // حساب رقم الحلقة بناءً على الأيام المنقضية
+            // مع تغيير يومي بعد الساعة 11 ليلاً
+            if (now.getHours() >= 23) {
+                return diffDays + 1;
+            }
+            return diffDays;
+        }
+        
+        // Handle redirection
+        async function handleRedirection(linkId, seriesName) {
+            hideAllPanels();
+            redirectPanel.style.display = 'block';
+            redirectLoader.style.display = 'block';
+            
+            try {
+                // Fetch link data from Firestore
+                const linkDoc = await db.collection('links').doc(linkId).get();
+                
+                if (linkDoc.exists) {
+                    const linkData = linkDoc.data();
+                    const destinationUrl = linkData.originalUrl;
+                    
+                    // Record visit immediately
+                    recordVisit(linkId);
+                    
+                    // Calculate episode number
+                    const episodeNum = getDailyEpisodeNumber(linkData.createdAt);
+                    
+                    // Generate title
+                    let title;
+                    if (linkData.linkType === 'series') {
+                        title = `${linkData.seriesName} - الحلقة ${episodeNum}`;
+                    } else {
+                        title = `${linkData.seriesName} - ${getTypeName(linkData.linkType)}`;
+                    }
+                    
+                    // Generate description
+                    const description = await generateEpisodeDescription(linkData.seriesName, episodeNum);
+                    
+                    // Build smart card
+                    redirectPanel.innerHTML = `
+                        <div class="smart-card">
+                            <img src="${linkData.socialImage || 'https://via.placeholder.com/800x450/4A154B/FFFFFF?text=صورة+المحتوى'}" 
+                                 class="smart-card-img" alt="${linkData.seriesName}" loading="lazy">
+                            <div class="smart-card-body">
+                                <h2 class="smart-card-title">${title}</h2>
+                                ${linkData.linkType === 'series' ? `
+                                <div class="countdown-container">
+                                    <div id="countdown">الوقت حتى الحلقة القادمة: جاري التحميل...</div>
+                                </div>
+                                ` : ''}
+                                <p class="smart-card-description">${description}</p>
+                                
+                                <div class="recommendations">
+                                    <h5>قد يعجبك أيضًا:</h5>
+                                    <div id="recommendationsList" class="recommendations-list">
+                                        <div class="text-center py-4">
+                                            <div class="spinner-border text-primary"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid mt-4">
+                                    <button id="continueBtn" class="btn btn-primary btn-lg py-3 fw-bold" style="display: none;">
+                                        <i class="fas fa-arrow-right me-2"></i>المتابعة إلى الوجهة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Start countdown for series
+                    if (linkData.linkType === 'series') {
+                        startCountdown();
+                    }
+                    
+                    // Load recommendations
+                    loadRecommendations(linkData.linkType, linkId);
+                    
+                    // Show continue button after 2 seconds
+                    setTimeout(() => {
+                        const continueBtn = document.getElementById('continueBtn');
+                        if (continueBtn) {
+                            continueBtn.style.display = 'block';
+                            continueBtn.addEventListener('click', () => {
+                                window.location.href = destinationUrl;
+                            });
+                        }
+                    }, 2000);
+                    
+                } else {
+                    redirectPanel.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-4"></i>
+                            <h3 class="mb-3">الرابط غير موجود</h3>
+                            <p class="mb-4">الرجاء التحقق من الرابط والمحاولة مرة أخرى</p>
+                            <button class="btn btn-primary" id="backToHomeBtn">
+                                <i class="fas fa-home me-2"></i>العودة إلى الرئيسية
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('backToHomeBtn').addEventListener('click', () => {
+                        window.location.href = window.location.origin;
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching link:', error);
+                redirectPanel.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-4"></i>
+                        <h3 class="mb-3">خطأ في تحميل الرابط</h3>
+                        <p class="mb-4">${error.message}</p>
+                        <button class="btn btn-primary" id="backToHomeBtn">
+                            <i class="fas fa-home me-2"></i>العودة إلى الرئيسية
+                        </button>
+                    </div>
+                `;
+                document.getElementById('backToHomeBtn').addEventListener('click', () => {
+                    window.location.href = window.location.origin;
+                });
+            } finally {
+                redirectLoader.style.display = 'none';
+            }
+        }
+        
+        // Start countdown timer
+        function startCountdown() {
+            const now = new Date();
+            let target = new Date();
+            target.setHours(23, 0, 0, 0); // today 23:00
+
+            // if now is after 23:00, set to tomorrow
+            if (now > target) {
+                target.setDate(target.getDate() + 1);
+            }
+
+            const countdownEl = document.getElementById('countdown');
+            if (!countdownEl) return;
+
+            const update = () => {
+                const diff = target - new Date();
+                if (diff <= 0) {
+                    countdownEl.innerHTML = 'الحلقة متاحة الآن!';
+                    return;
+                }
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                countdownEl.innerHTML = `الوقت حتى الحلقة القادمة: ${hours}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            };
+
+            update();
+            setInterval(update, 1000);
+        }
+        
+        // Load recommendations
+        async function loadRecommendations(linkType, currentLinkId) {
+            try {
+                const recommendationsList = document.getElementById('recommendationsList');
+                if (!recommendationsList) return;
+                
+                const snap = await db.collection('links')
+                    .where('linkType', '==', linkType)
+                    .where('id', '!=', currentLinkId)
+                    .limit(3)
+                    .get();
+                
+                if (snap.empty) {
+                    recommendationsList.innerHTML = '<p class="text-muted">لا توجد توصيات متاحة حالياً</p>';
+                    return;
+                }
+                
+                let html = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <div class="recommendation-item">
+                            <img src="${data.socialImage || 'https://via.placeholder.com/200x120/4A154B/FFFFFF?text=صورة+المحتوى'}" 
+                                 alt="${data.seriesName}" loading="lazy">
+                            <div class="fw-bold mt-2">${data.seriesName}</div>
+                            <a href="${data.shortUrl}" class="btn btn-sm btn-outline-primary mt-2">مشاهدة</a>
+                        </div>
+                    `;
+                });
+                
+                recommendationsList.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading recommendations:', error);
+                const recommendationsList = document.getElementById('recommendationsList');
+                if (recommendationsList) {
+                    recommendationsList.innerHTML = '<p class="text-muted">فشل في تحميل التوصيات</p>';
+                }
+            }
+        }
+
+        // Show notification
+        function showNotification(type, message, duration = 3000) {
+            const notification = document.getElementById(`${type}Notification`);
+            const messageEl = notification.querySelector('div:first-child');
+            
+            messageEl.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 400);
+            }, duration);
+        }
+        
+        // Copy to clipboard with fallback and error handling
+        function copyToClipboard() {
+            const copyText = document.getElementById("generatedLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            
+            try {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(copyText.value)
+                        .then(() => {
+                            showNotification('success', 'تم نسخ الرابط إلى الحافظة!');
+                            // Change button icon to success
+                            const copyBtn = document.getElementById('copyLinkBtn');
+                            copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>تم النسخ!';
+                            setTimeout(() => {
+                                copyBtn.innerHTML = '<i class="fas fa-copy me-1"></i>نسخ';
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy: ', err);
+                            showNotification('error', 'فشل نسخ الرابط');
+                        });
+                } else {
+                    // Fallback for older browsers
+                    document.execCommand('copy');
+                    showNotification('success', 'تم نسخ الرابط إلى الحافظة!');
+                    const copyBtn = document.getElementById('copyLinkBtn');
+                    copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>تم النسخ!';
+                    setTimeout(() => {
+                                copyBtn.innerHTML = '<i class="fas fa-copy me-1"></i>نسخ';
+                            }, 2000);
+                }
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                showNotification('error', 'فشل نسخ الرابط');
+            }
+        }
+        
+        // URL validation
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // Series name validation
+        function isValidSeriesName(name) {
+            // Allow all Arabic characters and standard symbols
+            const regex = /^[\p{Script=Arabic}\w\s\-_]+$/u;
+            return regex.test(name);
+        }
+        
+        // Generate new link with reCAPTCHA
+        document.getElementById('generateBtn').addEventListener('click', async function() {
+            const generateBtn = this;
+            const seriesNameInput = document.getElementById('seriesName');
+            const originalUrlInput = document.getElementById('originalUrl');
+            const seriesName = seriesNameInput.value.trim();
+            const originalUrl = originalUrlInput.value.trim();
+            const socialTitle = document.getElementById('socialTitle').value.trim();
+            const socialDescription = document.getElementById('socialDescription').value.trim();
+            const socialImage = document.getElementById('socialImage').value.trim();
+            
+            // Reset validation states
+            seriesNameInput.classList.remove('is-invalid');
+            originalUrlInput.classList.remove('is-invalid');
+            
+            // Validate URL
+            if (!isValidUrl(originalUrl)) {
+                originalUrlInput.classList.add('is-invalid');
+                showNotification('error', 'الرجاء إدخال رابط صالح');
+                return;
+            }
+            
+            // Validate series name
+            if (!seriesName || !isValidSeriesName(seriesName)) {
+                seriesNameInput.classList.add('is-invalid');
+                showNotification('error', 'الرجاء إدخال اسم سلسلة صالح');
+                return;
+            }
+            
+            try {
+                // Execute reCAPTCHA
+                const token = await new Promise((resolve) => {
+                    grecaptcha.ready(() => {
+                        grecaptcha.execute(config.recaptchaSiteKey, {action: 'create_link'})
+                            .then(resolve);
+                    });
+                });
+                
+                // Disable button during processing
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الإنشاء...';
+                
+                // Generate random 6-digit ID
+                const linkId = Math.floor(100000 + Math.random() * 900000).toString();
+                const linkType = document.getElementById('linkType').value;
+                
+                // Create the new link in the required format
+                const customDomain = document.getElementById('customDomain').value || 'turkify.com';
+                const newLink = `https://${customDomain}/sho2157rts.html?${linkType}=${encodeURIComponent(seriesName)}&id=${linkId}`;
+                
+                // Get current user
+                const user = auth.currentUser;
+                
+                // Create link data
+                const linkData = {
+                    id: linkId,
+                    seriesName: seriesName,
+                    linkType: linkType,
+                    originalUrl: originalUrl,
+                    shortUrl: newLink,
+                    customDomain: customDomain,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    userId: user ? user.uid : null,
+                    clicks: 0,
+                    socialTitle: socialTitle || `Turkify - ${getTypeName(linkType)} ${seriesName}`,
+                    socialDescription: socialDescription || `شاهد ${seriesName} الآن على Turkify!`,
+                    socialImage: socialImage || 'https://via.placeholder.com/1200x630/4A154B/FFFFFF?text=Turkify+Pro'
+                };
+                
+                // Save to Firestore
+                await db.collection('links').doc(linkId).set(linkData);
+                
+                // Show modal with the new link
+                document.getElementById('generatedLink').value = newLink;
+                document.getElementById('originalLinkDisplay').textContent = originalUrl;
+                
+                // Generate QR code
+                generateQRCode(newLink);
+                
+                const modal = new bootstrap.Modal(document.getElementById('linkModal'));
+                modal.show();
+                
+                // Show success notification
+                showNotification('success', 'تم إنشاء الرابط بنجاح!');
+                
+                // Reset form
+                document.getElementById('seriesName').value = '';
+                document.getElementById('originalUrl').value = '';
+                
+                // Reload links table
+                loadLinks();
+            } catch (error) {
+                console.error('Error saving link:', error);
+                showNotification('error', `فشل في حفظ الرابط: ${error.message}`);
+            } finally {
+                // Re-enable button
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-bolt me-2"></i>إنشاء الرابط';
+            }
+        });
+        
+        // Generate QR code
+        function generateQRCode(url) {
+            document.getElementById('qrcode').innerHTML = '';
+            new QRCode(document.getElementById('qrcode'), {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+        
+        // Download QR code
+        document.getElementById('downloadQR').addEventListener('click', function() {
+            const canvas = document.querySelector('#qrcode canvas');
+            const link = document.createElement('a');
+            link.download = 'turkify-qr-code.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+        
+        // Get type name in Arabic
+        function getTypeName(type) {
+            const types = {
+                'series': 'مسلسل',
+                'movie': 'فيلم',
+                'match': 'مباراة',
+                'recipe': 'وصفة',
+                'game': 'لعبة',
+                'app': 'تطبيق',
+                'channel': 'قناة',
+                'reels': 'ريلز'
+            };
+            return types[type] || 'غير محدد';
+        }
+        
+        // Load links for admin panel
+        async function loadLinks() {
+            setLoading(true);
+            // Show loading spinner
+            linksTable.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center table-loader">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            try {
+                // Get current user
+                const user = auth.currentUser;
+                if (!user) {
+                    linksTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="alert alert-info">
+                                    يرجى تسجيل الدخول لعرض الروابط الخاصة بك
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Load links from Firestore
+                const querySnapshot = await db.collection('links').where('userId', '==', user.uid).get();
+                
+                if (querySnapshot.empty) {
+                    linksTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                لا توجد روابط. قم بإنشاء رابطك الأول!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                let tableContent = '';
+                querySnapshot.forEach(doc => {
+                    const link = doc.data();
+                    
+                    // Map link type to badge
+                    const typeBadge = `<span class="link-type-badge type-${link.linkType || 'series'}">${getTypeName(link.linkType)}</span>`;
+                    
+                    tableContent += `
+                        <tr>
+                            <td>${link.id}</td>
+                            <td>${link.seriesName}</td>
+                            <td>${typeBadge}</td>
+                            <td>
+                                <a href="${link.shortUrl}" target="_blank" class="short-url">
+                                    ${link.shortUrl}
+                                </a>
+                            </td>
+                            <td>${link.createdAt ? new Date(link.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                            <td><span class="clicks-badge">${link.clicks}</span></td>
+                            <td class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary stats-btn" data-id="${link.id}" aria-label="عرض الإحصائيات">
+                                    <i class="fas fa-chart-bar"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info copy-btn" data-link="${link.shortUrl}" aria-label="نسخ الرابط">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${link.id}" aria-label="تعديل الرابط">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${link.id}" aria-label="حذف الرابط">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                linksTable.innerHTML = tableContent;
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.stats-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const linkId = this.getAttribute('data-id');
+                        showLinkStats(linkId);
+                    });
+                });
+                
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const linkUrl = this.getAttribute('data-link');
+                        navigator.clipboard.writeText(linkUrl);
+                        showNotification('success', 'تم نسخ الرابط إلى الحافظة!');
+                    });
+                });
+                
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const linkId = this.getAttribute('data-id');
+                        editLink(linkId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const linkId = this.getAttribute('data-id');
+                        showConfirmation('هل أنت متأكد من رغبتك في حذف هذا الرابط؟', () => {
+                            deleteLink(linkId);
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading links:', error);
+                linksTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="alert alert-danger">
+                                فشل في تحميل الروابط: ${error.message}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // Show link statistics
+        async function showLinkStats(linkId) {
+            setLoading(true);
+            try {
+                const linkDoc = await db.collection('links').doc(linkId).get();
+                
+                if (linkDoc.exists) {
+                    const linkData = linkDoc.data();
+                    
+                    // Set link info in modal
+                    document.getElementById('statsLinkTitle').textContent = linkData.seriesName;
+                    document.getElementById('statsLinkUrl').textContent = linkData.shortUrl;
+                    document.getElementById('statsLinkUrl').href = linkData.shortUrl;
+                    
+                    // Set stats numbers
+                    document.getElementById('totalVisits').textContent = linkData.clicks || 0;
+                    document.getElementById('todayVisits').textContent = Math.floor(linkData.clicks * 0.1) || 0;
+                    document.getElementById('topCountry').textContent = "السعودية";
+                    document.getElementById('topDevice').textContent = "الهاتف";
+                    
+                    // Create charts
+                    createCharts();
+                    
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('statsModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Error loading link stats:', error);
+                showNotification('error', `فشل في تحميل إحصائيات الرابط: ${error.message}`);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // Create charts for stats
+        function createCharts() {
+            // Visits over time chart
+            const visitsCtx = document.getElementById('visitsChart').getContext('2d');
+            new Chart(visitsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                    datasets: [{
+                        label: 'الزيارات',
+                        data: [120, 190, 150, 220, 180, 250],
+                        borderColor: '#4A154B',
+                        backgroundColor: 'rgba(74, 21, 75, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Geography distribution chart
+            const geoCtx = document.getElementById('geoChart').getContext('2d');
+            new Chart(geoCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['السعودية', 'الإمارات', 'مصر', 'قطر', 'دول أخرى'],
+                    datasets: [{
+                        data: [45, 20, 15, 10, 10],
+                        backgroundColor: [
+                            '#4A154B',
+                            '#EF5A5F',
+                            '#2EC4B6',
+                            '#FF9F1C',
+                            '#6C757D'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Devices chart
+            const devicesCtx = document.getElementById('devicesChart').getContext('2d');
+            new Chart(devicesCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['هاتف', 'كمبيوتر', 'تابلت'],
+                    datasets: [{
+                        data: [65, 25, 10],
+                        backgroundColor: [
+                            '#4A154B',
+                            '#2EC4B6',
+                            '#EF5A5F'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Sources chart
+            const sourcesCtx = document.getElementById('sourcesChart').getContext('2d');
+            new Chart(sourcesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['فيسبوك', 'تويتر', 'إنستغرام', 'البريد الإلكتروني', 'مباشر'],
+                    datasets: [{
+                        label: 'الزيارات',
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: '#4A154B'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Edit link function
+        async function editLink(linkId) {
+            setLoading(true);
+            try {
+                const linkDoc = await db.collection('links').doc(linkId).get();
+                
+                if (linkDoc.exists) {
+                    const linkData = linkDoc.data();
+                    
+                    // تعبئة النموذج ببيانات الرابط
+                    document.getElementById('seriesName').value = linkData.seriesName;
+                    document.getElementById('originalUrl').value = linkData.originalUrl;
+                    document.getElementById('customDomain').value = linkData.customDomain;
+                    document.getElementById('linkType').value = linkData.linkType || 'series';
+                    document.getElementById('socialTitle').value = linkData.socialTitle || '';
+                    document.getElementById('socialDescription').value = linkData.socialDescription || '';
+                    document.getElementById('socialImage').value = linkData.socialImage || '';
+                    
+                    // نقل المستخدم لنموذج الإنشاء
+                    window.location.hash = 'admin';
+                    window.scrollTo(0, 0);
+                    
+                    // Update preview
+                    updateSocialPreview();
+                }
+            } catch (error) {
+                showNotification('error', `فشل في تحميل الرابط: ${error.message}`);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // Delete link function
+        async function deleteLink(linkId) {
+            setLoading(true);
+            try {
+                await db.collection('links').doc(linkId).delete();
+                showNotification('success', 'تم حذف الرابط بنجاح!');
+                loadLinks();
+            } catch (error) {
+                console.error('Error deleting link:', error);
+                showNotification('error', `فشل في حذف الرابط: ${error.message}`);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // دالة لجلب الإحصائيات الحقيقية
+        async function loadAnalytics() {
+            setLoading(true);
+            try {
+                // إجمالي الروابط
+                const linksSnap = await db.collection('links').get();
+                document.getElementById("totalLinksStat").innerText = linksSnap.size + "+";
+                
+                // إجمالي النقرات
+                const visitsSnap = await db.collection('visits').get();
+                document.getElementById("totalClicksStat").innerText = visitsSnap.size + "+";
+                
+                // نقرات اليوم
+                const today = new Date();
+                const todayClicks = visitsSnap.docs.filter(doc => {
+                    const visitDate = doc.data().timestamp?.toDate();
+                    return visitDate && visitDate.toDateString() === today.toDateString();
+                }).length;
+                document.getElementById("todayClicksStat").innerText = todayClicks.toLocaleString();
+                
+                // نسبة التشغيل (ثابتة في هذا المثال)
+                document.getElementById("uptimeStat").innerText = "99.9%";
+                
+                // تحديث إحصائيات الأجهزة
+                const devices = { "هاتف": 0, "كمبيوتر": 0, "تابلت": 0, "تلفاز ذكي": 0 };
+                visitsSnap.forEach(doc => {
+                    const deviceType = doc.data().device;
+                    if (devices[deviceType] !== undefined) {
+                        devices[deviceType]++;
+                    }
+                });
+                
+                // عرض أعداد الأجهزة
+                document.querySelector(".device-mobile + .ms-auto").textContent = devices["هاتف"];
+                document.querySelector(".device-desktop + .ms-auto").textContent = devices["كمبيوتر"];
+                document.querySelector(".device-tablet + .ms-auto").textContent = devices["تابلت"];
+                
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Firebase Authentication
+        function initAuth() {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    // User is signed in
+                    userProfile.style.display = 'flex';
+                    authButtons.style.display = 'none';
+                    
+                    // Set user info
+                    userPhoto.src = user.photoURL || 'https://via.placeholder.com/40';
+                    userName.textContent = user.displayName || 'مستخدم';
+                    
+                    // Show welcome notification
+                    showNotification('success', `أهلاً بعودتك، ${user.displayName || 'مستخدم'}!`, 4000);
+                    
+                    // Set first user as admin
+                    await setFirstUserAsAdmin(user);
+                    
+                    // Show admin panel if on admin page
+                    if (window.location.hash === '#admin') {
+                        showAdminPanel();
+                    }
+                    
+                    // Load live statistics
+                    loadLiveStats();
+                } else {
+                    // User is signed out
+                    userProfile.style.display = 'none';
+                    authButtons.style.display = 'block';
+                    
+                    // Hide admin panel
+                    if (window.location.hash === '#admin') {
+                        hideAllPanels();
+                        showFeatures();
+                    }
+                }
+            });
+            
+            // Sign in with Google
+            signInButton.addEventListener('click', async () => {
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    const result = await auth.signInWithPopup(provider);
+                    showNotification('success', `تم تسجيل دخولك بنجاح، أهلاً بك ${result.user.displayName || 'مستخدم'}!`);
+                } catch (error) {
+                    showNotification('error', `فشل تسجيل الدخول: ${error.message}`);
+                }
+            });
+            
+            // Sign out
+            signOutButton.addEventListener('click', () => {
+                auth.signOut();
+                showNotification('info', 'تم تسجيل خروجك بنجاح');
+            });
+        }
+        
+        // Set first user as admin
+        async function setFirstUserAsAdmin(user) {
+            const usersRef = db.collection('users');
+            
+            try {
+                const usersSnapshot = await usersRef.get();
+                
+                if (usersSnapshot.empty) {
+                    // This is the first user, set as admin
+                    await usersRef.doc(user.uid).set({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        isAdmin: true,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showNotification('success', 'تم تعيينك كمسؤول للمنصة!');
+                    // Show admin-only elements
+                    adminOnlyElements.forEach(el => {
+                        el.style.display = 'block';
+                    });
+                } else {
+                    // Check if user is admin
+                    const userDoc = await usersRef.doc(user.uid).get();
+                    if (userDoc.exists && userDoc.data().isAdmin) {
+                        // Show admin-only elements
+                        adminOnlyElements.forEach(el => {
+                            el.style.display = 'block';
+                        });
+                    } else {
+                        // Hide admin-only elements for non-admin users
+                        adminOnlyElements.forEach(el => {
+                            el.style.display = 'none';
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error setting admin:', error);
+            }
+        }
+        
+        // Load live statistics
+        async function loadLiveStats() {
+            try {
+                const statsDoc = await db.collection('stats').doc('global').get();
+                const stats = statsDoc.data() || {};
+                
+                document.getElementById('totalLinksStat').textContent = 
+                    (stats.totalLinks || 25000).toLocaleString() + '+';
+                
+                document.getElementById('totalClicksStat').textContent = 
+                    (stats.totalClicks || 1200000).toLocaleString() + '+';
+                
+                document.getElementById('todayClicksStat').textContent = 
+                    (stats.todayClicks || 1245).toLocaleString();
+                
+                document.getElementById('uptimeStat').textContent = 
+                    (stats.uptime || 99.9).toFixed(1) + '%';
+            } catch (error) {
+                console.error('Error loading live stats:', error);
+            }
+        }
+        
+        // Update social media preview
+        function updateSocialPreview() {
+            const title = document.getElementById('socialTitle').value || 'عنوان المحتوى';
+            const description = document.getElementById('socialDescription').value || 'وصف المحتوى الذي سيظهر على منصات التواصل الاجتماعي';
+            const image = document.getElementById('socialImage').value || 'https://via.placeholder.com/500x300/4A154B/FFFFFF?text=صورة+المحتوى';
+            const domain = document.getElementById('customDomain').value || 'turkify.com';
+            
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewDescription').textContent = description;
+            document.getElementById('previewImage').src = image;
+            document.getElementById('previewDomain').textContent = domain;
+        }
+        
+        // Show confirmation modal
+        function showConfirmation(message, callback) {
+            const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            document.getElementById('confirmationMessage').textContent = message;
+            document.getElementById('confirmActionBtn').onclick = function() {
+                callback();
+                modal.hide();
+            };
+            modal.show();
+        }
+        
+        // Navigation event listeners
+        document.getElementById('adminLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.hash = 'admin';
+            highlightActiveNav();
+            if (auth.currentUser) {
+                showAdminPanel();
+            } else {
+                showFeatures();
+            }
+            window.scrollTo(0, 0);
+        });
+        
+        document.getElementById('statsLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.hash = 'analytics';
+            highlightActiveNav();
+            showAnalytics();
+            window.scrollTo(0, 0);
+        });
+        
+        document.getElementById('featuresLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.hash = 'features';
+            highlightActiveNav();
+            showFeatures();
+            window.scrollTo(0, 0);
+        });
+        
+        document.getElementById('homeLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.hash = '';
+            highlightActiveNav();
+            showFeatures();
+            window.scrollTo(0, 0);
+        });
+        
+        // Handle hash changes
+        window.addEventListener('hashchange', function() {
+            initPage();
+        });
+        
+        // Share link function
+        document.getElementById('shareLinkBtn').addEventListener('click', function() {
+            const link = document.getElementById('generatedLink').value;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'رابط قصير من Turkify Pro',
+                    text: 'تحقق من هذا الرابط القصير الذي أنشأته باستخدام Turkify Pro',
+                    url: link
+                }).then(() => {
+                    showNotification('success', 'تم مشاركة الرابط بنجاح!');
+                }).catch(error => {
+                    console.error('Error sharing:', error);
+                    copyToClipboard();
+                    showNotification('info', 'تم نسخ الرابط إلى الحافظة');
+                });
+            } else {
+                copyToClipboard();
+                showNotification('success', 'تم نسخ الرابط إلى الحافظة');
+            }
+        });
+        
+        // View analytics function
+        document.getElementById('viewAnalyticsBtn').addEventListener('click', function() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('linkModal'));
+            modal.hide();
+            window.location.hash = 'analytics';
+            highlightActiveNav();
+            showAnalytics();
+            window.scrollTo(0, 0);
+        });
+        
+        // Copy link button
+        document.getElementById('copyLinkBtn').addEventListener('click', copyToClipboard);
+        
+        // Back to home button
+        backToHomeBtn.addEventListener('click', function() {
+            window.location.href = window.location.origin;
+        });
+        
+        // Social media preview updates
+        document.getElementById('socialTitle').addEventListener('input', updateSocialPreview);
+        document.getElementById('socialDescription').addEventListener('input', updateSocialPreview);
+        document.getElementById('socialImage').addEventListener('input', updateSocialPreview);
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initPage();
+            initAuth();
+            updateSocialPreview();
+        });
+    </script>
+</body>
+</html>
