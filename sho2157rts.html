@@ -1844,7 +1844,7 @@
         // دالة إنشاء وصف تشويقي باستخدام Deepseek API
         async function generateEpisodeDescription(seriesName, episodeNum) {
             try {
-                const DEEPSEEK_API_KEY = "YOUR_DEEPSEEK_API_KEY"; // استبدل بمفتاح API الخاص بك
+                const DEEPSEEK_API_KEY = "sk-a9e20ebdf0854d06adcf1bc63db243bb"; // استبدل بمفتاح API الخاص بك
                 const payload = {
                     seriesName: seriesName,
                     episodeNumber: episodeNum,
@@ -1855,7 +1855,7 @@
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer sk-a9e20ebdf0854d06adcf1bc63db243bb`
+                        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
                     },
                     body: JSON.stringify(payload)
                 });
