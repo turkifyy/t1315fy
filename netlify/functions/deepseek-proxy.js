@@ -1,24 +1,47 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
+  // إعداد رؤوس CORS
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type,x-secret-key',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+
   try {
-    // 1. التحقق من الطريقة
-    if (event.httpMethod !== 'POST') {
-      return { statusCode: 405, body: 'Method Not Allowed' }
+    // الرد على طلب OPTIONS لتفادي CORS preflight failure
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: 'Preflight OK'
+      };
     }
 
-    // 2. التحقق من السر الخاص
+    if (event.httpMethod !== 'POST') {
+      return {
+        statusCode: 405,
+        headers: corsHeaders,
+        body: 'Method Not Allowed'
+      };
+    }
+
+    // التحقق من المفتاح السري
     const SECRET_KEY = process.env.MY_APP_SECRET;
     const clientSecret = event.headers['x-secret-key'];
-    
+
     if (clientSecret !== SECRET_KEY) {
-      return { statusCode: 401, body: 'Unauthorized' }
+      return {
+        statusCode: 401,
+        headers: corsHeaders,
+        body: 'Unauthorized'
+      };
     }
 
-    // 3. استخراج البيانات
+    // استخراج البيانات من الجسم
     const { seriesName, episodeNum, linkId } = JSON.parse(event.body);
 
-    // 4. طلب DeepSeek
+    // استدعاء DeepSeek API
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -30,11 +53,11 @@ exports.handler = async (event) => {
         messages: [
           {
             role: "system",
-            content: "أنت كاتب محتوى محترف متخصص في المسلسلات تركية المدبلجة الى العرابية وللهجة كل بلد عربي"
+            content: "أنت كاتب محتوى محترف متخصص في المسلسلات التركية المدبلجة للعربية، باللهجات المحلية لكل بلد عربي"
           },
           {
             role: "user",
-            content: `أنشئ وصفاً تشويقياً للحلقة ${episodeNum} من المسلسل ${seriesName}`
+            content: `أنشئ وصفاً تشويقياً للحلقة ${episodeNum} من المسلسل "${seriesName}"`
           }
         ],
         temperature: 0.7,
@@ -42,31 +65,36 @@ exports.handler = async (event) => {
       })
     });
 
-    // 5. معالجة الاستجابة
     if (!response.ok) {
-      throw new Error(`DeepSeek error: ${response.status}`);
+      throw new Error(`DeepSeek Error: ${response.status}`);
     }
 
     const data = await response.json();
-    const description = data.choices[0]?.message?.content || '';
-    
-    // 6. إرجاع النتيجة
+    const description = data.choices?.[0]?.message?.content || '';
+
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({ description })
     };
 
   } catch (error) {
-    // 7. السقوط الآمن: تسجيل الخطأ
     console.error('Proxy Error:', {
       message: error.message,
-      linkId: event.body.linkId,
+      linkId: (() => {
+        try {
+          return JSON.parse(event.body).linkId;
+        } catch (_) {
+          return null;
+        }
+      })(),
       timestamp: new Date().toISOString()
     });
-    
+
     return {
       statusCode: 500,
-      body: JSON.stringify({ 
+      headers: corsHeaders,
+      body: JSON.stringify({
         error: "فشل في توليد الوصف",
         fallback: true
       })
