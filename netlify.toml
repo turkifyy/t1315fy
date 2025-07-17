@@ -7,3 +7,4 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Headers = "Content-Type, x-secret-key"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
