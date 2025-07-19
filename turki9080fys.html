@@ -1,0 +1,2970 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turkify Pro - منصة إدارة الروابط الاحترافية</title>
+    
+    <!-- Enhanced SEO Meta Tags -->
+    <meta name="description" content="منصة Turkify Pro الاحترافية لإدارة وتحليل الروابط المختصرة مع ميزات متقدمة وتحليلات حقيقية">
+    <meta name="keywords" content="روابط مختصرة, تحليلات, إدارة روابط, مسلسلات, أفلام, محتوى رقمي">
+    <meta name="author" content="Turkify Pro">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://turkify.netlify.app/">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Turkify Pro - منصة إدارة الروابط الاحترافية">
+    <meta property="og:description" content="منصة احترافية لإدارة الروابط المختصرة مع تحليلات متقدمة ونظام إدارة المحتوى">
+    <meta property="og:image" content="https://turkify.netlify.app/assets/og-image.jpg">
+    <meta property="og:url" content="https://turkify.netlify.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Turkify Pro">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Turkify Pro - منصة إدارة الروابط الاحترافية">
+    <meta name="twitter:description" content="منصة احترافية لإدارة الروابط المختصرة مع تحليلات متقدمة">
+    <meta name="twitter:image" content="https://turkify.netlify.app/assets/twitter-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- CSS Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
+    
+    <style>
+        * {
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        body {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        :root {
+            --primary-purple: #6f42c1;
+            --primary-teal: #20c997;
+            --primary-red: #dc3545;
+            --gradient-bg: linear-gradient(135deg, var(--primary-purple), var(--primary-teal));
+            --dark-bg: #1a1a2e;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --netflix-bg: #141414;
+            --netflix-red: #e50914;
+            --admin-gold: #ffd700;
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
+            --danger-red: #dc3545;
+            --info-blue: #17a2b8;
+        }
+        
+        body {
+            background: var(--gradient-bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Enhanced Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(111, 66, 193, 0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+        
+        /* Enhanced Login Required Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .login-overlay.hide {
+            animation: fadeOut 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .login-card {
+            background: white;
+            padding: 50px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            transform: scale(0.9);
+            animation: slideIn 0.4s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .login-card h3 {
+            color: var(--primary-purple);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .login-card .btn-gradient {
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-card .btn-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .login-card .btn-gradient:hover::before {
+            left: 100%;
+        }
+        
+        .login-card .btn-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(111, 66, 193, 0.4);
+        }
+        
+        /* Enhanced Hero Section */
+        .hero-section {
+            padding: 120px 0;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') bottom/cover no-repeat;
+            z-index: -1;
+        }
+        
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #fff, #e3f2fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(111, 66, 193, 0.3); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(111, 66, 193, 0.6); }
+        }
+        
+        .hero-subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            transition: all 0.4s ease;
+            border: 2px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-bg);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .stats-card:hover::before {
+            transform: translateX(0);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+            border-color: var(--primary-purple);
+        }
+        
+        .stats-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* Enhanced Cards */
+        .card-custom {
+            background: var(--card-bg);
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+        
+        .card-custom:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+        }
+        
+        .card-custom .card-header {
+            background: var(--gradient-bg);
+            color: white;
+            border: none;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-custom .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .card-custom:hover .card-header::before {
+            transform: translateX(100%);
+        }
+        
+        /* Enhanced Buttons */
+        .btn-gradient {
+            background: var(--gradient-bg);
+            border: none;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .btn-gradient:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(111, 66, 193, 0.4);
+            color: white;
+        }
+        
+        .btn-gradient:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Enhanced Form Controls */
+        .form-control, .form-select {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.25);
+            transform: translateY(-2px);
+            background: white;
+        }
+        
+        .form-control:hover, .form-select:hover {
+            border-color: var(--primary-teal);
+            transform: translateY(-1px);
+        }
+        
+        /* Admin Badge */
+        .admin-badge {
+            background: linear-gradient(45deg, var(--admin-gold), #ffed4e);
+            color: #333;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-left: 15px;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Enhanced Table */
+        .table-enhanced {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .table-enhanced thead {
+            background: var(--gradient-bg);
+            color: white;
+        }
+        
+        .table-enhanced thead th {
+            padding: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-enhanced tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .table-enhanced tbody tr:hover {
+            background: rgba(111, 66, 193, 0.08);
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table-enhanced tbody td {
+            padding: 20px;
+            vertical-align: middle;
+        }
+        
+        /* Content Type Badges */
+        .content-badge {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .badge-series { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .badge-movie { background: linear-gradient(45deg, #9b59b6, #8e44ad); }
+        .badge-match { background: linear-gradient(45deg, #2ecc71, #27ae60); }
+        .badge-recipe { background: linear-gradient(45deg, #f39c12, #e67e22); }
+        .badge-game { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .badge-app { background: linear-gradient(45deg, #1abc9c, #16a085); }
+        .badge-channel { background: linear-gradient(45deg, #e67e22, #d35400); }
+        .badge-reels { background: linear-gradient(45deg, #e91e63, #ad1457); }
+        
+        /* Enhanced Pagination */
+        .pagination-custom {
+            justify-content: center;
+            margin-top: 40px;
+            gap: 10px;
+        }
+        
+        .pagination-custom .page-item {
+            margin: 0;
+        }
+        
+        .pagination-custom .page-link {
+            border-radius: 15px;
+            border: 2px solid transparent;
+            color: var(--primary-purple);
+            font-weight: 600;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .pagination-custom .page-link:hover {
+            background: var(--primary-purple);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(111, 66, 193, 0.3);
+            border-color: var(--primary-purple);
+        }
+        
+        .pagination-custom .page-item.active .page-link {
+            background: var(--gradient-bg);
+            border-color: var(--primary-purple);
+            color: white;
+        }
+        
+        /* Enhanced Modals */
+        .modal-content {
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 25px 100px rgba(0,0,0,0.3);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+        
+        .modal-header {
+            border-radius: 25px 25px 0 0;
+            border-bottom: none;
+            padding: 2rem;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Analytics Cards */
+        .analytics-card {
+            background: linear-gradient(135deg, rgba(111, 66, 193, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid rgba(111, 66, 193, 0.2);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .analytics-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .analytics-card:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .analytics-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-purple);
+            box-shadow: 0 20px 60px rgba(111, 66, 193, 0.2);
+        }
+        
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Enhanced Loading States */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .spinner-custom {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        
+        /* Enhanced Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .toast-custom {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            min-width: 300px;
+        }
+        
+        .toast-custom .toast-body {
+            padding: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .toast-custom .toast-body i {
+            font-size: 1.5rem;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: var(--success-green);
+            color: white;
+        }
+        
+        .status-inactive {
+            background: var(--danger-red);
+            color: white;
+        }
+        
+        .status-expired {
+            background: var(--warning-yellow);
+            color: #333;
+        }
+        
+        /* Live Indicator */
+        .live-indicator {
+            width: 12px;
+            height: 12px;
+            background: var(--success-green);
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+            animation: pulse-indicator 2s infinite;
+            position: relative;
+        }
+        
+        @keyframes pulse-indicator {
+            0% { 
+                opacity: 1; 
+                transform: scale(1); 
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.1); 
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1); 
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+        
+        /* Enhanced Action Buttons */
+        .action-btn {
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+        
+        .action-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        /* Copy Button Animation */
+        .copy-btn.copied {
+            background: var(--success-green) !important;
+            color: white !important;
+            border-color: var(--success-green) !important;
+            animation: copySuccess 0.3s ease;
+        }
+        
+        @keyframes copySuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Premium Features Section */
+        .premium-features {
+            background: linear-gradient(135deg, #f8f9fa, #e3f2fd);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid rgba(111, 66, 193, 0.1);
+        }
+        
+        .premium-features h6 {
+            color: var(--primary-purple);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .premium-features .form-check {
+            margin-bottom: 15px;
+        }
+        
+        .premium-features .form-check-input:checked {
+            background-color: var(--primary-purple);
+            border-color: var(--primary-purple);
+        }
+        
+        .premium-features .form-check-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Social Preview */
+        .social-preview {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+        }
+        
+        .social-preview-header {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .social-preview-content {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .social-preview-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .social-preview-text {
+            flex: 1;
+        }
+        
+        .social-preview-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        
+        .social-preview-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .social-preview-domain {
+            font-size: 0.8rem;
+            color: var(--primary-purple);
+            font-weight: 600;
+        }
+        
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .connection-status.online {
+            background: var(--success-green);
+            color: white;
+        }
+        
+        .connection-status.offline {
+            background: var(--danger-red);
+            color: white;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-purple);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-purple);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .stats-card {
+                margin: 0.5rem;
+                padding: 2rem;
+            }
+            
+            .stats-number {
+                font-size: 2.5rem;
+            }
+            
+            .card-custom {
+                margin-bottom: 20px;
+            }
+            
+            .btn-gradient {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .login-card {
+                padding: 30px;
+                max-width: 350px;
+            }
+            
+            .table-enhanced {
+                font-size: 0.9rem;
+            }
+            
+            .table-enhanced thead th,
+            .table-enhanced tbody td {
+                padding: 15px 10px;
+            }
+            
+            .action-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .modal-header,
+            .modal-body {
+                padding: 1.5rem;
+            }
+            
+            .analytics-card {
+                padding: 25px;
+            }
+            
+            .metric-value {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-section {
+                padding: 80px 0;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .stats-card {
+                padding: 1.5rem;
+            }
+            
+            .pagination-custom .page-link {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .toast-custom {
+                min-width: 280px;
+            }
+        }
+        
+        /* Hidden Class */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Success Animation */
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .success-animation {
+            animation: successPulse 0.6s ease;
+        }
+        
+        /* Error Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .error-animation {
+            animation: shake 0.5s ease;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .empty-state i {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Login Required Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <i class="fas fa-lock fa-4x text-primary mb-3"></i>
+                <h3>مرحباً بك في Turkify Pro</h3>
+                <p class="text-muted">يرجى تسجيل الدخول للوصول إلى منصة إدارة الروابط الاحترافية</p>
+            </div>
+            
+            <div class="d-grid">
+                <button class="btn btn-gradient" id="loginRequiredBtn">
+                    <i class="fab fa-google me-2"></i>
+                    تسجيل الدخول بـ Google
+                </button>
+            </div>
+            
+            <div class="mt-3 text-center">
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    تسجيل آمن ومشفر
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Enhanced Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner-custom"></div>
+            <div class="loading-text">جاري التحميل...</div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#" style="color: var(--primary-purple);">
+                <i class="fas fa-link me-2"></i>
+                <span>Turkify Pro</span>
+                <span class="badge bg-success ms-2 pulse">Professional</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard" id="dashboardNav">
+                            <i class="fas fa-tachometer-alt me-1"></i>لوحة التحكم
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analytics" id="analyticsNav">
+                            <i class="fas fa-chart-line me-1"></i>التحليلات المتقدمة
+                        </a>
+                    </li>
+                    <li class="nav-item hidden" id="adminNavItem">
+                        <a class="nav-link" href="#admin" id="adminNav">
+                            <i class="fas fa-crown me-1"></i>لوحة الإدارة
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    <div id="authButtons" class="d-flex align-items-center">
+                        <button class="btn btn-gradient me-2" id="loginBtn">
+                            <i class="fab fa-google me-2"></i>تسجيل دخول
+                        </button>
+                    </div>
+                    
+                    <div id="userMenu" class="dropdown hidden">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center user-menu-item" href="#" role="button" data-bs-toggle="dropdown">
+                            <span id="adminBadge" class="admin-badge hidden">
+                                <i class="fas fa-crown me-1"></i>المدير الأساسي
+                            </span>
+                            <div class="user-info me-2">
+                                <div class="user-name" id="userName"></div>
+                                <div class="user-role">مستخدم مسجل</div>
+                            </div>
+                            <img id="userPhoto" src="" alt="User" class="rounded-circle" style="width: 40px; height: 40px;">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" id="profileBtn">
+                                <i class="fas fa-user me-2"></i>الملف الشخصي
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" id="settingsBtn">
+                                <i class="fas fa-cog me-2"></i>الإعدادات
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt me-2"></i>تسجيل خروج
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Enhanced Hero Section -->
+    <section class="hero-section" id="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h1 class="hero-title">Turkify Pro</h1>
+                    <p class="hero-subtitle">منصة إدارة الروابط الاحترافية مع التحليلات المتقدمة والذكاء الاصطناعي</p>
+                    
+                    <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                        <button class="btn btn-gradient btn-lg" onclick="showSection('dashboard')">
+                            <i class="fas fa-rocket me-2"></i>ابدأ الآن
+                        </button>
+                        <button class="btn btn-outline-light btn-lg" onclick="showSection('analytics')">
+                            <i class="fas fa-chart-line me-2"></i>التحليلات
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <!-- AdSense Banner Ad -->
+                    <div class="ad-container">
+                        <div class="ad-label">إعلان</div>
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-YOUR_ADSENSE_ID"
+                             data-ad-slot="1234567890"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-5" id="statsSection">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalLinks">
+                            <i class="live-indicator"></i>0
+                        </div>
+                        <div class="text-muted">إجمالي الروابط</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalClicks">
+                            <i class="live-indicator"></i>0
+                        </div>
+                        <div class="text-muted">إجمالي النقرات</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-number" id="todayClicks">
+                            <i class="live-indicator"></i>0
+                        </div>
+                        <div class="text-muted">نقرات اليوم</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-number" id="activeUsers">
+                            <i class="live-indicator"></i>1
+                        </div>
+                        <div class="text-muted">المستخدمين النشطين</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Enhanced Dashboard Section -->
+    <section id="dashboard" class="py-5" style="background: rgba(255,255,255,0.1);">
+        <div class="container">
+            <div class="row">
+                <!-- Enhanced Link Creation Form -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card card-custom">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-plus-circle me-2"></i>إنشاء رابط احترافي
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="linkForm">
+                                <!-- Content Type with Subcategories -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">نوع المحتوى</label>
+                                    <select class="form-select" id="contentType" required>
+                                        <option value="">اختر نوع المحتوى</option>
+                                        <optgroup label="🎬 ترفيه">
+                                            <option value="series">مسلسل</option>
+                                            <option value="movie">فيلم</option>
+                                            <option value="reels">ريلز</option>
+                                        </optgroup>
+                                        <optgroup label="⚽ رياضة">
+                                            <option value="match">مباراة</option>
+                                        </optgroup>
+                                        <optgroup label="🍳 طبخ">
+                                            <option value="recipe">وصفة</option>
+                                        </optgroup>
+                                        <optgroup label="💻 تقنية">
+                                            <option value="game">لعبة</option>
+                                            <option value="app">تطبيق</option>
+                                        </optgroup>
+                                        <optgroup label="📺 قنوات">
+                                            <option value="channel">قناة</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                
+                                <!-- Content Subcategory -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">التصنيف الفرعي</label>
+                                    <select class="form-select" id="contentSubcategory">
+                                        <option value="">اختر التصنيف الفرعي</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">اسم المحتوى</label>
+                                    <input type="text" class="form-control" id="seriesName" placeholder="مثال: مسلسل الديوان" required>
+                                </div>
+                                
+                                <!-- Episodes Field (Hidden by default) -->
+                                <div class="mb-3 hidden" id="episodeFields">
+                                    <label class="form-label fw-bold">عدد الحلقات</label>
+                                    <input type="number" class="form-control" id="totalEpisodes" min="1" placeholder="مثال: 30" value="1">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">الرابط الأصلي</label>
+                                    <input type="url" class="form-control" id="originalUrl" placeholder="https://example.com" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">النطاق المخصص</label>
+                                    <select class="form-select" id="customDomain">
+                                        <option value="turkify.netlify.app">turkify.netlify.app</option>
+                                        <option value="short.ly">short.ly</option>
+                                        <option value="link.sa">link.sa</option>
+                                        <option value="custom">نطاق مخصص</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Custom Domain Input -->
+                                <div class="mb-3 hidden" id="customDomainInput">
+                                    <label class="form-label fw-bold">النطاق المخصص</label>
+                                    <input type="text" class="form-control" id="customDomainValue" placeholder="yourdomain.com">
+                                </div>
+                                
+                                <!-- Premium Features -->
+                                <div class="premium-features">
+                                    <h6>
+                                        <i class="fas fa-crown me-2"></i>الميزات الاحترافية
+                                    </h6>
+                                    
+                                    <!-- Password Protection -->
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="passwordProtected">
+                                        <label class="form-check-label" for="passwordProtected">
+                                            <i class="fas fa-lock me-2"></i>حماية بكلمة مرور
+                                        </label>
+                                    </div>
+                                    <input type="password" class="form-control mb-3 hidden" id="linkPassword" placeholder="كلمة المرور">
+                                    
+                                    <!-- Expiration Date -->
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="hasExpiration">
+                                        <label class="form-check-label" for="hasExpiration">
+                                            <i class="fas fa-calendar-alt me-2"></i>تاريخ انتهاء الصلاحية
+                                        </label>
+                                    </div>
+                                    <input type="datetime-local" class="form-control mb-3 hidden" id="expirationDate">
+                                    
+                                    <!-- Click Limit -->
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="hasClickLimit">
+                                        <label class="form-check-label" for="hasClickLimit">
+                                            <i class="fas fa-hashtag me-2"></i>حد أقصى للنقرات
+                                        </label>
+                                    </div>
+                                    <input type="number" class="form-control mb-3 hidden" id="clickLimit" placeholder="1000" min="1">
+                                </div>
+                                
+                                <!-- Enhanced Social Media Preview -->
+                                <div class="social-preview">
+                                    <div class="social-preview-header">
+                                        <i class="fas fa-share-alt me-2"></i>معاينة وسائل التواصل
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">العنوان</label>
+                                        <input type="text" class="form-control" id="socialTitle" placeholder="عنوان جذاب">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">الوصف</label>
+                                        <textarea class="form-control" id="socialDescription" rows="2" placeholder="وصف مختصر وجذاب"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">رابط الصورة</label>
+                                        <input type="url" class="form-control" id="socialImage" placeholder="https://example.com/image.jpg">
+                                    </div>
+                                    
+                                    <!-- Live Preview -->
+                                    <div class="social-preview-content" id="socialPreview">
+                                        <img id="previewImage" src="" class="social-preview-image" style="display: none;">
+                                        <div class="social-preview-text">
+                                            <div id="previewTitle" class="social-preview-title">عنوان الرابط</div>
+                                            <div id="previewDescription" class="social-preview-description">وصف الرابط</div>
+                                            <div id="previewDomain" class="social-preview-domain">turkify.netlify.app</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-gradient w-100 mt-4" id="createLinkBtn">
+                                    <i class="fas fa-magic me-2"></i>إنشاء رابط احترافي
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Links Management -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card card-custom">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list-alt me-2"></i>الروابط المُدارة
+                                <span class="badge bg-light text-dark ms-2" id="linksCount">0</span>
+                            </h5>
+                            <div class="d-flex gap-2">
+                                <!-- Enhanced Search -->
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" id="searchLinks" placeholder="بحث متقدم..." style="width: 250px; padding-right: 40px;">
+                                    <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+                                </div>
+                                
+                                <!-- Enhanced Filter Dropdown -->
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-filter me-1"></i>تصفية
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" data-filter="all">جميع الروابط</a></li>
+                                        <li><a class="dropdown-item" href="#" data-filter="series">المسلسلات</a></li>
+                                        <li><a class="dropdown-item" href="#" data-filter="movie">الأفلام</a></li>
+                                        <li><a class="dropdown-item" href="#" data-filter="active">النشطة</a></li>
+                                        <li><a class="dropdown-item" href="#" data-filter="expired">المنتهية</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-enhanced mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>المحتوى</th>
+                                            <th>النوع</th>
+                                            <th>الرابط المختصر</th>
+                                            <th>النقرات <i class="live-indicator"></i></th>
+                                            <th>التاريخ</th>
+                                            <th>الحالة</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="linksTableBody">
+                                        <!-- Links will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Enhanced Pagination -->
+                            <nav aria-label="صفحات الروابط" class="p-3">
+                                <ul class="pagination pagination-custom" id="linksPagination">
+                                    <!-- Pagination will be generated here -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Enhanced Analytics Section -->
+    <section id="analytics" class="py-5 hidden">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h2 class="text-white">
+                    <i class="fas fa-chart-line me-2"></i>التحليلات المتقدمة
+                    <i class="live-indicator"></i>
+                </h2>
+            </div>
+            
+            <!-- Enhanced Key Metrics -->
+            <div class="row mb-5">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card">
+                        <i class="fas fa-mouse-pointer fa-3x text-primary mb-3"></i>
+                        <div class="metric-value" id="analyticsClicks">0</div>
+                        <div class="text-muted">النقرات الإجمالية</div>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            <span id="clicksGrowth">+0%</span> من الفترة السابقة
+                        </small>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card">
+                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                        <div class="metric-value" id="analyticsVisitors">0</div>
+                        <div class="text-muted">الزوار الفريدون</div>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            <span id="visitorsGrowth">+0%</span> من الفترة السابقة
+                        </small>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card">
+                        <i class="fas fa-globe fa-3x text-warning mb-3"></i>
+                        <div class="metric-value" id="analyticsCountries">0</div>
+                        <div class="text-muted">الدول</div>
+                        <small class="text-info">انتشار جغرافي واسع</small>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card">
+                        <i class="fas fa-percentage fa-3x text-success mb-3"></i>
+                        <div class="metric-value" id="analyticsConversion">0%</div>
+                        <div class="text-muted">معدل التحويل</div>
+                        <small class="text-success">معدل ممتاز</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Enhanced Admin Dashboard Section -->
+    <section id="admin" class="py-5 hidden">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h2 class="text-white">
+                    <i class="fas fa-crown me-2"></i>لوحة الإدارة الرئيسية
+                    <span class="badge bg-warning text-dark">مدير النظام</span>
+                </h2>
+            </div>
+            
+            <!-- Enhanced Admin Stats -->
+            <div class="row mb-5">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card border-warning">
+                        <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                        <div class="metric-value" id="totalUsers">0</div>
+                        <div class="text-muted">إجمالي المستخدمين</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card border-info">
+                        <i class="fas fa-link fa-3x text-info mb-3"></i>
+                        <div class="metric-value" id="totalLinksAdmin">0</div>
+                        <div class="text-muted">إجمالي الروابط</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card border-success">
+                        <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
+                        <div class="metric-value" id="estimatedRevenue">$0</div>
+                        <div class="text-muted">الإيرادات المقدرة</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="analytics-card border-danger">
+                        <i class="fas fa-shield-alt fa-3x text-danger mb-3"></i>
+                        <div class="metric-value" id="securityIncidents">0</div>
+                        <div class="text-muted">حوادث الأمان</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Enhanced Modals -->
+    
+    <!-- QR Code Modal -->
+    <div class="modal fade" id="qrModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-qrcode me-2"></i>رمز QR للرابط
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="qrcode" class="mb-3"></div>
+                    <p class="text-muted mb-3">امسح الرمز ضوئياً للوصول المباشر للرابط</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button class="btn btn-gradient" id="downloadQR">
+                            <i class="fas fa-download me-2"></i>تحميل
+                        </button>
+                        <button class="btn btn-outline-primary" id="shareQR">
+                            <i class="fas fa-share me-2"></i>مشاركة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle me-2"></i>تم بنجاح!
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                    <h4 id="successModalTitle">تم إنشاء الرابط بنجاح!</h4>
+                    <p id="successModalMessage" class="text-muted">يمكنك الآن مشاركة الرابط أو عرض إحصائياته</p>
+                    
+                    <div class="mt-4" id="successModalActions">
+                        <!-- Actions will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Connection Status -->
+    <div class="connection-status online" id="connectionStatus">
+        <i class="fas fa-wifi me-2"></i>متصل
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    
+    <!-- Firebase v9 -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4B73N1T483"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-4B73N1T483');
+    </script>
+    
+    <!-- AdSense Initialization -->
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+    <script>
+        // Enhanced Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5VmidRUmMF6W3vvl44zznScS1gn2GHn0",
+            authDomain: "turkify-redirect.firebaseapp.com",
+            projectId: "turkify-redirect",
+            storageBucket: "turkify-redirect.appspot.com",
+            messagingSenderId: "986441766029",
+            appId: "1:986441766029:web:dd6a13879306472e43bec4"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Enhanced Global Variables
+        let currentUser = null;
+        let userLinks = [];
+        let isAdmin = false;
+        let currentPage = 1;
+        let linksPerPage = 10;
+        let filteredLinks = [];
+        let currentFilter = 'all';
+        let authStateChanging = false;
+        
+        // Enhanced Content Type Subcategories
+        const subcategories = {
+            series: ['دراما', 'كوميديا', 'أكشن', 'رومانسي', 'تاريخي', 'خيال علمي', 'جريمة', 'إثارة'],
+            movie: ['أكشن', 'كوميديا', 'دراما', 'رعب', 'مغامرات', 'وثائقي', 'رومانسي', 'خيال علمي'],
+            match: ['كرة قدم', 'كرة سلة', 'تنس', 'سباحة', 'ألعاب قوى', 'ملاكمة', 'مصارعة', 'أخرى'],
+            recipe: ['حلويات', 'أطباق رئيسية', 'مقبلات', 'مشروبات', 'سلطات', 'معجنات', 'وجبات خفيفة', 'أطباق تقليدية'],
+            game: ['أكشن', 'مغامرات', 'رياضة', 'استراتيجية', 'محاكاة', 'تعليمية', 'ألغاز', 'سباقات'],
+            app: ['إنتاجية', 'ترفيه', 'تعليم', 'صحة', 'مالية', 'تواصل اجتماعي', 'أدوات', 'ألعاب'],
+            channel: ['أخبار', 'ترفيه', 'تعليم', 'رياضة', 'طبخ', 'تقنية', 'أطفال', 'موسيقى'],
+            reels: ['كوميديا', 'رقص', 'طبخ', 'موضة', 'تعليمي', 'رياضة', 'سفر', 'حيوانات']
+        };
+        
+        // Enhanced Authentication State Observer
+        auth.onAuthStateChanged(async (user) => {
+            if (authStateChanging) return;
+            authStateChanging = true;
+            
+            try {
+                if (user) {
+                    currentUser = user;
+                    await checkAdminStatus(user);
+                    hideLoginOverlay();
+                    showUserMenu(user);
+                    await loadUserData();
+                    startRealTimeUpdates();
+                    
+                    // Show welcome message for new users
+                    if (isNewUser(user)) {
+                        showSuccessModal('مرحباً بك في Turkify Pro!', 
+                            `تم تسجيل دخولك بنجاح باسم: ${user.displayName || user.email}`);
+                    }
+                } else {
+                    currentUser = null;
+                    isAdmin = false;
+                    showLoginOverlay();
+                    showAuthButtons();
+                    stopRealTimeUpdates();
+                }
+            } catch (error) {
+                console.error('Auth state change error:', error);
+                showToast('خطأ في تحديث حالة المصادقة', 'error');
+            } finally {
+                authStateChanging = false;
+            }
+        });
+        
+        // Enhanced Login Overlay Management
+        function showLoginOverlay() {
+            const overlay = document.getElementById('loginOverlay');
+            overlay.style.display = 'flex';
+            overlay.classList.remove('hide');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideLoginOverlay() {
+            const overlay = document.getElementById('loginOverlay');
+            overlay.classList.add('hide');
+            document.body.style.overflow = 'auto';
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                overlay.classList.remove('hide');
+            }, 300);
+        }
+        
+        // Enhanced Admin Status Check
+        async function checkAdminStatus(user) {
+            try {
+                const adminDoc = await db.collection('admins').doc(user.uid).get();
+                if (!adminDoc.exists) {
+                    // Check if this is the first user (make them super admin)
+                    const usersSnapshot = await db.collection('users').get();
+                    if (usersSnapshot.empty) {
+                        isAdmin = true;
+                        // Create admin document
+                        await db.collection('admins').doc(user.uid).set({
+                            email: user.email,
+                            role: 'super_admin',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            permissions: ['all']
+                        });
+                        
+                        // Create user document
+                        await db.collection('users').doc(user.uid).set({
+                            email: user.email,
+                            displayName: user.displayName,
+                            photoURL: user.photoURL,
+                            isAdmin: true,
+                            role: 'super_admin',
+                            linksCount: 0,
+                            totalClicks: 0,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        isAdmin = false;
+                        // Create regular user document
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        if (!userDoc.exists) {
+                            await db.collection('users').doc(user.uid).set({
+                                email: user.email,
+                                displayName: user.displayName,
+                                photoURL: user.photoURL,
+                                isAdmin: false,
+                                role: 'user',
+                                linksCount: 0,
+                                totalClicks: 0,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } else {
+                            // Update last login
+                            await db.collection('users').doc(user.uid).update({
+                                lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    }
+                } else {
+                    isAdmin = true;
+                    // Update last login for admin
+                    await db.collection('users').doc(user.uid).update({
+                        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                // Show/hide admin navigation
+                updateAdminUI();
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                isAdmin = false;
+            }
+        }
+        
+        function updateAdminUI() {
+            const adminNavItem = document.getElementById('adminNavItem');
+            const adminBadge = document.getElementById('adminBadge');
+            
+            if (isAdmin) {
+                adminNavItem.classList.remove('hidden');
+                adminBadge.classList.remove('hidden');
+                document.querySelector('.user-role').textContent = 'مدير النظام';
+            } else {
+                adminNavItem.classList.add('hidden');
+                adminBadge.classList.add('hidden');
+                document.querySelector('.user-role').textContent = 'مستخدم مسجل';
+            }
+        }
+        
+        function isNewUser(user) {
+            // Check if user was created in the last 5 minutes
+            const creationTime = new Date(user.metadata.creationTime);
+            const now = new Date();
+            const diffMinutes = (now - creationTime) / (1000 * 60);
+            return diffMinutes < 5;
+        }
+        
+        // Enhanced Helper Functions
+        function showLoading(message = 'جاري التحميل...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = overlay.querySelector('.loading-text');
+            loadingText.textContent = message;
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function showToast(message, type = 'success', duration = 5000) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
+            const iconMap = {
+                success: 'check-circle',
+                error: 'exclamation-triangle',
+                warning: 'exclamation-circle',
+                info: 'info-circle'
+            };
+            
+            const colorMap = {
+                success: 'text-bg-success',
+                error: 'text-bg-danger',
+                warning: 'text-bg-warning',
+                info: 'text-bg-info'
+            };
+            
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = `toast toast-custom align-items-center ${colorMap[type]} border-0 show`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="toast-body">
+                    <i class="fas fa-${iconMap[type]} me-2"></i>${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.remove()"></button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after duration
+            setTimeout(() => {
+                if (document.getElementById(toastId)) {
+                    toast.classList.add('fade');
+                    setTimeout(() => {
+                        if (toastContainer.contains(toast)) {
+                            toastContainer.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+        
+        function showSuccessModal(title, message, actions = []) {
+            document.getElementById('successModalTitle').textContent = title;
+            document.getElementById('successModalMessage').textContent = message;
+            document.getElementById('successModalActions').innerHTML = actions.join('');
+            
+            const modal = new bootstrap.Modal(document.getElementById('successModal'));
+            modal.show();
+        }
+        
+        function showUserMenu(user) {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userName = document.getElementById('userName');
+            const userPhoto = document.getElementById('userPhoto');
+            
+            authButtons.classList.add('hidden');
+            userMenu.classList.remove('hidden');
+            userName.textContent = user.displayName || user.email;
+            userPhoto.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email)}&background=6f42c1&color=fff&size=45`;
+        }
+        
+        function showAuthButtons() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            authButtons.classList.remove('hidden');
+            userMenu.classList.add('hidden');
+        }
+        
+        // Enhanced Content Type Management
+        document.getElementById('contentType').addEventListener('change', function() {
+            const contentType = this.value;
+            const episodeFields = document.getElementById('episodeFields');
+            const subcategorySelect = document.getElementById('contentSubcategory');
+            
+            // Show/hide episode fields for series
+            if (contentType === 'series') {
+                episodeFields.classList.remove('hidden');
+                document.getElementById('totalEpisodes').required = true;
+            } else {
+                episodeFields.classList.add('hidden');
+                document.getElementById('totalEpisodes').required = false;
+            }
+            
+            // Update subcategories
+            subcategorySelect.innerHTML = '<option value="">اختر التصنيف الفرعي</option>';
+            if (subcategories[contentType]) {
+                subcategories[contentType].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+        });
+        
+        // Enhanced Custom Domain Toggle
+        document.getElementById('customDomain').addEventListener('change', function() {
+            const customInput = document.getElementById('customDomainInput');
+            const customValue = document.getElementById('customDomainValue');
+            
+            if (this.value === 'custom') {
+                customInput.classList.remove('hidden');
+                customValue.required = true;
+                customValue.focus();
+            } else {
+                customInput.classList.add('hidden');
+                customValue.required = false;
+            }
+            updateSocialPreview();
+        });
+        
+        // Enhanced Premium Features Toggles
+        document.getElementById('passwordProtected').addEventListener('change', function() {
+            const passwordField = document.getElementById('linkPassword');
+            if (this.checked) {
+                passwordField.classList.remove('hidden');
+                passwordField.required = true;
+                passwordField.focus();
+            } else {
+                passwordField.classList.add('hidden');
+                passwordField.required = false;
+            }
+        });
+        
+        document.getElementById('hasExpiration').addEventListener('change', function() {
+            const expirationField = document.getElementById('expirationDate');
+            if (this.checked) {
+                expirationField.classList.remove('hidden');
+                expirationField.required = true;
+                // Set default to 30 days from now
+                const future = new Date();
+                future.setDate(future.getDate() + 30);
+                expirationField.value = future.toISOString().slice(0, 16);
+            } else {
+                expirationField.classList.add('hidden');
+                expirationField.required = false;
+            }
+        });
+        
+        document.getElementById('hasClickLimit').addEventListener('change', function() {
+            const clickLimitField = document.getElementById('clickLimit');
+            if (this.checked) {
+                clickLimitField.classList.remove('hidden');
+                clickLimitField.required = true;
+                clickLimitField.focus();
+            } else {
+                clickLimitField.classList.add('hidden');
+                clickLimitField.required = false;
+            }
+        });
+        
+        // Enhanced Live Social Preview
+        function updateSocialPreview() {
+            const title = document.getElementById('socialTitle').value || document.getElementById('seriesName').value || 'عنوان الرابط';
+            const description = document.getElementById('socialDescription').value || 'وصف الرابط';
+            const image = document.getElementById('socialImage').value;
+            const domain = document.getElementById('customDomain').value === 'custom' ? 
+                document.getElementById('customDomainValue').value : 
+                document.getElementById('customDomain').value;
+            
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewDescription').textContent = description;
+            document.getElementById('previewDomain').textContent = domain || 'turkify.netlify.app';
+            
+            const previewImage = document.getElementById('previewImage');
+            if (image && isValidUrl(image)) {
+                previewImage.src = image;
+                previewImage.style.display = 'block';
+                
+                previewImage.onload = () => {
+                    previewImage.classList.add('success-animation');
+                    setTimeout(() => previewImage.classList.remove('success-animation'), 600);
+                };
+                
+                previewImage.onerror = () => {
+                    previewImage.style.display = 'none';
+                };
+            } else {
+                previewImage.style.display = 'none';
+            }
+        }
+        
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        // Enhanced Auto-update preview listeners
+        ['socialTitle', 'socialDescription', 'socialImage', 'customDomain', 'customDomainValue', 'seriesName'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', debounce(updateSocialPreview, 300));
+                element.addEventListener('change', updateSocialPreview);
+            }
+        });
+        
+        // Debounce function for better performance
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Enhanced Authentication Functions
+        document.getElementById('loginBtn').addEventListener('click', login);
+        document.getElementById('loginRequiredBtn').addEventListener('click', login);
+        
+        async function login() {
+            try {
+                showLoading('جاري تسجيل الدخول...');
+                
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.addScope('email');
+                provider.addScope('profile');
+                provider.setCustomParameters({
+                    'prompt': 'select_account'
+                });
+                
+                // Try popup first, fallback to redirect
+                try {
+                    await auth.signInWithPopup(provider);
+                    hideLoading();
+                    hideLoginOverlay();
+                    showToast('تم تسجيل الدخول بنجاح!', 'success');
+                } catch (popupError) {
+                    if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user') {
+                        // Fallback to redirect
+                        await auth.signInWithRedirect(provider);
+                    } else {
+                        throw popupError;
+                    }
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                hideLoading();
+                
+                let errorMessage = 'خطأ في تسجيل الدخول';
+                switch (error.code) {
+                    case 'auth/user-disabled':
+                        errorMessage = 'تم تعطيل هذا الحساب';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'تسجيل الدخول بـ Google غير مفعل';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'فشل في الاتصال بالإنترنت';
+                        break;
+                    default:
+                        errorMessage = error.message || 'خطأ غير معروف';
+                }
+                
+                showToast(errorMessage, 'error');
+            }
+        }
+        
+        // Handle redirect result
+        auth.getRedirectResult().then((result) => {
+            if (result.user) {
+                hideLoading();
+                hideLoginOverlay();
+                showToast('تم تسجيل الدخول بنجاح!', 'success');
+            }
+        }).catch((error) => {
+            console.error('Redirect login error:', error);
+            hideLoading();
+            showToast('خطأ في تسجيل الدخول: ' + error.message, 'error');
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                showLoading('جاري تسجيل الخروج...');
+                await auth.signOut();
+                hideLoading();
+                showToast('تم تسجيل الخروج بنجاح');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } catch (error) {
+                hideLoading();
+                showToast('خطأ في تسجيل الخروج: ' + error.message, 'error');
+            }
+        });
+        
+        // Enhanced Link Creation
+        document.getElementById('linkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showLoginOverlay();
+                return;
+            }
+            
+            try {
+                showLoading('جاري إنشاء الرابط...');
+                
+                const formData = getFormData();
+                
+                // Validate form data
+                if (!validateFormData(formData)) {
+                    hideLoading();
+                    return;
+                }
+                
+                // Generate unique short code
+                const shortCode = await generateUniqueShortCode();
+                
+                const linkData = {
+                    ...formData,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    shortCode: shortCode,
+                    
+                    // Analytics
+                    clicks: 0,
+                    uniqueVisitors: 0,
+                    conversionRate: 0,
+                    avgTimeSpent: 0,
+                    
+                    // Status
+                    isActive: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Add to Firestore
+                const docRef = await db.collection('links').add(linkData);
+                
+                // Update user stats
+                await db.collection('users').doc(currentUser.uid).update({
+                    linksCount: firebase.firestore.FieldValue.increment(1),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Track in Google Analytics
+                gtag('event', 'link_created', {
+                    'event_category': 'links',
+                    'event_label': formData.contentType,
+                    'value': 1
+                });
+                
+                hideLoading();
+                
+                // Generate short URL for display
+                const shortUrl = `https://${linkData.customDomain}/sho2157rts.html?${linkData.contentType}=${encodeURIComponent(linkData.seriesName)}&id=${docRef.id}`;
+                
+                // Show success modal with enhanced actions
+                showSuccessModal(
+                    'تم إنشاء الرابط بنجاح!',
+                    'يمكنك الآن مشاركة الرابط أو عرض إحصائياته',
+                    [
+                        `<button class="btn btn-gradient me-2" onclick="copyToClipboard('${shortUrl}')">
+                            <i class="fas fa-copy me-1"></i>نسخ الرابط
+                        </button>`,
+                        `<button class="btn btn-outline-primary me-2" onclick="generateQR('${shortUrl}')">
+                            <i class="fas fa-qrcode me-1"></i>رمز QR
+                        </button>`,
+                        `<button class="btn btn-outline-info" onclick="showLinkStats('${docRef.id}')">
+                            <i class="fas fa-chart-bar me-1"></i>الإحصائيات
+                        </button>`
+                    ]
+                );
+                
+                // Reset form with animation
+                resetForm();
+                
+            } catch (error) {
+                console.error('Error creating link:', error);
+                hideLoading();
+                
+                // Enhanced error handling
+                let errorMessage = 'خطأ في إنشاء الرابط';
+                if (error.code === 'permission-denied') {
+                    errorMessage = 'لا يوجد صلاحية لإنشاء الرابط. تحقق من بيانات النموذج.';
+                } else if (error.code === 'unavailable') {
+                    errorMessage = 'الخدمة غير متاحة حالياً. يرجى المحاولة لاحقاً.';
+                } else {
+                    errorMessage = 'خطأ في إنشاء الرابط: ' + (error.message || 'خطأ غير معروف');
+                }
+                
+                showToast(errorMessage, 'error');
+                
+                // Add error animation to form
+                const form = document.getElementById('linkForm');
+                form.classList.add('error-animation');
+                setTimeout(() => form.classList.remove('error-animation'), 500);
+            }
+        });
+        
+        function getFormData() {
+            const customDomain = document.getElementById('customDomain').value === 'custom' ? 
+                document.getElementById('customDomainValue').value : 
+                document.getElementById('customDomain').value;
+                
+            return {
+                contentType: document.getElementById('contentType').value,
+                contentSubcategory: document.getElementById('contentSubcategory').value || '',
+                seriesName: document.getElementById('seriesName').value.trim(),
+                originalUrl: document.getElementById('originalUrl').value.trim(),
+                customDomain: customDomain || 'turkify.netlify.app',
+                totalEpisodes: document.getElementById('contentType').value === 'series' ? 
+                    parseInt(document.getElementById('totalEpisodes').value) || 1 : 1,
+                
+                // Social media data
+                socialTitle: document.getElementById('socialTitle').value.trim() || '',
+                socialDescription: document.getElementById('socialDescription').value.trim() || '',
+                socialImage: document.getElementById('socialImage').value.trim() || '',
+                
+                // Premium features
+                passwordProtected: document.getElementById('passwordProtected').checked,
+                password: document.getElementById('passwordProtected').checked ? 
+                    document.getElementById('linkPassword').value : null,
+                hasExpiration: document.getElementById('hasExpiration').checked,
+                expirationDate: document.getElementById('hasExpiration').checked ? 
+                    firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('expirationDate').value)) : null,
+                hasClickLimit: document.getElementById('hasClickLimit').checked,
+                clickLimit: document.getElementById('hasClickLimit').checked ? 
+                    parseInt(document.getElementById('clickLimit').value) || null : null
+            };
+        }
+        
+        function validateFormData(data) {
+            if (!data.contentType || !data.seriesName || !data.originalUrl) {
+                showToast('يرجى ملء جميع الحقول المطلوبة', 'warning');
+                return false;
+            }
+            
+            if (!isValidUrl(data.originalUrl)) {
+                showToast('يرجى إدخال رابط صحيح', 'error');
+                document.getElementById('originalUrl').focus();
+                return false;
+            }
+            
+            if (data.socialImage && !isValidUrl(data.socialImage)) {
+                showToast('يرجى إدخال رابط صورة صحيح', 'warning');
+                document.getElementById('socialImage').focus();
+                return false;
+            }
+            
+            if (data.hasClickLimit && (!data.clickLimit || data.clickLimit < 1)) {
+                showToast('يرجى إدخال حد صحيح للنقرات', 'warning');
+                document.getElementById('clickLimit').focus();
+                return false;
+            }
+            
+            if (data.passwordProtected && (!data.password || data.password.length < 4)) {
+                showToast('كلمة المرور يجب أن تكون 4 أحرف على الأقل', 'warning');
+                document.getElementById('linkPassword').focus();
+                return false;
+            }
+            
+            return true;
+        }
+        
+        async function generateUniqueShortCode(length = 8) {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let attempts = 0;
+            
+            while (attempts < 10) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                
+                // Check if code already exists
+                try {
+                    const existingLink = await db.collection('links').where('shortCode', '==', result).get();
+                    if (existingLink.empty) {
+                        return result;
+                    }
+                } catch (error) {
+                    console.error('Error checking short code:', error);
+                    // Retry with a new code
+                }
+                
+                attempts++;
+                length++; // Increase length on each attempt
+            }
+            
+            // If we can't generate a unique code, use timestamp
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+        
+        function resetForm() {
+            const form = document.getElementById('linkForm');
+            form.reset();
+            form.classList.add('success-animation');
+            setTimeout(() => form.classList.remove('success-animation'), 600);
+            
+            // Hide optional fields
+            document.getElementById('episodeFields').classList.add('hidden');
+            document.getElementById('customDomainInput').classList.add('hidden');
+            document.getElementById('linkPassword').classList.add('hidden');
+            document.getElementById('expirationDate').classList.add('hidden');
+            document.getElementById('clickLimit').classList.add('hidden');
+            
+            // Reset subcategory
+            document.getElementById('contentSubcategory').innerHTML = '<option value="">اختر التصنيف الفرعي</option>';
+            
+            // Update preview
+            updateSocialPreview();
+        }
+        
+        // Enhanced Load User Data with Real-time Updates
+        async function loadUserData() {
+            if (!currentUser) return;
+            
+            try {
+                showLoading('جاري تحميل البيانات...');
+                
+                // Load user links with real-time listener
+                const unsubscribe = db.collection('links')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('createdAt', 'desc')
+                    .onSnapshot((snapshot) => {
+                        userLinks = snapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data()
+                        }));
+                        
+                        applyFilters();
+                        updateStatistics();
+                        renderLinksTable();
+                        updatePagination();
+                        
+                        // Update connection status
+                        updateConnectionStatus(true);
+                    }, (error) => {
+                        console.error('Error loading user data:', error);
+                        showToast('خطأ في تحميل البيانات: ' + error.message, 'error');
+                        updateConnectionStatus(false);
+                    });
+                
+                // Store unsubscribe function for cleanup
+                window.unsubscribeUserData = unsubscribe;
+                
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showToast('خطأ في تحميل البيانات: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Enhanced Filtering System
+        function applyFilters() {
+            let filtered = [...userLinks];
+            
+            // Apply content type filter
+            if (currentFilter !== 'all') {
+                if (currentFilter === 'active') {
+                    filtered = filtered.filter(link => link.isActive);
+                } else if (currentFilter === 'expired') {
+                    const now = new Date();
+                    filtered = filtered.filter(link => 
+                        link.expirationDate && link.expirationDate.toDate() < now
+                    );
+                } else {
+                    filtered = filtered.filter(link => link.contentType === currentFilter);
+                }
+            }
+            
+            filteredLinks = filtered;
+            currentPage = 1; // Reset to first page
+        }
+        
+        // Enhanced Search Function
+        document.getElementById('searchLinks').addEventListener('input', debounce(function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                applyFilters();
+            } else {
+                filteredLinks = userLinks.filter(link => 
+                    link.seriesName.toLowerCase().includes(searchTerm) ||
+                    link.contentType.toLowerCase().includes(searchTerm) ||
+                    link.contentSubcategory?.toLowerCase().includes(searchTerm) ||
+                    link.originalUrl.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            currentPage = 1;
+            renderLinksTable();
+            updatePagination();
+        }, 300));
+        
+        // Enhanced Filter Event Listeners
+        document.querySelectorAll('[data-filter]').forEach(filter => {
+            filter.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentFilter = this.dataset.filter;
+                
+                // Update active filter UI
+                document.querySelectorAll('[data-filter]').forEach(f => f.classList.remove('active'));
+                this.classList.add('active');
+                
+                applyFilters();
+                renderLinksTable();
+                updatePagination();
+                
+                showToast(`تم تطبيق فلتر: ${this.textContent}`, 'info', 2000);
+            });
+        });
+        
+        // Enhanced Links Table Rendering
+        function renderLinksTable() {
+            const tbody = document.getElementById('linksTableBody');
+            tbody.innerHTML = '';
+            
+            // Update links count with animation
+            const linksCount = document.getElementById('linksCount');
+            linksCount.textContent = filteredLinks.length;
+            linksCount.classList.add('success-animation');
+            setTimeout(() => linksCount.classList.remove('success-animation'), 600);
+            
+            if (filteredLinks.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <div class="empty-state">
+                                <i class="fas fa-link fa-4x mb-3 text-muted"></i>
+                                <h5>لا توجد روابط</h5>
+                                <p>لم يتم العثور على روابط تطابق المعايير المحددة</p>
+                                <button class="btn btn-gradient" onclick="document.getElementById('contentType').focus()">
+                                    <i class="fas fa-plus me-2"></i>إنشاء رابط جديد
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * linksPerPage;
+            const endIndex = startIndex + linksPerPage;
+            const pageLinks = filteredLinks.slice(startIndex, endIndex);
+            
+            pageLinks.forEach((link, index) => {
+                const row = document.createElement('tr');
+                row.className = 'align-middle';
+                row.style.animationDelay = `${index * 50}ms`;
+                
+                const createdDate = link.createdAt ? 
+                    (link.createdAt.toDate ? link.createdAt.toDate() : new Date(link.createdAt)).toLocaleDateString('ar-SA') : 
+                    'غير معروف';
+                
+                const customDomain = link.customDomain || 'turkify.netlify.app';
+                const shortUrl = `https://${customDomain}/sho2157rts.html?${link.contentType}=${encodeURIComponent(link.seriesName)}&id=${link.id}`;
+                
+                // Episode info for series
+                let episodeInfo = '';
+                if (link.contentType === 'series' && link.totalEpisodes > 1) {
+                    const currentEp = calculateCurrentEpisode(link.createdAt, link.totalEpisodes);
+                    episodeInfo = `<br><small class="text-muted">الحلقة ${currentEp}/${link.totalEpisodes}</small>`;
+                }
+                
+                // Status badge with enhanced styling
+                let statusBadge = '';
+                const now = new Date();
+                const isExpired = link.expirationDate && link.expirationDate.toDate() < now;
+                const isClickLimitReached = link.hasClickLimit && link.clicks >= link.clickLimit;
+                
+                if (isExpired) {
+                    statusBadge = '<span class="status-badge status-expired">منتهي الصلاحية</span>';
+                } else if (isClickLimitReached) {
+                    statusBadge = '<span class="status-badge status-inactive">حد النقرات مكتمل</span>';
+                } else if (!link.isActive) {
+                    statusBadge = '<span class="status-badge status-inactive">معطل</span>';
+                } else {
+                    statusBadge = '<span class="status-badge status-active">نشط</span>';
+                }
+                
+                // Content type badge
+                const contentTypeBadge = `<span class="content-badge badge-${link.contentType}">${getContentTypeLabel(link.contentType)}</span>`;
+                
+                // Premium features indicators
+                let premiumIndicators = '';
+                if (link.passwordProtected) {
+                    premiumIndicators += '<i class="fas fa-lock text-warning ms-1" title="محمي بكلمة مرور"></i>';
+                }
+                if (link.expirationDate) {
+                    premiumIndicators += '<i class="fas fa-clock text-info ms-1" title="له تاريخ انتهاء"></i>';
+                }
+                if (link.hasClickLimit) {
+                    premiumIndicators += '<i class="fas fa-hashtag text-primary ms-1" title="له حد نقرات"></i>';
+                }
+                
+                // Click metrics with enhanced display
+                const clickMetrics = `
+                    <div class="text-center">
+                        <span class="badge bg-primary fs-6">${link.clicks || 0}</span>
+                        <small class="text-muted d-block mt-1">زوار: ${link.uniqueVisitors || 0}</small>
+                        <small class="text-success">
+                            ${((link.clicks || 0) / Math.max(link.uniqueVisitors || 1, 1) * 100).toFixed(1)}% تحويل
+                        </small>
+                    </div>
+                `;
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <strong>${link.seriesName}</strong>
+                                ${episodeInfo}
+                                ${premiumIndicators}
+                                ${link.contentSubcategory ? `<br><small class="text-muted">${link.contentSubcategory}</small>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td>${contentTypeBadge}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <code class="me-2 text-truncate" style="max-width: 200px; font-size: 0.85rem;">${shortUrl}</code>
+                            <button class="btn btn-sm btn-outline-primary action-btn copy-btn" onclick="copyToClipboard('${shortUrl}', this)" title="نسخ">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>${clickMetrics}</td>
+                    <td>
+                        <small>${createdDate}</small>
+                        ${link.expirationDate ? `<br><small class="text-muted">ينتهي: ${link.expirationDate.toDate().toLocaleDateString('ar-SA')}</small>` : ''}
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-secondary action-btn" onclick="generateQR('${shortUrl}')" title="رمز QR">
+                                <i class="fas fa-qrcode"></i>
+                            </button>
+                            <button class="btn btn-sm ${link.isActive ? 'btn-outline-secondary' : 'btn-outline-success'} action-btn" 
+                                    onclick="toggleLinkStatus('${link.id}')" 
+                                    title="${link.isActive ? 'تعطيل' : 'تفعيل'}">
+                                <i class="fas fa-${link.isActive ? 'pause' : 'play'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteLink('${link.id}')" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Enhanced Pagination System
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredLinks.length / linksPerPage);
+            const pagination = document.getElementById('linksPagination');
+            pagination.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Previous button
+            const prevBtn = document.createElement('li');
+            prevBtn.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevBtn.innerHTML = `
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">
+                    <i class="fas fa-chevron-right me-1"></i>السابق
+                </a>
+            `;
+            pagination.appendChild(prevBtn);
+            
+            // Page numbers with smart display
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) {
+                const firstPage = document.createElement('li');
+                firstPage.className = 'page-item';
+                firstPage.innerHTML = `<a class="page-link" href="#" onclick="changePage(1)">1</a>`;
+                pagination.appendChild(firstPage);
+                
+                if (startPage > 2) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = `<span class="page-link">...</span>`;
+                    pagination.appendChild(dots);
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('li');
+                pageBtn.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageBtn.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+                pagination.appendChild(pageBtn);
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = `<span class="page-link">...</span>`;
+                    pagination.appendChild(dots);
+                }
+                
+                const lastPage = document.createElement('li');
+                lastPage.className = 'page-item';
+                lastPage.innerHTML = `<a class="page-link" href="#" onclick="changePage(${totalPages})">${totalPages}</a>`;
+                pagination.appendChild(lastPage);
+            }
+            
+            // Next button
+            const nextBtn = document.createElement('li');
+            nextBtn.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextBtn.innerHTML = `
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">
+                    التالي<i class="fas fa-chevron-left ms-1"></i>
+                </a>
+            `;
+            pagination.appendChild(nextBtn);
+        }
+        
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredLinks.length / linksPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            renderLinksTable();
+            updatePagination();
+            
+            // Scroll to table top
+            document.getElementById('linksTableBody').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Enhanced Helper Functions
+        function getContentTypeLabel(type) {
+            const labels = {
+                series: 'مسلسل',
+                movie: 'فيلم',
+                match: 'مباراة',
+                recipe: 'وصفة',
+                game: 'لعبة',
+                app: 'تطبيق',
+                channel: 'قناة',
+                reels: 'ريلز'
+            };
+            return labels[type] || type;
+        }
+        
+        function calculateCurrentEpisode(createdAt, totalEpisodes) {
+            if (!totalEpisodes || totalEpisodes <= 1) return 1;
+            
+            const now = new Date();
+            const created = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+            
+            // Convert to Saudi timezone (UTC+3)
+            const saudiOffset = 3 * 60 * 60 * 1000;
+            const saudiNow = new Date(now.getTime() + saudiOffset);
+            const saudiCreated = new Date(created.getTime() + saudiOffset);
+            
+            // Set to 11 PM for episode change
+            saudiNow.setHours(23, 0, 0, 0);
+            if (now.getHours() < 23) {
+                saudiNow.setDate(saudiNow.getDate() - 1);
+            }
+            
+            // Calculate days difference
+            const diffTime = saudiNow - saudiCreated;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Calculate current episode (1-based)
+            const currentEpisode = (diffDays % totalEpisodes) + 1;
+            return Math.max(1, currentEpisode);
+        }
+        
+        // Enhanced Copy to Clipboard with Visual Feedback
+        function copyToClipboard(text, button = null) {
+            // Modern method using navigator.clipboard
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    handleCopySuccess(button);
+                }).catch(() => {
+                    // Fallback to legacy method
+                    useLegacyCopy(text, button);
+                });
+            } else {
+                // Legacy method
+                useLegacyCopy(text, button);
+            }
+        }
+        
+        function useLegacyCopy(text, button) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const success = document.execCommand('copy');
+                if (success) {
+                    handleCopySuccess(button);
+                } else {
+                    showToast('فشل في نسخ الرابط', 'error');
+                }
+            } catch (err) {
+                showToast('فشل في نسخ الرابط', 'error');
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+        
+        function handleCopySuccess(button) {
+            if (button) {
+                const icon = button.querySelector('i');
+                const originalClass = icon.className;
+                
+                button.classList.add('copied');
+                icon.className = 'fas fa-check';
+                
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    icon.className = originalClass;
+                }, 2000);
+            }
+            showToast('تم نسخ الرابط بنجاح', 'success');
+        }
+        
+        // Enhanced QR Code Generation
+        function generateQR(url) {
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = '';
+            
+            QRCode.toCanvas(qrDiv, url, {
+                width: 280,
+                height: 280,
+                margin: 4,
+                color: {
+                    dark: '#000',
+                    light: '#fff'
+                },
+                errorCorrectionLevel: 'M'
+            }, (error) => {
+                if (error) {
+                    showToast('خطأ في إنشاء رمز QR', 'error');
+                } else {
+                    const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+                    modal.show();
+                }
+            });
+        }
+        
+        // Enhanced Link Management Functions
+        async function toggleLinkStatus(linkId) {
+            try {
+                const link = userLinks.find(l => l.id === linkId);
+                if (!link) return;
+                
+                showLoading('جاري تحديث الحالة...');
+                
+                await db.collection('links').doc(linkId).update({
+                    isActive: !link.isActive,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                hideLoading();
+                showToast(`تم ${!link.isActive ? 'تفعيل' : 'تعطيل'} الرابط بنجاح`, 'success');
+            } catch (error) {
+                hideLoading();
+                showToast('خطأ في تغيير حالة الرابط: ' + error.message, 'error');
+            }
+        }
+        
+        async function deleteLink(linkId) {
+            const link = userLinks.find(l => l.id === linkId);
+            if (!link) return;
+            
+            // Enhanced confirmation dialog
+            const confirmDelete = confirm(
+                `هل أنت متأكد من حذف الرابط "${link.seriesName}"؟\n\n` +
+                `سيتم حذف جميع الإحصائيات المرتبطة به (${link.clicks || 0} نقرة).\n` +
+                `هذا الإجراء لا يمكن التراجع عنه.`
+            );
+            
+            if (!confirmDelete) return;
+            
+            try {
+                showLoading('جاري حذف الرابط...');
+                
+                // Delete link
+                await db.collection('links').doc(linkId).delete();
+                
+                // Update user stats
+                await db.collection('users').doc(currentUser.uid).update({
+                    linksCount: firebase.firestore.FieldValue.increment(-1),
+                    totalClicks: firebase.firestore.FieldValue.increment(-(link.clicks || 0)),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                hideLoading();
+                showToast('تم حذف الرابط بنجاح', 'success');
+                
+            } catch (error) {
+                console.error('Error deleting link:', error);
+                hideLoading();
+                showToast('خطأ في حذف الرابط: ' + error.message, 'error');
+            }
+        }
+        
+        // Enhanced Statistics
+        async function updateStatistics() {
+            try {
+                if (!currentUser) return;
+                
+                const totalLinks = userLinks.length;
+                const totalClicks = userLinks.reduce((sum, link) => sum + (link.clicks || 0), 0);
+                
+                // Get today's clicks
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const todayLinks = userLinks.filter(link => {
+                    if (!link.createdAt) return false;
+                    const createdDate = link.createdAt.toDate ? link.createdAt.toDate() : new Date(link.createdAt);
+                    return createdDate >= today;
+                });
+                
+                const todayClicks = todayLinks.reduce((sum, link) => sum + (link.clicks || 0), 0);
+                
+                // Update UI with enhanced animations
+                updateStatCard('totalLinks', totalLinks);
+                updateStatCard('totalClicks', totalClicks);
+                updateStatCard('todayClicks', todayClicks);
+                updateStatCard('activeUsers', 1);
+                
+            } catch (error) {
+                console.error('Error updating statistics:', error);
+            }
+        }
+        
+        function updateStatCard(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const currentValue = parseInt(element.textContent.replace(/[^\d]/g, '')) || 0;
+            
+            if (currentValue !== value) {
+                element.classList.add('success-animation');
+                setTimeout(() => {
+                    element.innerHTML = `<i class="live-indicator"></i>${value}`;
+                    element.classList.remove('success-animation');
+                }, 300);
+            }
+        }
+        
+        // Enhanced Navigation System
+        document.getElementById('dashboardNav').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('dashboard');
+        });
+        
+        document.getElementById('analyticsNav').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('analytics');
+        });
+        
+        document.getElementById('adminNav')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isAdmin) {
+                showSection('admin');
+            }
+        });
+        
+        function showSection(sectionId) {
+            const sections = ['hero', 'dashboard', 'analytics', 'admin'];
+            
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (element) {
+                    if (section === sectionId || (sectionId === 'dashboard' && section === 'hero')) {
+                        element.classList.remove('hidden');
+                        element.style.display = 'block';
+                    } else {
+                        element.classList.add('hidden');
+                        element.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Update active nav with animation
+            document.querySelectorAll('.nav-link').forEach(nav => {
+                nav.classList.remove('active');
+            });
+            
+            const activeNav = document.getElementById(sectionId + 'Nav');
+            if (activeNav) {
+                activeNav.classList.add('active');
+            }
+        }
+        
+        // Enhanced Connection Status
+        function updateConnectionStatus(isOnline) {
+            const status = document.getElementById('connectionStatus');
+            if (isOnline) {
+                status.className = 'connection-status online';
+                status.innerHTML = '<i class="fas fa-wifi me-2"></i>متصل';
+            } else {
+                status.className = 'connection-status offline';
+                status.innerHTML = '<i class="fas fa-wifi-slash me-2"></i>غير متصل';
+            }
+        }
+        
+        // Enhanced Real-time Updates
+        function startRealTimeUpdates() {
+            // Update statistics every 3 minutes
+            window.statsInterval = setInterval(updateStatistics, 3 * 60 * 1000);
+            
+            // Update page title with click count
+            window.titleInterval = setInterval(() => {
+                const totalClicks = userLinks.reduce((sum, link) => sum + (link.clicks || 0), 0);
+                document.title = `Turkify Pro (${totalClicks} نقرة) - منصة إدارة الروابط`;
+            }, 30000);
+            
+            // Check connection status
+            window.connectionInterval = setInterval(() => {
+                updateConnectionStatus(navigator.onLine);
+            }, 10000);
+        }
+        
+        function stopRealTimeUpdates() {
+            if (window.statsInterval) clearInterval(window.statsInterval);
+            if (window.titleInterval) clearInterval(window.titleInterval);
+            if (window.connectionInterval) clearInterval(window.connectionInterval);
+            if (window.unsubscribeUserData) window.unsubscribeUserData();
+        }
+        
+        // Enhanced Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Enhanced Download QR functionality
+        document.getElementById('downloadQR')?.addEventListener('click', () => {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'turkify-qr-code.png';
+                link.href = canvas.toDataURL();
+                link.click();
+                showToast('تم تحميل رمز QR بنجاح', 'success');
+            }
+        });
+        
+        // Enhanced Share QR functionality
+        document.getElementById('shareQR')?.addEventListener('click', () => {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas && navigator.share) {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], 'turkify-qr-code.png', { type: 'image/png' });
+                    navigator.share({
+                        title: 'رمز QR للرابط - Turkify Pro',
+                        text: 'امسح هذا الرمز للوصول للرابط',
+                        files: [file]
+                    });
+                });
+            } else {
+                showToast('المشاركة غير مدعومة في هذا المتصفح', 'warning');
+            }
+        });
+        
+        // Enhanced Error Handling
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            gtag('event', 'javascript_error', {
+                'event_category': 'errors',
+                'event_label': e.error?.message || 'Unknown error'
+            });
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            gtag('event', 'promise_rejection', {
+                'event_category': 'errors',
+                'event_label': e.reason?.message || 'Unknown rejection'
+            });
+        });
+        
+        // Enhanced Connection Monitoring
+        window.addEventListener('online', () => {
+            updateConnectionStatus(true);
+            showToast('تم استعادة الاتصال بالإنترنت', 'success');
+        });
+        
+        window.addEventListener('offline', () => {
+            updateConnectionStatus(false);
+            showToast('تم فقدان الاتصال بالإنترنت', 'warning');
+        });
+        
+        // Enhanced App Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default section
+            showSection('dashboard');
+            
+            // Initialize live preview
+            updateSocialPreview();
+            
+            // Initialize connection status
+            updateConnectionStatus(navigator.onLine);
+            
+            // Add smooth scrolling
+            document.documentElement.style.scrollBehavior = 'smooth';
+        });
+        
+        // Enhanced Window Events
+        window.addEventListener('beforeunload', () => {
+            // Stop real-time updates
+            stopRealTimeUpdates();
+        });
+        
+        console.log('🚀 Turkify Pro - Enhanced Link Management Platform');
+        console.log('✨ Version 3.0 - Fixed All Issues & Enhanced Performance');
+        console.log('🔧 Fixed: Spread operator bug, improved error handling, enhanced security');
+    </script>
+</body>
+</html>
