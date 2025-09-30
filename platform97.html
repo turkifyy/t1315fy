@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Turkify - تواصل اجتماعي</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #1877f2;
+            --secondary-color: #42b72a;
+            --bg-color: #f0f2f5;
+            --card-color: #ffffff;
+            --text-primary: #1c1e21;
+            --text-secondary: #65676b;
+            --border-color: #dddfe2;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            padding-top: 56px;
+        }
+        
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+        
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        
+        .navbar-brand i {
+            color: #ff0000;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            bottom: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 0;
+            background-color: var(--card-color);
+            box-shadow: 0 0 4px rgba(0,0,0,.1);
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            margin-top: 20px;
+        }
+        
+        .post-card {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.1);
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .post-header {
+            padding: 12px 16px 0;
+        }
+        
+        .post-body {
+            padding: 12px 16px;
+        }
+        
+        .post-actions {
+            padding: 8px 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .post-image {
+            max-height: 500px;
+            object-fit: contain;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        .comment-section {
+            background-color: var(--bg-color);
+            border-radius: 0 0 8px 8px;
+            padding: 12px 16px;
+        }
+        
+        .comment {
+            background-color: var(--bg-color);
+            border-radius: 18px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .like-btn.active {
+            color: var(--primary-color);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .search-results {
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        
+        .search-result-item:hover {
+            background-color: var(--bg-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .post-actions .btn {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-heart-fill"></i> Turkify
+            </a>
+            
+            <div class="d-flex">
+                <!-- Search Bar -->
+                <div class="me-2 position-relative" id="searchContainer">
+                    <input type="text" class="form-control" placeholder="بحث عن مستخدمين..." id="searchInput">
+                    <div class="search-results d-none" id="searchResults"></div>
+                </div>
+                
+                <!-- User Info & Auth -->
+                <div id="authSection">
+                    <button class="btn btn-primary" id="loginBtn">
+                        <i class="bi bi-google"></i> تسجيل الدخول
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left Sidebar -->
+            <div class="col-md-3 col-lg-2 d-none d-md-block sidebar">
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center p-3 border-bottom">
+                        <img src="" class="user-avatar me-2" id="sidebarUserAvatar" alt="صورة المستخدم">
+                        <span id="sidebarUserName">مرحباً!</span>
+                    </div>
+                    
+                    <ul class="nav nav-pills flex-column mb-auto mt-3">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" id="homeLink">
+                                <i class="bi bi-house-door me-2"></i> الصفحة الرئيسية
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="profileLink">
+                                <i class="bi bi-person me-2"></i> الملف الشخصي
+                            </a>
+                        </li>
+                        <li class="nav-item d-none" id="adminLinkContainer">
+                            <a href="#" class="nav-link text-danger" id="adminLink">
+                                <i class="bi bi-shield-check me-2"></i> لوحة الإدارة
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Feed -->
+            <div class="col-md-9 col-lg-6 main-content">
+                <!-- Create Post Card -->
+                <div class="post-card d-none" id="createPostCard">
+                    <div class="post-header d-flex align-items-center">
+                        <img src="" class="user-avatar me-2" id="createPostUserAvatar" alt="صورة المستخدم">
+                        <div>
+                            <h6 class="mb-0" id="createPostUserName">اسم المستخدم</h6>
+                        </div>
+                    </div>
+                    <div class="post-body">
+                        <textarea class="form-control border-0" rows="3" placeholder="ماذا يدور في ذهنك؟" id="postText"></textarea>
+                        <div class="mt-2">
+                            <img src="" class="img-fluid rounded d-none" id="postImagePreview">
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div>
+                                <input type="file" accept="image/*" class="d-none" id="imageUpload">
+                                <button class="btn btn-sm btn-outline-secondary" id="addImageBtn">
+                                    <i class="bi bi-image"></i> صورة
+                                </button>
+                            </div>
+                            <button class="btn btn-primary" id="publishPostBtn" disabled>نشر</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div id="postsFeed"></div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="col-lg-4 d-none d-lg-block sidebar">
+                <div class="p-3">
+                    <h6>مستخدمون مقترحون</h6>
+                    <div id="suggestedUsers"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">صورة المنشور</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" class="img-fluid" id="modalImage">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalTitle">الملف الشخصي</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <img src="" class="user-avatar mb-2" id="profileModalAvatar" style="width: 80px; height: 80px;">
+                        <h5 id="profileModalName"></h5>
+                    </div>
+                    <div id="profileModalPosts"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admin Modal -->
+    <div class="modal fade" id="adminModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">لوحة الإدارة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="adminTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#usersTab">المستخدمون</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#postsTab">المنشورات</a>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="usersTab">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>الصورة</th>
+                                            <th>الاسم</th>
+                                            <th>البريد الإلكتروني</th>
+                                            <th>الدور</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminUsersTable">
+                                        <!-- Users will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="postsTab">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>المحتوى</th>
+                                            <th>الناشر</th>
+                                            <th>التاريخ</th>
+                                            <th>الإعجابات</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminPostsTable">
+                                        <!-- Posts will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & Firebase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase SDK v9 (compat version for easier use in single file) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+
+    <script>
+        // =============================================
+        // 🔧 إعدادات Firebase - استبدل هذه القيم بقيم مشروعك
+        // =============================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // 🔧 روابط Cloud Functions - استبدل بعد نشر الـ Functions
+        const ADMIN_DELETE_POST_URL = "YOUR_CLOUD_FUNCTION_URL/adminDeletePost";
+        const ADMIN_BAN_USER_URL = "YOUR_CLOUD_FUNCTION_URL/adminBanUser";
+        
+        // =============================================
+        // تهيئة Firebase
+        // =============================================
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        // =============================================
+        // متغيرات التطبيق
+        // =============================================
+        let currentUser = null;
+        let posts = [];
+        let users = [];
+        
+        // =============================================
+        // إدارة المصادقة
+        // =============================================
+        class AuthManager {
+            constructor() {
+                this.initAuthListener();
+            }
+            
+            // الاستماع لتغير حالة المصادقة
+            initAuthListener() {
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        await this.createUserDocument(user);
+                        await this.checkAdminRole(user.uid);
+                        this.updateUIForLoggedInUser(user);
+                        this.loadPosts();
+                        this.loadSuggestedUsers();
+                    } else {
+                        currentUser = null;
+                        this.updateUIForLoggedOutUser();
+                    }
+                });
+            }
+            
+            // تسجيل الدخول بـ Google
+            async signInWithGoogle() {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                try {
+                    await auth.signInWithPopup(provider);
+                } catch (error) {
+                    console.error("خطأ في تسجيل الدخول:", error);
+                    alert("حدث خطأ أثناء تسجيل الدخول: " + error.message);
+                }
+            }
+            
+            // تسجيل الخروج
+            async signOut() {
+                try {
+                    await auth.signOut();
+                } catch (error) {
+                    console.error("خطأ في تسجيل الخروج:", error);
+                alert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
+                }
+            }
+            
+            // إنشاء مستند المستخدم إذا لم يكن موجوداً
+            async createUserDocument(user) {
+                const userRef = db.collection('users').doc(user.uid);
+                const userDoc = await userRef.get();
+                
+                if (!userDoc.exists) {
+                    await userRef.set({
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        role: 'user',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            }
+            
+            // التحقق من دور المشرف
+            async checkAdminRole(uid) {
+                const userDoc = await db.collection('users').doc(uid).get();
+                if (userDoc.exists && userDoc.data().role === 'admin') {
+                    document.getElementById('adminLinkContainer').classList.remove('d-none');
+                }
+            }
+            
+            // تحديث واجهة المستخدم للمستخدم المسجل
+            updateUIForLoggedInUser(user) {
+                document.getElementById('authSection').innerHTML = `
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                            <img src="${user.photoURL || 'https://via.placeholder.com/40'}" class="user-avatar me-2">
+                            ${user.displayName}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="myProfileLink">ملفي الشخصي</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">تسجيل الخروج</a></li>
+                        </ul>
+                    </div>
+                `;
+                
+                document.getElementById('createPostCard').classList.remove('d-none');
+                document.getElementById('createPostUserAvatar').src = user.photoURL || 'https://via.placeholder.com/40';
+                document.getElementById('createPostUserName').textContent = user.displayName;
+                document.getElementById('sidebarUserAvatar').src = user.photoURL || 'https://via.placeholder.com/40';
+                document.getElementById('sidebarUserName').textContent = user.displayName;
+                
+                document.getElementById('logoutBtn').addEventListener('click', () => this.signOut());
+                document.getElementById('myProfileLink').addEventListener('click', () => this.showUserProfile(user.uid));
+            }
+            
+            // تحديث واجهة المستخدم للزائر
+            updateUIForLoggedOutUser() {
+                document.getElementById('authSection').innerHTML = `
+                    <button class="btn btn-primary" id="loginBtn">
+                        <i class="bi bi-google"></i> تسجيل الدخول
+                    </button>
+                `;
+                
+                document.getElementById('createPostCard').classList.add('d-none');
+                document.getElementById('postsFeed').innerHTML = '<p class="text-center">يرجى تسجيل الدخول لعرض المنشورات</p>';
+                document.getElementById('sidebarUserAvatar').src = '';
+                document.getElementById('sidebarUserName').textContent = 'مرحباً!';
+                document.getElementById('adminLinkContainer').classList.add('d-none');
+                
+                document.getElementById('loginBtn').addEventListener('click', () => this.signInWithGoogle());
+            }
+            
+            // عرض ملف مستخدم
+            async showUserProfile(uid) {
+                const userDoc = await db.collection('users').doc(uid).get();
+                if (!userDoc.exists) return;
+                
+                const userData = userDoc.data();
+                const postsSnapshot = await db.collection('posts')
+                    .where('uid', '==', uid)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                document.getElementById('profileModalTitle').textContent = `ملف ${userData.displayName}`;
+                document.getElementById('profileModalAvatar').src = userData.photoURL || 'https://via.placeholder.com/80';
+                document.getElementById('profileModalName').textContent = userData.displayName;
+                
+                const postsContainer = document.getElementById('profileModalPosts');
+                postsContainer.innerHTML = '';
+                
+                if (postsSnapshot.empty) {
+                    postsContainer.innerHTML = '<p class="text-center">لا توجد منشورات</p>';
+                } else {
+                    postsSnapshot.forEach(doc => {
+                        const post = doc.data();
+                        postsContainer.appendChild(this.createPostElement(post, doc.id));
+                    });
+                }
+                
+                new bootstrap.Modal(document.getElementById('profileModal')).show();
+            }
+        }
+        
+        // =============================================
+        // إدارة المنشورات
+        // =============================================
+        class PostManager {
+            constructor() {
+                this.initPostListeners();
+                this.restoreDraft();
+            }
+            
+            // تهيئة مستمعي الأحداث للمنشورات
+            initPostListeners() {
+                document.getElementById('publishPostBtn').addEventListener('click', () => this.createPost());
+                document.getElementById('addImageBtn').addEventListener('click', () => document.getElementById('imageUpload').click());
+                document.getElementById('imageUpload').addEventListener('change', (e) => this.handleImageUpload(e));
+                document.getElementById('postText').addEventListener('input', () => this.saveDraft());
+            }
+            
+            // حفظ مسودة المنشور
+            saveDraft() {
+                const postText = document.getElementById('postText').value;
+                const imageFile = document.getElementById('imageUpload').files[0];
+                
+                const draft = {
+                    text: postText,
+                    hasImage: !!imageFile
+                };
+                
+                localStorage.setItem('postDraft', JSON.stringify(draft));
+                this.updatePublishButton();
+            }
+            
+            // استعادة المسودة
+            restoreDraft() {
+                const draft = JSON.parse(localStorage.getItem('postDraft') || '{}');
+                if (draft.text) {
+                    document.getElementById('postText').value = draft.text;
+                    this.updatePublishButton();
+                }
+            }
+            
+            // تحديث حالة زر النشر
+            updatePublishButton() {
+                const postText = document.getElementById('postText').value.trim();
+                document.getElementById('publishPostBtn').disabled = !postText;
+            }
+            
+            // معالجة رفع الصورة
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // عرض معاينة الصورة
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.getElementById('postImagePreview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    this.saveDraft();
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // إنشاء منشور جديد
+            async createPost() {
+                const postText = document.getElementById('postText').value.trim();
+                const imageFile = document.getElementById('imageUpload').files[0];
+                
+                if (!postText) return;
+                
+                try {
+                    let imageURL = null;
+                    
+                    // رفع الصورة إذا وجدت
+                    if (imageFile) {
+                        imageURL = await this.uploadImage(imageFile);
+                    }
+                    
+                    // إنشاء المنشور في Firestore
+                    const postData = {
+                        uid: currentUser.uid,
+                        displayName: currentUser.displayName,
+                        userPhotoURL: currentUser.photoURL,
+                        text: postText,
+                        imageURL: imageURL,
+                        likesCount: 0,
+                        comments: [],
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    await db.collection('posts').add(postData);
+                    
+                    // إعادة تعيين النموذج
+                    this.resetPostForm();
+                    
+                    // إعادة تحميل المنشورات
+                    loadPosts();
+                    
+                } catch (error) {
+                    console.error("خطأ في إنشاء المنشور:", error);
+                    alert("حدث خطأ أثناء نشر المنشور: " + error.message);
+                }
+            }
+            
+            // رفع الصورة إلى Firebase Storage
+            async uploadImage(file) {
+                // ضغط الصورة قبل الرفع
+                const compressedFile = await this.compressImage(file);
+                
+                const storageRef = storage.ref();
+                const imageRef = storageRef.child(`posts/${currentUser.uid}/${Date.now()}_${file.name}`);
+                const snapshot = await imageRef.put(compressedFile);
+                return await snapshot.ref.getDownloadURL();
+            }
+            
+            // ضغط الصورة
+            compressImage(file) {
+                return new Promise((resolve) => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    img.onload = () => {
+                        // تحديد الأبعاد القصوى
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+                        
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob((blob) => {
+                            resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                        }, 'image/jpeg', 0.7);
+                    };
+                    
+                    img.src = URL.createObjectURL(file);
+                });
+            }
+            
+            // إعادة تعيين نموذج المنشور
+            resetPostForm() {
+                document.getElementById('postText').value = '';
+                document.getElementById('postImagePreview').classList.add('d-none');
+                document.getElementById('imageUpload').value = '';
+                document.getElementById('publishPostBtn').disabled = true;
+                localStorage.removeItem('postDraft');
+            }
+            
+            // تحميل المنشورات
+            async loadPosts() {
+                const postsSnapshot = await db.collection('posts')
+                    .orderBy('createdAt', 'desc')
+                    .limit(20)
+                    .get();
+                
+                posts = [];
+                postsSnapshot.forEach(doc => {
+                    posts.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                this.renderPosts();
+            }
+            
+            // عرض المنشورات
+            renderPosts() {
+                const postsContainer = document.getElementById('postsFeed');
+                postsContainer.innerHTML = '';
+                
+                if (posts.length === 0) {
+                    postsContainer.innerHTML = '<p class="text-center">لا توجد منشورات بعد</p>';
+                    return;
+                }
+                
+                posts.forEach(post => {
+                    postsContainer.appendChild(this.createPostElement(post, post.id));
+                });
+            }
+            
+            // إنشاء عنصر منشور
+            createPostElement(post, postId) {
+                const postElement = document.createElement('div');
+                postElement.className = 'post-card';
+                postElement.dataset.postId = postId;
+                
+                const timeAgo = this.getTimeAgo(post.createdAt?.toDate());
+                
+                postElement.innerHTML = `
+                    <div class="post-header d-flex align-items-center">
+                        <img src="${post.userPhotoURL || 'https://via.placeholder.com/40'}" class="user-avatar me-2" alt="صورة ${post.displayName}">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">${post.displayName}</h6>
+                            <small class="text-muted">${timeAgo}</small>
+                        </div>
+                        ${currentUser && currentUser.uid === post.uid ? `
+                            <button class="btn btn-sm btn-outline-danger delete-post-btn">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div class="post-body">
+                        <p class="mb-2">${post.text}</p>
+                        ${post.imageURL ? `
+                            <img src="${post.imageURL}" class="post-image mb-2" alt="صورة المنشور" loading="lazy">
+                        ` : ''}
+                    </div>
+                    <div class="post-actions d-flex justify-content-between">
+                        <button class="btn btn-sm like-btn ${post.userLikes && post.userLikes[currentUser?.uid] ? 'active' : ''}">
+                            <i class="bi bi-hand-thumbs-up"></i> 
+                            <span class="likes-count">${post.likesCount || 0}</span>
+                        </button>
+                        <button class="btn btn-sm comment-toggle-btn">
+                            <i class="bi bi-chat"></i> تعليق
+                        </button>
+                    </div>
+                    <div class="comment-section d-none">
+                        <div class="comments-list mb-2"></div>
+                        <div class="d-flex">
+                            <input type="text" class="form-control me-2" placeholder="اكتب تعليقاً...">
+                            <button class="btn btn-primary btn-sm add-comment-btn">نشر</button>
+                        </div>
+                    </div>
+                `;
+                
+                // إضافة مستمعي الأحداث
+                const likeBtn = postElement.querySelector('.like-btn');
+                const commentToggleBtn = postElement.querySelector('.comment-toggle-btn');
+                const addCommentBtn = postElement.querySelector('.add-comment-btn');
+                const commentInput = postElement.querySelector('input');
+                const commentsList = postElement.querySelector('.comments-list');
+                const postImage = postElement.querySelector('.post-image');
+                const deleteBtn = postElement.querySelector('.delete-post-btn');
+                
+                if (likeBtn) {
+                    likeBtn.addEventListener('click', () => this.toggleLike(postId));
+                }
+                
+                if (commentToggleBtn) {
+                    commentToggleBtn.addEventListener('click', () => {
+                        const commentSection = postElement.querySelector('.comment-section');
+                        commentSection.classList.toggle('d-none');
+                        if (!commentSection.classList.contains('d-none')) {
+                            this.loadComments(postId, commentsList);
+                        }
+                    });
+                }
+                
+                if (addCommentBtn) {
+                    addCommentBtn.addEventListener('click', () => {
+                        const commentText = commentInput.value.trim();
+                        if (commentText) {
+                            this.addComment(postId, commentText);
+                            commentInput.value = '';
+                        }
+                    });
+                }
+                
+                if (postImage) {
+                    postImage.addEventListener('click', () => {
+                        document.getElementById('modalImage').src = post.imageURL;
+                        new bootstrap.Modal(document.getElementById('imageModal')).show();
+                    });
+                }
+                
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => this.deletePost(postId));
+                }
+                
+                return postElement;
+            }
+            
+            // تبديل الإعجاب
+            async toggleLike(postId) {
+                if (!currentUser) return;
+                
+                const postRef = db.collection('posts').doc(postId);
+                const likeRef = db.collection('likes').doc(postId).collection('userLikes').doc(currentUser.uid);
+                
+                const likeDoc = await likeRef.get();
+                
+                if (likeDoc.exists) {
+                    // إلغاء الإعجاب
+                    await likeRef.delete();
+                    await postRef.update({
+                        likesCount: firebase.firestore.FieldValue.increment(-1)
+                    });
+                } else {
+                    // إضافة إعجاب
+                    await likeRef.set({
+                        uid: currentUser.uid,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    await postRef.update({
+                        likesCount: firebase.firestore.FieldValue.increment(1)
+                    });
+                }
+                
+                // تحديث الواجهة
+                this.loadPosts();
+            }
+            
+            // إضافة تعليق
+            async addComment(postId, commentText) {
+                if (!currentUser) return;
+                
+                const commentData = {
+                    uid: currentUser.uid,
+                    displayName: currentUser.displayName,
+                    userPhotoURL: currentUser.photoURL,
+                    text: commentText,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('posts').doc(postId).collection('comments').add(commentData);
+                
+                // تحديث قائمة التعليقات
+                const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                const commentsList = postElement.querySelector('.comments-list');
+                this.loadComments(postId, commentsList);
+            }
+            
+            // تحميل التعليقات
+            async loadComments(postId, commentsContainer) {
+                const commentsSnapshot = await db.collection('posts').doc(postId)
+                    .collection('comments')
+                    .orderBy('createdAt', 'asc')
+                    .get();
+                
+                commentsContainer.innerHTML = '';
+                
+                if (commentsSnapshot.empty) {
+                    commentsContainer.innerHTML = '<p class="text-muted text-center">لا توجد تعليقات</p>';
+                    return;
+                }
+                
+                commentsSnapshot.forEach(doc => {
+                    const comment = doc.data();
+                    const timeAgo = this.getTimeAgo(comment.createdAt?.toDate());
+                    
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment';
+                    commentElement.innerHTML = `
+                        <div class="d-flex align-items-start">
+                            <img src="${comment.userPhotoURL || 'https://via.placeholder.com/32'}" class="user-avatar me-2" style="width: 32px; height: 32px;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0" style="font-size: 0.9rem;">${comment.displayName}</h6>
+                                <p class="mb-0" style="font-size: 0.9rem;">${comment.text}</p>
+                                <small class="text-muted">${timeAgo}</small>
+                            </div>
+                        </div>
+                    `;
+                    
+                    commentsContainer.appendChild(commentElement);
+                });
+            }
+            
+            // حذف منشور
+            async deletePost(postId) {
+                if (!confirm('هل أنت متأكد من حذف هذا المنشور؟')) return;
+                
+                try {
+                    // حذف المنشور والتعليقات والإعجابات المرتبطة
+                    await db.collection('posts').doc(postId).delete();
+                    
+                    // حذف التعليقات
+                    const commentsSnapshot = await db.collection('posts').doc(postId).collection('comments').get();
+                    const deleteComments = commentsSnapshot.docs.map(doc => doc.ref.delete());
+                    await Promise.all(deleteComments);
+                    
+                    // حذف الإعجابات
+                    const likesSnapshot = await db.collection('likes').doc(postId).collection('userLikes').get();
+                    const deleteLikes = likesSnapshot.docs.map(doc => doc.ref.delete());
+                    await Promise.all(deleteLikes);
+                    
+                    // إعادة تحميل المنشورات
+                    this.loadPosts();
+                    
+                } catch (error) {
+                    console.error("خطأ في حذف المنشور:", error);
+                    alert("حدث خطأ أثناء حذف المنشور: " + error.message);
+                }
+            }
+            
+            // حساب الوقت المنقضي
+            getTimeAgo(date) {
+                if (!date) return '';
+                
+                const now = new Date();
+                const diffInSeconds = Math.floor((now - date) / 1000);
+                
+                if (diffInSeconds < 60) return 'الآن';
+                if (diffInSeconds < 3600) return `قبل ${Math.floor(diffInSeconds / 60)} دقيقة`;
+                if (diffInSeconds < 86400) return `قبل ${Math.floor(diffInSeconds / 3600)} ساعة`;
+                if (diffInSeconds < 2592000) return `قبل ${Math.floor(diffInSeconds / 86400)} يوم`;
+                
+                return date.toLocaleDateString('ar-EG');
+            }
+        }
+        
+        // =============================================
+        // إدارة البحث والمستخدمين
+        // =============================================
+        class SearchManager {
+            constructor() {
+                this.initSearchListeners();
+            }
+            
+            // تهيئة مستمعي البحث
+            initSearchListeners() {
+                const searchInput = document.getElementById('searchInput');
+                const searchResults = document.getElementById('searchResults');
+                
+                searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+                searchInput.addEventListener('focus', () => {
+                    if (searchResults.innerHTML.trim()) {
+                        searchResults.classList.remove('d-none');
+                    }
+                });
+                
+                // إخفاء نتائج البحث عند النقر خارجها
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#searchContainer')) {
+                        searchResults.classList.add('d-none');
+                    }
+                });
+            }
+            
+            // معالجة البحث
+            async handleSearch(query) {
+                const searchResults = document.getElementById('searchResults');
+                
+                if (query.length < 2) {
+                    searchResults.classList.add('d-none');
+                    searchResults.innerHTML = '';
+                    return;
+                }
+                
+                try {
+                    const usersSnapshot = await db.collection('users')
+                        .where('displayName', '>=', query)
+                        .where('displayName', '<=', query + '\uf8ff')
+                        .limit(10)
+                        .get();
+                    
+                    searchResults.innerHTML = '';
+                    
+                    if (usersSnapshot.empty) {
+                        searchResults.innerHTML = '<div class="search-result-item text-muted">لا توجد نتائج</div>';
+                    } else {
+                        usersSnapshot.forEach(doc => {
+                            const user = doc.data();
+                            const resultItem = document.createElement('div');
+                            resultItem.className = 'search-result-item';
+                            resultItem.innerHTML = `
+                                <div class="d-flex align-items-center">
+                                    <img src="${user.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar me-2" style="width: 32px; height: 32px;">
+                                    <span>${user.displayName}</span>
+                                </div>
+                            `;
+                            resultItem.addEventListener('click', () => {
+                                authManager.showUserProfile(user.uid);
+                                searchResults.classList.add('d-none');
+                                document.getElementById('searchInput').value = '';
+                            });
+                            searchResults.appendChild(resultItem);
+                        });
+                    }
+                    
+                    searchResults.classList.remove('d-none');
+                } catch (error) {
+                    console.error("خطأ في البحث:", error);
+                }
+            }
+            
+            // تحميل المستخدمين المقترحين
+            async loadSuggestedUsers() {
+                const usersSnapshot = await db.collection('users')
+                    .limit(5)
+                    .get();
+                
+                const suggestedUsersContainer = document.getElementById('suggestedUsers');
+                suggestedUsersContainer.innerHTML = '';
+                
+                usersSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    if (user.uid === currentUser.uid) return;
+                    
+                    const userElement = document.createElement('div');
+                    userElement.className = 'd-flex align-items-center mb-2';
+                    userElement.innerHTML = `
+                        <img src="${user.photoURL || 'https://via.placeholder.com/40'}" class="user-avatar me-2">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0" style="font-size: 0.9rem;">${user.displayName}</h6>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary view-profile-btn">عرض</button>
+                    `;
+                    
+                    userElement.querySelector('.view-profile-btn').addEventListener('click', () => {
+                        authManager.showUserProfile(user.uid);
+                    });
+                    
+                    suggestedUsersContainer.appendChild(userElement);
+                });
+            }
+        }
+        
+        // =============================================
+        // إدارة لوحة المشرفين
+        // =============================================
+        class AdminManager {
+            constructor() {
+                this.initAdminListeners();
+            }
+            
+            // تهيئة مستمعي لوحة الإدارة
+            initAdminListeners() {
+                document.getElementById('adminLink').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.showAdminPanel();
+                });
+            }
+            
+            // عرض لوحة الإدارة
+            async showAdminPanel() {
+                await this.loadAdminUsers();
+                await this.loadAdminPosts();
+                new bootstrap.Modal(document.getElementById('adminModal')).show();
+            }
+            
+            // تحميل المستخدمين للإدارة
+            async loadAdminUsers() {
+                const usersSnapshot = await db.collection('users').get();
+                const usersTable = document.getElementById('adminUsersTable');
+                usersTable.innerHTML = '';
+                
+                usersSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>
+                            <img src="${user.photoURL || 'https://via.placeholder.com/40'}" class="user-avatar" style="width: 40px; height: 40px;">
+                        </td>
+                        <td>${user.displayName}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-secondary'}">
+                                ${user.role === 'admin' ? 'مشرف' : 'مستخدم'}
+                            </span>
+                        </td>
+                        <td>
+                            ${user.uid !== currentUser.uid ? `
+                                <button class="btn btn-sm btn-danger ban-user-btn" data-user-id="${user.uid}">
+                                    حظر
+                                </button>
+                            ` : '<span class="text-muted">-</span>'}
+                        </td>
+                    `;
+                    
+                    usersTable.appendChild(row);
+                });
+                
+                // إضافة مستمعي الأحداث لأزرار الحظر
+                document.querySelectorAll('.ban-user-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const userId = e.target.dataset.userId;
+                        this.banUser(userId);
+                    });
+                });
+            }
+            
+            // تحميل المنشورات للإدارة
+            async loadAdminPosts() {
+                const postsSnapshot = await db.collection('posts')
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .get();
+                
+                const postsTable = document.getElementById('adminPostsTable');
+                postsTable.innerHTML = '';
+                
+                postsSnapshot.forEach(doc => {
+                    const post = doc.data();
+                    const timeAgo = postManager.getTimeAgo(post.createdAt?.toDate());
+                    const truncatedText = post.text.length > 50 ? post.text.substring(0, 50) + '...' : post.text;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${truncatedText}</td>
+                        <td>${post.displayName}</td>
+                        <td>${timeAgo}</td>
+                        <td>${post.likesCount || 0}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger delete-post-admin-btn" data-post-id="${doc.id}">
+                                حذف
+                            </button>
+                        </td>
+                    `;
+                    
+                    postsTable.appendChild(row);
+                });
+                
+                // إضافة مستمعي الأحداث لأزرار الحذف
+                document.querySelectorAll('.delete-post-admin-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const postId = e.target.dataset.postId;
+                        this.deletePostAdmin(postId);
+                    });
+                });
+            }
+            
+            // حظر مستخدم (استدعاء Cloud Function)
+            async banUser(userId) {
+                if (!confirm('هل أنت متأكد من حظر هذا المستخدم؟')) return;
+                
+                try {
+                    // استدعاء Cloud Function لحظر المستخدم
+                    const response = await fetch(ADMIN_BAN_USER_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${await currentUser.getIdToken()}`
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            adminId: currentUser.uid
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        alert('تم حظر المستخدم بنجاح');
+                        this.loadAdminUsers();
+                    } else {
+                        throw new Error('فشل في حظر المستخدم');
+                    }
+                } catch (error) {
+                    console.error("خطأ في حظر المستخدم:", error);
+                    alert("حدث خطأ أثناء حظر المستخدم: " + error.message);
+                }
+            }
+            
+            // حذف منشور كمشرف (استدعاء Cloud Function)
+            async deletePostAdmin(postId) {
+                if (!confirm('هل أنت متأكد من حذف هذا المنشور؟')) return;
+                
+                try {
+                    // استدعاء Cloud Function لحذف المنشور
+                    const response = await fetch(ADMIN_DELETE_POST_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${await currentUser.getIdToken()}`
+                        },
+                        body: JSON.stringify({
+                            postId: postId,
+                            adminId: currentUser.uid
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        alert('تم حذف المنشور بنجاح');
+                        this.loadAdminPosts();
+                        postManager.loadPosts();
+                    } else {
+                        throw new Error('فشل في حذف المنشور');
+                    }
+                } catch (error) {
+                    console.error("خطأ في حذف المنشور:", error);
+                    alert("حدث خطأ أثناء حذف المنشور: " + error.message);
+                }
+            }
+        }
+        
+        // =============================================
+        // تهيئة التطبيق
+        // =============================================
+        let authManager, postManager, searchManager, adminManager;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            authManager = new AuthManager();
+            postManager = new PostManager();
+            searchManager = new SearchManager();
+            adminManager = new AdminManager();
+            
+            // إضافة مستمعي الأحداث للروابط
+            document.getElementById('homeLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo(0, 0);
+            });
+            
+            document.getElementById('profileLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentUser) {
+                    authManager.showUserProfile(currentUser.uid);
+                }
+            });
+            
+            // تهيئة زر تسجيل الدخول
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                authManager.signInWithGoogle();
+            });
+        });
+    </script>
+</body>
+</html>
