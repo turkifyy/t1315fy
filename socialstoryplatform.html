@@ -1,0 +1,2783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialStory Scheduler v3.5</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+        }
+        
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .auth-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .auth-body {
+            padding: 30px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+        }
+        
+        .dashboard-card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: none;
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .platform-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .facebook-color {
+            color: #3b5998;
+        }
+        
+        .instagram-color {
+            color: #e1306c;
+        }
+        
+        .tiktok-color {
+            color: #000000;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .content-category {
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .content-category:hover {
+            transform: scale(1.03);
+        }
+        
+        .category-movies {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+        
+        .category-tv {
+            background: linear-gradient(45deg, #4ecdc4, #88d3ce);
+            color: white;
+        }
+        
+        .category-sports {
+            background: linear-gradient(45deg, #45b7d1, #96cfe3);
+            color: white;
+        }
+        
+        .category-recipes {
+            background: linear-gradient(45deg, #f9c74f, #fad874);
+            color: white;
+        }
+        
+        .category-games {
+            background: linear-gradient(45deg, #9d4edd, #b57fe6);
+            color: white;
+        }
+        
+        .category-apps {
+            background: linear-gradient(45deg, #f8961e, #f9b457);
+            color: white;
+        }
+        
+        .admin-sidebar {
+            background: var(--dark-color);
+            color: white;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        
+        .admin-sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .admin-sidebar .nav-link:hover, .admin-sidebar .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .story-preview {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            height: 600px;
+            width: 340px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .story-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .story-image {
+            max-width: 100%;
+            max-height: 70%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .scheduled-item {
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .platform-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .badge-facebook {
+            background: #3b5998;
+            color: white;
+        }
+        
+        .badge-instagram {
+            background: #e1306c;
+            color: white;
+        }
+        
+        .badge-tiktok {
+            background: #000000;
+            color: white;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .story-preview {
+                width: 100%;
+                height: 500px;
+            }
+            
+            .admin-sidebar {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Section -->
+    <div id="auth-section" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2><i class="fas fa-camera me-2"></i>SocialStory Scheduler</h2>
+                <p class="mb-0">v3.5 - Advanced Story Management</p>
+            </div>
+            <div class="auth-body">
+                <ul class="nav nav-pills mb-3 justify-content-center" id="auth-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login" type="button" role="tab">Login</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="signup-tab" data-bs-toggle="pill" data-bs-target="#signup" type="button" role="tab">Sign Up</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="auth-tabs-content">
+                    <div class="tab-pane fade show active" id="login" role="tabpanel">
+                        <form id="login-form">
+                            <div class="mb-3">
+                                <label for="login-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="login-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="login-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="login-password" required>
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                        </form>
+                        <div class="text-center mb-3">Or</div>
+                        <div class="d-grid">
+                            <button id="google-login" class="btn btn-google">
+                                <i class="fab fa-google me-2"></i>Login with Google
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="signup" role="tabpanel">
+                        <form id="signup-form">
+                            <div class="mb-3">
+                                <label for="signup-name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="signup-name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="signup-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="signup-password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="signup-confirm-password" required>
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </div>
+                        </form>
+                        <div class="text-center mb-3">Or</div>
+                        <div class="d-grid">
+                            <button id="google-signup" class="btn btn-google">
+                                <i class="fab fa-google me-2"></i>Sign Up with Google
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Section -->
+    <div id="dashboard-section" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><i class="fas fa-camera me-2"></i>SocialStory Scheduler</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-section="dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="schedule">Schedule Stories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="content">Content Generator</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="analytics">Analytics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="admin-panel">Admin Panel</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i> <span id="user-name">User</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-section="profile">Profile</a></li>
+                                <li><a class="dropdown-item" href="#" data-section="settings">Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logout-btn">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-4">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="section-view">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-stories">0</div>
+                            <div class="text-muted">Total Stories</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="scheduled-stories">0</div>
+                            <div class="text-muted">Scheduled</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="published-stories">0</div>
+                            <div class="text-muted">Published</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="engagement-rate">0%</div>
+                            <div class="text-muted">Engagement Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Recent Activity</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recent-activity">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading activities...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Platform Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="platform-chart" width="100%" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Stories View -->
+            <div id="schedule-view" class="section-view d-none">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Schedule New Story</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="schedule-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Select Platforms</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-facebook" value="facebook">
+                                                    <label class="form-check-label" for="platform-facebook">
+                                                        <i class="fab fa-facebook facebook-color me-1"></i> Facebook
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-instagram" value="instagram">
+                                                    <label class="form-check-label" for="platform-instagram">
+                                                        <i class="fab fa-instagram instagram-color me-1"></i> Instagram
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-tiktok" value="tiktok">
+                                                    <label class="form-check-label" for="platform-tiktok">
+                                                        <i class="fab fa-tiktok tiktok-color me-1"></i> TikTok
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="schedule-date" class="form-label">Schedule Date & Time</label>
+                                                <input type="datetime-local" class="form-control" id="schedule-date" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-content" class="form-label">Story Content</label>
+                                        <textarea class="form-control" id="story-content" rows="4" placeholder="Enter your story content here..."></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-category" class="form-label">Category</label>
+                                        <select class="form-select" id="story-category">
+                                            <option value="movies">Movies</option>
+                                            <option value="tv">TV Series</option>
+                                            <option value="sports">Sports</option>
+                                            <option value="recipes">Recipes</option>
+                                            <option value="games">Games</option>
+                                            <option value="apps">Apps</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-media" class="form-label">Upload Media (Optional)</label>
+                                        <input type="file" class="form-control" id="story-media" accept="image/*,video/*">
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Schedule Story</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Story Preview</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="story-preview">
+                                    <div class="story-content">
+                                        <img id="preview-image" src="" alt="Story Preview" class="story-image d-none">
+                                        <div id="preview-text" class="mt-3">Your story content will appear here</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Scheduled Stories</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="scheduled-stories-list">
+                                    <!-- Scheduled stories will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Generator View -->
+            <div id="content-view" class="section-view d-none">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">AI Content Generator</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="content-generator-form">
+                                    <div class="mb-3">
+                                        <label for="content-category" class="form-label">Content Category</label>
+                                        <select class="form-select" id="content-category" required>
+                                            <option value="">Select a category</option>
+                                            <option value="movies">Movies</option>
+                                            <option value="tv">TV Series</option>
+                                            <option value="sports">Sports</option>
+                                            <option value="recipes">Recipes</option>
+                                            <option value="games">Games</option>
+                                            <option value="apps">Apps</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="content-topic" class="form-label">Specific Topic (Optional)</label>
+                                        <input type="text" class="form-control" id="content-topic" placeholder="e.g., Avengers, Pizza recipe, Football">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="content-tone" class="form-label">Content Tone</label>
+                                        <select class="form-select" id="content-tone">
+                                            <option value="professional">Professional</option>
+                                            <option value="casual">Casual</option>
+                                            <option value="funny">Funny</option>
+                                            <option value="inspirational">Inspirational</option>
+                                            <option value="urgent">Urgent</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Generate Content</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Generated Content</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="loading-spinner" id="content-loading">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Generating content...</span>
+                                    </div>
+                                    <p class="mt-2">Generating content with DeepSec AI...</p>
+                                </div>
+                                <div id="generated-content">
+                                    <p class="text-muted">Select a category and generate content to see results here.</p>
+                                </div>
+                                <div class="mt-3 d-none" id="content-actions">
+                                    <button class="btn btn-sm btn-outline-primary" id="use-content-btn">Use This Content</button>
+                                    <button class="btn btn-sm btn-outline-secondary" id="regenerate-content-btn">Regenerate</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h4>Content Categories</h4>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="content-category category-movies" data-category="movies">
+                                    <h5><i class="fas fa-film me-2"></i>Movies</h5>
+                                    <p class="mb-0">Latest releases, reviews, and recommendations</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="content-category category-tv" data-category="tv">
+                                    <h5><i class="fas fa-tv me-2"></i>TV Series</h5>
+                                    <p class="mb-0">Episode guides, character insights, and binge-worthy shows</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="content-category category-sports" data-category="sports">
+                                    <h5><i class="fas fa-baseball-ball me-2"></i>Sports</h5>
+                                    <p class="mb-0">Game highlights, player stats, and tournament updates</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="content-category category-recipes" data-category="recipes">
+                                    <h5><i class="fas fa-utensils me-2"></i>Recipes</h5>
+                                    <p class="mb-0">Quick meals, cooking tips, and food inspiration</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="content-category category-games" data-category="games">
+                                    <h5><i class="fas fa-gamepad me-2"></i>Games</h5>
+                                    <p class="mb-0">Game reviews, walkthroughs, and gaming news</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="content-category category-apps" data-category="apps">
+                                    <h5><i class="fas fa-mobile-alt me-2"></i>Apps</h5>
+                                    <p class="mb-0">App reviews, tips, and productivity hacks</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="section-view d-none">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Story Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="performance-chart" width="100%" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Top Performing Categories</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="category-chart" width="100%" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Platform Engagement</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="platform-icon facebook-color">
+                                            <i class="fab fa-facebook"></i>
+                                        </div>
+                                        <h4 id="facebook-engagement">0%</h4>
+                                        <p class="text-muted">Facebook</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="platform-icon instagram-color">
+                                            <i class="fab fa-instagram"></i>
+                                        </div>
+                                        <h4 id="instagram-engagement">0%</h4>
+                                        <p class="text-muted">Instagram</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="platform-icon tiktok-color">
+                                            <i class="fab fa-tiktok"></i>
+                                        </div>
+                                        <h4 id="tiktok-engagement">0%</h4>
+                                        <p class="text-muted">TikTok</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Best Time to Post</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="best-time-chart">
+                                    <canvas id="time-chart" width="100%" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel View -->
+            <div id="admin-panel-view" class="section-view d-none">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="admin-sidebar">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#" data-admin-tab="users">User Management</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-admin-tab="platforms">Platform Settings</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-admin-tab="content">Content Moderation</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-admin-tab="analytics">System Analytics</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-admin-tab="api">API Configuration</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div id="admin-users" class="admin-tab-content">
+                            <h3>User Management</h3>
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Stories</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="users-table">
+                                            <!-- Users will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="admin-platforms" class="admin-tab-content d-none">
+                            <h3>Platform Settings</h3>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h5>Facebook Integration</h5>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="facebook-integration">
+                                            <label class="form-check-label" for="facebook-integration">Enable Facebook Integration</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="facebook-app-id" class="form-label">App ID</label>
+                                            <input type="text" class="form-control" id="facebook-app-id" placeholder="Facebook App ID">
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="facebook-app-secret" class="form-label">App Secret</label>
+                                            <input type="password" class="form-control" id="facebook-app-secret" placeholder="Facebook App Secret">
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3">
+                                        <h5>Instagram Integration</h5>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="instagram-integration">
+                                            <label class="form-check-label" for="instagram-integration">Enable Instagram Integration</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="instagram-app-id" class="form-label">App ID</label>
+                                            <input type="text" class="form-control" id="instagram-app-id" placeholder="Instagram App ID">
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="instagram-app-secret" class="form-label">App Secret</label>
+                                            <input type="password" class="form-control" id="instagram-app-secret" placeholder="Instagram App Secret">
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3">
+                                        <h5>TikTok Integration</h5>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="tiktok-integration">
+                                            <label class="form-check-label" for="tiktok-integration">Enable TikTok Integration</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="tiktok-app-id" class="form-label">App ID</label>
+                                            <input type="text" class="form-control" id="tiktok-app-id" placeholder="TikTok App ID">
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="tiktok-app-secret" class="form-label">App Secret</label>
+                                            <input type="password" class="form-control" id="tiktok-app-secret" placeholder="TikTok App Secret">
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary">Save Platform Settings</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="admin-content" class="admin-tab-content d-none">
+                            <h3>Content Moderation</h3>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h5>Auto-Moderation Settings</h5>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto-moderation">
+                                            <label class="form-check-label" for="auto-moderation">Enable Auto-Moderation</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="moderation-level" class="form-label">Moderation Level</label>
+                                            <select class="form-select" id="moderation-level">
+                                                <option value="low">Low - Basic filtering</option>
+                                                <option value="medium" selected>Medium - Standard filtering</option>
+                                                <option value="high">High - Strict filtering</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <h5>Flagged Content</h5>
+                                    <div id="flagged-content">
+                                        <p class="text-muted">No flagged content at the moment.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="admin-analytics" class="admin-tab-content d-none">
+                            <h3>System Analytics</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5>Platform Usage</h5>
+                                            <canvas id="system-usage-chart" width="100%" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5>User Growth</h5>
+                                            <canvas id="user-growth-chart" width="100%" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5>System Performance</h5>
+                                            <div class="row text-center">
+                                                <div class="col-md-3">
+                                                    <div class="stat-number" id="server-uptime">99.9%</div>
+                                                    <div class="text-muted">Server Uptime</div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="stat-number" id="avg-response">120ms</div>
+                                                    <div class="text-muted">Avg. Response Time</div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="stat-number" id="active-users">245</div>
+                                                    <div class="text-muted">Active Users</div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="stat-number" id="stories-today">1,234</div>
+                                                    <div class="text-muted">Stories Today</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="admin-api" class="admin-tab-content d-none">
+                            <h3>API Configuration</h3>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h5>DeepSec API Settings</h5>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="deepsec-api-enabled" checked>
+                                            <label class="form-check-label" for="deepsec-api-enabled">Enable DeepSec API</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="deepsec-api-key" class="form-label">API Key</label>
+                                            <input type="password" class="form-control" id="deepsec-api-key" placeholder="DeepSec API Key">
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="deepsec-api-endpoint" class="form-label">API Endpoint</label>
+                                            <input type="text" class="form-control" id="deepsec-api-endpoint" value="https://api.deepsec.ai/v1/generate" placeholder="API Endpoint">
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3">
+                                        <h5>API Usage Statistics</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <strong>Requests Today:</strong> <span id="api-requests-today">142</span>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <strong>Requests This Month:</strong> <span id="api-requests-month">3,245</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <strong>Success Rate:</strong> <span id="api-success-rate">98.7%</span>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <strong>Average Response Time:</strong> <span id="api-response-time">320ms</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary">Save API Settings</button>
+                                        <button class="btn btn-outline-secondary">Test API Connection</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile View -->
+            <div id="profile-view" class="section-view d-none">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                        <span class="text-white fw-bold" style="font-size: 2rem;" id="profile-initials">U</span>
+                                    </div>
+                                </div>
+                                <h4 id="profile-name">User Name</h4>
+                                <p class="text-muted" id="profile-email">user@example.com</p>
+                                <button class="btn btn-outline-primary btn-sm">Change Avatar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Profile Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="profile-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-first-name" class="form-label">First Name</label>
+                                                <input type="text" class="form-control" id="profile-first-name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-last-name" class="form-label">Last Name</label>
+                                                <input type="text" class="form-control" id="profile-last-name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="profile-email-input" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-bio" class="form-label">Bio</label>
+                                        <textarea class="form-control" id="profile-bio" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-company" class="form-label">Company</label>
+                                        <input type="text" class="form-control" id="profile-company">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="section-view d-none">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Account Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="settings-form">
+                                    <div class="mb-3">
+                                        <h6>Notification Preferences</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-email">
+                                            <label class="form-check-label" for="notify-email">Email Notifications</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-sms">
+                                            <label class="form-check-label" for="notify-sms">SMS Notifications</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-push">
+                                            <label class="form-check-label" for="notify-push">Push Notifications</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6>Privacy Settings</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="privacy-profile">
+                                            <label class="form-check-label" for="privacy-profile">Make profile public</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="privacy-activity">
+                                            <label class="form-check-label" for="privacy-activity">Show activity to other users</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6>Auto-Posting</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto-posting">
+                                            <label class="form-check-label" for="auto-posting">Enable Auto-Posting</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="auto-posting-time" class="form-label">Preferred Posting Time</label>
+                                            <select class="form-select" id="auto-posting-time">
+                                                <option value="morning">Morning (8 AM - 12 PM)</option>
+                                                <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                                                <option value="evening">Evening (5 PM - 9 PM)</option>
+                                                <option value="night">Night (9 PM - 12 AM)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Change Password</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="password-form">
+                                    <div class="mb-3">
+                                        <label for="current-password" class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" id="current-password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new-password" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="new-password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirm-password" class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" id="confirm-password">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Change Password</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+    // socialstory-platform.js
+// Production-ready JavaScript for SocialStory Scheduler v3.5
+
+class SocialStoryPlatform {
+    constructor() {
+        this.currentUser = null;
+        this.userData = null;
+        this.stories = [];
+        this.scheduledStories = [];
+        this.charts = {};
+        this.isInitialized = false;
+        
+        // Initialize the platform when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            this.initializePlatform();
+        });
+    }
+
+    // Initialize the entire platform
+    initializePlatform() {
+        if (this.isInitialized) return;
+        
+        console.log('Initializing SocialStory Platform v3.5...');
+        
+        // Initialize Firebase
+        this.initializeFirebase();
+        
+        // Set up all event listeners
+        this.setupEventListeners();
+        
+        // Initialize charts
+        this.initializeCharts();
+        
+        // Check authentication state
+        this.checkAuthState();
+        
+        this.isInitialized = true;
+        console.log('SocialStory Platform initialized successfully');
+    }
+
+    // Firebase configuration and initialization
+    initializeFirebase() {
+        try {
+        
+            // Production Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyBBipgGaT3gAVa9Xd4mYcmteZRu3M5RtrM",
+                authDomain: "studio-7770709444-57468.firebaseapp.com",
+                projectId: "studio-7770709444-57468",
+                storageBucket: "studio-7770709444-57468.firebasestorage.app",
+                messagingSenderId: "1068351165450",
+                appId: "1:1068351165450:web:1cb09e5950d64d2a7afbf3"
+            };
+
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            
+            this.auth = firebase.auth();
+            this.db = firebase.firestore();
+            this.storage = firebase.storage();
+            
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            this.showNotification('Firebase initialization failed. Please check configuration.', 'error');
+        }
+    }
+
+    // Set up all event listeners
+    setupEventListeners() {
+        // Authentication forms
+        this.setupAuthEventListeners();
+        
+        // Navigation
+        this.setupNavigationEventListeners();
+        
+        // Story scheduling
+        this.setupStoryEventListeners();
+        
+        // Content generation
+        this.setupContentGenerationEventListeners();
+        
+        // Admin panel
+        this.setupAdminEventListeners();
+        
+        // Profile and settings
+        this.setupProfileEventListeners();
+        
+        // Utility event listeners
+        this.setupUtilityEventListeners();
+    }
+
+    // Authentication event listeners
+    setupAuthEventListeners() {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const googleLoginBtn = document.getElementById('google-login');
+        const googleSignupBtn = document.getElementById('google-signup');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+        }
+        
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => this.handleSignup(e));
+        }
+        
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', () => this.handleGoogleAuth('login'));
+        }
+        
+        if (googleSignupBtn) {
+            googleSignupBtn.addEventListener('click', () => this.handleGoogleAuth('signup'));
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.handleLogout());
+        }
+    }
+
+    // Navigation event listeners
+    setupNavigationEventListeners() {
+        // Main navigation
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link[data-section]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.getAttribute('data-section');
+                this.showSection(section);
+                
+                // Update active nav link
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        // Admin tabs
+        const adminTabLinks = document.querySelectorAll('[data-admin-tab]');
+        adminTabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tab = e.target.getAttribute('data-admin-tab');
+                this.showAdminTab(tab);
+                
+                adminTabLinks.forEach(nav => nav.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        // Content categories
+        const contentCategories = document.querySelectorAll('.content-category');
+        contentCategories.forEach(category => {
+            category.addEventListener('click', (e) => {
+                const categoryValue = e.currentTarget.getAttribute('data-category');
+                document.getElementById('content-category').value = categoryValue;
+                this.showSection('content');
+            });
+        });
+    }
+
+    // Story scheduling event listeners
+    setupStoryEventListeners() {
+        const scheduleForm = document.getElementById('schedule-form');
+        const storyContent = document.getElementById('story-content');
+        const storyMedia = document.getElementById('story-media');
+
+        if (scheduleForm) {
+            scheduleForm.addEventListener('submit', (e) => this.handleScheduleStory(e));
+        }
+        
+        if (storyContent) {
+            storyContent.addEventListener('input', () => this.updateStoryPreview());
+        }
+        
+        if (storyMedia) {
+            storyMedia.addEventListener('change', (e) => this.handleMediaUpload(e));
+        }
+    }
+
+    // Content generation event listeners
+    setupContentGenerationEventListeners() {
+        const contentForm = document.getElementById('content-generator-form');
+        const useContentBtn = document.getElementById('use-content-btn');
+        const regenerateContentBtn = document.getElementById('regenerate-content-btn');
+
+        if (contentForm) {
+            contentForm.addEventListener('submit', (e) => this.handleGenerateContent(e));
+        }
+        
+        if (useContentBtn) {
+            useContentBtn.addEventListener('click', () => this.useGeneratedContent());
+        }
+        
+        if (regenerateContentBtn) {
+            regenerateContentBtn.addEventListener('click', () => this.regenerateContent());
+        }
+    }
+
+    // Admin panel event listeners
+    setupAdminEventListeners() {
+        // Platform integration toggles
+        const platformToggles = ['facebook', 'instagram', 'tiktok'];
+        platformToggles.forEach(platform => {
+            const toggle = document.getElementById(`${platform}-integration`);
+            if (toggle) {
+                toggle.addEventListener('change', (e) => this.togglePlatformIntegration(platform, e.target.checked));
+            }
+        });
+
+        // Auto-moderation toggle
+        const autoModerationToggle = document.getElementById('auto-moderation');
+        if (autoModerationToggle) {
+            autoModerationToggle.addEventListener('change', (e) => this.toggleAutoModeration(e.target.checked));
+        }
+
+        // API configuration
+        const apiToggle = document.getElementById('deepsec-api-enabled');
+        if (apiToggle) {
+            apiToggle.addEventListener('change', (e) => this.toggleDeepSecAPI(e.target.checked));
+        }
+
+        // Save platform settings
+        const savePlatformBtn = document.querySelector('#admin-platforms .btn-primary');
+        if (savePlatformBtn) {
+            savePlatformBtn.addEventListener('click', () => this.savePlatformSettings());
+        }
+
+        // Save API settings
+        const saveAPIBtn = document.querySelector('#admin-api .btn-primary');
+        if (saveAPIBtn) {
+            saveAPIBtn.addEventListener('click', () => this.saveAPISettings());
+        }
+
+        // Test API connection
+        const testAPIBtn = document.querySelector('#admin-api .btn-outline-secondary');
+        if (testAPIBtn) {
+            testAPIBtn.addEventListener('click', () => this.testAPIConnection());
+        }
+    }
+
+    // Profile and settings event listeners
+    setupProfileEventListeners() {
+        const profileForm = document.getElementById('profile-form');
+        const settingsForm = document.getElementById('settings-form');
+        const passwordForm = document.getElementById('password-form');
+
+        if (profileForm) {
+            profileForm.addEventListener('submit', (e) => this.handleProfileUpdate(e));
+        }
+        
+        if (settingsForm) {
+            settingsForm.addEventListener('submit', (e) => this.handleSettingsUpdate(e));
+        }
+        
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', (e) => this.handlePasswordChange(e));
+        }
+    }
+
+    // Utility event listeners
+    setupUtilityEventListeners() {
+        // Handle window resize for responsive charts
+        window.addEventListener('resize', () => {
+            Object.values(this.charts).forEach(chart => {
+                if (chart && typeof chart.resize === 'function') {
+                    chart.resize();
+                }
+            });
+        });
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && this.currentUser) {
+                // Refresh data when page becomes visible again
+                this.refreshDashboardData();
+            }
+        });
+    }
+
+    // Authentication state management
+    checkAuthState() {
+        if (!this.auth) return;
+        
+        this.auth.onAuthStateChanged((user) => {
+            if (user) {
+                this.currentUser = user;
+                this.loadUserData(user.uid);
+                this.showDashboard();
+                this.updateUserInfo(user);
+            } else {
+                this.currentUser = null;
+                this.userData = null;
+                this.showAuth();
+            }
+        });
+    }
+
+    // Handle user login
+    async handleLogin(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        if (!email || !password) {
+            this.showNotification('Please enter both email and password', 'error');
+            return;
+        }
+        
+        this.showLoading('Logging in...');
+        
+        try {
+            const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
+            console.log('User logged in:', userCredential.user);
+            this.showNotification('Login successful!', 'success');
+        } catch (error) {
+            console.error('Login error:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle user signup
+    async handleSignup(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('signup-confirm-password').value;
+        
+        if (!name || !email || !password || !confirmPassword) {
+            this.showNotification('Please fill in all fields', 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            this.showNotification('Passwords do not match', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            this.showNotification('Password should be at least 6 characters', 'error');
+            return;
+        }
+        
+        this.showLoading('Creating your account...');
+        
+        try {
+            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            // Update profile with name
+            await user.updateProfile({
+                displayName: name
+            });
+            
+            // Create user document in Firestore
+            await this.db.collection('users').doc(user.uid).set({
+                name: name,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                role: 'user',
+                preferences: {
+                    notifications: {
+                        email: true,
+                        sms: false,
+                        push: true
+                    },
+                    privacy: {
+                        publicProfile: false,
+                        showActivity: true
+                    },
+                    autoPosting: {
+                        enabled: false,
+                        preferredTime: 'evening'
+                    }
+                }
+            });
+            
+            console.log('User created and profile updated');
+            this.showNotification('Account created successfully!', 'success');
+        } catch (error) {
+            console.error('Signup error:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle Google authentication
+    async handleGoogleAuth(action) {
+        this.showLoading(`${action === 'login' ? 'Logging in' : 'Signing up'} with Google...`);
+        
+        try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            const result = await this.auth.signInWithPopup(provider);
+            const user = result.user;
+            
+            // Check if user exists in Firestore
+            const userDoc = await this.db.collection('users').doc(user.uid).get();
+            
+            if (!userDoc.exists) {
+                // Create user document if it doesn't exist
+                await this.db.collection('users').doc(user.uid).set({
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'user',
+                    preferences: {
+                        notifications: {
+                            email: true,
+                            sms: false,
+                            push: true
+                        },
+                        privacy: {
+                            publicProfile: false,
+                            showActivity: true
+                        },
+                        autoPosting: {
+                            enabled: false,
+                            preferredTime: 'evening'
+                        }
+                    }
+                });
+            }
+            
+            console.log(`Google ${action} successful:`, user);
+            this.showNotification(`${action === 'login' ? 'Login' : 'Signup'} successful!`, 'success');
+        } catch (error) {
+            console.error(`Google ${action} error:`, error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle user logout
+    async handleLogout() {
+        try {
+            await this.auth.signOut();
+            console.log('User signed out');
+            this.showNotification('Logged out successfully', 'info');
+        } catch (error) {
+            console.error('Logout error:', error);
+            this.showNotification('Error during logout', 'error');
+        }
+    }
+
+    // Load user data from Firestore
+    async loadUserData(userId) {
+        try {
+            const userDoc = await this.db.collection('users').doc(userId).get();
+            
+            if (userDoc.exists) {
+                this.userData = userDoc.data();
+                this.userData.id = userId;
+                
+                // Load user-specific data
+                this.loadDashboardData();
+                this.loadScheduledStories();
+                this.loadRecentActivity();
+                
+                // Load admin data if user is admin
+                if (this.userData.role === 'admin') {
+                    this.loadAdminData();
+                }
+                
+                // Load profile data
+                this.loadProfileData();
+            } else {
+                console.error('User document not found');
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error);
+        }
+    }
+
+    // Load dashboard data
+    async loadDashboardData() {
+        if (!this.currentUser) return;
+        
+        try {
+            // Get stories for this user
+            const storiesSnapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .get();
+            
+            this.stories = [];
+            storiesSnapshot.forEach(doc => {
+                this.stories.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            // Calculate statistics
+            const totalStories = this.stories.length;
+            const scheduledStories = this.stories.filter(story => story.status === 'scheduled').length;
+            const publishedStories = this.stories.filter(story => story.status === 'published').length;
+            
+            // Calculate engagement rate (simulated based on published stories)
+            const engagementRate = publishedStories > 0 ? 
+                Math.min(95, Math.floor((publishedStories / totalStories) * 100)) : 0;
+            
+            // Update dashboard statistics
+            document.getElementById('total-stories').textContent = totalStories;
+            document.getElementById('scheduled-stories').textContent = scheduledStories;
+            document.getElementById('published-stories').textContent = publishedStories;
+            document.getElementById('engagement-rate').textContent = engagementRate + '%';
+            
+            // Update platform engagement (simulated)
+            document.getElementById('facebook-engagement').textContent = 
+                Math.floor(Math.random() * 10) + 5 + '%';
+            document.getElementById('instagram-engagement').textContent = 
+                Math.floor(Math.random() * 15) + 10 + '%';
+            document.getElementById('tiktok-engagement').textContent = 
+                Math.floor(Math.random() * 20) + 15 + '%';
+            
+            // Update charts with real data
+            this.updateDashboardCharts();
+            
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+
+    // Load scheduled stories
+    async loadScheduledStories() {
+        if (!this.currentUser) return;
+        
+        const scheduledStoriesList = document.getElementById('scheduled-stories-list');
+        if (!scheduledStoriesList) return;
+        
+        try {
+            const scheduledStoriesSnapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .where('status', '==', 'scheduled')
+                .orderBy('scheduledTime', 'asc')
+                .get();
+            
+            this.scheduledStories = [];
+            scheduledStoriesSnapshot.forEach(doc => {
+                this.scheduledStories.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            if (this.scheduledStories.length === 0) {
+                scheduledStoriesList.innerHTML = '<p class="text-muted text-center py-4">No scheduled stories found.</p>';
+                return;
+            }
+            
+            let html = '';
+            this.scheduledStories.forEach(story => {
+                const scheduledTime = story.scheduledTime.toDate();
+                const formattedTime = scheduledTime.toLocaleString();
+                
+                html += `
+                    <div class="scheduled-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>${story.content.substring(0, 50)}${story.content.length > 50 ? '...' : ''}</h6>
+                                <p class="mb-1"><small class="text-muted">Scheduled for: ${formattedTime}</small></p>
+                                <div class="mb-2">
+                                    ${story.platforms.map(platform => 
+                                        `<span class="platform-badge badge-${platform} me-1">${platform.charAt(0).toUpperCase() + platform.slice(1)}</span>`
+                                    ).join('')}
+                                </div>
+                                <span class="badge bg-secondary">${story.category}</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="socialStoryPlatform.cancelStory('${story.id}')">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            scheduledStoriesList.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Error loading scheduled stories:', error);
+            scheduledStoriesList.innerHTML = '<p class="text-danger text-center py-4">Error loading scheduled stories.</p>';
+        }
+    }
+
+    // Load recent activity
+    async loadRecentActivity() {
+        if (!this.currentUser) return;
+        
+        const recentActivity = document.getElementById('recent-activity');
+        if (!recentActivity) return;
+        
+        try {
+            const activitySnapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .limit(5)
+                .get();
+            
+            if (activitySnapshot.empty) {
+                recentActivity.innerHTML = '<p class="text-muted text-center py-4">No recent activity.</p>';
+                return;
+            }
+            
+            let html = '';
+            activitySnapshot.forEach(doc => {
+                const story = doc.data();
+                const createdAt = story.createdAt.toDate();
+                const timeAgo = this.getTimeAgo(createdAt);
+                
+                html += `
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-camera text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">Story ${story.status}</h6>
+                            <p class="mb-0 text-muted">${story.content.substring(0, 60)}${story.content.length > 60 ? '...' : ''}</p>
+                            <small class="text-muted">${timeAgo}</small>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            recentActivity.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Error loading recent activity:', error);
+            recentActivity.innerHTML = '<p class="text-danger text-center py-4">Error loading recent activity.</p>';
+        }
+    }
+
+    // Handle story scheduling
+    async handleScheduleStory(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser) {
+            this.showNotification('Please log in to schedule stories', 'error');
+            return;
+        }
+        
+        const platforms = [];
+        if (document.getElementById('platform-facebook').checked) platforms.push('facebook');
+        if (document.getElementById('platform-instagram').checked) platforms.push('instagram');
+        if (document.getElementById('platform-tiktok').checked) platforms.push('tiktok');
+        
+        if (platforms.length === 0) {
+            this.showNotification('Please select at least one platform', 'error');
+            return;
+        }
+        
+        const scheduleDate = document.getElementById('schedule-date').value;
+        const content = document.getElementById('story-content').value;
+        const category = document.getElementById('story-category').value;
+        
+        if (!scheduleDate) {
+            this.showNotification('Please select a schedule date and time', 'error');
+            return;
+        }
+        
+        if (!content.trim()) {
+            this.showNotification('Please enter story content', 'error');
+            return;
+        }
+        
+        this.showLoading('Scheduling your story...');
+        
+        try {
+            // Handle media upload if present
+            let mediaUrl = null;
+            const mediaFile = document.getElementById('story-media').files[0];
+            
+            if (mediaFile) {
+                mediaUrl = await this.uploadMedia(mediaFile);
+            }
+            
+            // Add to Firestore
+            await this.db.collection('stories').add({
+                userId: this.currentUser.uid,
+                platforms: platforms,
+                content: content,
+                category: category,
+                mediaUrl: mediaUrl,
+                scheduledTime: new Date(scheduleDate),
+                status: 'scheduled',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                engagement: {
+                    views: 0,
+                    clicks: 0,
+                    shares: 0
+                }
+            });
+            
+            this.showNotification('Story scheduled successfully!', 'success');
+            
+            // Reset form
+            document.getElementById('schedule-form').reset();
+            document.getElementById('preview-text').textContent = 'Your story content will appear here';
+            document.getElementById('preview-image').classList.add('d-none');
+            
+            // Reload data
+            this.loadDashboardData();
+            this.loadScheduledStories();
+            this.loadRecentActivity();
+            
+        } catch (error) {
+            console.error('Error scheduling story:', error);
+            this.showNotification('Error scheduling story: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Upload media file to Firebase Storage
+    async uploadMedia(file) {
+        return new Promise((resolve, reject) => {
+            const storageRef = this.storage.ref();
+            const fileRef = storageRef.child(`stories/${this.currentUser.uid}/${Date.now()}_${file.name}`);
+            
+            const uploadTask = fileRef.put(file);
+            
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // Progress monitoring can be implemented here
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                },
+                (error) => {
+                    reject(error);
+                },
+                async () => {
+                    try {
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        resolve(downloadURL);
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            );
+        });
+    }
+
+    // Cancel a scheduled story
+    async cancelStory(storyId) {
+        if (!confirm('Are you sure you want to cancel this story?')) return;
+        
+        try {
+            await this.db.collection('stories').doc(storyId).update({
+                status: 'cancelled',
+                cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            this.showNotification('Story cancelled successfully', 'success');
+            
+            // Reload scheduled stories
+            this.loadScheduledStories();
+            this.loadDashboardData();
+            
+        } catch (error) {
+            console.error('Error cancelling story:', error);
+            this.showNotification('Error cancelling story: ' + error.message, 'error');
+        }
+    }
+
+    // Handle content generation
+    async handleGenerateContent(e) {
+        e.preventDefault();
+        
+        const category = document.getElementById('content-category').value;
+        const topic = document.getElementById('content-topic').value;
+        const tone = document.getElementById('content-tone').value;
+        
+        if (!category) {
+            this.showNotification('Please select a category', 'error');
+            return;
+        }
+        
+        this.showContentLoading(true);
+        
+        try {
+            // In a real implementation, this would call the DeepSec API
+            const content = await this.generateAIContent(category, topic, tone);
+            
+            document.getElementById('generated-content').innerHTML = `<p>${content}</p>`;
+            document.getElementById('content-actions').classList.remove('d-none');
+            
+        } catch (error) {
+            console.error('Error generating content:', error);
+            this.showNotification('Error generating content: ' + error.message, 'error');
+        } finally {
+            this.showContentLoading(false);
+        }
+    }
+
+    // Generate AI content (simulated API call)
+    async generateAIContent(category, topic, tone) {
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const contentTemplates = {
+            movies: [
+                `Just watched ${topic || 'an incredible film'} that left me speechless! The cinematography was stunning and the performances were award-worthy. Definitely adding this to my all-time favorites list! 🎬`,
+                `Movie night just got better! ${topic || 'This hidden gem'} deserves more attention. The storyline had me on the edge of my seat from start to finish. Don't miss it!`,
+                `Behind the scenes trivia: Did you know ${topic || 'this movie'} was filmed in just 30 days? The dedication of the cast and crew truly shows in every frame.`
+            ],
+            tv: [
+                `Binge-watching alert! ${topic || 'This series'} has the perfect blend of drama, suspense, and character development. Already counting down to the next season! 📺`,
+                `That plot twist in ${topic || 'the latest episode'} completely caught me off guard! This show knows how to keep viewers hooked week after week.`,
+                `Character appreciation post: The development of ${topic || 'the main character'} throughout this season has been phenomenal. Great writing and acting!`
+            ],
+            sports: [
+                `What an incredible game! ${topic || 'The determination and skill'} on display tonight was nothing short of inspirational. These athletes are true role models. 🏆`,
+                `Breaking records and making history! ${topic || 'This team'} continues to raise the bar for excellence in the sport. So proud to be a fan!`,
+                `Training insights: The dedication required to ${topic || 'perform at this level'} is immense. Respect to all the athletes pushing their limits every day.`
+            ],
+            recipes: [
+                `Just tried ${topic || 'this amazing recipe'} and it turned out perfectly! Simple ingredients but incredible flavors. Your taste buds will thank you! 🍽️`,
+                `Kitchen hack: ${topic || 'This cooking technique'} changed everything for me! Faster prep times and better results. Sharing because everyone should know this!`,
+                `Comfort food at its finest! ${topic || 'This dish'} brings back so many memories. Perfect for family dinners or when you need a little pick-me-up.`
+            ],
+            games: [
+                `New game alert! ${topic || 'The graphics are stunning'} and the gameplay is incredibly immersive. Already lost track of time playing this one! 🎮`,
+                `Pro tip: Mastering ${topic || 'this game mechanic'} will completely change your strategy. Level up your skills with these simple techniques!`,
+                `The storytelling in ${topic || 'this game'} is next level! Emotional, engaging, and with characters you truly care about. A must-play for any gamer.`
+            ],
+            apps: [
+                `${topic || 'This app'} has revolutionized how I manage my daily tasks! Intuitive design and powerful features make it a game-changer. 📱`,
+                `Productivity hack: Using ${topic || 'this app'} has saved me hours each week. The automation features are incredible and easy to set up!`,
+                `User experience done right! ${topic || 'This app'} understands exactly what users need and delivers it in the most efficient way possible.`
+            ]
+        };
+        
+        const categoryTemplates = contentTemplates[category] || contentTemplates.movies;
+        const randomIndex = Math.floor(Math.random() * categoryTemplates.length);
+        
+        return categoryTemplates[randomIndex];
+    }
+
+    // Use generated content in schedule form
+    useGeneratedContent() {
+        const generatedContent = document.getElementById('generated-content').textContent;
+        document.getElementById('story-content').value = generatedContent;
+        document.getElementById('preview-text').textContent = generatedContent;
+        this.showSection('schedule');
+        this.showNotification('Content added to story form', 'success');
+    }
+
+    // Regenerate content
+    regenerateContent() {
+        document.getElementById('content-generator-form').dispatchEvent(new Event('submit'));
+    }
+
+    // Update story preview
+    updateStoryPreview() {
+        const content = document.getElementById('story-content').value;
+        document.getElementById('preview-text').textContent = content || 'Your story content will appear here';
+    }
+
+    // Handle media upload preview
+    handleMediaUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime'];
+        if (!validTypes.includes(file.type)) {
+            this.showNotification('Please select a valid image or video file', 'error');
+            e.target.value = '';
+            return;
+        }
+        
+        // Validate file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size > maxSize) {
+            this.showNotification('File size must be less than 10MB', 'error');
+            e.target.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const previewImage = document.getElementById('preview-image');
+            previewImage.src = event.target.result;
+            previewImage.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Load admin data
+    async loadAdminData() {
+        if (this.userData.role !== 'admin') return;
+        
+        try {
+            // Load users for admin panel
+            const usersSnapshot = await this.db.collection('users').get();
+            const usersTable = document.getElementById('users-table');
+            
+            if (usersSnapshot.empty) {
+                usersTable.innerHTML = '<tr><td colspan="5" class="text-center">No users found</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            usersSnapshot.forEach(doc => {
+                const user = doc.data();
+                html += `
+                    <tr>
+                        <td>${user.name || 'N/A'}</td>
+                        <td>${user.email}</td>
+                        <td>${user.storyCount || 0}</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            usersTable.innerHTML = html;
+            
+            // Load admin analytics
+            this.updateAdminAnalytics();
+            
+        } catch (error) {
+            console.error('Error loading admin data:', error);
+        }
+    }
+
+    // Update admin analytics
+    async updateAdminAnalytics() {
+        try {
+            // Get system statistics
+            const usersCount = await this.getCollectionCount('users');
+            const storiesCount = await this.getCollectionCount('stories');
+            const scheduledCount = await this.getCollectionCountByField('stories', 'status', 'scheduled');
+            
+            // Update system performance metrics
+            document.getElementById('active-users').textContent = usersCount;
+            document.getElementById('stories-today').textContent = storiesCount;
+            
+            // Update API usage statistics (simulated)
+            document.getElementById('api-requests-today').textContent = Math.floor(Math.random() * 200) + 100;
+            document.getElementById('api-requests-month').textContent = Math.floor(Math.random() * 5000) + 3000;
+            document.getElementById('api-success-rate').textContent = '98.7%';
+            document.getElementById('api-response-time').textContent = '320ms';
+            
+        } catch (error) {
+            console.error('Error updating admin analytics:', error);
+        }
+    }
+
+    // Get count of documents in a collection
+    async getCollectionCount(collectionName) {
+        const snapshot = await this.db.collection(collectionName).get();
+        return snapshot.size;
+    }
+
+    // Get count of documents by field value
+    async getCollectionCountByField(collectionName, field, value) {
+        const snapshot = await this.db.collection(collectionName)
+            .where(field, '==', value)
+            .get();
+        return snapshot.size;
+    }
+
+    // Toggle platform integration
+    togglePlatformIntegration(platform, enabled) {
+        console.log(`${platform} integration ${enabled ? 'enabled' : 'disabled'}`);
+        // In a real implementation, this would update the platform settings in the database
+    }
+
+    // Toggle auto-moderation
+    toggleAutoModeration(enabled) {
+        console.log(`Auto-moderation ${enabled ? 'enabled' : 'disabled'}`);
+        // In a real implementation, this would update the moderation settings in the database
+    }
+
+    // Toggle DeepSec API
+    toggleDeepSecAPI(enabled) {
+        console.log(`DeepSec API ${enabled ? 'enabled' : 'disabled'}`);
+        // In a real implementation, this would update the API settings in the database
+    }
+
+    // Save platform settings
+    async savePlatformSettings() {
+        this.showLoading('Saving platform settings...');
+        
+        try {
+            // In a real implementation, this would save the settings to the database
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            this.showNotification('Platform settings saved successfully', 'success');
+        } catch (error) {
+            console.error('Error saving platform settings:', error);
+            this.showNotification('Error saving platform settings', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Save API settings
+    async saveAPISettings() {
+        this.showLoading('Saving API settings...');
+        
+        try {
+            // In a real implementation, this would save the API settings to the database
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            this.showNotification('API settings saved successfully', 'success');
+        } catch (error) {
+            console.error('Error saving API settings:', error);
+            this.showNotification('Error saving API settings', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Test API connection
+    async testAPIConnection() {
+        this.showLoading('Testing API connection...');
+        
+        try {
+            // Simulate API test
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Random success/failure for simulation
+            const isSuccess = Math.random() > 0.2;
+            
+            if (isSuccess) {
+                this.showNotification('API connection test successful!', 'success');
+            } else {
+                this.showNotification('API connection test failed. Please check your settings.', 'error');
+            }
+        } catch (error) {
+            console.error('Error testing API connection:', error);
+            this.showNotification('Error testing API connection', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Load profile data
+    loadProfileData() {
+        if (!this.userData) return;
+        
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileEmailInput = document.getElementById('profile-email-input');
+        const profileInitials = document.getElementById('profile-initials');
+        const profileFirstName = document.getElementById('profile-first-name');
+        const profileLastName = document.getElementById('profile-last-name');
+        const profileBio = document.getElementById('profile-bio');
+        const profileCompany = document.getElementById('profile-company');
+        
+        if (profileName) profileName.textContent = this.userData.name || 'User Name';
+        if (profileEmail) profileEmail.textContent = this.userData.email;
+        if (profileEmailInput) profileEmailInput.value = this.userData.email;
+        
+        // Set profile initials
+        if (profileInitials) {
+            const initials = this.userData.name ? 
+                this.userData.name.split(' ').map(n => n[0]).join('').toUpperCase() : 
+                this.userData.email[0].toUpperCase();
+            profileInitials.textContent = initials;
+        }
+        
+        // Set profile form fields
+        if (profileFirstName && profileLastName && this.userData.name) {
+            const nameParts = this.userData.name.split(' ');
+            profileFirstName.value = nameParts[0] || '';
+            profileLastName.value = nameParts.slice(1).join(' ') || '';
+        }
+        
+        if (profileBio) profileBio.value = this.userData.bio || '';
+        if (profileCompany) profileCompany.value = this.userData.company || '';
+        
+        // Load settings
+        this.loadSettingsData();
+    }
+
+    // Load settings data
+    loadSettingsData() {
+        if (!this.userData || !this.userData.preferences) return;
+        
+        const preferences = this.userData.preferences;
+        
+        // Notification preferences
+        if (document.getElementById('notify-email')) {
+            document.getElementById('notify-email').checked = preferences.notifications.email;
+        }
+        if (document.getElementById('notify-sms')) {
+            document.getElementById('notify-sms').checked = preferences.notifications.sms;
+        }
+        if (document.getElementById('notify-push')) {
+            document.getElementById('notify-push').checked = preferences.notifications.push;
+        }
+        
+        // Privacy settings
+        if (document.getElementById('privacy-profile')) {
+            document.getElementById('privacy-profile').checked = preferences.privacy.publicProfile;
+        }
+        if (document.getElementById('privacy-activity')) {
+            document.getElementById('privacy-activity').checked = preferences.privacy.showActivity;
+        }
+        
+        // Auto-posting settings
+        if (document.getElementById('auto-posting')) {
+            document.getElementById('auto-posting').checked = preferences.autoPosting.enabled;
+        }
+        if (document.getElementById('auto-posting-time')) {
+            document.getElementById('auto-posting-time').value = preferences.autoPosting.preferredTime;
+        }
+    }
+
+    // Handle profile update
+    async handleProfileUpdate(e) {
+        e.preventDefault();
+        
+        const firstName = document.getElementById('profile-first-name').value;
+        const lastName = document.getElementById('profile-last-name').value;
+        const bio = document.getElementById('profile-bio').value;
+        const company = document.getElementById('profile-company').value;
+        
+        const fullName = `${firstName} ${lastName}`.trim();
+        
+        this.showLoading('Updating profile...');
+        
+        try {
+            // Update user document in Firestore
+            await this.db.collection('users').doc(this.currentUser.uid).update({
+                name: fullName,
+                bio: bio,
+                company: company,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Update user profile in Firebase Auth
+            await this.currentUser.updateProfile({
+                displayName: fullName
+            });
+            
+            // Reload user data
+            await this.loadUserData(this.currentUser.uid);
+            
+            this.showNotification('Profile updated successfully', 'success');
+            
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            this.showNotification('Error updating profile: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle settings update
+    async handleSettingsUpdate(e) {
+        e.preventDefault();
+        
+        const notifyEmail = document.getElementById('notify-email').checked;
+        const notifySMS = document.getElementById('notify-sms').checked;
+        const notifyPush = document.getElementById('notify-push').checked;
+        const privacyProfile = document.getElementById('privacy-profile').checked;
+        const privacyActivity = document.getElementById('privacy-activity').checked;
+        const autoPosting = document.getElementById('auto-posting').checked;
+        const autoPostingTime = document.getElementById('auto-posting-time').value;
+        
+        this.showLoading('Updating settings...');
+        
+        try {
+            await this.db.collection('users').doc(this.currentUser.uid).update({
+                'preferences.notifications.email': notifyEmail,
+                'preferences.notifications.sms': notifySMS,
+                'preferences.notifications.push': notifyPush,
+                'preferences.privacy.publicProfile': privacyProfile,
+                'preferences.privacy.showActivity': privacyActivity,
+                'preferences.autoPosting.enabled': autoPosting,
+                'preferences.autoPosting.preferredTime': autoPostingTime,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            this.showNotification('Settings updated successfully', 'success');
+            
+        } catch (error) {
+            console.error('Error updating settings:', error);
+            this.showNotification('Error updating settings: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle password change
+    async handlePasswordChange(e) {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            this.showNotification('Please fill in all password fields', 'error');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            this.showNotification('New passwords do not match', 'error');
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            this.showNotification('New password should be at least 6 characters', 'error');
+            return;
+        }
+        
+        this.showLoading('Changing password...');
+        
+        try {
+            // Reauthenticate user
+            const credential = firebase.auth.EmailAuthProvider.credential(
+                this.currentUser.email, 
+                currentPassword
+            );
+            
+            await this.currentUser.reauthenticateWithCredential(credential);
+            
+            // Update password
+            await this.currentUser.updatePassword(newPassword);
+            
+            document.getElementById('password-form').reset();
+            this.showNotification('Password changed successfully', 'success');
+            
+        } catch (error) {
+            console.error('Error changing password:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Show/hide authentication section
+    showAuth() {
+        document.getElementById('auth-section').classList.remove('d-none');
+        document.getElementById('dashboard-section').classList.add('d-none');
+    }
+
+    // Show/hide dashboard section
+    showDashboard() {
+        document.getElementById('auth-section').classList.add('d-none');
+        document.getElementById('dashboard-section').classList.remove('d-none');
+        this.showSection('dashboard');
+    }
+
+    // Show specific section
+    showSection(sectionName) {
+        // Hide all sections
+        document.querySelectorAll('.section-view').forEach(view => {
+            view.classList.add('d-none');
+        });
+        
+        // Show requested section
+        const section = document.getElementById(`${sectionName}-view`);
+        if (section) {
+            section.classList.remove('d-none');
+            
+            // Load section-specific data
+            this.loadSectionData(sectionName);
+        }
+    }
+
+    // Show admin tab
+    showAdminTab(tabName) {
+        // Hide all admin tabs
+        document.querySelectorAll('.admin-tab-content').forEach(tab => {
+            tab.classList.add('d-none');
+        });
+        
+        // Show requested tab
+        const tab = document.getElementById(`admin-${tabName}`);
+        if (tab) {
+            tab.classList.remove('d-none');
+        }
+    }
+
+    // Load section-specific data
+    loadSectionData(sectionName) {
+        switch (sectionName) {
+            case 'dashboard':
+                this.loadDashboardData();
+                break;
+            case 'schedule':
+                this.loadScheduledStories();
+                break;
+            case 'analytics':
+                this.updateAnalyticsCharts();
+                break;
+            case 'admin-panel':
+                if (this.userData && this.userData.role === 'admin') {
+                    this.loadAdminData();
+                }
+                break;
+        }
+    }
+
+    // Refresh dashboard data
+    refreshDashboardData() {
+        if (this.currentUser) {
+            this.loadDashboardData();
+            this.loadScheduledStories();
+            this.loadRecentActivity();
+        }
+    }
+
+    // Initialize charts
+    initializeCharts() {
+        // Platform Performance Chart
+        const platformCtx = document.getElementById('platform-chart');
+        if (platformCtx) {
+            this.charts.platform = new Chart(platformCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Facebook', 'Instagram', 'TikTok'],
+                    datasets: [{
+                        data: [30, 45, 25],
+                        backgroundColor: ['#3b5998', '#e1306c', '#000000'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Performance Chart
+        const performanceCtx = document.getElementById('performance-chart');
+        if (performanceCtx) {
+            this.charts.performance = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Stories Published',
+                        data: [12, 19, 15, 25, 22, 30],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Engagement Rate',
+                        data: [65, 59, 70, 75, 72, 80],
+                        borderColor: '#f72585',
+                        backgroundColor: 'rgba(247, 37, 133, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Category Chart
+        const categoryCtx = document.getElementById('category-chart');
+        if (categoryCtx) {
+            this.charts.category = new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Movies', 'TV', 'Sports', 'Recipes', 'Games', 'Apps'],
+                    datasets: [{
+                        label: 'Engagement',
+                        data: [85, 78, 92, 65, 88, 72],
+                        backgroundColor: [
+                            '#ff6b6b', '#4ecdc4', '#45b7d1', 
+                            '#f9c74f', '#9d4edd', '#f8961e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Time Chart
+        const timeCtx = document.getElementById('time-chart');
+        if (timeCtx) {
+            this.charts.time = new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['6AM', '9AM', '12PM', '3PM', '6PM', '9PM'],
+                    datasets: [{
+                        label: 'Engagement',
+                        data: [35, 65, 80, 75, 90, 70],
+                        backgroundColor: '#4361ee'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // System Usage Chart
+        const systemUsageCtx = document.getElementById('system-usage-chart');
+        if (systemUsageCtx) {
+            this.charts.systemUsage = new Chart(systemUsageCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Content Generation', 'Scheduling', 'Analytics', 'User Management'],
+                    datasets: [{
+                        data: [40, 30, 20, 10],
+                        backgroundColor: ['#4361ee', '#3f37c9', '#4895ef', '#4cc9f0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // User Growth Chart
+        const userGrowthCtx = document.getElementById('user-growth-chart');
+        if (userGrowthCtx) {
+            this.charts.userGrowth = new Chart(userGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'New Users',
+                        data: [50, 75, 100, 150, 200, 300],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Update dashboard charts with real data
+    updateDashboardCharts() {
+        if (!this.stories.length) return;
+        
+        // Update platform chart based on actual platform usage
+        const platformData = {
+            facebook: 0,
+            instagram: 0,
+            tiktok: 0
+        };
+        
+        this.stories.forEach(story => {
+            story.platforms.forEach(platform => {
+                platformData[platform]++;
+            });
+        });
+        
+        const totalPlatforms = Object.values(platformData).reduce((a, b) => a + b, 0);
+        
+        if (totalPlatforms > 0 && this.charts.platform) {
+            const percentages = [
+                Math.round((platformData.facebook / totalPlatforms) * 100),
+                Math.round((platformData.instagram / totalPlatforms) * 100),
+                Math.round((platformData.tiktok / totalPlatforms) * 100)
+            ];
+            
+            this.charts.platform.data.datasets[0].data = percentages;
+            this.charts.platform.update();
+        }
+    }
+
+    // Update analytics charts
+    updateAnalyticsCharts() {
+        // In a real implementation, this would update charts with actual analytics data
+        console.log('Updating analytics charts...');
+    }
+
+    // Show loading state
+    showLoading(message = 'Loading...') {
+        // Create or show loading overlay
+        let loadingOverlay = document.getElementById('loading-overlay');
+        
+        if (!loadingOverlay) {
+            loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loading-overlay';
+            loadingOverlay.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center';
+            loadingOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            loadingOverlay.style.zIndex = '9999';
+            
+            loadingOverlay.innerHTML = `
+                <div class="bg-white rounded p-4 text-center">
+                    <div class="spinner-border text-primary mb-2"></div>
+                    <p class="mb-0">${message}</p>
+                </div>
+            `;
+            
+            document.body.appendChild(loadingOverlay);
+        } else {
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.querySelector('p').textContent = message;
+        }
+    }
+
+    // Hide loading state
+    hideLoading() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
+    }
+
+    // Show content loading state
+    showContentLoading(show) {
+        const contentLoading = document.getElementById('content-loading');
+        if (contentLoading) {
+            contentLoading.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    // Show notification
+    showNotification(message, type = 'info') {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.alert-notification');
+        existingNotifications.forEach(notification => {
+            notification.remove();
+        });
+        
+        // Create notification
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} alert-dismissible fade show alert-notification position-fixed`;
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '9999';
+        notification.style.minWidth = '300px';
+        
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    // Get authentication error message
+    getAuthErrorMessage(error) {
+        switch (error.code) {
+            case 'auth/invalid-email':
+                return 'Invalid email address';
+            case 'auth/user-disabled':
+                return 'This account has been disabled';
+            case 'auth/user-not-found':
+                return 'No account found with this email';
+            case 'auth/wrong-password':
+                return 'Incorrect password';
+            case 'auth/email-already-in-use':
+                return 'This email is already registered';
+            case 'auth/weak-password':
+                return 'Password should be at least 6 characters';
+            case 'auth/network-request-failed':
+                return 'Network error. Please check your connection';
+            default:
+                return error.message || 'An error occurred';
+        }
+    }
+
+    // Get time ago string
+    getTimeAgo(date) {
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+        
+        if (diffInSeconds < 60) {
+            return 'Just now';
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days} day${days > 1 ? 's' : ''} ago`;
+        }
+    }
+
+    // Update user info in UI
+    updateUserInfo(user) {
+        const userNameElement = document.getElementById('user-name');
+        if (userNameElement) {
+            userNameElement.textContent = user.displayName || user.email;
+        }
+    }
+}
+
+// Initialize the platform
+const socialStoryPlatform = new SocialStoryPlatform();
+
+// Make platform globally available for HTML onclick handlers
+window.socialStoryPlatform = socialStoryPlatform;
+            
+    </script>
+</body>
+</html>
