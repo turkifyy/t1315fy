@@ -1,0 +1,2654 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialStory Scheduler v4.1 - Production Enhanced</title>
+    <meta name="description" content="منصة احترافية لجدولة منشورات وسائل التواصل الاجتماعي مع توليد محتوى بالذكاء الاصطناعي، دعم متعدد المنصات، وتحليلات متقدمة">
+    <meta name="keywords" content="جدولة وسائل التواصل, جدولة القصص, فيسبوك, انستجرام, تيك توك, إدارة وسائل التواصل">
+    <meta property="og:title" content="SocialStory Scheduler - إدارة احترافية لوسائل التواصل">
+    <meta property="og:description" content="جدولة وإدارة قصص وسائل التواصل عبر منصات متعددة مع توليد محتوى بالذكاء الاصطناعي">
+    <meta property="og:type" content="website">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+        
+        /* Authentication Section */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+        }
+        
+        .auth-header h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.75rem;
+        }
+        
+        .auth-body {
+            padding: 30px;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-google:hover {
+            background-color: #c23321;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Navigation */
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+        }
+        
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+            background: white;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .dashboard-card .card-header {
+            background: white;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+        }
+        
+        /* Platform Icons */
+        .platform-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .facebook-color { color: #3b5998; }
+        .instagram-color { color: #e1306c; }
+        .tiktok-color { color: #000000; }
+        
+        /* Stat Cards */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Content Categories */
+        .content-category {
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            text-align: center;
+        }
+        
+        .content-category:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .content-category i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .category-movies { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .category-tv { background: linear-gradient(135deg, #4ecdc4, #88d3ce); }
+        .category-sports { background: linear-gradient(135deg, #45b7d1, #96cfe3); }
+        .category-recipes { background: linear-gradient(135deg, #f9c74f, #fad874); }
+        .category-games { background: linear-gradient(135deg, #9d4edd, #b57fe6); }
+        .category-apps { background: linear-gradient(135deg, #f8961e, #f9b457); }
+        
+        /* Admin Sidebar */
+        .admin-sidebar {
+            background: var(--dark-color);
+            color: white;
+            min-height: calc(100vh - 56px);
+            padding: 20px 0;
+        }
+        
+        .admin-sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin: 0 10px 5px 10px;
+            transition: all 0.3s;
+        }
+        
+        .admin-sidebar .nav-link:hover,
+        .admin-sidebar .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Story Preview */
+        .story-preview {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            height: 600px;
+            width: 340px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .story-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .story-image {
+            max-width: 100%;
+            max-height: 70%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+        
+        .preview-text {
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Scheduled Items */
+        .scheduled-item {
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .scheduled-item:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+        
+        /* Platform Badges */
+        .platform-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .badge-facebook { background: #3b5998; color: white; }
+        .badge-instagram { background: #e1306c; color: white; }
+        .badge-tiktok { background: #000000; color: white; }
+        
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        #loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9998;
+        }
+        
+        .custom-toast {
+            min-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .toast-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .toast-error {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .toast-info {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Profile Section */
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .story-preview {
+                width: 100%;
+                max-width: 340px;
+                height: 500px;
+            }
+            
+            .admin-sidebar {
+                min-height: auto;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .dashboard-card {
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Utility Classes */
+        .d-none { display: none !important; }
+        .cursor-pointer { cursor: pointer; }
+        
+        /* RTL Support */
+        body[dir="rtl"] {
+            text-align: right;
+        }
+        
+        body[dir="rtl"] .me-2 {
+            margin-right: 0 !important;
+            margin-left: 0.5rem !important;
+        }
+        
+        body[dir="rtl"] .ms-2 {
+            margin-left: 0 !important;
+            margin-right: 0.5rem !important;
+        }
+        
+        body[dir="rtl"] .me-3 {
+            margin-right: 0 !important;
+            margin-left: 1rem !important;
+        }
+        
+        body[dir="rtl"] .ms-3 {
+            margin-left: 0 !important;
+            margin-right: 1rem !important;
+        }
+        
+        body[dir="rtl"] .text-start {
+            text-align: right !important;
+        }
+        
+        body[dir="rtl"] .text-end {
+            text-align: left !important;
+        }
+    </style>
+</head>
+<body dir="rtl">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div id="loading-text">جاري التحميل...</div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Authentication Section -->
+    <div id="auth-section" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2><i class="fas fa-camera ms-2"></i>منصة SocialStory</h2>
+                <p class="mb-0">الإصدار 4.1 - محسّن للإنتاج</p>
+            </div>
+            <div class="auth-body">
+                <ul class="nav nav-pills mb-4 justify-content-center" id="auth-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login" type="button" role="tab">تسجيل الدخول</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="signup-tab" data-bs-toggle="pill" data-bs-target="#signup" type="button" role="tab">إنشاء حساب</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="auth-tabs-content">
+                    <div class="tab-pane fade show active" id="login" role="tabpanel">
+                        <form id="login-form">
+                            <div class="mb-3">
+                                <label for="login-email" class="form-label">البريد الإلكتروني</label>
+                                <input type="email" class="form-control" id="login-email" required placeholder="your@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="login-password" class="form-label">كلمة المرور</label>
+                                <input type="password" class="form-control" id="login-password" required placeholder="••••••••">
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
+                            </div>
+                        </form>
+                        <div class="text-center my-3">أو</div>
+                        <div class="d-grid">
+                            <button id="google-login" class="btn btn-google">
+                                <i class="fab fa-google ms-2"></i>تسجيل الدخول عبر Google
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="signup" role="tabpanel">
+                        <form id="signup-form">
+                            <div class="mb-3">
+                                <label for="signup-name" class="form-label">الاسم الكامل</label>
+                                <input type="text" class="form-control" id="signup-name" required placeholder="John Doe">
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-email" class="form-label">البريد الإلكتروني</label>
+                                <input type="email" class="form-control" id="signup-email" required placeholder="your@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-password" class="form-label">كلمة المرور</label>
+                                <input type="password" class="form-control" id="signup-password" required placeholder="••••••••">
+                                <small class="form-text text-muted">6 أحرف على الأقل</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-confirm-password" class="form-label">تأكيد كلمة المرور</label>
+                                <input type="password" class="form-control" id="signup-confirm-password" required placeholder="••••••••">
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary">إنشاء حساب</button>
+                            </div>
+                        </form>
+                        <div class="text-center my-3">أو</div>
+                        <div class="d-grid">
+                            <button id="google-signup" class="btn btn-google">
+                                <i class="fab fa-google ms-2"></i>إنشاء حساب عبر Google
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Section -->
+    <div id="dashboard-section" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><i class="fas fa-camera ms-2"></i>منصة SocialStory</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-section="dashboard">لوحة التحكم</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="schedule">جدولة القصص</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="content">مولد المحتوى</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="analytics">التحليلات</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="admin-panel">لوحة الإدارة</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle ms-1"></i> <span id="user-name">المستخدم</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-section="profile"><i class="fas fa-user ms-2"></i>الملف الشخصي</a></li>
+                                <li><a class="dropdown-item" href="#" data-section="settings"><i class="fas fa-cog ms-2"></i>الإعدادات</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt ms-2"></i>تسجيل الخروج</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-4 px-4">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="section-view">
+                <h2 class="mb-4">لوحة التحكم</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-stories">0</div>
+                            <div class="stat-label">إجمالي القصص</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="scheduled-stories">0</div>
+                            <div class="stat-label">المجدولة</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="published-stories">0</div>
+                            <div class="stat-label">المنشورة</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="engagement-rate">0%</div>
+                            <div class="stat-label">معدل التفاعل</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-clock ms-2"></i>النشاط الأخير</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recent-activity">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <h3>لا يوجد نشاط حديث</h3>
+                                        <p>سيظهر نشاطك هنا</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-chart-pie ms-2"></i>أداء المنصات</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="platform-chart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Stories View -->
+            <div id="schedule-view" class="section-view d-none">
+                <h2 class="mb-4">جدولة قصة جديدة</h2>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-calendar-plus ms-2"></i>إنشاء قصة</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="schedule-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-share-alt ms-2"></i>اختر المنصات</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-facebook" value="facebook">
+                                                    <label class="form-check-label" for="platform-facebook">
+                                                        <i class="fab fa-facebook facebook-color ms-1"></i> فيسبوك
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-instagram" value="instagram">
+                                                    <label class="form-check-label" for="platform-instagram">
+                                                        <i class="fab fa-instagram instagram-color ms-1"></i> انستجرام
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-tiktok" value="tiktok">
+                                                    <label class="form-check-label" for="platform-tiktok">
+                                                        <i class="fab fa-tiktok tiktok-color ms-1"></i> تيك توك
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="schedule-date" class="form-label"><i class="fas fa-calendar ms-2"></i>تاريخ ووقت الجدولة</label>
+                                                <input type="datetime-local" class="form-control" id="schedule-date" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-content" class="form-label"><i class="fas fa-edit ms-2"></i>محتوى القصة</label>
+                                        <textarea class="form-control" id="story-content" rows="5" placeholder="أدخل محتوى القصة هنا..." required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-category" class="form-label"><i class="fas fa-tag ms-2"></i>الفئة</label>
+                                        <select class="form-select" id="story-category">
+                                            <option value="movies">أفلام</option>
+                                            <option value="tv">مسلسلات تلفزيونية</option>
+                                            <option value="sports">رياضة</option>
+                                            <option value="recipes">وصفات</option>
+                                            <option value="games">ألعاب</option>
+                                            <option value="apps">تطبيقات</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-media" class="form-label"><i class="fas fa-image ms-2"></i>رفع وسائط (اختياري)</label>
+                                        <input type="file" class="form-control" id="story-media" accept="image/*,video/*">
+                                        <small class="form-text text-muted">الحد الأقصى لحجم الملف: 10MB. الصيغ المدعومة: JPG, PNG, GIF, MP4, MOV</small>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-check ms-2"></i>جدولة القصة</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-eye ms-2"></i>معاينة القصة</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="story-preview">
+                                    <div class="story-content">
+                                        <img id="preview-image" src="" alt="معاينة القصة" class="story-image d-none">
+                                        <div id="preview-text" class="preview-text">سيظهر محتوى قصتك هنا</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-list ms-2"></i>القصص المجدولة</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="scheduled-stories-list">
+                                    <div class="empty-state">
+                                        <i class="fas fa-calendar-times"></i>
+                                        <h3>لا توجد قصص مجدولة</h3>
+                                        <p>قم بجدولة قصتك الأولى أعلاه!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Generator View -->
+            <div id="content-view" class="section-view d-none">
+                <h2 class="mb-4">مولد المحتوى</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="content-category category-movies" data-category="movies">
+                            <i class="fas fa-film"></i>
+                            <h4>أفلام</h4>
+                            <p>إنشاء محتوى عن الأفلام</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-tv" data-category="tv">
+                            <i class="fas fa-tv"></i>
+                            <h4>مسلسلات تلفزيونية</h4>
+                            <p>إنشاء محتوى عن المسلسلات</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-sports" data-category="sports">
+                            <i class="fas fa-football-ball"></i>
+                            <h4>رياضة</h4>
+                            <p>إنشاء محتوى رياضي</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-recipes" data-category="recipes">
+                            <i class="fas fa-utensils"></i>
+                            <h4>وصفات</h4>
+                            <p>إنشاء محتوى الوصفات</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-games" data-category="games">
+                            <i class="fas fa-gamepad"></i>
+                            <h4>ألعاب</h4>
+                            <p>إنشاء محتوى الألعاب</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-apps" data-category="apps">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h4>تطبيقات</h4>
+                            <p>إنشاء محتوى التطبيقات</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-magic ms-2"></i>إنشاء المحتوى</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="content-generator-form">
+                                    <div class="mb-3">
+                                        <label for="content-category" class="form-label">الفئة</label>
+                                        <select class="form-select" id="content-category">
+                                            <option value="movies">أفلام</option>
+                                            <option value="tv">مسلسلات تلفزيونية</option>
+                                            <option value="sports">رياضة</option>
+                                            <option value="recipes">وصفات</option>
+                                            <option value="games">ألعاب</option>
+                                            <option value="apps">تطبيقات</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="content-keywords" class="form-label">كلمات مفتاحية (اختياري)</label>
+                                        <input type="text" class="form-control" id="content-keywords" placeholder="أدخل الكلمات المفتاحية مفصولة بفواصل">
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles ms-2"></i>إنشاء المحتوى</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-lightbulb ms-2"></i>المحتوى المُنشأ</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="generated-content-container">
+                                    <p id="generated-content" class="mb-3">انقر فوق إنشاء لإنشاء محتوى</p>
+                                    <div class="d-grid gap-2">
+                                        <button id="use-content-btn" class="btn btn-success" disabled>
+                                            <i class="fas fa-check ms-2"></i>استخدام هذا المحتوى
+                                        </button>
+                                        <button id="regenerate-content-btn" class="btn btn-outline-secondary" disabled>
+                                            <i class="fas fa-sync ms-2"></i>إعادة الإنشاء
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="section-view d-none">
+                <h2 class="mb-4">التحليلات</h2>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-chart-line ms-2"></i>الأداء عبر الزمن</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="performance-chart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-chart-bar ms-2"></i>أداء الفئات</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="category-chart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-12">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-clock ms-2"></i>أفضل أوقات النشر</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="time-chart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel View -->
+            <div id="admin-panel-view" class="section-view d-none">
+                <h2 class="mb-4">لوحة الإدارة</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="admin-sidebar">
+                            <div class="nav flex-column nav-pills" role="tablist">
+                                <a class="nav-link active" href="#" data-admin-tab="users">
+                                    <i class="fas fa-users ms-2"></i>المستخدمون
+                                </a>
+                                <a class="nav-link" href="#" data-admin-tab="platforms">
+                                    <i class="fas fa-share-alt ms-2"></i>المنصات
+                                </a>
+                                <a class="nav-link" href="#" data-admin-tab="analytics">
+                                    <i class="fas fa-chart-line ms-2"></i>تحليلات النظام
+                                </a>
+                                <a class="nav-link" href="#" data-admin-tab="api">
+                                    <i class="fas fa-code ms-2"></i>إعدادات API
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <!-- Users Tab -->
+                        <div id="admin-users" class="admin-tab-content">
+                            <div class="card dashboard-card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="fas fa-users ms-2"></i>إدارة المستخدمين</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>الاسم</th>
+                                                    <th>البريد الإلكتروني</th>
+                                                    <th>القصص</th>
+                                                    <th>الحالة</th>
+                                                    <th>الإجراءات</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="users-table">
+                                                <tr>
+                                                    <td colspan="5" class="text-center">لم يتم العثور على مستخدمين</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Platforms Tab -->
+                        <div id="admin-platforms" class="admin-tab-content d-none">
+                            <div class="card dashboard-card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="fas fa-share-alt ms-2"></i>تكاملات المنصات</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <h6>تكامل فيسبوك</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="facebook-integration">
+                                            <label class="form-check-label" for="facebook-integration">تمكين تكامل فيسبوك</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>تكامل انستجرام</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="instagram-integration">
+                                            <label class="form-check-label" for="instagram-integration">تمكين تكامل انستجرام</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>تكامل تيك توك</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="tiktok-integration">
+                                            <label class="form-check-label" for="tiktok-integration">تمكين تكامل تيك توك</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>الرقابة على المحتوى</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto-moderation">
+                                            <label class="form-check-label" for="auto-moderation">تمكين الرقابة التلقائية</label>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary"><i class="fas fa-save ms-2"></i>حفظ إعدادات المنصة</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Analytics Tab -->
+                        <div id="admin-analytics" class="admin-tab-content d-none">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="stat-card">
+                                        <div class="stat-number" id="active-users">0</div>
+                                        <div class="stat-label">المستخدمون النشطون</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stat-card">
+                                        <div class="stat-number" id="stories-today">0</div>
+                                        <div class="stat-label">القصص اليوم</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- API Settings Tab -->
+                        <div id="admin-api" class="admin-tab-content d-none">
+                            <div class="card dashboard-card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="fas fa-code ms-2"></i>تكوين API</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <h6>حالة API</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="api-enabled">
+                                            <label class="form-check-label" for="api-enabled">تمكين الوصول إلى API</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="api-key" class="form-label">مفتاح API</label>
+                                        <input type="text" class="form-control" id="api-key" value="••••••••••••••••" readonly>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>إحصائيات استخدام API</h6>
+                                        <p>الطلبات اليوم: <strong id="api-requests-today">0</strong></p>
+                                        <p>الطلبات هذا الشهر: <strong id="api-requests-month">0</strong></p>
+                                        <p>معدل النجاح: <strong id="api-success-rate">100%</strong></p>
+                                        <p>متوسط وقت الاستجابة: <strong id="api-response-time">0ms</strong></p>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary"><i class="fas fa-save ms-2"></i>حفظ إعدادات API</button>
+                                        <button class="btn btn-outline-secondary"><i class="fas fa-vial ms-2"></i>اختبار اتصال API</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile View -->
+            <div id="profile-view" class="section-view d-none">
+                <h2 class="mb-4">الملف الشخصي</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-body text-center">
+                                <div class="profile-avatar" id="profile-initials">م</div>
+                                <h4 id="profile-name">اسم المستخدم</h4>
+                                <p class="text-muted" id="profile-email">user@email.com</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-user ms-2"></i>معلومات الملف الشخصي</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="profile-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-first-name" class="form-label">الاسم الأول</label>
+                                                <input type="text" class="form-control" id="profile-first-name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-last-name" class="form-label">الاسم الأخير</label>
+                                                <input type="text" class="form-control" id="profile-last-name" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-email-input" class="form-label">البريد الإلكتروني</label>
+                                        <input type="email" class="form-control" id="profile-email-input" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-bio" class="form-label">نبذة</label>
+                                        <textarea class="form-control" id="profile-bio" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-company" class="form-label">الشركة</label>
+                                        <input type="text" class="form-control" id="profile-company">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save ms-2"></i>تحديث الملف الشخصي</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="section-view d-none">
+                <h2 class="mb-4">الإعدادات</h2>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-cog ms-2"></i>إعدادات الحساب</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="settings-form">
+                                    <div class="mb-4">
+                                        <h6>تفضيلات الإشعارات</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-email">
+                                            <label class="form-check-label" for="notify-email">إشعارات البريد الإلكتروني</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-sms">
+                                            <label class="form-check-label" for="notify-sms">إشعارات SMS</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-push">
+                                            <label class="form-check-label" for="notify-push">إشعارات الدفع</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>إعدادات الخصوصية</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="privacy-profile">
+                                            <label class="form-check-label" for="privacy-profile">جعل الملف الشخصي عامًا</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="privacy-activity">
+                                            <label class="form-check-label" for="privacy-activity">عرض النشاط للمستخدمين الآخرين</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>النشر التلقائي</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto-posting">
+                                            <label class="form-check-label" for="auto-posting">تمكين النشر التلقائي</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="auto-posting-time" class="form-label">وقت النشر المفضل</label>
+                                            <select class="form-select" id="auto-posting-time">
+                                                <option value="morning">الصباح (8 ص - 12 م)</option>
+                                                <option value="afternoon">بعد الظهر (12 م - 5 م)</option>
+                                                <option value="evening">المساء (5 م - 9 م)</option>
+                                                <option value="night">الليل (9 م - 12 ص)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save ms-2"></i>حفظ الإعدادات</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-lock ms-2"></i>تغيير كلمة المرور</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="password-form">
+                                    <div class="mb-3">
+                                        <label for="current-password" class="form-label">كلمة المرور الحالية</label>
+                                        <input type="password" class="form-control" id="current-password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new-password" class="form-label">كلمة المرور الجديدة</label>
+                                        <input type="password" class="form-control" id="new-password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirm-password" class="form-label">تأكيد كلمة المرور الجديدة</label>
+                                        <input type="password" class="form-control" id="confirm-password" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-key ms-2"></i>تغيير كلمة المرور</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+/**
+ * SocialStory Scheduler v4.1 - Production Enhanced
+ * ==============================================
+ * 
+ * منصة احترافية لجدولة منشورات وسائل التواصل الاجتماعي مع:
+ * - مصادقة Firebase (البريد الإلكتروني/كلمة المرور و Google)
+ * - قاعدة بيانات Firestore لبيانات المستخدم والجداول
+ * - تخزين Cloudflare R2 للملفات الوسائط (تكامل API للخلفية)
+ * - توليد محتوى بالذكاء الاصطناعي
+ * - جدولة متعددة المنصات (فيسبوك، انستجرام، تيك توك)
+ * - تحليلات ورؤى
+ * - لوحة إدارة
+ * 
+ * تعليمات الإعداد:
+ * ===================
+ * 1. استبدل تكوين Firebase أدناه ببيانات الاعتماد الخاصة بك
+ * 2. قم بتمكين مصادقة البريد الإلكتروني/كلمة المرور و Google في وحدة تحكم Firebase
+ * 3. قم بإعداد قاعدة بيانات Firestore مع قواعد الأمان
+ * 4. (اختياري) قم بتكوين تخزين R2 عبر لوحة الإدارة لتحميل الوسائط
+ * 
+ * احصل على تكوين Firebase: https://console.firebase.google.com/
+ * احصل على بيانات اعتماد R2: https://dash.cloudflare.com/
+ */
+
+class SocialStoryPlatform {
+    constructor() {
+        this.currentUser = null;
+        this.userData = null;
+        this.stories = [];
+        this.scheduledStories = [];
+        this.charts = {};
+        this.isInitialized = false;
+        this.generatedContent = null;
+        this.r2Configured = false;
+        this.currentMediaFile = null;
+        this.firestoreListeners = [];
+        
+        // تهيئة المنصة عند تحميل الصفحة
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initializePlatform());
+        } else {
+            this.initializePlatform();
+        }
+    }
+
+    // تهيئة المنصة بالكامل
+    initializePlatform() {
+        if (this.isInitialized) return;
+        
+        console.log('%c🚀 تهيئة منصة SocialStory الإصدار 4.1...', 'color: #4361ee; font-size: 16px; font-weight: bold');
+        
+        try {
+            this.initializeFirebase();
+            this.checkR2Status();
+            this.setupEventListeners();
+            this.checkAuthState();
+            this.isInitialized = true;
+            console.log('%c✅ تمت تهيئة المنصة بنجاح', 'color: #4cc9f0; font-size: 14px');
+        } catch (error) {
+            console.error('❌ فشل في تهيئة المنصة:', error);
+            this.showNotification('فشل في تهيئة المنصة. يرجى تحديث الصفحة.', 'error');
+        }
+    }
+
+    // تكوين Firebase وتهيئته
+    initializeFirebase() {
+        try {
+        
+            const firebaseConfig = {
+                apiKey: process.env.FIREBASE_API_KEY123,
+                authDomain: process.env.FIREBASE_AUTH_DOMAIN123,
+                projectId: process.env.FIREBASE_PROJECT_ID123,
+                storageBucket: process.env.FIREBASE_STORAGE_BUCKET123,
+                messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID123 ,
+                appId: process.env.FIREBASE_APP_ID123
+            };
+
+            // التحقق من التكوين
+            if (firebaseConfig.apiKey === process.env.FIREBASE_API_KEY123) {
+                console.warn('⚠️ Firebase غير مهيء! يرجى إضافة بيانات اعتماد Firebase في قسم البرنامج النصي.');
+                this.showNotification('يرجى تكوين بيانات اعتماد Firebase لاستخدام ميزات المصادقة.', 'warning');
+                return;
+            }
+
+            // تهيئة Firebase فقط إذا لم تكن مهيأة مسبقًا
+            if (!firebase.apps || firebase.apps.length === 0) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            
+            this.auth = firebase.auth();
+            this.db = firebase.firestore();
+            
+            console.log('✅ تمت تهيئة Firebase بنجاح');
+        } catch (error) {
+            console.error('❌ خطأ في تهيئة Firebase:', error);
+            this.showNotification('فشل في الاتصال بـ Firebase. يرجى التحقق من التكوين.', 'error');
+        }
+    }
+
+    // التحقق من حالة تخزين R2
+    async checkR2Status() {
+        try {
+            const response = await fetch('/api/r2/status');
+            if (response.ok) {
+                const data = await response.json();
+                this.r2Configured = data.isConfigured;
+                if (this.r2Configured) {
+                    console.log('✅ تم تكوين تخزين R2');
+                } else {
+                    console.warn('⚠️ لم يتم تكوين تخزين R2. سيتم تعطيل تحميل الوسائط.');
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ الخلفية لـ R2 غير متاحة. سيتم تعطيل تحميل الوسائط.');
+            this.r2Configured = false;
+        }
+    }
+
+    // تحميل ملف إلى تخزين R2 عبر API للخلفية
+    async uploadToR2(file) {
+        if (!this.r2Configured) {
+            throw new Error('لم يتم تكوين تخزين R2');
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/r2/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'فشل التحميل');
+        }
+
+        const result = await response.json();
+        return {
+            url: result.url,
+            key: result.key
+        };
+    }
+
+    // حذف ملف من تخزين R2 عبر API للخلفية
+    async deleteFromR2(key) {
+        if (!this.r2Configured || !key) return;
+
+        try {
+            const response = await fetch('/api/r2/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ key: key })
+            });
+
+            if (!response.ok) {
+                console.error('فشل في حذف الملف من R2');
+            }
+        } catch (error) {
+            console.error('خطأ في الحذف من R2:', error);
+        }
+    }
+
+    // إعداد جميع مستمعي الأحداث
+    setupEventListeners() {
+        this.setupAuthEventListeners();
+        this.setupNavigationEventListeners();
+        this.setupStoryEventListeners();
+        this.setupContentGenerationEventListeners();
+        this.setupAdminEventListeners();
+        this.setupProfileEventListeners();
+        this.setupUtilityEventListeners();
+    }
+
+    // مستمعي أحداث المصادقة
+    setupAuthEventListeners() {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const googleLoginBtn = document.getElementById('google-login');
+        const googleSignupBtn = document.getElementById('google-signup');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+        }
+        
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => this.handleSignup(e));
+        }
+        
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', () => this.handleGoogleAuth());
+        }
+        
+        if (googleSignupBtn) {
+            googleSignupBtn.addEventListener('click', () => this.handleGoogleAuth());
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleLogout();
+            });
+        }
+    }
+
+    // مستمعي أحداث التنقل
+    setupNavigationEventListeners() {
+        const navLinks = document.querySelectorAll('[data-section]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                this.showSection(section);
+                
+                // تحديث حالة التنقل النشط
+                document.querySelectorAll('.navbar-nav .nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                if (link.classList.contains('nav-link')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // علامات تبويب الإدارة
+        const adminTabLinks = document.querySelectorAll('[data-admin-tab]');
+        adminTabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tab = link.getAttribute('data-admin-tab');
+                this.showAdminTab(tab);
+                
+                adminTabLinks.forEach(nav => nav.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // فئات المحتوى
+        const contentCategories = document.querySelectorAll('.content-category');
+        contentCategories.forEach(category => {
+            category.addEventListener('click', (e) => {
+                const categoryValue = category.getAttribute('data-category');
+                const categorySelect = document.getElementById('content-category');
+                if (categorySelect) {
+                    categorySelect.value = categoryValue;
+                }
+            });
+        });
+    }
+
+    // مستمعي أحداث جدولة القصص
+    setupStoryEventListeners() {
+        const scheduleForm = document.getElementById('schedule-form');
+        const storyContent = document.getElementById('story-content');
+        const storyMedia = document.getElementById('story-media');
+
+        if (scheduleForm) {
+            scheduleForm.addEventListener('submit', (e) => this.handleScheduleStory(e));
+        }
+        
+        if (storyContent) {
+            storyContent.addEventListener('input', () => this.updateStoryPreview());
+        }
+        
+        if (storyMedia) {
+            storyMedia.addEventListener('change', (e) => this.handleMediaUpload(e));
+        }
+    }
+
+    // مستمعي أحداث إنشاء المحتوى
+    setupContentGenerationEventListeners() {
+        const contentForm = document.getElementById('content-generator-form');
+        const useContentBtn = document.getElementById('use-content-btn');
+        const regenerateContentBtn = document.getElementById('regenerate-content-btn');
+
+        if (contentForm) {
+            contentForm.addEventListener('submit', (e) => this.handleGenerateContent(e));
+        }
+        
+        if (useContentBtn) {
+            useContentBtn.addEventListener('click', () => this.useGeneratedContent());
+        }
+        
+        if (regenerateContentBtn) {
+            regenerateContentBtn.addEventListener('click', () => {
+                const form = document.getElementById('content-generator-form');
+                if (form) {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+    }
+
+    // مستمعي أحداث لوحة الإدارة
+    setupAdminEventListeners() {
+        const platformToggles = ['facebook', 'instagram', 'tiktok'];
+        platformToggles.forEach(platform => {
+            const toggle = document.getElementById(`${platform}-integration`);
+            if (toggle) {
+                toggle.addEventListener('change', (e) => {
+                    this.togglePlatformIntegration(platform, e.target.checked);
+                });
+            }
+        });
+
+        const autoModerationToggle = document.getElementById('auto-moderation');
+        if (autoModerationToggle) {
+            autoModerationToggle.addEventListener('change', (e) => {
+                this.toggleAutoModeration(e.target.checked);
+            });
+        }
+    }
+
+    // مستمعي أحداث الملف الشخصي والإعدادات
+    setupProfileEventListeners() {
+        const profileForm = document.getElementById('profile-form');
+        const settingsForm = document.getElementById('settings-form');
+        const passwordForm = document.getElementById('password-form');
+
+        if (profileForm) {
+            profileForm.addEventListener('submit', (e) => this.handleProfileUpdate(e));
+        }
+        
+        if (settingsForm) {
+            settingsForm.addEventListener('submit', (e) => this.handleSettingsUpdate(e));
+        }
+        
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', (e) => this.handlePasswordChange(e));
+        }
+    }
+
+    // مستمعي الأحداث المساعدة
+    setupUtilityEventListeners() {
+        window.addEventListener('resize', () => {
+            Object.values(this.charts).forEach(chart => {
+                if (chart && typeof chart.resize === 'function') {
+                    chart.resize();
+                }
+            });
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && this.currentUser) {
+                this.refreshDashboardData();
+            }
+        });
+    }
+
+    // إدارة حالة المصادقة
+    checkAuthState() {
+        if (!this.auth) {
+            console.warn('⚠️ Firebase Auth غير مهيء');
+            return;
+        }
+        
+        this.auth.onAuthStateChanged((user) => {
+            if (user) {
+                this.currentUser = user;
+                this.loadUserData(user.uid);
+                this.showDashboard();
+                this.updateUserInfo(user);
+            } else {
+                this.currentUser = null;
+                this.userData = null;
+                this.showAuth();
+            }
+        });
+    }
+
+    // معالجة تسجيل دخول المستخدم
+    async handleLogin(e) {
+        e.preventDefault();
+        
+        if (!this.auth) {
+            this.showNotification('Firebase غير مهيء. يرجى إضافة بيانات اعتماد Firebase.', 'error');
+            return;
+        }
+        
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        
+        if (!email || !password) {
+            this.showNotification('يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error');
+            return;
+        }
+        
+        this.showLoading('جاري تسجيل الدخول...');
+        
+        try {
+            await this.auth.signInWithEmailAndPassword(email, password);
+            this.showNotification('تم تسجيل الدخول بنجاح!', 'success');
+        } catch (error) {
+            console.error('خطأ في تسجيل الدخول:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // معالجة إنشاء حساب المستخدم
+    async handleSignup(e) {
+        e.preventDefault();
+        
+        if (!this.auth) {
+            this.showNotification('Firebase غير مهيء. يرجى إضافة بيانات اعتماد Firebase.', 'error');
+            return;
+        }
+        
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('signup-confirm-password').value;
+        
+        if (!name || !email || !password || !confirmPassword) {
+            this.showNotification('يرجى ملء جميع الحقول', 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            this.showNotification('كلمات المرور غير متطابقة', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            this.showNotification('يجب أن تكون كلمة المرور 6 أحرف على الأقل', 'error');
+            return;
+        }
+        
+        this.showLoading('جاري إنشاء حسابك...');
+        
+        try {
+            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            await user.updateProfile({ displayName: name });
+            
+            await this.db.collection('users').doc(user.uid).set({
+                name: name,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                role: 'user',
+                preferences: {
+                    notifications: { email: true, sms: false, push: true },
+                    privacy: { publicProfile: false, showActivity: true },
+                    autoPosting: { enabled: false, preferredTime: 'evening' }
+                }
+            });
+            
+            this.showNotification('تم إنشاء الحساب بنجاح!', 'success');
+            document.getElementById('signup-form').reset();
+        } catch (error) {
+            console.error('خطأ في إنشاء الحساب:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // معالجة مصادقة Google
+    async handleGoogleAuth() {
+        if (!this.auth) {
+            this.showNotification('Firebase غير مهيء. يرجى إضافة بيانات اعتماد Firebase.', 'error');
+            return;
+        }
+        
+        this.showLoading('جاري تسجيل الدخول عبر Google...');
+        
+        try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            const result = await this.auth.signInWithPopup(provider);
+            const user = result.user;
+            
+            const userDoc = await this.db.collection('users').doc(user.uid).get();
+            
+            if (!userDoc.exists) {
+                await this.db.collection('users').doc(user.uid).set({
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'user',
+                    preferences: {
+                        notifications: { email: true, sms: false, push: true },
+                        privacy: { publicProfile: false, showActivity: true },
+                        autoPosting: { enabled: false, preferredTime: 'evening' }
+                    }
+                });
+            }
+            
+            this.showNotification('تم تسجيل الدخول عبر Google بنجاح!', 'success');
+        } catch (error) {
+            console.error('خطأ في مصادقة Google:', error);
+            if (error.code !== 'auth/popup-closed-by-user') {
+                this.showNotification(this.getAuthErrorMessage(error), 'error');
+            }
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // معالجة تسجيل الخروج
+    async handleLogout() {
+        if (!this.auth) return;
+        
+        this.showLoading('جاري تسجيل الخروج...');
+        
+        try {
+            await this.auth.signOut();
+            this.stories = [];
+            this.scheduledStories = [];
+            this.showNotification('تم تسجيل الخروج بنجاح', 'success');
+        } catch (error) {
+            console.error('خطأ في تسجيل الخروج:', error);
+            this.showNotification('خطأ في تسجيل الخروج', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // تحميل بيانات المستخدم
+    async loadUserData(uid) {
+        if (!this.db) return;
+        
+        try {
+            const userDoc = await this.db.collection('users').doc(uid).get();
+            if (userDoc.exists) {
+                this.userData = { id: uid, ...userDoc.data() };
+                this.loadProfileData();
+            }
+        } catch (error) {
+            console.error('خطأ في تحميل بيانات المستخدم:', error);
+        }
+    }
+
+    // تحديث معلومات المستخدم في شريط التنقل
+    updateUserInfo(user) {
+        const userNameEl = document.getElementById('user-name');
+        if (userNameEl) {
+            userNameEl.textContent = user.displayName || user.email || 'المستخدم';
+        }
+    }
+
+    // معالجة جدولة القصة
+    async handleScheduleStory(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser) {
+            this.showNotification('يرجى تسجيل الدخول أولاً', 'error');
+            return;
+        }
+        
+        const platforms = [];
+        if (document.getElementById('platform-facebook').checked) platforms.push('facebook');
+        if (document.getElementById('platform-instagram').checked) platforms.push('instagram');
+        if (document.getElementById('platform-tiktok').checked) platforms.push('tiktok');
+        
+        const content = document.getElementById('story-content').value.trim();
+        const category = document.getElementById('story-category').value;
+        const scheduleDate = document.getElementById('schedule-date').value;
+        const mediaFile = document.getElementById('story-media').files[0];
+        
+        if (platforms.length === 0) {
+            this.showNotification('يرجى اختيار منصة واحدة على الأقل', 'error');
+            return;
+        }
+        
+        if (!content) {
+            this.showNotification('يرجى إدخال محتوى القصة', 'error');
+            return;
+        }
+        
+        if (!scheduleDate) {
+            this.showNotification('يرجى اختيار تاريخ ووقت', 'error');
+            return;
+        }
+        
+        const scheduledTime = new Date(scheduleDate);
+        if (scheduledTime <= new Date()) {
+            this.showNotification('يرجى اختيار تاريخ ووقت في المستقبل', 'error');
+            return;
+        }
+        
+        this.showLoading('جاري جدولة القصة...');
+        
+        try {
+            let mediaURL = null;
+            let mediaKey = null;
+            
+            // تحميل الوسائط إلى R2 إذا كان الملف موجودًا وتم تكوين R2
+            if (mediaFile && this.r2Configured) {
+                try {
+                    const uploadResult = await this.uploadToR2(mediaFile);
+                    mediaURL = uploadResult.url;
+                    mediaKey = uploadResult.key;
+                } catch (uploadError) {
+                    console.error('فشل تحميل الوسائط:', uploadError);
+                    this.showNotification('تحذير: فشل تحميل الوسائط. سيتم إنشاء القصة بدون وسائط.', 'warning');
+                }
+            } else if (mediaFile && !this.r2Configured) {
+                this.showNotification('تحذير: لم يتم تكوين تخزين R2. سيتم إنشاء القصة بدون وسائط.', 'warning');
+            }
+            
+            const story = {
+                userId: this.currentUser.uid,
+                content: content,
+                category: category,
+                platforms: platforms,
+                scheduledTime: firebase.firestore.Timestamp.fromDate(scheduledTime),
+                mediaURL: mediaURL,
+                mediaKey: mediaKey,
+                status: 'scheduled',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (this.db) {
+                await this.db.collection('stories').add(story);
+            }
+            
+            this.showNotification('تم جدولة القصة بنجاح!', 'success');
+            document.getElementById('schedule-form').reset();
+            document.getElementById('preview-image').classList.add('d-none');
+            document.getElementById('preview-text').textContent = 'سيظهر محتوى قصتك هنا';
+            
+            this.loadScheduledStories();
+            this.loadDashboardData();
+        } catch (error) {
+            console.error('خطأ في جدولة القصة:', error);
+            this.showNotification('خطأ في جدولة القصة: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // تحميل القصص المجدولة
+    async loadScheduledStories() {
+        if (!this.currentUser || !this.db) return;
+        
+        try {
+            const snapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .where('status', '==', 'scheduled')
+                .orderBy('scheduledTime', 'desc')
+                .limit(10)
+                .get();
+            
+            const listContainer = document.getElementById('scheduled-stories-list');
+            
+            if (snapshot.empty) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>لا توجد قصص مجدولة</h3>
+                        <p>قم بجدولة قصتك الأولى أعلاه!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            snapshot.forEach(doc => {
+                const story = doc.data();
+                const scheduledDate = story.scheduledTime.toDate();
+                const platformBadges = story.platforms.map(p => 
+                    `<span class="platform-badge badge-${p}">${p}</span>`
+                ).join('');
+                
+                html += `
+                    <div class="scheduled-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="mb-2">${platformBadges}</div>
+                                <p class="mb-1">${this.escapeHtml(story.content.substring(0, 100))}${story.content.length > 100 ? '...' : ''}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock ms-1"></i>${this.formatDate(scheduledDate)}
+                                    <span class="me-3"><i class="fas fa-tag ms-1"></i>${story.category}</span>
+                                </small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger me-3" onclick="platform.deleteStory('${doc.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        } catch (error) {
+            console.error('خطأ في تحميل القصص المجدولة:', error);
+        }
+    }
+
+    // حذف القصة
+    async deleteStory(storyId) {
+        if (!confirm('هل أنت متأكد أنك تريد حذف هذه القصة المجدولة؟')) return;
+        
+        this.showLoading('جاري حذف القصة...');
+        
+        try {
+            if (this.db) {
+                // الحصول على بيانات القصة لاسترداد مفتاح الوسائط
+                const storyDoc = await this.db.collection('stories').doc(storyId).get();
+                const storyData = storyDoc.data();
+                
+                // حذف الوسائط من R2 إذا كانت موجودة
+                if (storyData && storyData.mediaKey) {
+                    await this.deleteFromR2(storyData.mediaKey);
+                }
+                
+                // حذف وثيقة القصة من Firestore
+                await this.db.collection('stories').doc(storyId).delete();
+                
+                this.showNotification('تم حذف القصة بنجاح', 'success');
+                this.loadScheduledStories();
+                this.loadDashboardData();
+            }
+        } catch (error) {
+            console.error('خطأ في حذف القصة:', error);
+            this.showNotification('خطأ في حذف القصة', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // تحميل بيانات لوحة التحكم
+    async loadDashboardData() {
+        if (!this.currentUser || !this.db) return;
+        
+        try {
+            const storiesSnapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .get();
+            
+            const total = storiesSnapshot.size;
+            let scheduled = 0;
+            let published = 0;
+            
+            storiesSnapshot.forEach(doc => {
+                const story = doc.data();
+                if (story.status === 'scheduled') scheduled++;
+                if (story.status === 'published') published++;
+            });
+            
+            document.getElementById('total-stories').textContent = total;
+            document.getElementById('scheduled-stories').textContent = scheduled;
+            document.getElementById('published-stories').textContent = published;
+            document.getElementById('engagement-rate').textContent = total > 0 ? '75%' : '0%';
+            
+            this.loadRecentActivity();
+            this.initializeCharts();
+        } catch (error) {
+            console.error('خطأ في تحميل بيانات لوحة التحكم:', error);
+        }
+    }
+
+    // تحميل النشاط الأخير
+    async loadRecentActivity() {
+        if (!this.currentUser || !this.db) return;
+        
+        try {
+            const snapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .limit(5)
+                .get();
+            
+            const activityContainer = document.getElementById('recent-activity');
+            
+            if (snapshot.empty) {
+                activityContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>لا يوجد نشاط حديث</h3>
+                        <p>سيظهر نشاطك هنا</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="list-group">';
+            snapshot.forEach(doc => {
+                const story = doc.data();
+                const createdDate = story.createdAt ? story.createdAt.toDate() : new Date();
+                
+                html += `
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">${this.escapeHtml(story.content.substring(0, 50))}...</h6>
+                            <small>${this.getTimeAgo(createdDate)}</small>
+                        </div>
+                        <small class="text-muted">${story.category} • ${story.status}</small>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            activityContainer.innerHTML = html;
+        } catch (error) {
+            console.error('خطأ في تحميل النشاط الأخير:', error);
+            const activityContainer = document.getElementById('recent-activity');
+            activityContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>لا يوجد نشاط حديث</h3>
+                    <p>سيظهر نشاطك هنا</p>
+                </div>
+            `;
+        }
+    }
+
+    // معالجة إنشاء المحتوى
+    handleGenerateContent(e) {
+        e.preventDefault();
+        
+        const category = document.getElementById('content-category').value;
+        const keywords = document.getElementById('content-keywords').value.trim();
+        
+        const content = this.generateContentByCategory(category, keywords);
+        
+        document.getElementById('generated-content').textContent = content;
+        document.getElementById('use-content-btn').disabled = false;
+        document.getElementById('regenerate-content-btn').disabled = false;
+        
+        this.generatedContent = content;
+        this.showNotification('تم إنشاء المحتوى بنجاح!', 'success');
+    }
+
+    // إنشاء المحتوى حسب الفئة
+    generateContentByCategory(category, keywords) {
+        const templates = {
+            movies: [
+                `شاهدت للتو ${keywords || 'فيلم'} مذهل! كان سرد القصة رائعًا والمشاهد البصرية كانت مذهلة. أوصي به بشدة! 🎬✨`,
+                `ليلة أفلام ناجحة! ${keywords || 'هذا الفيلم'} تجاوز كل التوقعات. يجب مشاهدته لأي شخص يحب السينما الرائعة! 🍿`,
+                `لا أستطيع التوقف عن التفكير في ${keywords || 'هذا الفيلم'}. مفاجآت الحبكة أبقتني على حافة المقعد! ما رأيك؟ 🎥`
+            ],
+            tv: [
+                `أشاهد حاليًا ${keywords || 'هذا المسلسل'} بشراهة ولا أستطيع الحصول على ما يكفي! تطور الشخصيات لا يصدق. 📺`,
+                `تنبيه حلقة جديدة! ${keywords || 'هذا العرض'} يتحسن باستمرار. من آخر يشاهده؟ 🎭`,
+                `أنهيت للتو ${keywords || 'هذا المسلسل'} ويا للروعة! يا لها من رحلة. أفتقد الشخصيات بالفعل! 💫`
+            ],
+            sports: [
+                `يا لها من مباراة! أظهر ${keywords || 'الفريق'} مهارة وتصميمًا لا يصدق اليوم. أشعر بالفخر! ⚽🏆`,
+                `تنبيه لعشاق الرياضة! ${keywords || 'هذه المباراة'} كانت مثيرة من البداية إلى النهاية! 🏅`,
+                `لا أصدق ما شاهدته للتو! ${keywords || 'تلك اللعبة'} كانت أسطورية. أفضل مباراة في الموسم! 🔥`
+            ],
+            recipes: [
+                `صنعت للتو ${keywords || 'هذه الوصفة'} اللذيذة وخرجت مثالية! أشارك حب الطهي! 🍳👨‍🍳`,
+                `لحظة لعشاق الطعام! ${keywords || 'هذا الطبق'} سهل التحضير جدًا وطعمه لا يصدق. الوصفة قريبًا! 🥘`,
+                `العلاج بالطهي في أفضل حالاته! صنعت ${keywords || 'هذا الطبق الرائع'} اليوم. من يريد الوصفة؟ 😋`
+            ],
+            games: [
+                `جلسة لعب انتهت! ${keywords || 'هذه اللعبة'} تسبب الإدمان بشدة. من آخر يلعبها؟ 🎮`,
+                `درجة عالية جديدة! ${keywords || 'هذه اللعبة'} تستمر في مفاجأتي بتحديات جديدة. أحبها! 🕹️`,
+                `اكتشفت للتو ${keywords || 'هذه اللعبة'} وأنا مدمن! الرسومات واللعب من الطراز الأول! 🎯`
+            ],
+            apps: [
+                `وجدت ${keywords || 'هذا التطبيق'} المذهل الذي يجعل حياتي أسهل بكثير! أوصي بتجربته بشدة! 📱`,
+                `تطبيق اليوم! ${keywords || 'هذا التطبيق'} لديه ميزات لا تصدق. حمله الآن! ✨`,
+                `دفعة إنتاجية! ${keywords || 'هذا التطبيق'} يغير قواعد اللعبة لإنجاز الأمور! 🚀`
+            ]
+        };
+        
+        const categoryTemplates = templates[category] || templates.movies;
+        const randomIndex = Math.floor(Math.random() * categoryTemplates.length);
+        
+        return categoryTemplates[randomIndex];
+    }
+
+    // استخدام المحتوى المُنشأ
+    useGeneratedContent() {
+        if (!this.generatedContent) return;
+        
+        document.getElementById('story-content').value = this.generatedContent;
+        this.updateStoryPreview();
+        this.showSection('schedule');
+        this.showNotification('تمت إضافة المحتوى إلى نموذج القصة', 'success');
+    }
+
+    // تحديث معاينة القصة
+    updateStoryPreview() {
+        const content = document.getElementById('story-content').value;
+        const previewText = document.getElementById('preview-text');
+        
+        if (previewText) {
+            previewText.textContent = content || 'سيظهر محتوى قصتك هنا';
+        }
+    }
+
+    // معالجة تحميل الوسائط
+    handleMediaUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime'];
+        if (!validTypes.includes(file.type)) {
+            this.showNotification('يرجى اختيار ملف صورة أو فيديو صالح (JPG, PNG, GIF, MP4, MOV)', 'error');
+            e.target.value = '';
+            return;
+        }
+        
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            this.showNotification('يجب أن يكون حجم الملف أقل من 10MB', 'error');
+            e.target.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const previewImage = document.getElementById('preview-image');
+            if (previewImage) {
+                previewImage.src = event.target.result;
+                previewImage.classList.remove('d-none');
+            }
+        };
+        reader.onerror = () => {
+            this.showNotification('خطأ في قراءة الملف', 'error');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // تحميل بيانات الملف الشخصي
+    loadProfileData() {
+        if (!this.userData) return;
+        
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileEmailInput = document.getElementById('profile-email-input');
+        const profileInitials = document.getElementById('profile-initials');
+        const profileFirstName = document.getElementById('profile-first-name');
+        const profileLastName = document.getElementById('profile-last-name');
+        const profileBio = document.getElementById('profile-bio');
+        const profileCompany = document.getElementById('profile-company');
+        
+        if (profileName) profileName.textContent = this.userData.name || 'اسم المستخدم';
+        if (profileEmail) profileEmail.textContent = this.userData.email || '';
+        if (profileEmailInput) profileEmailInput.value = this.userData.email || '';
+        
+        if (profileInitials) {
+            const initials = this.userData.name ? 
+                this.userData.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 
+                (this.userData.email ? this.userData.email[0].toUpperCase() : 'م');
+            profileInitials.textContent = initials;
+        }
+        
+        if (profileFirstName && profileLastName && this.userData.name) {
+            const nameParts = this.userData.name.split(' ');
+            profileFirstName.value = nameParts[0] || '';
+            profileLastName.value = nameParts.slice(1).join(' ') || '';
+        }
+        
+        if (profileBio) profileBio.value = this.userData.bio || '';
+        if (profileCompany) profileCompany.value = this.userData.company || '';
+        
+        this.loadSettingsData();
+    }
+
+    // تحميل بيانات الإعدادات
+    loadSettingsData() {
+        if (!this.userData || !this.userData.preferences) return;
+        
+        const prefs = this.userData.preferences;
+        
+        if (prefs.notifications) {
+            const notifyEmail = document.getElementById('notify-email');
+            const notifySMS = document.getElementById('notify-sms');
+            const notifyPush = document.getElementById('notify-push');
+            
+            if (notifyEmail) notifyEmail.checked = prefs.notifications.email || false;
+            if (notifySMS) notifySMS.checked = prefs.notifications.sms || false;
+            if (notifyPush) notifyPush.checked = prefs.notifications.push || false;
+        }
+        
+        if (prefs.privacy) {
+            const privacyProfile = document.getElementById('privacy-profile');
+            const privacyActivity = document.getElementById('privacy-activity');
+            
+            if (privacyProfile) privacyProfile.checked = prefs.privacy.publicProfile || false;
+            if (privacyActivity) privacyActivity.checked = prefs.privacy.showActivity || false;
+        }
+        
+        if (prefs.autoPosting) {
+            const autoPosting = document.getElementById('auto-posting');
+            const autoPostingTime = document.getElementById('auto-posting-time');
+            
+            if (autoPosting) autoPosting.checked = prefs.autoPosting.enabled || false;
+            if (autoPostingTime) autoPostingTime.value = prefs.autoPosting.preferredTime || 'evening';
+        }
+    }
+
+    // معالجة تحديث الملف الشخصي
+    async handleProfileUpdate(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser || !this.db) return;
+        
+        const firstName = document.getElementById('profile-first-name').value.trim();
+        const lastName = document.getElementById('profile-last-name').value.trim();
+        const bio = document.getElementById('profile-bio').value.trim();
+        const company = document.getElementById('profile-company').value.trim();
+        
+        const fullName = `${firstName} ${lastName}`.trim();
+        
+        if (!fullName) {
+            this.showNotification('يرجى إدخال اسمك', 'error');
+            return;
+        }
+        
+        this.showLoading('جاري تحديث الملف الشخصي...');
+        
+        try {
+            await this.db.collection('users').doc(this.currentUser.uid).update({
+                name: fullName,
+                bio: bio,
+                company: company,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            await this.currentUser.updateProfile({
+                displayName: fullName
+            });
+            
+            await this.loadUserData(this.currentUser.uid);
+            this.updateUserInfo(this.currentUser);
+            
+            this.showNotification('تم تحديث الملف الشخصي بنجاح!', 'success');
+        } catch (error) {
+            console.error('خطأ في تحديث الملف الشخصي:', error);
+            this.showNotification('خطأ في تحديث الملف الشخصي: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // معالجة تحديث الإعدادات
+    async handleSettingsUpdate(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser || !this.db) return;
+        
+        const notifyEmail = document.getElementById('notify-email').checked;
+        const notifySMS = document.getElementById('notify-sms').checked;
+        const notifyPush = document.getElementById('notify-push').checked;
+        const privacyProfile = document.getElementById('privacy-profile').checked;
+        const privacyActivity = document.getElementById('privacy-activity').checked;
+        const autoPosting = document.getElementById('auto-posting').checked;
+        const autoPostingTime = document.getElementById('auto-posting-time').value;
+        
+        this.showLoading('جاري تحديث الإعدادات...');
+        
+        try {
+            await this.db.collection('users').doc(this.currentUser.uid).update({
+                'preferences.notifications.email': notifyEmail,
+                'preferences.notifications.sms': notifySMS,
+                'preferences.notifications.push': notifyPush,
+                'preferences.privacy.publicProfile': privacyProfile,
+                'preferences.privacy.showActivity': privacyActivity,
+                'preferences.autoPosting.enabled': autoPosting,
+                'preferences.autoPosting.preferredTime': autoPostingTime,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            this.showNotification('تم تحديث الإعدادات بنجاح!', 'success');
+        } catch (error) {
+            console.error('خطأ في تحديث الإعدادات:', error);
+            this.showNotification('خطأ في تحديث الإعدادات: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // معالجة تغيير كلمة المرور
+    async handlePasswordChange(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser) return;
+        
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            this.showNotification('يرجى ملء جميع حقول كلمة المرور', 'error');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            this.showNotification('كلمات المرور الجديدة غير متطابقة', 'error');
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            this.showNotification('يجب أن تكون كلمة المرور الجديدة 6 أحرف على الأقل', 'error');
+            return;
+        }
+        
+        this.showLoading('جاري تغيير كلمة المرور...');
+        
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(
+                this.currentUser.email,
+                currentPassword
+            );
+            
+            await this.currentUser.reauthenticateWithCredential(credential);
+            await this.currentUser.updatePassword(newPassword);
+            
+            document.getElementById('password-form').reset();
+            this.showNotification('تم تغيير كلمة المرور بنجاح!', 'success');
+        } catch (error) {
+            console.error('خطأ في تغيير كلمة المرور:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // تبديل تكامل المنصة
+    togglePlatformIntegration(platform, enabled) {
+        console.log(`تم ${enabled ? 'تمكين' : 'تعطيل'} تكامل ${platform}`);
+        this.showNotification(`تم ${enabled ? 'تمكين' : 'تعطيل'} تكامل ${platform}`, 'info');
+    }
+
+    // تبديل الرقابة التلقائية
+    toggleAutoModeration(enabled) {
+        console.log(`تم ${enabled ? 'تمكين' : 'تعطيل'} الرقابة التلقائية`);
+        this.showNotification(`تم ${enabled ? 'تمكين' : 'تعطيل'} الرقابة التلقائية`, 'info');
+    }
+
+    // تهيئة الرسوم البيانية
+    initializeCharts() {
+        // رسم أداء المنصات
+        const platformCtx = document.getElementById('platform-chart');
+        if (platformCtx && typeof Chart !== 'undefined') {
+            if (this.charts.platform) {
+                this.charts.platform.destroy();
+            }
+            
+            this.charts.platform = new Chart(platformCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['فيسبوك', 'انستجرام', 'تيك توك'],
+                    datasets: [{
+                        data: [30, 45, 25],
+                        backgroundColor: ['#3b5998', '#e1306c', '#000000'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // رسم الأداء
+        const performanceCtx = document.getElementById('performance-chart');
+        if (performanceCtx && typeof Chart !== 'undefined') {
+            if (this.charts.performance) {
+                this.charts.performance.destroy();
+            }
+            
+            this.charts.performance = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                    datasets: [{
+                        label: 'القصص المنشورة',
+                        data: [12, 19, 15, 25, 22, 30],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'معدل التفاعل',
+                        data: [65, 59, 70, 75, 72, 80],
+                        borderColor: '#f72585',
+                        backgroundColor: 'rgba(247, 37, 133, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // رسم الفئات
+        const categoryCtx = document.getElementById('category-chart');
+        if (categoryCtx && typeof Chart !== 'undefined') {
+            if (this.charts.category) {
+                this.charts.category.destroy();
+            }
+            
+            this.charts.category = new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['أفلام', 'تلفزيون', 'رياضة', 'وصفات', 'ألعاب', 'تطبيقات'],
+                    datasets: [{
+                        label: 'التفاعل',
+                        data: [85, 78, 92, 65, 88, 72],
+                        backgroundColor: [
+                            '#ff6b6b', '#4ecdc4', '#45b7d1',
+                            '#f9c74f', '#9d4edd', '#f8961e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // رسم الوقت
+        const timeCtx = document.getElementById('time-chart');
+        if (timeCtx && typeof Chart !== 'undefined') {
+            if (this.charts.time) {
+                this.charts.time.destroy();
+            }
+            
+            this.charts.time = new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['6 ص', '9 ص', '12 م', '3 م', '6 م', '9 م'],
+                    datasets: [{
+                        label: 'التفاعل',
+                        data: [35, 65, 80, 75, 90, 70],
+                        backgroundColor: '#4361ee'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // إظهار/إخفاء الأقسام
+    showAuth() {
+        document.getElementById('auth-section').classList.remove('d-none');
+        document.getElementById('dashboard-section').classList.add('d-none');
+    }
+
+    showDashboard() {
+        document.getElementById('auth-section').classList.add('d-none');
+        document.getElementById('dashboard-section').classList.remove('d-none');
+        this.showSection('dashboard');
+    }
+
+    showSection(sectionName) {
+        document.querySelectorAll('.section-view').forEach(view => {
+            view.classList.add('d-none');
+        });
+        
+        const section = document.getElementById(`${sectionName}-view`);
+        if (section) {
+            section.classList.remove('d-none');
+            this.loadSectionData(sectionName);
+        }
+    }
+
+    showAdminTab(tabName) {
+        document.querySelectorAll('.admin-tab-content').forEach(tab => {
+            tab.classList.add('d-none');
+        });
+        
+        const tab = document.getElementById(`admin-${tabName}`);
+        if (tab) {
+            tab.classList.remove('d-none');
+        }
+    }
+
+    loadSectionData(sectionName) {
+        switch (sectionName) {
+            case 'dashboard':
+                this.loadDashboardData();
+                break;
+            case 'schedule':
+                this.loadScheduledStories();
+                break;
+            case 'analytics':
+                this.initializeCharts();
+                break;
+            case 'profile':
+                this.loadProfileData();
+                break;
+            case 'settings':
+                this.loadSettingsData();
+                break;
+        }
+    }
+
+    refreshDashboardData() {
+        if (this.currentUser) {
+            this.loadDashboardData();
+            this.loadScheduledStories();
+        }
+    }
+
+    // وظائف مساعدة
+    showLoading(message = 'جاري التحميل...') {
+        const overlay = document.getElementById('loading-overlay');
+        const text = document.getElementById('loading-text');
+        if (overlay) {
+            if (text) text.textContent = message;
+            overlay.classList.add('show');
+        }
+    }
+
+    hideLoading() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        const container = document.querySelector('.toast-container');
+        if (!container) return;
+        
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `custom-toast toast-${type} p-3 mb-2`;
+        toast.style.borderRadius = '8px';
+        
+        const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+        
+        toast.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-${icon} ms-2"></i>
+                <div class="flex-grow-1">${this.escapeHtml(message)}</div>
+                <button type="button" class="btn-close btn-close-white me-2" onclick="document.getElementById('${toastId}').remove()"></button>
+            </div>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.3s';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    getAuthErrorMessage(error) {
+        const errorMessages = {
+            'auth/user-not-found': 'لم يتم العثور على حساب بهذا البريد الإلكتروني',
+            'auth/wrong-password': 'كلمة مرور غير صحيحة',
+            'auth/email-already-in-use': 'البريد الإلكتروني مستخدم بالفعل',
+            'auth/weak-password': 'كلمة المرور ضعيفة جدًا',
+            'auth/invalid-email': 'عنوان بريد إلكتروني غير صالح',
+            'auth/operation-not-allowed': 'العملية غير مسموح بها',
+            'auth/requires-recent-login': 'يرجى تسجيل الدخول مرة أخرى لإجراء هذا الإجراء'
+        };
+        
+        return errorMessages[error.code] || error.message || 'حدث خطأ';
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    formatDate(date) {
+        const options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return date.toLocaleDateString('ar-SA', options);
+    }
+
+    getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        const intervals = {
+            year: 31536000,
+            month: 2592000,
+            week: 604800,
+            day: 86400,
+            hour: 3600,
+            minute: 60
+        };
+        
+        for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+            const interval = Math.floor(seconds / secondsInUnit);
+            if (interval >= 1) {
+                const unitNames = {
+                    year: 'سنة',
+                    month: 'شهر',
+                    week: 'أسبوع',
+                    day: 'يوم',
+                    hour: 'ساعة',
+                    minute: 'دقيقة'
+                };
+                return interval === 1 ? `منذ ${interval} ${unitNames[unit]}` : `منذ ${interval} ${unitNames[unit]}${unit !== 'minute' ? 'ات' : ''}`;
+            }
+        }
+        
+        return 'الآن';
+    }
+}
+
+// تهيئة المنصة
+const platform = new SocialStoryPlatform();
+
+// جعل المنصة قابلة للوصول عالميًا لمعالجات الأحداث
+window.platform = platform;
+    </script>
+</body>
+</html>
