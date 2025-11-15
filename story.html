@@ -1,0 +1,2615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialStory Scheduler v4.0 - Production Ready</title>
+    <meta name="description" content="Professional social media story scheduler with AI content generation, multi-platform support, and advanced analytics. Schedule stories for Facebook, Instagram, and TikTok.">
+    <meta name="keywords" content="social media scheduler, story scheduler, Facebook stories, Instagram stories, TikTok, content generator, social media management">
+    <meta property="og:title" content="SocialStory Scheduler - Professional Social Media Management">
+    <meta property="og:description" content="Schedule and manage social media stories across multiple platforms with AI-powered content generation.">
+    <meta property="og:type" content="website">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK v9 (Auth & Firestore only - R2 Storage for media) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+        
+        /* Authentication Section */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+        }
+        
+        .auth-header h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.75rem;
+        }
+        
+        .auth-body {
+            padding: 30px;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-google:hover {
+            background-color: #c23321;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Navigation */
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+        }
+        
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+            background: white;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .dashboard-card .card-header {
+            background: white;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+        }
+        
+        /* Platform Icons */
+        .platform-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .facebook-color { color: #3b5998; }
+        .instagram-color { color: #e1306c; }
+        .tiktok-color { color: #000000; }
+        
+        /* Stat Cards */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Content Categories */
+        .content-category {
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            text-align: center;
+        }
+        
+        .content-category:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .content-category i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .category-movies { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .category-tv { background: linear-gradient(135deg, #4ecdc4, #88d3ce); }
+        .category-sports { background: linear-gradient(135deg, #45b7d1, #96cfe3); }
+        .category-recipes { background: linear-gradient(135deg, #f9c74f, #fad874); }
+        .category-games { background: linear-gradient(135deg, #9d4edd, #b57fe6); }
+        .category-apps { background: linear-gradient(135deg, #f8961e, #f9b457); }
+        
+        /* Admin Sidebar */
+        .admin-sidebar {
+            background: var(--dark-color);
+            color: white;
+            min-height: calc(100vh - 56px);
+            padding: 20px 0;
+        }
+        
+        .admin-sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin: 0 10px 5px 10px;
+            transition: all 0.3s;
+        }
+        
+        .admin-sidebar .nav-link:hover,
+        .admin-sidebar .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Story Preview */
+        .story-preview {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            height: 600px;
+            width: 340px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .story-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .story-image {
+            max-width: 100%;
+            max-height: 70%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+        
+        .preview-text {
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Scheduled Items */
+        .scheduled-item {
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .scheduled-item:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+        
+        /* Platform Badges */
+        .platform-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .badge-facebook { background: #3b5998; color: white; }
+        .badge-instagram { background: #e1306c; color: white; }
+        .badge-tiktok { background: #000000; color: white; }
+        
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        #loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9998;
+        }
+        
+        .custom-toast {
+            min-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .toast-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .toast-error {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .toast-info {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Profile Section */
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .story-preview {
+                width: 100%;
+                max-width: 340px;
+                height: 500px;
+            }
+            
+            .admin-sidebar {
+                min-height: auto;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .dashboard-card {
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Utility Classes */
+        .d-none { display: none !important; }
+        .cursor-pointer { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div id="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Authentication Section -->
+    <div id="auth-section" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2><i class="fas fa-camera me-2"></i>SocialStory Scheduler</h2>
+                <p class="mb-0">v3.5 - Advanced Story Management</p>
+            </div>
+            <div class="auth-body">
+                <ul class="nav nav-pills mb-4 justify-content-center" id="auth-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login" type="button" role="tab">Login</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="signup-tab" data-bs-toggle="pill" data-bs-target="#signup" type="button" role="tab">Sign Up</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="auth-tabs-content">
+                    <div class="tab-pane fade show active" id="login" role="tabpanel">
+                        <form id="login-form">
+                            <div class="mb-3">
+                                <label for="login-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="login-email" required placeholder="your@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="login-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="login-password" required placeholder="••••••••">
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                        </form>
+                        <div class="text-center my-3">Or</div>
+                        <div class="d-grid">
+                            <button id="google-login" class="btn btn-google">
+                                <i class="fab fa-google me-2"></i>Login with Google
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="signup" role="tabpanel">
+                        <form id="signup-form">
+                            <div class="mb-3">
+                                <label for="signup-name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="signup-name" required placeholder="John Doe">
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="signup-email" required placeholder="your@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="signup-password" required placeholder="••••••••">
+                                <small class="form-text text-muted">Minimum 6 characters</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="signup-confirm-password" required placeholder="••••••••">
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </div>
+                        </form>
+                        <div class="text-center my-3">Or</div>
+                        <div class="d-grid">
+                            <button id="google-signup" class="btn btn-google">
+                                <i class="fab fa-google me-2"></i>Sign Up with Google
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Section -->
+    <div id="dashboard-section" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><i class="fas fa-camera me-2"></i>SocialStory Scheduler</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-section="dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="schedule">Schedule Stories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="content">Content Generator</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="analytics">Analytics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="admin-panel">Admin Panel</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i> <span id="user-name">User</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-section="profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#" data-section="settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-4 px-4">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="section-view">
+                <h2 class="mb-4">Dashboard</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-stories">0</div>
+                            <div class="stat-label">Total Stories</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="scheduled-stories">0</div>
+                            <div class="stat-label">Scheduled</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="published-stories">0</div>
+                            <div class="stat-label">Published</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="engagement-rate">0%</div>
+                            <div class="stat-label">Engagement Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recent-activity">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <h3>No recent activity</h3>
+                                        <p>Your activity will appear here</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Platform Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="platform-chart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Stories View -->
+            <div id="schedule-view" class="section-view d-none">
+                <h2 class="mb-4">Schedule New Story</h2>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-calendar-plus me-2"></i>Create Story</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="schedule-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-share-alt me-2"></i>Select Platforms</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-facebook" value="facebook">
+                                                    <label class="form-check-label" for="platform-facebook">
+                                                        <i class="fab fa-facebook facebook-color me-1"></i> Facebook
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-instagram" value="instagram">
+                                                    <label class="form-check-label" for="platform-instagram">
+                                                        <i class="fab fa-instagram instagram-color me-1"></i> Instagram
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="platform-tiktok" value="tiktok">
+                                                    <label class="form-check-label" for="platform-tiktok">
+                                                        <i class="fab fa-tiktok tiktok-color me-1"></i> TikTok
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="schedule-date" class="form-label"><i class="fas fa-calendar me-2"></i>Schedule Date & Time</label>
+                                                <input type="datetime-local" class="form-control" id="schedule-date" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-content" class="form-label"><i class="fas fa-edit me-2"></i>Story Content</label>
+                                        <textarea class="form-control" id="story-content" rows="5" placeholder="Enter your story content here..." required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-category" class="form-label"><i class="fas fa-tag me-2"></i>Category</label>
+                                        <select class="form-select" id="story-category">
+                                            <option value="movies">Movies</option>
+                                            <option value="tv">TV Series</option>
+                                            <option value="sports">Sports</option>
+                                            <option value="recipes">Recipes</option>
+                                            <option value="games">Games</option>
+                                            <option value="apps">Apps</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="story-media" class="form-label"><i class="fas fa-image me-2"></i>Upload Media (Optional)</label>
+                                        <input type="file" class="form-control" id="story-media" accept="image/*,video/*">
+                                        <small class="form-text text-muted">Max file size: 10MB. Supported formats: JPG, PNG, GIF, MP4, MOV</small>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-check me-2"></i>Schedule Story</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-eye me-2"></i>Story Preview</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="story-preview">
+                                    <div class="story-content">
+                                        <img id="preview-image" src="" alt="Story Preview" class="story-image d-none">
+                                        <div id="preview-text" class="preview-text">Your story content will appear here</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Scheduled Stories</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="scheduled-stories-list">
+                                    <div class="empty-state">
+                                        <i class="fas fa-calendar-times"></i>
+                                        <h3>No scheduled stories</h3>
+                                        <p>Schedule your first story above!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Generator View -->
+            <div id="content-view" class="section-view d-none">
+                <h2 class="mb-4">Content Generator</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="content-category category-movies" data-category="movies">
+                            <i class="fas fa-film"></i>
+                            <h4>Movies</h4>
+                            <p>Generate content about movies</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-tv" data-category="tv">
+                            <i class="fas fa-tv"></i>
+                            <h4>TV Series</h4>
+                            <p>Generate content about TV shows</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-sports" data-category="sports">
+                            <i class="fas fa-football-ball"></i>
+                            <h4>Sports</h4>
+                            <p>Generate sports content</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-recipes" data-category="recipes">
+                            <i class="fas fa-utensils"></i>
+                            <h4>Recipes</h4>
+                            <p>Generate recipe content</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-games" data-category="games">
+                            <i class="fas fa-gamepad"></i>
+                            <h4>Games</h4>
+                            <p>Generate gaming content</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-category category-apps" data-category="apps">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h4>Apps</h4>
+                            <p>Generate app content</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-magic me-2"></i>Generate Content</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="content-generator-form">
+                                    <div class="mb-3">
+                                        <label for="content-category" class="form-label">Category</label>
+                                        <select class="form-select" id="content-category">
+                                            <option value="movies">Movies</option>
+                                            <option value="tv">TV Series</option>
+                                            <option value="sports">Sports</option>
+                                            <option value="recipes">Recipes</option>
+                                            <option value="games">Games</option>
+                                            <option value="apps">Apps</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="content-keywords" class="form-label">Keywords (Optional)</label>
+                                        <input type="text" class="form-control" id="content-keywords" placeholder="Enter keywords separated by commas">
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles me-2"></i>Generate Content</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-lightbulb me-2"></i>Generated Content</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="generated-content-container">
+                                    <p id="generated-content" class="mb-3">Click Generate to create content</p>
+                                    <div class="d-grid gap-2">
+                                        <button id="use-content-btn" class="btn btn-success" disabled>
+                                            <i class="fas fa-check me-2"></i>Use This Content
+                                        </button>
+                                        <button id="regenerate-content-btn" class="btn btn-outline-secondary" disabled>
+                                            <i class="fas fa-sync me-2"></i>Regenerate
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="section-view d-none">
+                <h2 class="mb-4">Analytics</h2>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Performance Over Time</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="performance-chart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Category Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="category-chart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-12">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-clock me-2"></i>Best Posting Times</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="time-chart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel View -->
+            <div id="admin-panel-view" class="section-view d-none">
+                <h2 class="mb-4">Admin Panel</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="admin-sidebar">
+                            <div class="nav flex-column nav-pills" role="tablist">
+                                <a class="nav-link active" href="#" data-admin-tab="users">
+                                    <i class="fas fa-users me-2"></i>Users
+                                </a>
+                                <a class="nav-link" href="#" data-admin-tab="platforms">
+                                    <i class="fas fa-share-alt me-2"></i>Platforms
+                                </a>
+                                <a class="nav-link" href="#" data-admin-tab="analytics">
+                                    <i class="fas fa-chart-line me-2"></i>System Analytics
+                                </a>
+                                <a class="nav-link" href="#" data-admin-tab="api">
+                                    <i class="fas fa-code me-2"></i>API Settings
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <!-- Users Tab -->
+                        <div id="admin-users" class="admin-tab-content">
+                            <div class="card dashboard-card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="fas fa-users me-2"></i>User Management</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Stories</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="users-table">
+                                                <tr>
+                                                    <td colspan="5" class="text-center">No users found</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Platforms Tab -->
+                        <div id="admin-platforms" class="admin-tab-content d-none">
+                            <div class="card dashboard-card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="fas fa-share-alt me-2"></i>Platform Integrations</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <h6>Facebook Integration</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="facebook-integration">
+                                            <label class="form-check-label" for="facebook-integration">Enable Facebook Integration</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>Instagram Integration</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="instagram-integration">
+                                            <label class="form-check-label" for="instagram-integration">Enable Instagram Integration</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>TikTok Integration</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="tiktok-integration">
+                                            <label class="form-check-label" for="tiktok-integration">Enable TikTok Integration</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>Content Moderation</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto-moderation">
+                                            <label class="form-check-label" for="auto-moderation">Enable Auto-Moderation</label>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary"><i class="fas fa-save me-2"></i>Save Platform Settings</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Analytics Tab -->
+                        <div id="admin-analytics" class="admin-tab-content d-none">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="stat-card">
+                                        <div class="stat-number" id="active-users">0</div>
+                                        <div class="stat-label">Active Users</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stat-card">
+                                        <div class="stat-number" id="stories-today">0</div>
+                                        <div class="stat-label">Stories Today</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- API Settings Tab -->
+                        <div id="admin-api" class="admin-tab-content d-none">
+                            <div class="card dashboard-card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="fas fa-code me-2"></i>API Configuration</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <h6>API Status</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="api-enabled">
+                                            <label class="form-check-label" for="api-enabled">Enable API Access</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="api-key" class="form-label">API Key</label>
+                                        <input type="text" class="form-control" id="api-key" value="••••••••••••••••" readonly>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>API Usage Statistics</h6>
+                                        <p>Requests Today: <strong id="api-requests-today">0</strong></p>
+                                        <p>Requests This Month: <strong id="api-requests-month">0</strong></p>
+                                        <p>Success Rate: <strong id="api-success-rate">100%</strong></p>
+                                        <p>Avg Response Time: <strong id="api-response-time">0ms</strong></p>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary"><i class="fas fa-save me-2"></i>Save API Settings</button>
+                                        <button class="btn btn-outline-secondary"><i class="fas fa-vial me-2"></i>Test API Connection</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile View -->
+            <div id="profile-view" class="section-view d-none">
+                <h2 class="mb-4">Profile</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-body text-center">
+                                <div class="profile-avatar" id="profile-initials">U</div>
+                                <h4 id="profile-name">User Name</h4>
+                                <p class="text-muted" id="profile-email">user@email.com</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-user me-2"></i>Profile Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="profile-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-first-name" class="form-label">First Name</label>
+                                                <input type="text" class="form-control" id="profile-first-name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-last-name" class="form-label">Last Name</label>
+                                                <input type="text" class="form-control" id="profile-last-name" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-email-input" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="profile-email-input" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-bio" class="form-label">Bio</label>
+                                        <textarea class="form-control" id="profile-bio" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profile-company" class="form-label">Company</label>
+                                        <input type="text" class="form-control" id="profile-company">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Update Profile</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="section-view d-none">
+                <h2 class="mb-4">Settings</h2>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-cog me-2"></i>Account Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="settings-form">
+                                    <div class="mb-4">
+                                        <h6>Notification Preferences</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-email">
+                                            <label class="form-check-label" for="notify-email">Email Notifications</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-sms">
+                                            <label class="form-check-label" for="notify-sms">SMS Notifications</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify-push">
+                                            <label class="form-check-label" for="notify-push">Push Notifications</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>Privacy Settings</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="privacy-profile">
+                                            <label class="form-check-label" for="privacy-profile">Make profile public</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="privacy-activity">
+                                            <label class="form-check-label" for="privacy-activity">Show activity to other users</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>Auto-Posting</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto-posting">
+                                            <label class="form-check-label" for="auto-posting">Enable Auto-Posting</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="auto-posting-time" class="form-label">Preferred Posting Time</label>
+                                            <select class="form-select" id="auto-posting-time">
+                                                <option value="morning">Morning (8 AM - 12 PM)</option>
+                                                <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                                                <option value="evening">Evening (5 PM - 9 PM)</option>
+                                                <option value="night">Night (9 PM - 12 AM)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="fas fa-lock me-2"></i>Change Password</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="password-form">
+                                    <div class="mb-3">
+                                        <label for="current-password" class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" id="current-password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new-password" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="new-password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirm-password" class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" id="confirm-password" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-key me-2"></i>Change Password</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+/**
+ * SocialStory Scheduler v4.0 - Production Ready
+ * ==============================================
+ * 
+ * Professional social media story scheduler with:
+ * - Firebase Authentication (Email/Password & Google)
+ * - Firestore Database for user data and schedules
+ * - Cloudflare R2 Storage for media files (backend API integration)
+ * - AI Content Generation
+ * - Multi-platform scheduling (Facebook, Instagram, TikTok)
+ * - Analytics and Insights
+ * - Admin Panel
+ * 
+ * SETUP INSTRUCTIONS:
+ * ===================
+ * 1. Replace Firebase configuration below with your credentials
+ * 2. Enable Email/Password and Google auth in Firebase Console
+ * 3. Set up Firestore database with security rules
+ * 4. (Optional) Configure R2 Storage via Admin Panel for media uploads
+ * 
+ * Get Firebase config: https://console.firebase.google.com/
+ * Get R2 credentials: https://dash.cloudflare.com/
+ */
+
+class SocialStoryPlatform {
+    constructor() {
+        this.currentUser = null;
+        this.userData = null;
+        this.stories = [];
+        this.scheduledStories = [];
+        this.charts = {};
+        this.isInitialized = false;
+        this.generatedContent = null;
+        this.r2Configured = false;
+        this.currentMediaFile = null;
+        this.firestoreListeners = [];
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initializePlatform());
+        } else {
+            this.initializePlatform();
+        }
+    }
+
+    // Initialize the entire platform
+    initializePlatform() {
+        if (this.isInitialized) return;
+        
+        console.log('%c🚀 Initializing SocialStory Platform v4.0...', 'color: #4361ee; font-size: 16px; font-weight: bold');
+        
+        try {
+            this.initializeFirebase();
+            this.checkR2Status();
+            this.setupEventListeners();
+            this.checkAuthState();
+            this.isInitialized = true;
+            console.log('%c✅ Platform initialized successfully', 'color: #4cc9f0; font-size: 14px');
+        } catch (error) {
+            console.error('❌ Platform initialization failed:', error);
+            this.showNotification('Failed to initialize platform. Please refresh the page.', 'error');
+        }
+    }
+
+    // Firebase configuration and initialization
+    initializeFirebase() {
+        try {
+            // IMPORTANT: Replace this with your own Firebase configuration!
+            // Get it from: https://console.firebase.google.com/ > Project Settings > General
+            const firebaseConfig = {
+                apiKey: "AIzaSyBBipgGaT3gAVa9Xd4mYcmteZRu3M5RtrM",
+                authDomain: "studio-7770709444-57468.firebaseapp.com",
+                projectId: "studio-7770709444-57468",
+                storageBucket: "studio-7770709444-57468.firebasestorage.app",
+                messagingSenderId: "1068351165450",
+                appId: "1:1068351165450:web:e06b73b035096f987afbf3"
+            };
+
+            // Validate configuration
+            if (firebaseConfig.apiKey === "AIzaSyBBipgGaT3gAVa9Xd4mYcmteZRu3M5RtrM") {
+                console.warn('⚠️ Firebase not configured! Please add your Firebase credentials in the script section.');
+                this.showNotification('Please configure Firebase credentials to use authentication features.', 'warning');
+                return;
+            }
+
+            // Initialize Firebase only if not already initialized
+            if (!firebase.apps || firebase.apps.length === 0) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            
+            this.auth = firebase.auth();
+            this.db = firebase.firestore();
+            
+            console.log('✅ Firebase initialized successfully');
+        } catch (error) {
+            console.error('❌ Firebase initialization error:', error);
+            this.showNotification('Failed to connect to Firebase. Please check your configuration.', 'error');
+        }
+    }
+
+    // Check R2 Storage status
+    async checkR2Status() {
+        try {
+            const response = await fetch('/api/r2/status');
+            if (response.ok) {
+                const data = await response.json();
+                this.r2Configured = data.isConfigured;
+                if (this.r2Configured) {
+                    console.log('✅ R2 Storage configured');
+                } else {
+                    console.warn('⚠️ R2 Storage not configured. Media uploads will be disabled.');
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ R2 backend not available. Media uploads will be disabled.');
+            this.r2Configured = false;
+        }
+    }
+
+    // Upload file to R2 Storage via backend API
+    async uploadToR2(file) {
+        if (!this.r2Configured) {
+            throw new Error('R2 storage not configured');
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/r2/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Upload failed');
+        }
+
+        const result = await response.json();
+        return {
+            url: result.url,
+            key: result.key
+        };
+    }
+
+    // Delete file from R2 Storage via backend API
+    async deleteFromR2(key) {
+        if (!this.r2Configured || !key) return;
+
+        try {
+            const response = await fetch('/api/r2/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ key: key })
+            });
+
+            if (!response.ok) {
+                console.error('Failed to delete file from R2');
+            }
+        } catch (error) {
+            console.error('Error deleting from R2:', error);
+        }
+    }
+
+    // Set up all event listeners
+    setupEventListeners() {
+        this.setupAuthEventListeners();
+        this.setupNavigationEventListeners();
+        this.setupStoryEventListeners();
+        this.setupContentGenerationEventListeners();
+        this.setupAdminEventListeners();
+        this.setupProfileEventListeners();
+        this.setupUtilityEventListeners();
+    }
+
+    // Authentication event listeners
+    setupAuthEventListeners() {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const googleLoginBtn = document.getElementById('google-login');
+        const googleSignupBtn = document.getElementById('google-signup');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+        }
+        
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => this.handleSignup(e));
+        }
+        
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', () => this.handleGoogleAuth());
+        }
+        
+        if (googleSignupBtn) {
+            googleSignupBtn.addEventListener('click', () => this.handleGoogleAuth());
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleLogout();
+            });
+        }
+    }
+
+    // Navigation event listeners
+    setupNavigationEventListeners() {
+        const navLinks = document.querySelectorAll('[data-section]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                this.showSection(section);
+                
+                // Update active nav state
+                document.querySelectorAll('.navbar-nav .nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                if (link.classList.contains('nav-link')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Admin tabs
+        const adminTabLinks = document.querySelectorAll('[data-admin-tab]');
+        adminTabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tab = link.getAttribute('data-admin-tab');
+                this.showAdminTab(tab);
+                
+                adminTabLinks.forEach(nav => nav.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Content categories
+        const contentCategories = document.querySelectorAll('.content-category');
+        contentCategories.forEach(category => {
+            category.addEventListener('click', (e) => {
+                const categoryValue = category.getAttribute('data-category');
+                const categorySelect = document.getElementById('content-category');
+                if (categorySelect) {
+                    categorySelect.value = categoryValue;
+                }
+            });
+        });
+    }
+
+    // Story scheduling event listeners
+    setupStoryEventListeners() {
+        const scheduleForm = document.getElementById('schedule-form');
+        const storyContent = document.getElementById('story-content');
+        const storyMedia = document.getElementById('story-media');
+
+        if (scheduleForm) {
+            scheduleForm.addEventListener('submit', (e) => this.handleScheduleStory(e));
+        }
+        
+        if (storyContent) {
+            storyContent.addEventListener('input', () => this.updateStoryPreview());
+        }
+        
+        if (storyMedia) {
+            storyMedia.addEventListener('change', (e) => this.handleMediaUpload(e));
+        }
+    }
+
+    // Content generation event listeners
+    setupContentGenerationEventListeners() {
+        const contentForm = document.getElementById('content-generator-form');
+        const useContentBtn = document.getElementById('use-content-btn');
+        const regenerateContentBtn = document.getElementById('regenerate-content-btn');
+
+        if (contentForm) {
+            contentForm.addEventListener('submit', (e) => this.handleGenerateContent(e));
+        }
+        
+        if (useContentBtn) {
+            useContentBtn.addEventListener('click', () => this.useGeneratedContent());
+        }
+        
+        if (regenerateContentBtn) {
+            regenerateContentBtn.addEventListener('click', () => {
+                const form = document.getElementById('content-generator-form');
+                if (form) {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+    }
+
+    // Admin panel event listeners
+    setupAdminEventListeners() {
+        const platformToggles = ['facebook', 'instagram', 'tiktok'];
+        platformToggles.forEach(platform => {
+            const toggle = document.getElementById(`${platform}-integration`);
+            if (toggle) {
+                toggle.addEventListener('change', (e) => {
+                    this.togglePlatformIntegration(platform, e.target.checked);
+                });
+            }
+        });
+
+        const autoModerationToggle = document.getElementById('auto-moderation');
+        if (autoModerationToggle) {
+            autoModerationToggle.addEventListener('change', (e) => {
+                this.toggleAutoModeration(e.target.checked);
+            });
+        }
+    }
+
+    // Profile and settings event listeners
+    setupProfileEventListeners() {
+        const profileForm = document.getElementById('profile-form');
+        const settingsForm = document.getElementById('settings-form');
+        const passwordForm = document.getElementById('password-form');
+
+        if (profileForm) {
+            profileForm.addEventListener('submit', (e) => this.handleProfileUpdate(e));
+        }
+        
+        if (settingsForm) {
+            settingsForm.addEventListener('submit', (e) => this.handleSettingsUpdate(e));
+        }
+        
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', (e) => this.handlePasswordChange(e));
+        }
+    }
+
+    // Utility event listeners
+    setupUtilityEventListeners() {
+        window.addEventListener('resize', () => {
+            Object.values(this.charts).forEach(chart => {
+                if (chart && typeof chart.resize === 'function') {
+                    chart.resize();
+                }
+            });
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && this.currentUser) {
+                this.refreshDashboardData();
+            }
+        });
+    }
+
+    // Authentication state management
+    checkAuthState() {
+        if (!this.auth) {
+            console.warn('⚠️ Firebase Auth not initialized');
+            return;
+        }
+        
+        this.auth.onAuthStateChanged((user) => {
+            if (user) {
+                this.currentUser = user;
+                this.loadUserData(user.uid);
+                this.showDashboard();
+                this.updateUserInfo(user);
+            } else {
+                this.currentUser = null;
+                this.userData = null;
+                this.showAuth();
+            }
+        });
+    }
+
+    // Handle user login
+    async handleLogin(e) {
+        e.preventDefault();
+        
+        if (!this.auth) {
+            this.showNotification('Firebase not configured. Please add your Firebase credentials.', 'error');
+            return;
+        }
+        
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        
+        if (!email || !password) {
+            this.showNotification('Please enter both email and password', 'error');
+            return;
+        }
+        
+        this.showLoading('Logging in...');
+        
+        try {
+            await this.auth.signInWithEmailAndPassword(email, password);
+            this.showNotification('Login successful!', 'success');
+        } catch (error) {
+            console.error('Login error:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle user signup
+    async handleSignup(e) {
+        e.preventDefault();
+        
+        if (!this.auth) {
+            this.showNotification('Firebase not configured. Please add your Firebase credentials.', 'error');
+            return;
+        }
+        
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('signup-confirm-password').value;
+        
+        if (!name || !email || !password || !confirmPassword) {
+            this.showNotification('Please fill in all fields', 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            this.showNotification('Passwords do not match', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            this.showNotification('Password must be at least 6 characters', 'error');
+            return;
+        }
+        
+        this.showLoading('Creating your account...');
+        
+        try {
+            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            await user.updateProfile({ displayName: name });
+            
+            await this.db.collection('users').doc(user.uid).set({
+                name: name,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                role: 'user',
+                preferences: {
+                    notifications: { email: true, sms: false, push: true },
+                    privacy: { publicProfile: false, showActivity: true },
+                    autoPosting: { enabled: false, preferredTime: 'evening' }
+                }
+            });
+            
+            this.showNotification('Account created successfully!', 'success');
+            document.getElementById('signup-form').reset();
+        } catch (error) {
+            console.error('Signup error:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle Google authentication
+    async handleGoogleAuth() {
+        if (!this.auth) {
+            this.showNotification('Firebase not configured. Please add your Firebase credentials.', 'error');
+            return;
+        }
+        
+        this.showLoading('Signing in with Google...');
+        
+        try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            const result = await this.auth.signInWithPopup(provider);
+            const user = result.user;
+            
+            const userDoc = await this.db.collection('users').doc(user.uid).get();
+            
+            if (!userDoc.exists) {
+                await this.db.collection('users').doc(user.uid).set({
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'user',
+                    preferences: {
+                        notifications: { email: true, sms: false, push: true },
+                        privacy: { publicProfile: false, showActivity: true },
+                        autoPosting: { enabled: false, preferredTime: 'evening' }
+                    }
+                });
+            }
+            
+            this.showNotification('Google sign-in successful!', 'success');
+        } catch (error) {
+            console.error('Google auth error:', error);
+            if (error.code !== 'auth/popup-closed-by-user') {
+                this.showNotification(this.getAuthErrorMessage(error), 'error');
+            }
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle logout
+    async handleLogout() {
+        if (!this.auth) return;
+        
+        this.showLoading('Logging out...');
+        
+        try {
+            await this.auth.signOut();
+            this.stories = [];
+            this.scheduledStories = [];
+            this.showNotification('Logged out successfully', 'success');
+        } catch (error) {
+            console.error('Logout error:', error);
+            this.showNotification('Error logging out', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Load user data
+    async loadUserData(uid) {
+        if (!this.db) return;
+        
+        try {
+            const userDoc = await this.db.collection('users').doc(uid).get();
+            if (userDoc.exists) {
+                this.userData = { id: uid, ...userDoc.data() };
+                this.loadProfileData();
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error);
+        }
+    }
+
+    // Update user info in navbar
+    updateUserInfo(user) {
+        const userNameEl = document.getElementById('user-name');
+        if (userNameEl) {
+            userNameEl.textContent = user.displayName || user.email || 'User';
+        }
+    }
+
+    // Handle schedule story
+    async handleScheduleStory(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser) {
+            this.showNotification('Please login first', 'error');
+            return;
+        }
+        
+        const platforms = [];
+        if (document.getElementById('platform-facebook').checked) platforms.push('facebook');
+        if (document.getElementById('platform-instagram').checked) platforms.push('instagram');
+        if (document.getElementById('platform-tiktok').checked) platforms.push('tiktok');
+        
+        const content = document.getElementById('story-content').value.trim();
+        const category = document.getElementById('story-category').value;
+        const scheduleDate = document.getElementById('schedule-date').value;
+        const mediaFile = document.getElementById('story-media').files[0];
+        
+        if (platforms.length === 0) {
+            this.showNotification('Please select at least one platform', 'error');
+            return;
+        }
+        
+        if (!content) {
+            this.showNotification('Please enter story content', 'error');
+            return;
+        }
+        
+        if (!scheduleDate) {
+            this.showNotification('Please select a date and time', 'error');
+            return;
+        }
+        
+        const scheduledTime = new Date(scheduleDate);
+        if (scheduledTime <= new Date()) {
+            this.showNotification('Please select a future date and time', 'error');
+            return;
+        }
+        
+        this.showLoading('Scheduling story...');
+        
+        try {
+            let mediaURL = null;
+            let mediaKey = null;
+            
+            // Upload media to R2 if file exists and R2 is configured
+            if (mediaFile && this.r2Configured) {
+                try {
+                    const uploadResult = await this.uploadToR2(mediaFile);
+                    mediaURL = uploadResult.url;
+                    mediaKey = uploadResult.key;
+                } catch (uploadError) {
+                    console.error('Media upload failed:', uploadError);
+                    this.showNotification('Warning: Media upload failed. Story will be created without media.', 'warning');
+                }
+            } else if (mediaFile && !this.r2Configured) {
+                this.showNotification('Warning: R2 storage not configured. Story will be created without media.', 'warning');
+            }
+            
+            const story = {
+                userId: this.currentUser.uid,
+                content: content,
+                category: category,
+                platforms: platforms,
+                scheduledTime: firebase.firestore.Timestamp.fromDate(scheduledTime),
+                mediaURL: mediaURL,
+                mediaKey: mediaKey,
+                status: 'scheduled',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (this.db) {
+                await this.db.collection('stories').add(story);
+            }
+            
+            this.showNotification('Story scheduled successfully!', 'success');
+            document.getElementById('schedule-form').reset();
+            document.getElementById('preview-image').classList.add('d-none');
+            document.getElementById('preview-text').textContent = 'Your story content will appear here';
+            
+            this.loadScheduledStories();
+            this.loadDashboardData();
+        } catch (error) {
+            console.error('Error scheduling story:', error);
+            this.showNotification('Error scheduling story: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Load scheduled stories
+    async loadScheduledStories() {
+        if (!this.currentUser || !this.db) return;
+        
+        try {
+            const snapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .where('status', '==', 'scheduled')
+                .orderBy('scheduledTime', 'desc')
+                .limit(10)
+                .get();
+            
+            const listContainer = document.getElementById('scheduled-stories-list');
+            
+            if (snapshot.empty) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>No scheduled stories</h3>
+                        <p>Schedule your first story above!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            snapshot.forEach(doc => {
+                const story = doc.data();
+                const scheduledDate = story.scheduledTime.toDate();
+                const platformBadges = story.platforms.map(p => 
+                    `<span class="platform-badge badge-${p}">${p}</span>`
+                ).join('');
+                
+                html += `
+                    <div class="scheduled-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="mb-2">${platformBadges}</div>
+                                <p class="mb-1">${this.escapeHtml(story.content.substring(0, 100))}${story.content.length > 100 ? '...' : ''}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>${this.formatDate(scheduledDate)}
+                                    <span class="ms-3"><i class="fas fa-tag me-1"></i>${story.category}</span>
+                                </small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger ms-3" onclick="platform.deleteStory('${doc.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading scheduled stories:', error);
+        }
+    }
+
+    // Delete story
+    async deleteStory(storyId) {
+        if (!confirm('Are you sure you want to delete this scheduled story?')) return;
+        
+        this.showLoading('Deleting story...');
+        
+        try {
+            if (this.db) {
+                // Get story data to retrieve media key
+                const storyDoc = await this.db.collection('stories').doc(storyId).get();
+                const storyData = storyDoc.data();
+                
+                // Delete media from R2 if it exists
+                if (storyData && storyData.mediaKey) {
+                    await this.deleteFromR2(storyData.mediaKey);
+                }
+                
+                // Delete story document from Firestore
+                await this.db.collection('stories').doc(storyId).delete();
+                
+                this.showNotification('Story deleted successfully', 'success');
+                this.loadScheduledStories();
+                this.loadDashboardData();
+            }
+        } catch (error) {
+            console.error('Error deleting story:', error);
+            this.showNotification('Error deleting story', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Load dashboard data
+    async loadDashboardData() {
+        if (!this.currentUser || !this.db) return;
+        
+        try {
+            const storiesSnapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .get();
+            
+            const total = storiesSnapshot.size;
+            let scheduled = 0;
+            let published = 0;
+            
+            storiesSnapshot.forEach(doc => {
+                const story = doc.data();
+                if (story.status === 'scheduled') scheduled++;
+                if (story.status === 'published') published++;
+            });
+            
+            document.getElementById('total-stories').textContent = total;
+            document.getElementById('scheduled-stories').textContent = scheduled;
+            document.getElementById('published-stories').textContent = published;
+            document.getElementById('engagement-rate').textContent = total > 0 ? '75%' : '0%';
+            
+            this.loadRecentActivity();
+            this.initializeCharts();
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+
+    // Load recent activity
+    async loadRecentActivity() {
+        if (!this.currentUser || !this.db) return;
+        
+        try {
+            const snapshot = await this.db.collection('stories')
+                .where('userId', '==', this.currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .limit(5)
+                .get();
+            
+            const activityContainer = document.getElementById('recent-activity');
+            
+            if (snapshot.empty) {
+                activityContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No recent activity</h3>
+                        <p>Your activity will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="list-group">';
+            snapshot.forEach(doc => {
+                const story = doc.data();
+                const createdDate = story.createdAt ? story.createdAt.toDate() : new Date();
+                
+                html += `
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">${this.escapeHtml(story.content.substring(0, 50))}...</h6>
+                            <small>${this.getTimeAgo(createdDate)}</small>
+                        </div>
+                        <small class="text-muted">${story.category} • ${story.status}</small>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            activityContainer.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading recent activity:', error);
+            const activityContainer = document.getElementById('recent-activity');
+            activityContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No recent activity</h3>
+                    <p>Your activity will appear here</p>
+                </div>
+            `;
+        }
+    }
+
+    // Handle content generation
+    handleGenerateContent(e) {
+        e.preventDefault();
+        
+        const category = document.getElementById('content-category').value;
+        const keywords = document.getElementById('content-keywords').value.trim();
+        
+        const content = this.generateContentByCategoryfunction(category, keywords);
+        
+        document.getElementById('generated-content').textContent = content;
+        document.getElementById('use-content-btn').disabled = false;
+        document.getElementById('regenerate-content-btn').disabled = false;
+        
+        this.generatedContent = content;
+        this.showNotification('Content generated successfully!', 'success');
+    }
+
+    // Generate content by category
+    generateContentByCategory(category, keywords) {
+        const templates = {
+            movies: [
+                `Just watched an incredible ${keywords || 'movie'}! The storytelling was amazing and the visuals were stunning. Highly recommend! 🎬✨`,
+                `Movie night done right! ${keywords || 'This film'} exceeded all expectations. A must-watch for anyone who loves great cinema! 🍿`,
+                `Can't stop thinking about this ${keywords || 'movie'}. The plot twists kept me on the edge of my seat! What did you think? 🎥`
+            ],
+            tv: [
+                `Currently binge-watching ${keywords || 'this series'} and I can't get enough! The character development is incredible. 📺`,
+                `New episode alert! ${keywords || 'This show'} just keeps getting better. Who else is watching? 🎭`,
+                `Just finished ${keywords || 'this series'} and WOW! What a journey. Already missing the characters! 💫`
+            ],
+            sports: [
+                `What a game! ${keywords || 'The team'} showed incredible skill and determination today. So proud! ⚽🏆`,
+                `Sports fan alert! ${keywords || 'This match'} was absolutely thrilling from start to finish! 🏅`,
+                `Can't believe what I just witnessed! ${keywords || 'That play'} was legendary. Best game of the season! 🔥`
+            ],
+            recipes: [
+                `Just made this delicious ${keywords || 'recipe'} and it turned out perfect! Sharing the love of cooking! 🍳👨‍🍳`,
+                `Foodie moment! This ${keywords || 'dish'} is so easy to make and tastes incredible. Recipe coming soon! 🥘`,
+                `Cooking therapy at its finest! Made ${keywords || 'this amazing dish'} today. Who wants the recipe? 😋`
+            ],
+            games: [
+                `Gaming session complete! ${keywords || 'This game'} is absolutely addictive. Who else is playing? 🎮`,
+                `New high score! ${keywords || 'This game'} keeps surprising me with new challenges. Love it! 🕹️`,
+                `Just discovered ${keywords || 'this game'} and I'm hooked! The graphics and gameplay are top-notch! 🎯`
+            ],
+            apps: [
+                `Found this amazing ${keywords || 'app'} that's making my life so much easier! Highly recommend checking it out! 📱`,
+                `App of the day! ${keywords || 'This app'} has some incredible features. Download it now! ✨`,
+                `Productivity boost! ${keywords || 'This app'} is a game-changer for getting things done! 🚀`
+            ]
+        };
+        
+        const categoryTemplates = templates[category] || templates.movies;
+        const randomIndex = Math.floor(Math.random() * categoryTemplates.length);
+        
+        return categoryTemplates[randomIndex];
+    }
+
+    // Use generated content
+    useGeneratedContent() {
+        if (!this.generatedContent) return;
+        
+        document.getElementById('story-content').value = this.generatedContent;
+        this.updateStoryPreview();
+        this.showSection('schedule');
+        this.showNotification('Content added to story form', 'success');
+    }
+
+    // Update story preview
+    updateStoryPreview() {
+        const content = document.getElementById('story-content').value;
+        const previewText = document.getElementById('preview-text');
+        
+        if (previewText) {
+            previewText.textContent = content || 'Your story content will appear here';
+        }
+    }
+
+    // Handle media upload
+    handleMediaUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime'];
+        if (!validTypes.includes(file.type)) {
+            this.showNotification('Please select a valid image or video file (JPG, PNG, GIF, MP4, MOV)', 'error');
+            e.target.value = '';
+            return;
+        }
+        
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            this.showNotification('File size must be less than 10MB', 'error');
+            e.target.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const previewImage = document.getElementById('preview-image');
+            if (previewImage) {
+                previewImage.src = event.target.result;
+                previewImage.classList.remove('d-none');
+            }
+        };
+        reader.onerror = () => {
+            this.showNotification('Error reading file', 'error');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Load profile data
+    loadProfileData() {
+        if (!this.userData) return;
+        
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileEmailInput = document.getElementById('profile-email-input');
+        const profileInitials = document.getElementById('profile-initials');
+        const profileFirstName = document.getElementById('profile-first-name');
+        const profileLastName = document.getElementById('profile-last-name');
+        const profileBio = document.getElementById('profile-bio');
+        const profileCompany = document.getElementById('profile-company');
+        
+        if (profileName) profileName.textContent = this.userData.name || 'User Name';
+        if (profileEmail) profileEmail.textContent = this.userData.email || '';
+        if (profileEmailInput) profileEmailInput.value = this.userData.email || '';
+        
+        if (profileInitials) {
+            const initials = this.userData.name ? 
+                this.userData.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 
+                (this.userData.email ? this.userData.email[0].toUpperCase() : 'U');
+            profileInitials.textContent = initials;
+        }
+        
+        if (profileFirstName && profileLastName && this.userData.name) {
+            const nameParts = this.userData.name.split(' ');
+            profileFirstName.value = nameParts[0] || '';
+            profileLastName.value = nameParts.slice(1).join(' ') || '';
+        }
+        
+        if (profileBio) profileBio.value = this.userData.bio || '';
+        if (profileCompany) profileCompany.value = this.userData.company || '';
+        
+        this.loadSettingsData();
+    }
+
+    // Load settings data
+    loadSettingsData() {
+        if (!this.userData || !this.userData.preferences) return;
+        
+        const prefs = this.userData.preferences;
+        
+        if (prefs.notifications) {
+            const notifyEmail = document.getElementById('notify-email');
+            const notifySMS = document.getElementById('notify-sms');
+            const notifyPush = document.getElementById('notify-push');
+            
+            if (notifyEmail) notifyEmail.checked = prefs.notifications.email || false;
+            if (notifySMS) notifySMS.checked = prefs.notifications.sms || false;
+            if (notifyPush) notifyPush.checked = prefs.notifications.push || false;
+        }
+        
+        if (prefs.privacy) {
+            const privacyProfile = document.getElementById('privacy-profile');
+            const privacyActivity = document.getElementById('privacy-activity');
+            
+            if (privacyProfile) privacyProfile.checked = prefs.privacy.publicProfile || false;
+            if (privacyActivity) privacyActivity.checked = prefs.privacy.showActivity || false;
+        }
+        
+        if (prefs.autoPosting) {
+            const autoPosting = document.getElementById('auto-posting');
+            const autoPostingTime = document.getElementById('auto-posting-time');
+            
+            if (autoPosting) autoPosting.checked = prefs.autoPosting.enabled || false;
+            if (autoPostingTime) autoPostingTime.value = prefs.autoPosting.preferredTime || 'evening';
+        }
+    }
+
+    // Handle profile update
+    async handleProfileUpdate(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser || !this.db) return;
+        
+        const firstName = document.getElementById('profile-first-name').value.trim();
+        const lastName = document.getElementById('profile-last-name').value.trim();
+        const bio = document.getElementById('profile-bio').value.trim();
+        const company = document.getElementById('profile-company').value.trim();
+        
+        const fullName = `${firstName} ${lastName}`.trim();
+        
+        if (!fullName) {
+            this.showNotification('Please enter your name', 'error');
+            return;
+        }
+        
+        this.showLoading('Updating profile...');
+        
+        try {
+            await this.db.collection('users').doc(this.currentUser.uid).update({
+                name: fullName,
+                bio: bio,
+                company: company,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            await this.currentUser.updateProfile({
+                displayName: fullName
+            });
+            
+            await this.loadUserData(this.currentUser.uid);
+            this.updateUserInfo(this.currentUser);
+            
+            this.showNotification('Profile updated successfully!', 'success');
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            this.showNotification('Error updating profile: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle settings update
+    async handleSettingsUpdate(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser || !this.db) return;
+        
+        const notifyEmail = document.getElementById('notify-email').checked;
+        const notifySMS = document.getElementById('notify-sms').checked;
+        const notifyPush = document.getElementById('notify-push').checked;
+        const privacyProfile = document.getElementById('privacy-profile').checked;
+        const privacyActivity = document.getElementById('privacy-activity').checked;
+        const autoPosting = document.getElementById('auto-posting').checked;
+        const autoPostingTime = document.getElementById('auto-posting-time').value;
+        
+        this.showLoading('Updating settings...');
+        
+        try {
+            await this.db.collection('users').doc(this.currentUser.uid).update({
+                'preferences.notifications.email': notifyEmail,
+                'preferences.notifications.sms': notifySMS,
+                'preferences.notifications.push': notifyPush,
+                'preferences.privacy.publicProfile': privacyProfile,
+                'preferences.privacy.showActivity': privacyActivity,
+                'preferences.autoPosting.enabled': autoPosting,
+                'preferences.autoPosting.preferredTime': autoPostingTime,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            this.showNotification('Settings updated successfully!', 'success');
+        } catch (error) {
+            console.error('Error updating settings:', error);
+            this.showNotification('Error updating settings: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Handle password change
+    async handlePasswordChange(e) {
+        e.preventDefault();
+        
+        if (!this.currentUser) return;
+        
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            this.showNotification('Please fill in all password fields', 'error');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            this.showNotification('New passwords do not match', 'error');
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            this.showNotification('New password must be at least 6 characters', 'error');
+            return;
+        }
+        
+        this.showLoading('Changing password...');
+        
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(
+                this.currentUser.email,
+                currentPassword
+            );
+            
+            await this.currentUser.reauthenticateWithCredential(credential);
+            await this.currentUser.updatePassword(newPassword);
+            
+            document.getElementById('password-form').reset();
+            this.showNotification('Password changed successfully!', 'success');
+        } catch (error) {
+            console.error('Error changing password:', error);
+            this.showNotification(this.getAuthErrorMessage(error), 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Toggle platform integration
+    togglePlatformIntegration(platform, enabled) {
+        console.log(`${platform} integration ${enabled ? 'enabled' : 'disabled'}`);
+        this.showNotification(`${platform} integration ${enabled ? 'enabled' : 'disabled'}`, 'info');
+    }
+
+    // Toggle auto-moderation
+    toggleAutoModeration(enabled) {
+        console.log(`Auto-moderation ${enabled ? 'enabled' : 'disabled'}`);
+        this.showNotification(`Auto-moderation ${enabled ? 'enabled' : 'disabled'}`, 'info');
+    }
+
+    // Initialize charts
+    initializeCharts() {
+        // Platform Performance Chart
+        const platformCtx = document.getElementById('platform-chart');
+        if (platformCtx && typeof Chart !== 'undefined') {
+            if (this.charts.platform) {
+                this.charts.platform.destroy();
+            }
+            
+            this.charts.platform = new Chart(platformCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Facebook', 'Instagram', 'TikTok'],
+                    datasets: [{
+                        data: [30, 45, 25],
+                        backgroundColor: ['#3b5998', '#e1306c', '#000000'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Performance Chart
+        const performanceCtx = document.getElementById('performance-chart');
+        if (performanceCtx && typeof Chart !== 'undefined') {
+            if (this.charts.performance) {
+                this.charts.performance.destroy();
+            }
+            
+            this.charts.performance = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Stories Published',
+                        data: [12, 19, 15, 25, 22, 30],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Engagement Rate',
+                        data: [65, 59, 70, 75, 72, 80],
+                        borderColor: '#f72585',
+                        backgroundColor: 'rgba(247, 37, 133, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Category Chart
+        const categoryCtx = document.getElementById('category-chart');
+        if (categoryCtx && typeof Chart !== 'undefined') {
+            if (this.charts.category) {
+                this.charts.category.destroy();
+            }
+            
+            this.charts.category = new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Movies', 'TV', 'Sports', 'Recipes', 'Games', 'Apps'],
+                    datasets: [{
+                        label: 'Engagement',
+                        data: [85, 78, 92, 65, 88, 72],
+                        backgroundColor: [
+                            '#ff6b6b', '#4ecdc4', '#45b7d1',
+                            '#f9c74f', '#9d4edd', '#f8961e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Time Chart
+        const timeCtx = document.getElementById('time-chart');
+        if (timeCtx && typeof Chart !== 'undefined') {
+            if (this.charts.time) {
+                this.charts.time.destroy();
+            }
+            
+            this.charts.time = new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['6AM', '9AM', '12PM', '3PM', '6PM', '9PM'],
+                    datasets: [{
+                        label: 'Engagement',
+                        data: [35, 65, 80, 75, 90, 70],
+                        backgroundColor: '#4361ee'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Show/hide sections
+    showAuth() {
+        document.getElementById('auth-section').classList.remove('d-none');
+        document.getElementById('dashboard-section').classList.add('d-none');
+    }
+
+    showDashboard() {
+        document.getElementById('auth-section').classList.add('d-none');
+        document.getElementById('dashboard-section').classList.remove('d-none');
+        this.showSection('dashboard');
+    }
+
+    showSection(sectionName) {
+        document.querySelectorAll('.section-view').forEach(view => {
+            view.classList.add('d-none');
+        });
+        
+        const section = document.getElementById(`${sectionName}-view`);
+        if (section) {
+            section.classList.remove('d-none');
+            this.loadSectionData(sectionName);
+        }
+    }
+
+    showAdminTab(tabName) {
+        document.querySelectorAll('.admin-tab-content').forEach(tab => {
+            tab.classList.add('d-none');
+        });
+        
+        const tab = document.getElementById(`admin-${tabName}`);
+        if (tab) {
+            tab.classList.remove('d-none');
+        }
+    }
+
+    loadSectionData(sectionName) {
+        switch (sectionName) {
+            case 'dashboard':
+                this.loadDashboardData();
+                break;
+            case 'schedule':
+                this.loadScheduledStories();
+                break;
+            case 'analytics':
+                this.initializeCharts();
+                break;
+            case 'profile':
+                this.loadProfileData();
+                break;
+            case 'settings':
+                this.loadSettingsData();
+                break;
+        }
+    }
+
+    refreshDashboardData() {
+        if (this.currentUser) {
+            this.loadDashboardData();
+            this.loadScheduledStories();
+        }
+    }
+
+    // Utility functions
+    showLoading(message = 'Loading...') {
+        const overlay = document.getElementById('loading-overlay');
+        const text = document.getElementById('loading-text');
+        if (overlay) {
+            if (text) text.textContent = message;
+            overlay.classList.add('show');
+        }
+    }
+
+    hideLoading() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        const container = document.querySelector('.toast-container');
+        if (!container) return;
+        
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `custom-toast toast-${type} p-3 mb-2`;
+        toast.style.borderRadius = '8px';
+        
+        const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+        
+        toast.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-${icon} me-2"></i>
+                <div class="flex-grow-1">${this.escapeHtml(message)}</div>
+                <button type="button" class="btn-close btn-close-white ms-2" onclick="document.getElementById('${toastId}').remove()"></button>
+            </div>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.3s';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    getAuthErrorMessage(error) {
+        const errorMessages = {
+            'auth/user-not-found': 'No account found with this email',
+            'auth/wrong-password': 'Incorrect password',
+            'auth/email-already-in-use': 'Email already in use',
+            'auth/weak-password': 'Password is too weak',
+            'auth/invalid-email': 'Invalid email address',
+            'auth/operation-not-allowed': 'Operation not allowed',
+            'auth/requires-recent-login': 'Please login again to perform this action'
+        };
+        
+        return errorMessages[error.code] || error.message || 'An error occurred';
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    formatDate(date) {
+        const options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        const intervals = {
+            year: 31536000,
+            month: 2592000,
+            week: 604800,
+            day: 86400,
+            hour: 3600,
+            minute: 60
+        };
+        
+        for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+            const interval = Math.floor(seconds / secondsInUnit);
+            if (interval >= 1) {
+                return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
+            }
+        }
+        
+        return 'Just now';
+    }
+}
+
+// Initialize the platform
+const platform = new SocialStoryPlatform();
+
+// Make platform globally accessible for event handlers
+window.platform = platform;
+    </script>
+</body>
+</html>
