@@ -76,8 +76,8 @@
         (function(){
             "use strict";
 
-            // ---------- الرابط المحول (dl=1) مع إمكانية إضافة معامل raw احتياطي ----------
-            const AUDIO_URL = 'https://www.dropbox.com/scl/fi/df0c05o2z5bxt2ofetk5a/lucy_s_hunt.mp3?rlkey=gt7jw8086tpqdn03mz8l1mms7&dl=1';
+            // ---------- رابط GitHub Raw الجديد (يدعم CORS) ----------
+            const AUDIO_URL = 'https://github.com/turkifyy/t1315fy/raw/refs/heads/main/lucy_s_hunt.mp3';
             
             const master = document.getElementById('masterContainer');
             const splash = document.getElementById('splashScreen');
@@ -90,18 +90,13 @@
             let musicActive = false;
             let musicAudible = false;
 
-            // ---------- محاولة تشغيل صامت عبر Web Audio مع CORS ----------
+            // ---------- محاولة تشغيل صامت عبر Web Audio ----------
             async function trySilentWebAudio() {
                 try {
                     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
                     webAudio.context = new AudioContextClass();
                     
-                    // استخدام fetch مع crossorigin
-                    const response = await fetch(AUDIO_URL, { 
-                        mode: 'cors',
-                        credentials: 'omit',
-                        cache: 'default'
-                    });
+                    const response = await fetch(AUDIO_URL);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     
                     const arrayBuffer = await response.arrayBuffer();
@@ -120,7 +115,7 @@
                     
                     musicActive = true;
                     musicAudible = false;
-                    console.log('🔇 Web Audio صامت يعمل.');
+                    console.log('🔇 Web Audio صامت يعمل (GitHub Raw).');
                     return true;
                 } catch (e) {
                     console.warn('Web Audio فشل:', e.message);
@@ -132,7 +127,7 @@
             function trySilentAudioElement() {
                 return new Promise((resolve) => {
                     const audio = new Audio();
-                    audio.crossOrigin = 'anonymous';  // مهم لـ CORS
+                    audio.crossOrigin = 'anonymous';
                     audio.src = AUDIO_URL;
                     audio.loop = true;
                     audio.volume = 0.0;
@@ -141,7 +136,7 @@
                         fallbackAudio = audio;
                         musicActive = true;
                         musicAudible = false;
-                        console.log('🔇 Audio element صامت يعمل.');
+                        console.log('🔇 Audio element صامت يعمل (GitHub Raw).');
                         resolve(true);
                     }).catch((err) => {
                         console.warn('Audio element فشل:', err);
@@ -304,7 +299,7 @@
 
             window.addEventListener('beforeunload', () => { if (loadTimeout) clearTimeout(loadTimeout); stopAllAudio(); });
 
-            console.log('🚀 التطبيق جاهز: الموسيقى من الرابط المحول dl=1 مع CORS مناسب.');
+            console.log('🚀 التطبيق جاهز: الموسيقى من GitHub Raw تدعم CORS بشكل كامل.');
         })();
     </script>
 </body>
