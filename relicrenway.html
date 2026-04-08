@@ -4,23 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
     <title>🎮 Splash + موسيقى ذكية | Relic Runway</title>
+
     <!-- Bootstrap 5 RTL -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Cairo', sans-serif; }
-        body { display: flex; align-items: center; justify-content: center; min-height: 100dvh; min-width: 100dvw; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
-        .game-master-container { position: relative; width: 100%; height: 100%; max-width: 100vw; max-height: 100vh; background: #0b0e14; overflow: hidden; }
-        .iframe-full-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #0a0c12; pointer-events: none; }
-        .game-master-container.splash-hidden .iframe-full-wrapper { pointer-events: auto; }
-        #gameFrame { width: 100%; height: 100%; border: none; display: block; background: #0f1219; }
-        .fullscreen-splash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; transition: opacity 0.45s, visibility 0.45s; will-change: opacity; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .splash-image { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
-        @media (min-aspect-ratio: 21/9) { .splash-image { object-fit: contain; background: #000; } }
-        .fullscreen-splash.splash-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Cairo', sans-serif;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100dvh;
+            min-width: 100dvw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        .game-master-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            background: #0b0e14;
+            overflow: hidden;
+        }
+        .iframe-full-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: #0a0c12;
+            pointer-events: none;
+        }
+        .game-master-container.splash-hidden .iframe-full-wrapper {
+            pointer-events: auto;
+        }
+        #gameFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: #0f1219;
+        }
+        .fullscreen-splash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            cursor: pointer;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.45s, visibility 0.45s;
+            will-change: opacity;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .splash-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            display: block;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        @media (min-aspect-ratio: 21/9) {
+            .splash-image {
+                object-fit: contain;
+                background: #000;
+            }
+        }
+        .fullscreen-splash.splash-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
 
-        /* زر الصوت */
         .sound-control-btn {
             position: absolute;
             bottom: 30px;
@@ -41,47 +119,86 @@
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(0,0,0,0.6);
             transition: all 0.3s ease;
-            border: none;
             outline: none;
             white-space: nowrap;
         }
-        .sound-control-btn:hover { background: rgba(40, 45, 60, 0.9); border-color: gold; transform: translateX(-50%) scale(1.02); }
-        .sound-control-btn:active { transform: translateX(-50%) scale(0.98); }
-        .sound-control-btn.hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s, visibility 0.3s; }
-        @media (max-width: 480px) { .sound-control-btn { padding: 10px 20px; font-size: 1rem; bottom: 20px; } }
+        .sound-control-btn:hover {
+            background: rgba(40, 45, 60, 0.9);
+            border-color: gold;
+            transform: translateX(-50%) scale(1.02);
+        }
+        .sound-control-btn:active {
+            transform: translateX(-50%) scale(0.98);
+        }
+        .sound-control-btn.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        @media (max-width: 480px) {
+            .sound-control-btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+                bottom: 20px;
+            }
+        }
 
         .preload-hint {
-            position: absolute; bottom: 100px; left: 0; right: 0; text-align: center;
-            color: rgba(255,255,255,0.5); font-size: 0.9rem; z-index: 5; pointer-events: none;
-            backdrop-filter: blur(4px); width: fit-content; margin: 0 auto; padding: 6px 18px;
-            border-radius: 40px; background: rgba(10,15,20,0.2); border: 1px solid rgba(255,215,0,0.15);
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            z-index: 5;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+            width: fit-content;
+            margin: 0 auto;
+            padding: 6px 18px;
+            border-radius: 40px;
+            background: rgba(10,15,20,0.2);
+            border: 1px solid rgba(255,215,0,0.15);
             transition: opacity 0.5s;
         }
-        @media (min-width: 1920px) { .preload-hint { font-size: 1.4rem; padding: 12px 32px; } }
+        @media (min-width: 1920px) {
+            .preload-hint {
+                font-size: 1.4rem;
+                padding: 12px 32px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="game-master-container" id="masterContainer">
         <div class="iframe-full-wrapper">
-            <iframe id="gameFrame" title="Relic Runway Game" src="https://gemioli.com/relicrunway/" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="eager" importance="high"></iframe>
+            <iframe
+                id="gameFrame"
+                title="Relic Runway Game"
+                src="https://gemioli.com/relicrunway/"
+                allow="autoplay; fullscreen; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                loading="eager">
+            </iframe>
             <div class="preload-hint" id="loadingHint">⏳ جاري تحميل المغامرة...</div>
         </div>
+
         <div class="fullscreen-splash" id="splashScreen">
             <img src="https://turkify.netlify.app/20260407_221107.webp" alt="Splash Screen" class="splash-image" loading="eager" fetchpriority="high" decoding="async" draggable="false">
-            <button class="sound-control-btn" id="soundButton"><span>🔇</span> <span>تشغيل الصوت</span></button>
+            <button class="sound-control-btn" id="soundButton" type="button">
+                <span>🔇</span>
+                <span>تشغيل الصوت</span>
+            </button>
         </div>
     </div>
 
-    <!-- عنصر الصوت المخفي مع autoplay و muted -->
-    <audio id="bgMusic" loop autoplay muted crossorigin="anonymous" style="display: none;">
-        <source src="https://github.com/turkifyy/t1315fy/raw/refs/heads/main/lucy_s_hunt.mp3" type="audio/mpeg">
+    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous" style="display: none;">
+        <source src="https://raw.githubusercontent.com/turkifyy/t1315fy/main/lucy_s_hunt.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- زر وهمي للمحاكاة البشرية التلقائية -->
-    <button id="dummyUnmuteBtn" style="position: fixed; opacity: 0; pointer-events: none; width: 1px; height: 1px;"></button>
-
     <script>
-        (function(){
+        (function () {
             "use strict";
 
             const master = document.getElementById('masterContainer');
@@ -90,140 +207,162 @@
             const hint = document.getElementById('loadingHint');
             const soundBtn = document.getElementById('soundButton');
             const bgMusic = document.getElementById('bgMusic');
-            const dummyBtn = document.getElementById('dummyUnmuteBtn');
 
-            let musicActive = false;       // هل عنصر الصوت يعمل
-            let musicAudible = false;      // هل الصوت مسموع (غير مكتوم)
-            let autoUnmuteAttempted = false;
+            let splashHidden = false;
+            let autoplayTried = false;
+            let musicStarted = false;
 
-            // ضبط مستوى الصوت
             bgMusic.volume = 0.5;
 
-            // ---------- دالة إلغاء الكتم (يجب استدعاؤها من حدث نقر حقيقي أو محاكى) ----------
-            function unmuteAudio() {
-                if (!bgMusic) return false;
-                if (!musicAudible) {
-                    bgMusic.muted = false;
-                    musicAudible = true;
-                    console.log('🔊 تم إلغاء كتم الموسيقى.');
-                }
-                return true;
-            }
+            function setButtonState(state) {
+                const icon = soundBtn.querySelector('span:first-child');
+                const text = soundBtn.querySelector('span:last-child');
 
-            // ---------- محاكاة نقرة بشرية على الزر الوهمي لتشغيل الصوت تلقائياً ----------
-            function simulateHumanUnmute() {
-                if (autoUnmuteAttempted) return;
-                autoUnmuteAttempted = true;
+                if (!icon || !text) return;
 
-                // نرسل حدث click للزر الوهمي
-                const clickEvent = new MouseEvent('click', {
-                    view: window,
-                    bubbles: true,
-                    cancelable: true
-                });
-                dummyBtn.dispatchEvent(clickEvent);
-            }
-
-            // عند النقر على الزر الوهمي (قد يكون برمجياً أو يدوياً) نقوم بإلغاء الكتم وإخفاء الزر الحقيقي
-            dummyBtn.addEventListener('click', function(e) {
-                unmuteAudio();
-                if (musicAudible) {
+                if (state === 'playing') {
+                    icon.textContent = '🔊';
+                    text.textContent = 'الصوت يعمل';
                     soundBtn.classList.add('hidden');
-                    console.log('✅ تم إلغاء الكتم تلقائياً عبر المحاكاة.');
+                } else if (state === 'loading') {
+                    icon.textContent = '⏳';
+                    text.textContent = 'جاري التشغيل...';
+                    soundBtn.classList.remove('hidden');
+                } else {
+                    icon.textContent = '🔇';
+                    text.textContent = 'تشغيل الصوت';
+                    soundBtn.classList.remove('hidden');
                 }
-            });
+            }
 
-            // ---------- معالج النقر الحقيقي على زر الصوت ----------
-            soundBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                unmuteAudio();
-                soundBtn.classList.add('hidden');
-            });
+            async function playMusicFromUserGesture() {
+                try {
+                    bgMusic.muted = false;
+                    await bgMusic.play();
+                    musicStarted = true;
+                    setButtonState('playing');
+                    console.log('🔊 الموسيقى اشتغلت بنجاح.');
+                    return true;
+                } catch (err) {
+                    console.warn('فشل تشغيل الموسيقى:', err);
+                    setButtonState('ready');
+                    return false;
+                }
+            }
 
-            // ---------- إخفاء السبلاش وإيقاف الموسيقى ----------
-            let splashHidden = false;
+            async function tryMutedAutoplay() {
+                if (autoplayTried) return;
+                autoplayTried = true;
+
+                try {
+                    bgMusic.muted = true;
+                    await bgMusic.play();
+                    console.log('🔇 تم تشغيل الموسيقى بصمت.');
+                    setButtonState('ready');
+                } catch (err) {
+                    console.warn('Autoplay مرفوض من المتصفح:', err);
+                    bgMusic.pause();
+                    bgMusic.currentTime = 0;
+                    setButtonState('ready');
+                }
+            }
+
             function hideSplash() {
                 if (splashHidden) return;
-                // إيقاف الموسيقى
-                bgMusic.pause();
-                bgMusic.currentTime = 0;
-                musicActive = false;
-                musicAudible = false;
-                
+
                 splash.classList.add('splash-hidden');
                 master.classList.add('splash-hidden');
+
                 if (hint) {
                     hint.style.opacity = '0';
-                    setTimeout(() => { if(hint) hint.style.display = 'none'; }, 400);
+                    setTimeout(() => {
+                        if (hint) hint.style.display = 'none';
+                    }, 400);
                 }
+
                 splashHidden = true;
-                console.log('⏹️ الموسيقى توقفت، السبلاش مخفية.');
+                console.log('✅ تم إخفاء السبلاش.');
             }
 
-            // ---------- ربط الأحداث بالسپلاش ----------
-            splash.addEventListener('click', (e) => {
-                if (e.target === soundBtn || soundBtn.contains(e.target)) return;
-                hideSplash();
+            function startExperience() {
+                // أول نقرة حقيقية من المستخدم: شغّل الصوت ثم أخفِ السبلاش
+                playMusicFromUserGesture().finally(() => {
+                    hideSplash();
+                });
+            }
+
+            soundBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                startExperience();
             });
-            splash.addEventListener('touchend', (e) => {
-                if (e.target === soundBtn || soundBtn.contains(e.target)) return;
+
+            splash.addEventListener('click', function (e) {
+                if (soundBtn.contains(e.target)) return;
+                startExperience();
+            });
+
+            splash.addEventListener('touchend', function (e) {
+                if (soundBtn.contains(e.target)) return;
                 e.preventDefault();
-                hideSplash();
+                startExperience();
             }, { passive: false });
+
             splash.addEventListener('contextmenu', (e) => e.preventDefault());
             splash.addEventListener('dragstart', (e) => e.preventDefault());
 
-            // ---------- بدء التشغيل التلقائي الصامت مع المحاكاة ----------
-            async function initAudio() {
-                // التأكد من تشغيل العنصر الصوتي (قد يكون قيد التحميل)
-                try {
-                    await bgMusic.play();
-                    musicActive = true;
-                    console.log('🔇 الموسيقى تعمل بصمت (autoplay).');
-                } catch (e) {
-                    console.warn('فشل autoplay الأولي:', e);
-                    // محاولة يدوية
-                    bgMusic.muted = true;
-                    bgMusic.play().then(() => {
-                        musicActive = true;
-                        console.log('🔇 تم التشغيل الصامت بعد محاولة يدوية.');
-                    }).catch(err => console.error('فشل التشغيل:', err));
+            bgMusic.addEventListener('playing', () => {
+                musicStarted = true;
+            });
+
+            bgMusic.addEventListener('error', () => {
+                console.error('خطأ في تحميل ملف الصوت.');
+                setButtonState('ready');
+                if (hint) {
+                    hint.textContent = '⚠️ تعذر تحميل ملف الموسيقى';
+                    hint.style.opacity = '0.9';
                 }
+            });
 
-                // بعد فترة قصيرة، محاكاة النقر التلقائي لإلغاء الكتم
-                setTimeout(() => {
-                    if (!musicAudible) {
-                        simulateHumanUnmute();
-                    }
-                }, 300);
+            // محاولة تشغيل صامتة عند التحميل، لكن لا نعتمد عليها
+            function initAudio() {
+                tryMutedAutoplay();
 
-                // في حال فشل المحاكاة (بقيت مكتومة)، نظهر الزر بعد 1.5 ثانية
                 setTimeout(() => {
-                    if (!musicAudible) {
-                        soundBtn.classList.remove('hidden');
-                        console.log('⚠️ المحاكاة فشلت، الزر ظاهر للنقر اليدوي.');
+                    if (!musicStarted) {
+                        setButtonState('ready');
                     }
-                }, 1500);
+                }, 1200);
             }
 
-            // بدء التشغيل عند تحميل الصفحة
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initAudio);
             } else {
                 initAudio();
             }
 
-            // ---------- تحميل iframe ----------
-            let frameLoaded = false, loadTimeout = null;
+            let frameLoaded = false;
+            let loadTimeout = null;
+
             frame.addEventListener('load', () => {
                 frameLoaded = true;
-                if (hint) { hint.textContent = '✨ جاهز! اضغط للبدء'; hint.style.opacity = '0.8'; }
+                if (hint) {
+                    hint.textContent = '✨ جاهز! اضغط للبدء';
+                    hint.style.opacity = '0.8';
+                }
                 if (loadTimeout) clearTimeout(loadTimeout);
             });
-            frame.addEventListener('error', () => { if (hint) hint.textContent = '⚡ جارٍ المحاولة...'; });
-            loadTimeout = setTimeout(() => { if (!frameLoaded && hint) { hint.textContent = '🎯 اضغط للمتابعة'; hint.style.opacity = '0.7'; } }, 6000);
 
-            // ---------- تحسينات الصورة والأبعاد ----------
+            frame.addEventListener('error', () => {
+                if (hint) hint.textContent = '⚡ جارٍ المحاولة...';
+            });
+
+            loadTimeout = setTimeout(() => {
+                if (!frameLoaded && hint) {
+                    hint.textContent = '🎯 اضغط للمتابعة';
+                    hint.style.opacity = '0.7';
+                }
+            }, 6000);
+
             function adjustImage() {
                 const img = document.querySelector('.splash-image');
                 if (!img) return;
@@ -231,17 +370,32 @@
                 img.style.objectFit = (ratio >= 2.2) ? 'contain' : 'cover';
                 img.style.background = (ratio >= 2.2) ? '#000' : 'transparent';
             }
-            function setViewportHeight() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
-            window.addEventListener('resize', () => { adjustImage(); setViewportHeight(); });
-            window.addEventListener('orientationchange', () => setTimeout(() => { adjustImage(); setViewportHeight(); }, 50));
-            adjustImage(); setViewportHeight();
+
+            function setViewportHeight() {
+                document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+            }
+
+            window.addEventListener('resize', () => {
+                adjustImage();
+                setViewportHeight();
+            });
+
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    adjustImage();
+                    setViewportHeight();
+                }, 50);
+            });
 
             window.addEventListener('beforeunload', () => {
                 if (loadTimeout) clearTimeout(loadTimeout);
                 bgMusic.pause();
             });
 
-            console.log('🚀 التطبيق جاهز: رابط GitHub Raw مع محاكاة نقر ذكية.');
+            adjustImage();
+            setViewportHeight();
+
+            console.log('🚀 التطبيق جاهز بنسخة مصححة.');
         })();
     </script>
 </body>
