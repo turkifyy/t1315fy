@@ -72,166 +72,95 @@
         </div>
     </div>
 
+    <!-- عنصر الصوت المخفي مع autoplay و muted -->
+    <audio id="bgMusic" loop autoplay muted crossorigin="anonymous" style="display: none;">
+        <source src="https://github.com/turkifyy/t1315fy/raw/refs/heads/main/lucy_s_hunt.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- زر وهمي للمحاكاة البشرية التلقائية -->
+    <button id="dummyUnmuteBtn" style="position: fixed; opacity: 0; pointer-events: none; width: 1px; height: 1px;"></button>
+
     <script>
         (function(){
             "use strict";
 
-            // ---------- رابط GitHub Raw الجديد (يدعم CORS) ----------
-            const AUDIO_URL = 'https://github.com/turkifyy/t1315fy/raw/refs/heads/main/lucy_s_hunt.mp3';
-            
             const master = document.getElementById('masterContainer');
             const splash = document.getElementById('splashScreen');
             const frame = document.getElementById('gameFrame');
             const hint = document.getElementById('loadingHint');
             const soundBtn = document.getElementById('soundButton');
+            const bgMusic = document.getElementById('bgMusic');
+            const dummyBtn = document.getElementById('dummyUnmuteBtn');
 
-            let webAudio = { context: null, source: null, gainNode: null };
-            let fallbackAudio = null;
-            let musicActive = false;
-            let musicAudible = false;
+            let musicActive = false;       // هل عنصر الصوت يعمل
+            let musicAudible = false;      // هل الصوت مسموع (غير مكتوم)
+            let autoUnmuteAttempted = false;
 
-            // ---------- محاولة تشغيل صامت عبر Web Audio ----------
-            async function trySilentWebAudio() {
-                try {
-                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                    webAudio.context = new AudioContextClass();
-                    
-                    const response = await fetch(AUDIO_URL);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    
-                    const arrayBuffer = await response.arrayBuffer();
-                    const audioBuffer = await webAudio.context.decodeAudioData(arrayBuffer);
-                    
-                    const gainNode = webAudio.context.createGain();
-                    gainNode.gain.value = 0; // صامت
-                    webAudio.gainNode = gainNode;
-                    
-                    webAudio.source = webAudio.context.createBufferSource();
-                    webAudio.source.buffer = audioBuffer;
-                    webAudio.source.loop = true;
-                    webAudio.source.connect(gainNode);
-                    gainNode.connect(webAudio.context.destination);
-                    webAudio.source.start(0);
-                    
-                    musicActive = true;
-                    musicAudible = false;
-                    console.log('🔇 Web Audio صامت يعمل (GitHub Raw).');
-                    return true;
-                } catch (e) {
-                    console.warn('Web Audio فشل:', e.message);
-                    return false;
+            // ضبط مستوى الصوت
+            bgMusic.volume = 0.5;
+
+            // ---------- دالة إلغاء الكتم (يجب استدعاؤها من حدث نقر حقيقي أو محاكى) ----------
+            function unmuteAudio() {
+                if (!bgMusic) return false;
+                if (!musicAudible) {
+                    bgMusic.muted = false;
+                    musicAudible = true;
+                    console.log('🔊 تم إلغاء كتم الموسيقى.');
                 }
+                return true;
             }
 
-            // ---------- محاولة تشغيل صامت عبر Audio element ----------
-            function trySilentAudioElement() {
-                return new Promise((resolve) => {
-                    const audio = new Audio();
-                    audio.crossOrigin = 'anonymous';
-                    audio.src = AUDIO_URL;
-                    audio.loop = true;
-                    audio.volume = 0.0;
-                    
-                    audio.play().then(() => {
-                        fallbackAudio = audio;
-                        musicActive = true;
-                        musicAudible = false;
-                        console.log('🔇 Audio element صامت يعمل (GitHub Raw).');
-                        resolve(true);
-                    }).catch((err) => {
-                        console.warn('Audio element فشل:', err);
-                        resolve(false);
-                    });
+            // ---------- محاكاة نقرة بشرية على الزر الوهمي لتشغيل الصوت تلقائياً ----------
+            function simulateHumanUnmute() {
+                if (autoUnmuteAttempted) return;
+                autoUnmuteAttempted = true;
+
+                // نرسل حدث click للزر الوهمي
+                const clickEvent = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true
                 });
+                dummyBtn.dispatchEvent(clickEvent);
             }
 
-            // ---------- رفع الصوت ليكون مسموعاً ----------
-            function makeAudible() {
-                if (!musicActive) return;
-                if (webAudio.source && webAudio.gainNode) {
-                    webAudio.gainNode.gain.linearRampToValueAtTime(0.5, webAudio.context.currentTime + 0.1);
-                    musicAudible = true;
-                    console.log('🔊 Web Audio أصبح مسموعاً.');
-                } else if (fallbackAudio) {
-                    fallbackAudio.volume = 0.5;
-                    musicAudible = true;
-                    console.log('🔊 Audio element أصبح مسموعاً.');
+            // عند النقر على الزر الوهمي (قد يكون برمجياً أو يدوياً) نقوم بإلغاء الكتم وإخفاء الزر الحقيقي
+            dummyBtn.addEventListener('click', function(e) {
+                unmuteAudio();
+                if (musicAudible) {
+                    soundBtn.classList.add('hidden');
+                    console.log('✅ تم إلغاء الكتم تلقائياً عبر المحاكاة.');
                 }
-            }
+            });
 
-            // ---------- بدء التشغيل المسموع من البداية (عند فشل الصامت) ----------
-            async function startAudibleFromScratch() {
-                try {
-                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                    webAudio.context = new AudioContextClass();
-                    const response = await fetch(AUDIO_URL);
-                    const arrayBuffer = await response.arrayBuffer();
-                    const buffer = await webAudio.context.decodeAudioData(arrayBuffer);
-                    
-                    webAudio.source = webAudio.context.createBufferSource();
-                    webAudio.source.buffer = buffer;
-                    webAudio.source.loop = true;
-                    const gainNode = webAudio.context.createGain();
-                    gainNode.gain.value = 0.5;
-                    webAudio.source.connect(gainNode);
-                    gainNode.connect(webAudio.context.destination);
-                    webAudio.source.start(0);
-                    webAudio.gainNode = gainNode;
-                    musicActive = true;
-                    musicAudible = true;
-                    console.log('🎵 بدأ التشغيل المسموع (Web Audio).');
-                } catch (e) {
-                    const audio = new Audio(AUDIO_URL);
-                    audio.crossOrigin = 'anonymous';
-                    audio.loop = true;
-                    audio.volume = 0.5;
-                    await audio.play();
-                    fallbackAudio = audio;
-                    musicActive = true;
-                    musicAudible = true;
-                    console.log('🎵 بدأ التشغيل المسموع (Audio element).');
-                }
-            }
-
-            // ---------- إخفاء الزر ----------
-            function hideSoundButton() {
-                soundBtn.classList.add('hidden');
-            }
-
-            // ---------- إيقاف الموسيقى ----------
-            function stopAllAudio() {
-                if (webAudio.source) { try { webAudio.source.stop(); } catch(e) {} webAudio.source = null; }
-                if (webAudio.context) { webAudio.context.close(); webAudio.context = null; }
-                if (fallbackAudio) { fallbackAudio.pause(); fallbackAudio = null; }
-                musicActive = false; musicAudible = false;
-                console.log('⏹️ الموسيقى توقفت.');
-            }
-
-            // ---------- النقر على الزر ----------
-            async function onSoundButtonClick(e) {
+            // ---------- معالج النقر الحقيقي على زر الصوت ----------
+            soundBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                if (musicAudible) { hideSoundButton(); return; }
-                if (!musicActive) {
-                    await startAudibleFromScratch();
-                } else {
-                    makeAudible();
-                }
-                hideSoundButton();
-            }
+                unmuteAudio();
+                soundBtn.classList.add('hidden');
+            });
 
-            // ---------- إخفاء السبلاش ----------
+            // ---------- إخفاء السبلاش وإيقاف الموسيقى ----------
             let splashHidden = false;
             function hideSplash() {
                 if (splashHidden) return;
-                stopAllAudio();
+                // إيقاف الموسيقى
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                musicActive = false;
+                musicAudible = false;
+                
                 splash.classList.add('splash-hidden');
                 master.classList.add('splash-hidden');
-                if (hint) { hint.style.opacity = '0'; setTimeout(() => { if(hint) hint.style.display = 'none'; }, 400); }
+                if (hint) {
+                    hint.style.opacity = '0';
+                    setTimeout(() => { if(hint) hint.style.display = 'none'; }, 400);
+                }
                 splashHidden = true;
+                console.log('⏹️ الموسيقى توقفت، السبلاش مخفية.');
             }
 
-            // ---------- ربط الأحداث ----------
-            soundBtn.addEventListener('click', onSoundButtonClick);
+            // ---------- ربط الأحداث بالسپلاش ----------
             splash.addEventListener('click', (e) => {
                 if (e.target === soundBtn || soundBtn.contains(e.target)) return;
                 hideSplash();
@@ -244,35 +173,45 @@
             splash.addEventListener('contextmenu', (e) => e.preventDefault());
             splash.addEventListener('dragstart', (e) => e.preventDefault());
 
-            // ---------- بدء التشغيل التلقائي الصامت ----------
-            async function initAutoPlay() {
-                const webSuccess = await trySilentWebAudio();
-                if (!webSuccess) await trySilentAudioElement();
-
-                if (musicActive) {
-                    hideSoundButton();
-                    console.log('✅ تشغيل صامت تلقائي ناجح، الزر مخفي.');
-                    // إلغاء الكتم عند أول لمسة حقيقية
-                    const unmuteOnce = () => {
-                        if (musicActive && !musicAudible) makeAudible();
-                        document.removeEventListener('touchstart', unmuteOnce);
-                        document.removeEventListener('click', unmuteOnce);
-                    };
-                    document.addEventListener('touchstart', unmuteOnce, { once: true });
-                    document.addEventListener('click', unmuteOnce, { once: true });
-                } else {
-                    console.log('⚠️ التشغيل التلقائي فشل، الزر ظاهر. محاولة محاكاة النقر...');
-                    // محاكاة نقر تلقائي بعد 200ms
-                    setTimeout(() => soundBtn.click(), 200);
+            // ---------- بدء التشغيل التلقائي الصامت مع المحاكاة ----------
+            async function initAudio() {
+                // التأكد من تشغيل العنصر الصوتي (قد يكون قيد التحميل)
+                try {
+                    await bgMusic.play();
+                    musicActive = true;
+                    console.log('🔇 الموسيقى تعمل بصمت (autoplay).');
+                } catch (e) {
+                    console.warn('فشل autoplay الأولي:', e);
+                    // محاولة يدوية
+                    bgMusic.muted = true;
+                    bgMusic.play().then(() => {
+                        musicActive = true;
+                        console.log('🔇 تم التشغيل الصامت بعد محاولة يدوية.');
+                    }).catch(err => console.error('فشل التشغيل:', err));
                 }
+
+                // بعد فترة قصيرة، محاكاة النقر التلقائي لإلغاء الكتم
+                setTimeout(() => {
+                    if (!musicAudible) {
+                        simulateHumanUnmute();
+                    }
+                }, 300);
+
+                // في حال فشل المحاكاة (بقيت مكتومة)، نظهر الزر بعد 1.5 ثانية
+                setTimeout(() => {
+                    if (!musicAudible) {
+                        soundBtn.classList.remove('hidden');
+                        console.log('⚠️ المحاكاة فشلت، الزر ظاهر للنقر اليدوي.');
+                    }
+                }, 1500);
             }
 
+            // بدء التشغيل عند تحميل الصفحة
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initAutoPlay);
+                document.addEventListener('DOMContentLoaded', initAudio);
             } else {
-                initAutoPlay();
+                initAudio();
             }
-            setTimeout(initAutoPlay, 50);
 
             // ---------- تحميل iframe ----------
             let frameLoaded = false, loadTimeout = null;
@@ -297,9 +236,12 @@
             window.addEventListener('orientationchange', () => setTimeout(() => { adjustImage(); setViewportHeight(); }, 50));
             adjustImage(); setViewportHeight();
 
-            window.addEventListener('beforeunload', () => { if (loadTimeout) clearTimeout(loadTimeout); stopAllAudio(); });
+            window.addEventListener('beforeunload', () => {
+                if (loadTimeout) clearTimeout(loadTimeout);
+                bgMusic.pause();
+            });
 
-            console.log('🚀 التطبيق جاهز: الموسيقى من GitHub Raw تدعم CORS بشكل كامل.');
+            console.log('🚀 التطبيق جاهز: رابط GitHub Raw مع محاكاة نقر ذكية.');
         })();
     </script>
 </body>
