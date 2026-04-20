@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+  <title>Relic Runway - طبقة حماية ذكية</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .game-wrapper { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+    #gameFrame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; background: #1a1e2a; }
+    .overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+    .click-blocker { position: absolute; background: transparent; pointer-events: auto; cursor: default; }
+    .toolbar { position: fixed; bottom: 16px; right: 16px; z-index: 30; display: flex; gap: 10px; background: rgba(20,20,30,0.7); backdrop-filter: blur(8px); padding: 8px 16px; border-radius: 40px; border: 1px solid rgba(255,215,0,0.3); box-shadow: 0 8px 20px rgba(0,0,0,0.5); pointer-events: auto; }
+    .toolbar button { background: rgba(255,215,0,0.15); border: 1px solid gold; color: gold; padding: 8px 18px; border-radius: 30px; font-weight: bold; font-size: 16px; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); letter-spacing: 0.5px; }
+    .toolbar button:hover { background: gold; color: #0a0f1a; transform: scale(1.02); }
+    .debug-info { position: fixed; bottom: 16px; left: 16px; z-index: 30; background: rgba(0,0,0,0.5); color: #0ff; padding: 6px 14px; border-radius: 24px; font-size: 13px; backdrop-filter: blur(5px); border-left: 4px solid cyan; pointer-events: none; font-family: monospace; }
+  </style>
+</head>
+<body>
+<div class="game-wrapper">
+  <iframe id="gameFrame" src="https://gemioli.com/relicrunway/" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager" title="Relic Runway"></iframe>
+  <div class="overlay-container" id="overlayContainer">
+    <div class="click-blocker" id="clickBlocker"></div>
+  </div>
+</div>
+<div class="toolbar">
+  <button id="fullscreenBtn">⛶ ملء الشاشة</button>
+</div>
+<div class="debug-info" id="debugDisplay">
+  📱 جاهز | <span id="resolutionLabel">--- x ---</span> | 🔒 <span id="ruleLabel">القاعدة الافتراضية</span>
+</div>
+<script>
+  (function(){
+    "use strict";
+
+    const rules = [
+      // المجموعة 1: هواتف ذكية (390x844, 430x932, ...)
+      { w: 390, h: 844, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 430, h: 932, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 360, h: 780, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1179, h: 2556, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1320, h: 2868, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1080, h: 2340, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1220, h: 2712, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1260, h: 2800, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1260, h: 2844, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1440, h: 3168, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      { w: 1440, h: 3200, top: 65.2, left: 33.5, width: 33.0, height: 5.7 },
+      // هواتف 375x667
+      { w: 375, h: 667, top: 69.7, left: 36.0, width: 28.0, height: 5.3 },
+      // تابلت 744x1133
+      { w: 744, h: 1133, top: 73.1, left: 35.0, width: 30.5, height: 5.0 },
+      // تابلت 800x1280 (الأول)
+      { w: 800, h: 1280, top: 72.2, left: 35.0, width: 29.5, height: 4.9 },
+      // تابلت 820x1180 (الأول)
+      { w: 820, h: 1180, top: 75.0, left: 35.5, width: 29.0, height: 5.9 },
+      // هواتف 820x1180 (الثاني)
+      { w: 820, h: 1180, top: 65.2, left: 36.0, width: 28.0, height: 4.5 },
+      // تابلت 800x1280 (الثاني)
+      { w: 800, h: 1280, top: 71.1, left: 36.0, width: 28.5, height: 6.3 },
+      // تابلت 834x1194
+      { w: 834, h: 1194, top: 74.4, left: 36.0, width: 28.5, height: 6.3 },
+      // ✨ إضافة تابلت 800x1108 بنسب دقيقة جديدة ✨
+      { w: 800, h: 1108, top: 72.5, left: 35.2, width: 29.0, height: 5.3 },
+      // تلفزيونات 16:9
+      { w: 1920, h: 1080, top: 75.9, left: 39.5, width: 20.0, height: 9.8 },
+      { w: 3840, h: 2160, top: 75.9, left: 39.5, width: 20.0, height: 9.8 },
+      { w: 1280, h: 720,  top: 75.9, left: 39.5, width: 20.0, height: 9.8 }
+    ];
+
+    const blocker = document.getElementById('clickBlocker');
+    const debugResSpan = document.getElementById('resolutionLabel');
+    const debugRuleSpan = document.getElementById('ruleLabel');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const wrapper = document.querySelector('.game-wrapper');
+
+    function findMatchingRule(w, h) {
+      for (let rule of rules) {
+        if (rule.w === w && rule.h === h) return rule;
+      }
+      return null;
+    }
+
+    function applyRule(rule) {
+      if (!rule) {
+        blocker.style.display = 'none';
+        debugRuleSpan.textContent = '❌ لا توجد قاعدة';
+        return;
+      }
+      blocker.style.display = 'block';
+      const container = document.getElementById('overlayContainer');
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      blocker.style.top = (rule.top / 100) * ch + 'px';
+      blocker.style.left = (rule.left / 100) * cw + 'px';
+      blocker.style.width = (rule.width / 100) * cw + 'px';
+      blocker.style.height = (rule.height / 100) * ch + 'px';
+      blocker.style.backgroundColor = 'transparent';
+      blocker.style.pointerEvents = 'auto';
+      debugRuleSpan.innerHTML = `🎯 ${rule.w}x${rule.h} | T:${rule.top}% L:${rule.left}% W:${rule.width}% H:${rule.height}%`;
+    }
+
+    function updateBlockerPosition() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      debugResSpan.textContent = `${w} x ${h}`;
+      const matched = findMatchingRule(w, h);
+      if (matched) {
+        applyRule(matched);
+        console.log(`[ذكي] تم تطبيق قاعدة: ${w}x${h}`);
+      } else {
+        blocker.style.display = 'none';
+        debugRuleSpan.textContent = `⚠️ لا توجد قاعدة (${w}x${h})`;
+      }
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateBlockerPosition, 50);
+    });
+    window.addEventListener('orientationchange', () => setTimeout(updateBlockerPosition, 30));
+    window.addEventListener('load', updateBlockerPosition);
+    document.getElementById('gameFrame').addEventListener('load', () => setTimeout(updateBlockerPosition, 20));
+    if (window.ResizeObserver) {
+      new ResizeObserver(updateBlockerPosition).observe(document.querySelector('.overlay-container'));
+    }
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) wrapper.requestFullscreen().catch(err => alert(`تعذر تفعيل ملء الشاشة: ${err.message}`));
+      else document.exitFullscreen();
+    }
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', () => setTimeout(updateBlockerPosition, 50));
+    document.addEventListener('webkitfullscreenchange', () => setTimeout(updateBlockerPosition, 50));
+    let lastHeight = window.innerHeight;
+    setInterval(() => { if (window.innerHeight !== lastHeight) { lastHeight = window.innerHeight; updateBlockerPosition(); } }, 300);
+    updateBlockerPosition();
+    console.log('%c✨ نظام الطبقة الذكية | Relic Runway ✨', 'background: #1e2a3a; color: gold; font-size: 14px; padding: 6px; border-radius: 6px;');
+  })();
+</script>
+</body>
+</html>
