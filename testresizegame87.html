@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>طبقة حاجزة - 360x760</title>
+    <title>طبقة حاجزة - 360x584</title>
     <style>
         * {
             margin: 0;
@@ -59,16 +59,16 @@
             z-index: 20;
             outline: none;
             display: none;
-            top: 70.1%;
-            left: 33.0%;
+            top: 68.8%;
+            left: 31.5%;
             width: 35.5%;
             height: 8.5%;
         }
 
-        /* رسالة التوست الاحترافية - تظهر في الأعلى */
+        /* رسالة التوست الرئيسية - تظهر في الأعلى وسط */
         .dimension-hint {
             position: fixed;
-            top: 20px;               /* نقلها للأعلى */
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(15, 15, 30, 0.95);
@@ -90,31 +90,36 @@
             transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
-        /* عند الإخفاء */
         .dimension-hint.hidden {
             opacity: 0;
             transform: translateX(-50%) translateY(-20px);
             pointer-events: none;
         }
 
-        /* شريط معلومات صغير (يبقى في الأسفل) */
+        /* شريط معلومات الحالة - الآن في الأعلى، كبير وواضح */
         .debug-info {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
-            background: rgba(0,0,0,0.7);
-            color: #0f0;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-family: monospace;
-            font-size: 14px;
+            top: 90px;               /* تحت رسالة التوست */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);  /* خلفية داكنة واضحة بدون ضباب */
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-family: 'Segoe UI', system-ui, monospace;
+            font-size: 24px;          /* حجم خط كبير */
+            font-weight: bold;
             z-index: 1000;
             pointer-events: none;
-            backdrop-filter: blur(4px);
-            border: 1px solid #3a3a5a;
+            border: 2px solid #4a4a6a;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            white-space: nowrap;
+            letter-spacing: 1px;
+            transition: color 0.2s;
         }
 
-        /* جعل النص متجاوبًا على الشاشات الصغيرة */
+        /* للشاشات الصغيرة */
         @media (max-width: 600px) {
             .dimension-hint {
                 font-size: 14px;
@@ -123,13 +128,28 @@
                 max-width: 90%;
                 border-radius: 40px;
             }
+
+            .debug-info {
+                font-size: 18px;
+                padding: 12px 24px;
+                top: 100px;
+                white-space: nowrap;
+            }
+        }
+
+        /* شاشات صغيرة جدًا */
+        @media (max-width: 400px) {
+            .debug-info {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="dimension-hint" id="dimensionHint">
-        ⚠️ اضبط نافذة المتصفح على البُعد <strong>360×760</strong> لتفعيل الطبقة الحاجزة.<br>
+        ⚠️ اضبط نافذة المتصفح على البُعد <strong>360×584</strong> لتفعيل الطبقة الحاجزة.<br>
         👉 استخدم وضع <strong>Responsive Design</strong> في أدوات المطور (F12).
     </div>
 
@@ -158,13 +178,12 @@
             const frame = document.getElementById('tabletFrame');
 
             // ─────────────────────────────────────────────────────────
-            // خريطة الأبعاد المدعومة - 360x760 فقط
+            // الجهاز المدعوم الوحيد: 360x584
             // ─────────────────────────────────────────────────────────
             const dimensionMap = new Map([
-                ['360x760', { top: '70.1%', left: '33.0%', width: '35.5%', height: '8.5%' }]
+                ['360x584', { top: '68.8%', left: '31.5%', width: '35.5%', height: '8.5%' }]
             ]);
 
-            // دالة تحديث مظهر الطبقة بناءً على الأبعاد الحالية
             function applyOverlayForDimension(width, height) {
                 const key = `${width}x${height}`;
                 const config = dimensionMap.get(key);
@@ -176,21 +195,20 @@
                     overlay.style.height = config.height;
                     overlay.style.display = 'block';
                     hint.classList.add('hidden');
-                    debugInfo.textContent = `${width}×${height} ✓ مطابق`;
-                    debugInfo.style.color = '#0f0';
+                    debugInfo.textContent = `✅ ${width} × ${height}  (مطابق)`;
+                    debugInfo.style.color = '#a0ffa0';
+                    debugInfo.style.borderColor = '#4caf50';
                 } else {
                     overlay.style.display = 'none';
                     hint.classList.remove('hidden');
-                    debugInfo.textContent = `${width}×${height} ✗ غير مدعوم`;
-                    debugInfo.style.color = '#ff8888';
+                    debugInfo.textContent = `❌ ${width} × ${height}  (غير مدعوم)`;
+                    debugInfo.style.color = '#ffaaaa';
+                    debugInfo.style.borderColor = '#f44336';
                 }
 
                 frame.style.aspectRatio = `${width} / ${height}`;
             }
 
-            // ─────────────────────────────────────────────────────────
-            // آلية حظر الأحداث على الطبقة الشفافة
-            // ─────────────────────────────────────────────────────────
             const BLOCKED_EVENTS = [
                 'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove',
                 'mouseenter', 'mouseleave', 'mouseover', 'mouseout',
@@ -225,7 +243,6 @@
                 overlay.setAttribute('tabindex', '-1');
             }
 
-            // تحديث عند تغيير الحجم
             function onResize() {
                 const w = window.innerWidth;
                 const h = window.innerHeight;
@@ -233,18 +250,15 @@
                 enforceBlocker();
             }
 
-            // مراقب الطفرات لضمان استمرار الخاصية
             const observer = new MutationObserver(() => enforceBlocker());
             observer.observe(overlay, { attributes: true, attributeFilter: ['style', 'class'] });
 
-            // بدء التشغيل
             window.addEventListener('resize', onResize);
             onResize();
 
-            // اختصار لعرض البُعد المدعوم في وحدة التحكم (للمطور)
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'd' || e.key === 'D') {
-                    console.log('البُعد المدعوم: 360x760');
+                    console.log('البُعد المدعوم حالياً: 360x584');
                 }
             });
 
