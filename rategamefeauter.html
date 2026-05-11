@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+    <meta name="theme-color" content="#0a0c14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>⭐ Rate the Game | Google Play</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Sans:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --primary-gold-bright: #FFE44D;
+            --primary-glow: rgba(255, 215, 0, 0.5);
+            --primary-glow-strong: rgba(255, 215, 0, 0.75);
+            --bg-deep: #06080f;
+            --text-primary: #ffffff;
+            --text-secondary: #d0d0d0;
+            --text-muted: #a0a0b0;
+            --shadow-xl: 0 30px 60px rgba(0, 0, 0, 0.7);
+            --shadow-gold: 0 0 60px rgba(255, 215, 0, 0.35);
+            --radius-xl: 28px;
+            --radius-md: 16px;
+            --transition-smooth: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-ease: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Cairo', 'Noto Sans', sans-serif;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100dvh;
+            min-width: 100dvw;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .master-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            overflow: hidden;
+            /* عادت للـ hidden لأننا لا نحتاج لظلال خارجية تسبب قضبان تمرير */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-image {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: url('https://turkifyy.github.io/t1315fy/rategamebackground.webp') no-repeat center center / cover;
+            background-color: #0a0c14;
+            pointer-events: none;
+        }
+
+        .transparent-shield {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            background: transparent;
+            pointer-events: auto;
+            cursor: default;
+            touch-action: manipulation;
+        }
+
+        /* ---- بطاقة Google Play القابلة للنقر ---- */
+        .google-play-card-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(12px, 2.5vw, 20px);
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: transform var(--transition-ease), opacity 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            background: transparent;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        .google-play-card-wrapper:active {
+            transform: translate(-50%, -50%) scale(0.98);
+        }
+
+        .google-play-image {
+            width: clamp(350px, 75vw, 700px);
+            height: auto;
+            max-height: clamp(190px, 44vh, 400px);
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+            filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.35));
+            transition: filter var(--transition-ease);
+            outline: none;
+            border: none;
+            /* تمت إزالة image-rendering الذي كان يسبب التشوه */
+        }
+
+        .google-play-card-wrapper:hover .google-play-image,
+        .google-play-card-wrapper:active .google-play-image {
+            filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 32px rgba(255, 215, 0, 0.55));
+        }
+
+        /* تأثير التموج الذهبي عند الضغط */
+        .press-ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            margin-top: -60px;
+            margin-left: -60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.9) 0%, transparent 70%);
+            pointer-events: none;
+            transform: scale(0);
+            opacity: 0;
+            z-index: 25;
+            will-change: transform, opacity;
+        }
+
+        @keyframes rippleExpand {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2.8);
+                opacity: 0;
+            }
+        }
+
+        .google-play-hint {
+            color: var(--text-secondary);
+            font-size: clamp(0.85rem, 2vw, 1.05rem);
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+            pointer-events: none;
+            user-select: none;
+            animation: hintPulse 2.8s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes hintPulse {
+            0%,
+            100% {
+                opacity: 0.75;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .google-play-hint .star-icon {
+            display: inline-block;
+            animation: starSpin 3s linear infinite;
+            margin: 0 4px;
+        }
+
+        @keyframes starSpin {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.3);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        /* ---- رسالة الشكر بعد التقييم ---- */
+        .thank-you-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 25;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(10px, 2vw, 16px);
+            pointer-events: none;
+        }
+
+        .thank-you-message.visible {
+            display: flex;
+            animation: celebrateEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes celebrateEntrance {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8) rotate(-2deg);
+                filter: blur(4px);
+            }
+            60% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.05) rotate(0deg);
+                filter: blur(0);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .thank-you-title {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            letter-spacing: 0.02em;
+        }
+
+        .thank-you-sub {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: var(--text-secondary);
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* تأثير احتفالي إضافي (جزيئات ذهبية) */
+        .celebrate-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-glow-strong);
+            animation: particleFly 1.2s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes particleFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        /* ---- حوار تأكيد التقييم ---- */
+        .dialog-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-smooth), visibility var(--transition-smooth);
+        }
+
+        .dialog-backdrop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dialog-panel {
+            background: rgba(18, 22, 36, 0.92);
+            backdrop-filter: blur(24px) saturate(190%);
+            -webkit-backdrop-filter: blur(24px) saturate(190%);
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            border-radius: var(--radius-xl);
+            padding: clamp(24px, 5vw, 36px) clamp(20px, 4vw, 32px);
+            width: 90%;
+            max-width: 440px;
+            color: var(--text-primary);
+            text-align: center;
+            box-shadow: var(--shadow-xl), var(--shadow-gold), 0 0 80px rgba(255, 180, 0, 0.35);
+            transform: scale(0.85);
+            transition: transform var(--transition-smooth);
+            will-change: transform;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(14px, 2.5vw, 20px);
+        }
+
+        .dialog-backdrop.visible .dialog-panel {
+            transform: scale(1);
+        }
+
+        .dialog-icon-badge {
+            width: clamp(56px, 10vw, 70px);
+            height: clamp(56px, 10vw, 70px);
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(28px, 5vw, 36px);
+            box-shadow: 0 6px 22px rgba(255, 215, 0, 0.5);
+            animation: badgeBreathe 2.2s ease-in-out infinite;
+        }
+
+        @keyframes badgeBreathe {
+            0%,
+            100% {
+                box-shadow: 0 6px 22px rgba(255, 215, 0, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 8px 34px rgba(255, 215, 0, 0.75);
+                transform: scale(1.07);
+            }
+        }
+
+        .dialog-title {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 900;
+            color: var(--primary-gold-bright);
+            text-shadow: 0 0 18px var(--primary-glow);
+            letter-spacing: 0.01em;
+            line-height: 1.3;
+        }
+
+        .dialog-message {
+            font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 340px;
+        }
+
+        .dialog-buttons-row {
+            display: flex;
+            gap: clamp(10px, 2vw, 16px);
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .dialog-btn {
+            flex: 1;
+            min-width: 120px;
+            max-width: 180px;
+            padding: clamp(12px, 2.5vw, 16px) clamp(16px, 3vw, 24px);
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-family: 'Cairo', 'Noto Sans', sans-serif;
+            letter-spacing: 0.02em;
+            transition: all 0.25s ease;
+            touch-action: manipulation;
+            will-change: transform;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dialog-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .dialog-btn:active {
+            transform: scale(0.94);
+        }
+
+        .dialog-btn-yes {
+            background: linear-gradient(135deg, #2ed573, #1e824c);
+            color: #fff;
+            box-shadow: 0 4px 0 #166b38, 0 6px 18px rgba(46, 213, 115, 0.3);
+        }
+        .dialog-btn-yes:hover {
+            box-shadow: 0 4px 0 #166b38, 0 8px 26px rgba(46, 213, 115, 0.45);
+        }
+        .dialog-btn-yes::after {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .dialog-btn-yes:active::after {
+            opacity: 1;
+        }
+
+        .dialog-btn-no {
+            background: linear-gradient(135deg, #ff4757, #c0392b);
+            color: #fff;
+            box-shadow: 0 4px 0 #a33024, 0 6px 18px rgba(255, 71, 87, 0.3);
+        }
+        .dialog-btn-no:hover {
+            box-shadow: 0 4px 0 #a33024, 0 8px 26px rgba(255, 71, 87, 0.45);
+        }
+        .dialog-btn-no::after {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .dialog-btn-no:active::after {
+            opacity: 1;
+        }
+
+        /* ---- نخب الإنجاز ---- */
+        .achievement-toast {
+            position: fixed;
+            top: clamp(60px, 10vh, 90px);
+            left: clamp(16px, 3vw, 28px);
+            z-index: 200;
+            background: rgba(18, 22, 36, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            padding: clamp(14px, 2.5vw, 18px) clamp(16px, 3vw, 22px);
+            border-left: 4px solid var(--primary-gold);
+            color: var(--text-primary);
+            max-width: clamp(260px, 50vw, 340px);
+            transform: translateX(-130%);
+            transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55), 0 0 20px rgba(255, 215, 0, 0.15);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .achievement-toast.show {
+            transform: translateX(0);
+        }
+        .toast-title {
+            font-weight: 700;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            color: var(--primary-gold-bright);
+        }
+        .toast-desc {
+            font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* ---- استجابة الأجهزة ---- */
+        @media (max-width: 380px) {
+            .google-play-image {
+                width: clamp(260px, 85vw, 340px);
+                max-height: clamp(130px, 32vh, 200px);
+            }
+            .google-play-hint {
+                font-size: 0.8rem;
+            }
+            .dialog-buttons-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            .dialog-btn {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+        @media (min-width: 381px) and (max-width: 480px) {
+            .google-play-image {
+                width: clamp(280px, 75vw, 400px);
+                max-height: clamp(150px, 36vh, 240px);
+            }
+        }
+        @media (min-width: 481px) and (max-width: 768px) {
+            .google-play-image {
+                width: clamp(320px, 65vw, 520px);
+                max-height: clamp(170px, 40vh, 300px);
+            }
+        }
+        @media (min-width: 769px) and (max-width: 1200px) {
+            .google-play-image {
+                width: clamp(380px, 55vw, 600px);
+                max-height: clamp(200px, 44vh, 360px);
+            }
+        }
+        @media (min-width: 1201px) {
+            .google-play-image {
+                width: clamp(450px, 45vw, 720px);
+                max-height: clamp(230px, 48vh, 420px);
+            }
+        }
+        @media (orientation: landscape) and (max-height: 500px) {
+            .google-play-card-wrapper {
+                flex-direction: row;
+                gap: clamp(10px, 2vw, 16px);
+            }
+            .google-play-image {
+                width: clamp(200px, 45vw, 360px);
+                max-height: clamp(110px, 30vh, 200px);
+            }
+            .google-play-hint {
+                font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+                white-space: nowrap;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .google-play-hint,
+            .dialog-icon-badge,
+            .thank-you-message,
+            .press-ripple,
+            .particle {
+                animation: none !important;
+            }
+            .google-play-card-wrapper {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="master-wrapper" id="masterWrapper">
+        <div class="bg-image" aria-hidden="true"></div>
+        <div class="transparent-shield" id="transparentShield" aria-hidden="true"></div>
+
+        <!-- بطاقة Google Play -->
+        <div class="google-play-card-wrapper" id="googlePlayCardWrapper" role="button" aria-label="Rate on Google Play">
+            <img id="googlePlayImage" class="google-play-image" src="https://turkify.netlify.app/LucyhuntRategameen.webp" alt="Rate the game on Google Play" loading="eager" fetchpriority="high" decoding="async" draggable="false"
+            onerror="this.style.display='none'; this.parentElement.querySelector('.img-fallback-text').style.display='block';">
+            <!-- تأثير التموج -->
+            <div class="press-ripple" id="pressRipple"></div>
+
+            <span class="img-fallback-text" style="display:none; color:#FFD700; font-weight:900; font-size:clamp(1rem,2.5vw,1.4rem); text-align:center; pointer-events:none;">⭐ Rate on Google Play ⭐</span>
+
+            <span class="google-play-hint">
+                <span class="star-icon">⭐</span> Tap to rate & support us <span class="star-icon">⭐</span>
+            </span>
+        </div>
+
+        <!-- رسالة الشكر -->
+        <div class="thank-you-message" id="thankYouMessage">
+            <div class="thank-you-title" id="thankYouTitle">🏆 Thanks for Rating!</div>
+            <div class="thank-you-sub" id="thankYouSub">Your support means the world to us</div>
+        </div>
+
+        <!-- جزيئات احتفالية -->
+        <div class="celebrate-particles" id="celebrateParticles"></div>
+
+        <!-- نخب الإنجاز -->
+        <div class="achievement-toast" id="achievementToast" aria-live="assertive" aria-atomic="true">
+            <div class="toast-title" id="toastTitle">🏆 Thanks for Rating!</div>
+            <div class="toast-desc" id="toastDesc">Your support means the world to us</div>
+        </div>
+
+        <!-- حوار تأكيد التقييم -->
+        <div class="dialog-backdrop" id="dialogBackdrop" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogMessage">
+            <div class="dialog-panel">
+                <div class="dialog-icon-badge" aria-hidden="true">⭐</div>
+                <div class="dialog-title" id="dialogTitle">🌟 Rating Confirmation</div>
+                <div class="dialog-message" id="dialogMessage">Have you rated the game on Google Play?</div>
+                <div class="dialog-buttons-row">
+                    <button class="dialog-btn dialog-btn-no" id="btnNotYet" type="button">⏳ Not yet</button>
+                    <button class="dialog-btn dialog-btn-yes" id="btnYesRated" type="button">👍 Yes, I rated</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const CONFIG = {
+                GOOGLE_PLAY_URL: 'https://play.google.com/store/apps/details?id=com.your.game.package',
+                RATING_CLICK_COOLDOWN: 2500,
+                RETURN_CHECK_TIMEOUT: 90000,
+                TOAST_DURATION: 4200,
+                PLAY_IMAGES: {
+                    en: 'https://turkify.netlify.app/LucyhuntRategameen.webp',
+                    ar: 'https://turkify.netlify.app/LucyhuntRategamear.webp',
+                    es: 'https://turkify.netlify.app/LucyhuntRategamees.webp',
+                    fr: 'https://turkify.netlify.app/LucyhuntRategamefr.webp',
+                    hi: 'https://turkify.netlify.app/LucyhuntRategameindia.webp'
+                },
+                DEFAULT_PLAY_IMAGE: 'https://turkify.netlify.app/LucyhuntRategameen.webp',
+                STORAGE_KEY_RATED: 'rr_rated_v20',
+            };
+
+            const TEXTS = {
+                en: {
+                    dialogTitle: '🌟 Rating Confirmation',
+                    dialogMessage: 'Have you rated the game on Google Play?',
+                    btnYes: '👍 Yes, I rated',
+                    btnNo: '⏳ Not yet',
+                    toastTitle: '🏆 Thanks for Rating!',
+                    toastDesc: 'Your support means the world to us',
+                    hint: '⭐ Tap to rate & support us ⭐',
+                    fallback: '⭐ Rate on Google Play ⭐',
+                    thankTitle: '🏆 Thanks for Rating!',
+                    thankSub: 'Youʼre awesome!'
+                },
+                ar: {
+                    dialogTitle: '🌟 تأكيد التقييم',
+                    dialogMessage: 'هل قمت بتقييم اللعبة على Google Play؟',
+                    btnYes: '👍 نعم، قيمت',
+                    btnNo: '⏳ ليس بعد',
+                    toastTitle: '🏆 شكراً لتقييمك!',
+                    toastDesc: 'دعمك يعني الكثير لنا',
+                    hint: '⭐ انقر للتقييم والدعم ⭐',
+                    fallback: '⭐ قيم على Google Play ⭐',
+                    thankTitle: '🏆 شكراً لتقييمك!',
+                    thankSub: 'أنت رائع!'
+                },
+                es: {
+                    dialogTitle: '🌟 Confirmación de Calificación',
+                    dialogMessage: '¿Has calificado el juego en Google Play?',
+                    btnYes: '👍 Sí, califiqué',
+                    btnNo: '⏳ Aún no',
+                    toastTitle: '🏆 ¡Gracias por Calificar!',
+                    toastDesc: 'Tu apoyo significa mucho para nosotros',
+                    hint: '⭐ Toca para calificar ⭐',
+                    fallback: '⭐ Califica en Google Play ⭐',
+                    thankTitle: '🏆 ¡Gracias por Calificar!',
+                    thankSub: '¡Eres increíble!'
+                },
+                fr: {
+                    dialogTitle: '🌟 Confirmation de Notation',
+                    dialogMessage: 'Avez-vous noté le jeu sur Google Play ?',
+                    btnYes: '👍 Oui, j\'ai noté',
+                    btnNo: '⏳ Pas encore',
+                    toastTitle: '🏆 Merci pour votre note !',
+                    toastDesc: 'Votre soutien compte beaucoup pour nous',
+                    hint: '⭐ Appuyez pour noter ⭐',
+                    fallback: '⭐ Notez sur Google Play ⭐',
+                    thankTitle: '🏆 Merci pour votre note !',
+                    thankSub: 'Vous êtes formidable !'
+                },
+                hi: {
+                    dialogTitle: '🌟 रिव्यू कन्फर्मेशन',
+                    dialogMessage: 'क्या आपने Google Play पर गेम को रेट किया है?',
+                    btnYes: '👍 हाँ, रेट किया',
+                    btnNo: '⏳ अभी नहीं',
+                    toastTitle: '🏆 रेटिंग के लिए धन्यवाद!',
+                    toastDesc: 'आपका समर्थन हमारे लिए बहुत मायने रखता है',
+                    hint: '⭐ रेट करने के लिए टैप करें ⭐',
+                    fallback: '⭐ Google Play पर रेट करें ⭐',
+                    thankTitle: '🏆 रेटिंग के लिए धन्यवाद!',
+                    thankSub: 'आप बहुत अच्छे हैं!'
+                }
+            };
+
+            const DOM = {
+                shield: document.getElementById('transparentShield'),
+                cardWrapper: document.getElementById('googlePlayCardWrapper'),
+                googleImage: document.getElementById('googlePlayImage'),
+                pressRipple: document.getElementById('pressRipple'),
+                thankYouMsg: document.getElementById('thankYouMessage'),
+                thankYouTitle: document.getElementById('thankYouTitle'),
+                thankYouSub: document.getElementById('thankYouSub'),
+                celebrateContainer: document.getElementById('celebrateParticles'),
+                dialogBackdrop: document.getElementById('dialogBackdrop'),
+                dialogTitle: document.getElementById('dialogTitle'),
+                dialogMessage: document.getElementById('dialogMessage'),
+                btnYes: document.getElementById('btnYesRated'),
+                btnNo: document.getElementById('btnNotYet'),
+                toast: document.getElementById('achievementToast'),
+                toastTitle: document.getElementById('toastTitle'),
+                toastDesc: document.getElementById('toastDesc'),
+                hintSpan: document.querySelector('.google-play-hint'),
+                fallbackSpan: document.querySelector('.img-fallback-text'),
+            };
+
+            const State = {
+                hasRated: false,
+                waitingForReturn: false,
+                dialogVisible: false,
+                lastStoreOpen: 0,
+                currentLanguage: 'en',
+                timers: { returnCheck: null, toast: null },
+            };
+
+            function detectBrowserLanguage() {
+                const allLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [
+                    navigator.language || 'en'
+                ];
+                for (const rawLang of allLangs) {
+                    const code = rawLang.split(/[-_]/)[0].toLowerCase();
+                    if (TEXTS[code]) return code;
+                }
+                return 'en';
+            }
+
+            function applyLanguage(lang) {
+                const code = lang.toLowerCase();
+                if (!TEXTS[code]) return;
+                State.currentLanguage = code;
+                const t = TEXTS[code];
+                DOM.dialogTitle.textContent = t.dialogTitle;
+                DOM.dialogMessage.textContent = t.dialogMessage;
+                DOM.btnYes.textContent = t.btnYes;
+                DOM.btnNo.textContent = t.btnNo;
+                if (DOM.hintSpan) DOM.hintSpan.innerHTML = t.hint;
+                if (DOM.fallbackSpan) DOM.fallbackSpan.textContent = t.fallback;
+                DOM.googleImage.src = CONFIG.PLAY_IMAGES[code] || CONFIG.DEFAULT_PLAY_IMAGE;
+                DOM.thankYouTitle.textContent = t.thankTitle;
+                DOM.thankYouSub.textContent = t.thankSub;
+            }
+
+            async function detectLanguageFromIP() {
+                const COUNTRY_MAP = {
+                    'MA': 'ar',
+                    'DZ': 'ar',
+                    'TN': 'ar',
+                    'LY': 'ar',
+                    'EG': 'ar',
+                    'SA': 'ar',
+                    'AE': 'ar',
+                    'KW': 'ar',
+                    'QA': 'ar',
+                    'BH': 'ar',
+                    'OM': 'ar',
+                    'YE': 'ar',
+                    'IQ': 'ar',
+                    'SY': 'ar',
+                    'JO': 'ar',
+                    'LB': 'ar',
+                    'PS': 'ar',
+                    'SD': 'ar',
+                    'SO': 'ar',
+                    'MR': 'ar',
+                    'DJ': 'ar',
+                    'FR': 'fr',
+                    'BE': 'fr',
+                    'CH': 'fr',
+                    'LU': 'fr',
+                    'MC': 'fr',
+                    'SN': 'fr',
+                    'CI': 'fr',
+                    'CM': 'fr',
+                    'ML': 'fr',
+                    'BF': 'fr',
+                    'NE': 'fr',
+                    'CD': 'fr',
+                    'CG': 'fr',
+                    'ES': 'es',
+                    'MX': 'es',
+                    'CO': 'es',
+                    'AR': 'es',
+                    'PE': 'es',
+                    'VE': 'es',
+                    'CL': 'es',
+                    'EC': 'es',
+                    'GT': 'es',
+                    'CU': 'es',
+                    'DO': 'es',
+                    'IN': 'hi',
+                    'PK': 'hi',
+                    'BD': 'hi',
+                    'NP': 'hi',
+                    'US': 'en',
+                    'GB': 'en',
+                    'CA': 'en',
+                    'AU': 'en',
+                    'NZ': 'en',
+                    'IE': 'en'
+                };
+                try {
+                    const res = await fetch('https://ipinfo.io/json?token=', { cache: 'default' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const country = (data.country || '').toUpperCase();
+                        const ipLang = COUNTRY_MAP[country];
+                        if (ipLang && ipLang !== State.currentLanguage) applyLanguage(ipLang);
+                    }
+                } catch {
+                    try {
+                        const res = await fetch('https://api.country.is/', { cache: 'default' });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const country = (data.country || '').toUpperCase();
+                            const ipLang = COUNTRY_MAP[country];
+                            if (ipLang && ipLang !== State.currentLanguage) applyLanguage(ipLang);
+                        }
+                    } catch { /* silent */ }
+                }
+            }
+
+            function initStorage() {
+                State.hasRated = localStorage.getItem(CONFIG.STORAGE_KEY_RATED) === 'true';
+                if (State.hasRated) {
+                    showThankYou();
+                }
+            }
+
+            function markAsRated() {
+                State.hasRated = true;
+                localStorage.setItem(CONFIG.STORAGE_KEY_RATED, 'true');
+                clearAllTimers();
+                hideDialog();
+                triggerCelebration();
+                showThankYou();
+            }
+
+            function showThankYou() {
+                DOM.cardWrapper.style.display = 'none';
+                DOM.cardWrapper.style.pointerEvents = 'none';
+                DOM.shield.style.display = 'none';
+                DOM.shield.style.pointerEvents = 'none';
+                DOM.thankYouMsg.classList.add('visible');
+            }
+
+            function triggerCelebration() {
+                const container = DOM.celebrateContainer;
+                const particleCount = 24;
+                const colors = ['#FFD700', '#FFA500', '#FFE44D', '#FFF8DC'];
+                const fragment = document.createDocumentFragment();
+
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const angle = (i / particleCount) * 360;
+                    const distance = 80 + Math.random() * 100;
+                    const tx = Math.cos(angle * Math.PI / 180) * distance;
+                    const ty = Math.sin(angle * Math.PI / 180) * distance;
+                    particle.style.setProperty('--tx', tx + 'px');
+                    particle.style.setProperty('--ty', ty + 'px');
+                    particle.style.left = '50%';
+                    particle.style.top = '50%';
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.width = (6 + Math.random() * 10) + 'px';
+                    particle.style.height = particle.style.width;
+                    fragment.appendChild(particle);
+                }
+
+                container.innerHTML = '';
+                container.appendChild(fragment);
+
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 1300);
+            }
+
+            function clearTimer(name) { if (State.timers[name]) { clearTimeout(State.timers[name]);
+                    State.timers[name] = null; } }
+
+            function clearAllTimers() { Object.keys(State.timers).forEach(k => clearTimer(k)); }
+
+            function showToast(title, desc) {
+                DOM.toastTitle.textContent = title;
+                DOM.toastDesc.textContent = desc;
+                DOM.toast.classList.add('show');
+                clearTimer('toast');
+                State.timers.toast = setTimeout(() => DOM.toast.classList.remove('show'), CONFIG.TOAST_DURATION);
+            }
+
+            function showDialog() {
+                if (State.hasRated || State.dialogVisible) return;
+                State.dialogVisible = true;
+                DOM.dialogBackdrop.classList.add('visible');
+                DOM.cardWrapper.style.opacity = '0.4';
+                DOM.cardWrapper.style.pointerEvents = 'none';
+            }
+
+            function hideDialog() {
+                DOM.dialogBackdrop.classList.remove('visible');
+                State.dialogVisible = false;
+                DOM.cardWrapper.style.opacity = '1';
+                DOM.cardWrapper.style.pointerEvents = 'auto';
+            }
+
+            function openGooglePlayStore() {
+                if (State.hasRated) return;
+                if (Date.now() - State.lastStoreOpen < CONFIG.RATING_CLICK_COOLDOWN) return;
+                State.lastStoreOpen = Date.now();
+                window.open(CONFIG.GOOGLE_PLAY_URL, '_blank', 'noopener,noreferrer');
+                State.waitingForReturn = true;
+                setupReturnDetection();
+            }
+
+            function setupReturnDetection() {
+                clearTimer('returnCheck');
+                const cleanup = () => {
+                    document.removeEventListener('visibilitychange', onVisibility);
+                    window.removeEventListener('focus', onFocus);
+                    clearTimer('returnCheck');
+                };
+                const onReturn = () => {
+                    if (!State.waitingForReturn) return;
+                    State.waitingForReturn = false;
+                    cleanup();
+                    setTimeout(() => { if (!State.hasRated && !State.dialogVisible) showDialog(); }, 600);
+                };
+                const onVisibility = () => { if (!document.hidden) onReturn(); };
+                const onFocus = () => onReturn();
+                document.addEventListener('visibilitychange', onVisibility);
+                window.addEventListener('focus', onFocus);
+                State.timers.returnCheck = setTimeout(() => { State.waitingForReturn = false;
+                    cleanup(); }, CONFIG.RETURN_CHECK_TIMEOUT);
+            }
+
+            function triggerRipple() {
+                if (!DOM.pressRipple || State.hasRated) return;
+                DOM.pressRipple.style.animation = 'none';
+                void DOM.pressRipple.offsetWidth;
+                DOM.pressRipple.style.animation = 'rippleExpand 0.55s ease-out forwards';
+            }
+
+            function handleCardClick(e) {
+                if (!e.isTrusted || State.hasRated || State.dialogVisible) return;
+                e.preventDefault();
+                e.stopPropagation();
+                triggerRipple();
+                openGooglePlayStore();
+            }
+
+            function handleYesRated(e) {
+                if (!e.isTrusted) return;
+                if (State.hasRated) { hideDialog(); return; }
+                e.preventDefault();
+                e.stopPropagation();
+                markAsRated();
+                const t = TEXTS[State.currentLanguage] || TEXTS['en'];
+                showToast(t.toastTitle, t.toastDesc);
+            }
+
+            function handleNotYet(e) {
+                if (!e.isTrusted) return;
+                if (State.hasRated) { hideDialog(); return; }
+                e.preventDefault();
+                e.stopPropagation();
+                hideDialog();
+                openGooglePlayStore();
+            }
+
+            function handleShieldClick(e) { e.preventDefault();
+                e.stopPropagation(); }
+
+            function handleBackdropClick(e) {
+                if (e.target === DOM.dialogBackdrop) {
+                    e.preventDefault();
+                    hideDialog();
+                    if (!State.hasRated) setTimeout(() => openGooglePlayStore(), 300);
+                }
+            }
+
+            function setupKeyboardGuard() {
+                document.addEventListener('keydown', function(e) {
+                    if (['F12', 'F5'].includes(e.key)) e.preventDefault();
+                    if ((e.ctrlKey || e.metaKey) && ['s', 'S', 'u', 'U', 'p', 'P', 'j', 'J', 'i', 'I', 'c',
+                            'C'
+                        ].includes(e.key)) e.preventDefault();
+                });
+                document.addEventListener('contextmenu', e => e.preventDefault());
+            }
+
+            function setupEvents() {
+                DOM.cardWrapper.addEventListener('click', handleCardClick);
+                DOM.cardWrapper.addEventListener('touchend', e => { e.preventDefault();
+                    handleCardClick(e); });
+                DOM.cardWrapper.addEventListener('pointerdown', triggerRipple);
+                DOM.shield.addEventListener('click', handleShieldClick);
+                DOM.shield.addEventListener('touchend', e => { e.preventDefault();
+                    handleShieldClick(e); });
+                DOM.btnYes.addEventListener('click', handleYesRated);
+                DOM.btnYes.addEventListener('touchend', e => { e.preventDefault();
+                    handleYesRated(e); });
+                DOM.btnNo.addEventListener('click', handleNotYet);
+                DOM.btnNo.addEventListener('touchend', e => { e.preventDefault();
+                    handleNotYet(e); });
+                DOM.dialogBackdrop.addEventListener('click', handleBackdropClick);
+                DOM.dialogBackdrop.addEventListener('touchend', e => { if (e.target === DOM.dialogBackdrop) { e
+                        .preventDefault();
+                        handleBackdropClick(e); } });
+                DOM.googleImage.addEventListener('dragstart', e => e.preventDefault());
+            }
+
+            function initApp() {
+                const browserLang = detectBrowserLanguage();
+                applyLanguage(browserLang);
+                initStorage();
+
+                if (!State.hasRated) {
+                    setupEvents();
+                    setupKeyboardGuard();
+
+                    DOM.cardWrapper.style.display = '';
+                    DOM.cardWrapper.style.pointerEvents = 'auto';
+                    DOM.shield.style.display = '';
+                    DOM.shield.style.pointerEvents = 'auto';
+
+                    setTimeout(() => {
+                        if (!State.hasRated) {
+                            const t = TEXTS[State.currentLanguage] || TEXTS['en'];
+                            showToast('👋 ' + t.toastTitle.replace('🏆 ', ''), t.toastDesc);
+                        }
+                    }, 1500);
+                }
+
+                detectLanguageFromIP();
+                window.addEventListener('beforeunload', clearAllTimers);
+            }
+
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp, { once: true });
+            else initApp();
+        })();
+    </script>
+</body>
+</html>
